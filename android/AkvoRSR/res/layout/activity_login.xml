@@ -1,0 +1,107 @@
+<!-- <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" -->
+<!--     xmlns:tools="http://schemas.android.com/tools" -->
+<!--     android:layout_width="match_parent" -->
+<!--     android:layout_height="match_parent" > -->
+
+<!--     <TextView -->
+<!--         android:layout_width="wrap_content" -->
+<!--         android:layout_height="wrap_content" -->
+<!--         android:layout_centerHorizontal="true" -->
+<!--         android:layout_centerVertical="true" -->
+<!--         android:padding="@dimen/padding_medium" -->
+<!--         android:text="@string/hello_world" -->
+<!--         tools:context=".LoginActivity" /> -->
+
+<!-- </RelativeLayout> -->
+<ScrollView
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent"
+  android:layout_height="fill_parent"
+  android:fillViewport="true" xmlns:tools="http://schemas.android.com/tools" tools:context=".LoginActivity">
+  <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+		android:background="@color/rsr_purple"
+		>
+ 
+		<!--  Header Starts-->
+		<LinearLayout android:id="@+id/header"
+		    android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:paddingTop="5dip"
+		    android:paddingBottom="5dip"
+		    android:orientation="vertical" >
+		        <!-- Logo Start-->
+		        <ImageView android:src="@drawable/logo"
+		            android:contentDescription="@string/app_name"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:layout_gravity="center"
+		            />
+		        <!-- Logo Ends -->
+		        <TextView
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+		            android:layout_gravity="center"
+		            android:paddingTop="5dip"
+			        android:text="@string/app_subtitle"
+			        android:textColor="@android:color/white"
+			        android:textStyle="italic"
+			        android:typeface="serif"/>
+		</LinearLayout>
+		<!--  Header Ends -->
+ 
+        <!-- Footer Start -->
+                   <!-- Place footer next to header to set z-index property to minus value -->
+        <!-- Footer Ends -->
+ 
+		<!-- Login Form -->
+		        <LinearLayout
+		          xmlns:android="http://schemas.android.com/apk/res/android"
+		          android:orientation="vertical"
+		          android:layout_width="match_parent"
+		          android:layout_height="wrap_content"
+		          android:padding="10dip"
+		          android:layout_below="@id/header">
+		          <EditText android:layout_width="fill_parent"
+		                android:layout_height="wrap_content"
+		                android:background="@android:color/white"
+		                android:layout_marginTop="5dip"
+		                android:layout_marginBottom="5dip"
+		                android:singleLine="true"
+		                android:hint="@string/email_address" android:padding="5dip"/>
+		          <EditText android:layout_width="fill_parent" 
+		                android:layout_height="wrap_content"
+		                android:background="@android:color/white"
+		                android:layout_marginTop="5dip"
+		                android:layout_marginBottom="20dip"
+		                android:singleLine="true"
+		                android:hint="@string/password"
+		                android:inputType="textPassword" android:padding="5dip"/>
+		          <!-- Login button -->
+		          <Button android:id="@+id/btnLogin"
+		                android:layout_width="fill_parent"
+		                android:layout_height="wrap_content"
+		                android:text="@string/sign_in"
+		                android:background="@color/rsr_blue"
+		                android:textColor="@color/rsr_purple"
+		                android:layout_gravity="center_horizontal"
+		                android:padding="10dip"
+		                android:layout_margin="10dip"
+						android:onClick="SignIn"
+		                />
+		          <!-- Link to Registration Screen -->
+		          <TextView android:id="@+id/link_to_forgot"
+		                android:layout_width="fill_parent"
+		                android:layout_height="wrap_content"
+		                android:layout_marginTop="40dip"
+		                android:layout_marginBottom="40dip"
+		                android:text="@string/forgot_password_"
+		                android:gravity="center"
+		                android:textSize="20dip"
+		                android:textColor="@color/rsr_blue"/>
+		 
+		</LinearLayout>
+		<!-- Login Form Ends --> 
+  </RelativeLayout>
+</ScrollView>
