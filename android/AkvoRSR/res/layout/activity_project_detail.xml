@@ -42,7 +42,7 @@
 
 				    <ImageButton
 				        android:layout_width="0dp"
-				        android:layout_height="match_parent"
+				        android:layout_height="fill_parent"
 				        android:layout_weight="1"
 				        android:src="@drawable/ic_menu_forward"
 			            />
@@ -74,7 +74,7 @@
 
 	    <Button
 	        android:layout_width="0dp"
-	        android:layout_height="match_parent"
+	        android:layout_height="fill_parent"
 	        android:layout_weight="1"
 	        android:drawableTop="@drawable/ic_menu_view"
 	        android:text="VIEW ALL UPDATES"
@@ -83,7 +83,7 @@
 
 	    <Button
 	        android:layout_width="0dp"
-	        android:layout_height="match_parent"
+	        android:layout_height="fill_parent"
 	        android:layout_weight="1"
 	        android:drawableTop="@drawable/ic_menu_add"
 	        android:text="ADD UPDATE"
@@ -93,5 +93,3 @@
     	</LinearLayout>
 	    </ScrollView>
 </LinearLayout>
-	
-	

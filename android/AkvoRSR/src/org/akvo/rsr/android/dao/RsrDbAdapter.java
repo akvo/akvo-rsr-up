@@ -1,21 +1,4 @@
-/*
- *  Copyright (C) 2012 Stichting Akvo (Akvo Foundation)
- *
- *  This file is part of Akvo RSR.
- *
- *  Akvo FLOW is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
- *
- *  Akvo FLOW is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
- *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
- */
-
 package org.akvo.rsr.android.dao;
-
 
 import org.akvo.rsr.android.domain.Project;
 
@@ -31,12 +14,10 @@ import android.util.Log;
  * Database class for the RSR db. It can create/upgrade the database as well
  * as select/insert/update.
  * 
- * @author Stellan Lagerström
+ * @author Stellan Lagerstroem
  * 
  */
-
 public class RsrDbAdapter {
-
 	public static final String PK_ID_COL = "_id";
 	public static final String TITLE_COL = "title";
 	public static final String SUBTITLE_COL = "subtitle";
@@ -71,7 +52,7 @@ public class RsrDbAdapter {
 	 * 
 	 * It is declared with package scope for VM optimizations
 	 * 
-	 * @author Stellan Lagerstr�m
+	 * @author Stellan Lagerstroem
 	 * 
 	 */
 	static class DatabaseHelper extends SQLiteOpenHelper {
@@ -263,12 +244,12 @@ public class RsrDbAdapter {
 	}
 
 	/**
-	 * Create a new survey using the title and body provided. If the survey is
+	 * Create a new project using the title and body provided. If the project is
 	 * successfully created return the new id, otherwise return a -1 to indicate
 	 * failure.
 	 * 
-	 * @param name
-	 *            survey name
+	 * @param title
+	 *            project title
 	 * 
 	 * @return rowId or -1 if failed
 	 */
@@ -282,7 +263,7 @@ public class RsrDbAdapter {
 
 
 	/**
-	 * updates a survey in the db and resets the deleted flag to "N"
+	 * updates a project in the db and resets the deleted flag to "N"
 	 * 
 	 * @param survey
 	 * @return
@@ -420,17 +401,4 @@ public class RsrDbAdapter {
 //		executeSql("update preferences set value = '' where key = 'user.lastuser.id'");
 	}
 
-	/**
-	 * performs a soft-delete on a user
-	 * 
-	 * @param id
-	 */
-	/*
-	public void deleteUser(Long id) {
-		ContentValues updatedValues = new ContentValues();
-		updatedValues.put(DELETED_COL, "Y");
-		database.update(USER_TABLE, updatedValues, PK_ID_COL + " = ?",
-				new String[] { id.toString() });
-	}
-	*/
 }

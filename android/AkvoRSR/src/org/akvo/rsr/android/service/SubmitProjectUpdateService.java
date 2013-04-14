@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
-
 /*
  * What to submit:
  * 
@@ -30,12 +29,12 @@ application/xml
   */
 
 public class SubmitProjectUpdateService extends Service {
-    public SubmitProjectUpdateService() {
-    }
+	public SubmitProjectUpdateService() {
+	}
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
+	@Override
+	public IBinder onBind(Intent intent) {
+		// TODO: Return the communication channel to the service.
+		throw new UnsupportedOperationException("Not yet implemented");
+	}
 }
