@@ -74,6 +74,7 @@ static demo
 		            android:typeface="serif" />
 
 		        <TextView
+			        android:id="@+id/projcountlabel"
 			        android:layout_width="wrap_content"
 			        android:layout_height="wrap_content"
 		            android:layout_gravity="right"
@@ -82,19 +83,20 @@ static demo
 		            android:text="03"
 			        android:background="@color/lt_gray"
 			        android:typeface="sans"/>
-		        </LinearLayout>
-      	<ScrollView
-  android:layout_width="fill_parent"
-  android:layout_height="fill_parent"
-   >
-<LinearLayout
+		</LinearLayout>
+       <!--	    
+	    <ScrollView
+ 		android:layout_width="fill_parent"
+  		android:layout_height="fill_parent"
+   		>
+		<LinearLayout
   		android:layout_width="fill_parent"
   		android:layout_height="wrap_content"
 		android:background="@color/dk_gray"
 	    android:orientation="vertical"
 		>
-      	    
-	    <!-- Project 1  -->
+
+		    	    - Project 1  -
 	    <LinearLayout
 	        android:orientation="horizontal"
     	    android:layout_width="fill_parent"
@@ -163,7 +165,7 @@ static demo
    			    	</LinearLayout>
    		    	</LinearLayout>
 	    		</LinearLayout>
-	    <!-- Project 2  -->
+	    - Project 2  -
 	    <LinearLayout
 	        android:orientation="horizontal"
     	    android:layout_width="fill_parent"
@@ -229,7 +231,7 @@ static demo
 	        		    	</LinearLayout>
 	        		    		        		    	</LinearLayout>
 				
-	    <!-- Project 3  -->
+	    - Project 3  -
 	    <LinearLayout
 	        android:orientation="horizontal"
     	    android:layout_width="fill_parent"
@@ -293,19 +295,25 @@ static demo
 					        android:textColor="#0000ff"
 					        android:typeface="sans"/>
    			    	</LinearLayout>
-	        		    	</LinearLayout>
-	        		    	</LinearLayout>
-					    					    	
+	        	</LinearLayout>
+	        </LinearLayout>
+		-->		
+	        <ListView android:id="@android:id/list"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:background="#CCCCCC"
+              android:layout_weight="1"
+              android:drawSelectorOnTop="false"/>	    					    	
 	    <!-- Refresh button -->
 
 	    <Button
+	        android:id="@+id/button_refresh_projects"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
 	        android:drawableTop="@drawable/ic_menu_refresh"
 	        android:text="REFRESH PROJECT LIST" />
 	    	
-	    	</LinearLayout>
-	    </ScrollView>
+	    
 		
       		
 </LinearLayout>

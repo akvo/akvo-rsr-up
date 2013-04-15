@@ -35,7 +35,7 @@ public class RsrDbAdapter {
 
 	private static final String[] DEFAULT_INSERTS = new String[] {
 		"insert into project values(1,'Sample Proj1', 4711.00,'Sample proj 1 subtitle')",
-		"insert into project values(2,'Sample Proj2', 0.0,'Sample proj 2 subtitle)" };
+		"insert into project values(2,'Sample Proj2', 0.0,'Sample proj 2 subtitle')" };
 
 	private static final String DATABASE_NAME = "rsrdata";
 	private static final String PROJECT_TABLE = "project";
@@ -290,6 +290,22 @@ public class RsrDbAdapter {
 	}
 
 	/**
+	 * Gets all projects, all columns
+	 */
+	public Cursor findAllProjects() {
+		Cursor cursor = database.query(PROJECT_TABLE,
+										null,
+										null,
+										null,
+										null,
+										null,
+										null);
+
+		return cursor;
+	}
+
+
+	/**
 	 * Gets a single project from the db using its primary key
 	 */
 	public Project findProject(String _id) {
@@ -389,7 +405,7 @@ public class RsrDbAdapter {
 	 * The survey xml must exist in the APK
 	 */
 	public void reinstallTestSurvey() {
-		executeSql("insert into project values(999991,'Sample Survey', 1.0,'Survey','res','testsurvey','english','N','N')");
+//		executeSql("insert into project values(999991,'Sample Survey', 1.0,'Survey','res','testsurvey','english','N','N')");
 	}
 
 	/**
