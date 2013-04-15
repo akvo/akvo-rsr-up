@@ -2,11 +2,11 @@
 <resources>
 
     <string name="app_name">AkvoRSR</string>
+    <string name="app_version">0.2</string>
     <string name="app_subtitle">Really Simple Reporting</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_login">Akvo RSR</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
     <string name="title_activity_project_list">Akvo RSR</string>
     <string name="proj1_txt">PROMOTING QUALITY EDUCATION THROUGH ICT</string>
     <string name="proj2_txt">PASTORALIST EDUCATION AND POWERMENT</string>

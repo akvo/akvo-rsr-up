@@ -19,9 +19,12 @@ import android.util.Log;
  */
 public class RsrDbAdapter {
 	public static final String PK_ID_COL = "_id";
+//	public static final String SERVER_ID_COL = "server_id";
 	public static final String TITLE_COL = "title";
 	public static final String SUBTITLE_COL = "subtitle";
 	public static final String FUNDS_COL = "funds";
+	public static final String THUMBNAIL_URL_COL = "thumbnail_url";
+	public static final String THUMBNAIL_FILENAME_COL = "thumbnail_fn";
 
 	private static final String TAG = "RsrDbAdapter";
 	private DatabaseHelper databaseHelper;
@@ -30,12 +33,15 @@ public class RsrDbAdapter {
 	/**
 	 * Database creation sql statement
 	 */
-	private static final String PROJECT_TABLE_CREATE = "create table project (_id integer primary key, "
-			+ "title text not null, funds real, subtitle text);";
+	private static final String PROJECT_TABLE_CREATE =
+			"create table project (_id integer primary key, "+
+			"title text not null, subtitle text, funds real, "+
+			"thumbnail_url text, thumbnail_fn text);";
 
 	private static final String[] DEFAULT_INSERTS = new String[] {
-		"insert into project values(1,'Sample Proj1', 4711.00,'Sample proj 1 subtitle')",
-		"insert into project values(2,'Sample Proj2', 0.0,'Sample proj 2 subtitle')" };
+		"insert into project values(1,'Sample Proj1', 'Sample proj 1 subtitle', 4711.00, 'url1', 'fn1')",
+		"insert into project values(2,'Sample Proj2', 'Sample proj 2 subtitle', 4712.00, 'url2', 'fn2')"
+		};
 
 	private static final String DATABASE_NAME = "rsrdata";
 	private static final String PROJECT_TABLE = "project";
@@ -43,7 +49,7 @@ public class RsrDbAdapter {
 //	private static final String RESPONSE_JOIN = "survey_respondent LEFT OUTER JOIN survey_response ON (survey_respondent._id = survey_response.survey_respondent_id) LEFT OUTER JOIN user ON (user._id = survey_respondent.user_id)";
 //	private static final String PLOT_JOIN = "plot LEFT OUTER JOIN plot_point ON (plot._id = plot_point.plot_id) LEFT OUTER JOIN user ON (user._id = plot.user_id)";
 
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 
 	private final Context context;
 
@@ -79,7 +85,14 @@ public class RsrDbAdapter {
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 			Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
 					+ newVersion);
-/*
+
+			
+			if (oldVersion < 2) { //start over fresh
+				db.execSQL("DROP TABLE IF EXISTS " + PROJECT_TABLE);
+				onCreate(db);
+			}			
+			
+			/*
 			if (oldVersion < 57) {
 				db.execSQL("DROP TABLE IF EXISTS " + RESPONSE_TABLE);
 				db.execSQL("DROP TABLE IF EXISTS " + RESPONDENT_TABLE);
@@ -269,12 +282,20 @@ public class RsrDbAdapter {
 	 * @return
 	 */
 	public void saveProject(Project project) {
-		Cursor cursor = database.query(PROJECT_TABLE,
-				new String[] { PK_ID_COL }, PK_ID_COL + " = ?",
-				new String[] { project.getTitle(), }, null, null, null);
 		ContentValues updatedValues = new ContentValues();
 		updatedValues.put(PK_ID_COL, project.getId());
+//		updatedValues.put(SERVER_ID_COL, project.getServerId());
+		updatedValues.put(TITLE_COL, project.getTitle());
 		updatedValues.put(SUBTITLE_COL, project.getSubtitle());
+		updatedValues.put(FUNDS_COL, project.getFunds());
+		updatedValues.put(THUMBNAIL_URL_COL, project.getThumbnailUrl());
+		updatedValues.put(THUMBNAIL_FILENAME_COL, project.getThumbnailFilename());
+
+		Cursor cursor = database.query(PROJECT_TABLE,
+				new String[] { PK_ID_COL },
+				PK_ID_COL + " = ?",
+				new String[] { project.getId(), },
+				null, null, null);
 
 		if (cursor != null && cursor.getCount() > 0) {
 			// if we found an item, it's an update, otherwise, it's an insert
@@ -319,10 +340,10 @@ public class RsrDbAdapter {
 				cursor.moveToFirst();
 				project = new Project();
 				project.setId(_id);
-				project.setTitle(cursor.getString(cursor
-						.getColumnIndexOrThrow(TITLE_COL)));
-				project.setSubtitle(cursor.getString(cursor
-						.getColumnIndexOrThrow(SUBTITLE_COL)));
+				project.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(TITLE_COL)));
+				project.setSubtitle(cursor.getString(cursor.getColumnIndexOrThrow(SUBTITLE_COL)));
+				project.setThumbnailUrl(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_URL_COL)));
+				project.setThumbnail(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_FILENAME_COL)));
 			}
 			cursor.close();
 		}
@@ -380,12 +401,12 @@ public class RsrDbAdapter {
 */
 
 
-
 	/**
 	 * deletes all the projects from the database
 	 */
 	public void deleteAllProjects() {
 		database.delete(PROJECT_TABLE, null, null);
+		//TODO delete all updates
 	}
 
 
@@ -414,6 +435,7 @@ public class RsrDbAdapter {
 	 */
 	public void clearAllData() {
 		executeSql("delete from project");
+//		executeSql("delete from updates");
 //		executeSql("update preferences set value = '' where key = 'user.lastuser.id'");
 	}
 

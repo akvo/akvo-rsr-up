@@ -4,8 +4,11 @@ import java.util.Date;
 
 public class Project {
 	private String id;
+	private String serverId;
 	private String title;
 	private String subtitle;
+	private String thumbnailUrl;
+	private String thumbnailFilename;	
 	private Date startDate;
 	private Date endDate;
 	private double funds;
@@ -16,6 +19,14 @@ public class Project {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getServerId() {
+		return serverId;
+	}
+
+	public void setServerId(String id) {
+		this.serverId = id;
 	}
 
 	public String getTitle() {
@@ -32,6 +43,22 @@ public class Project {
 
 	public void setSubtitle(String subtitle) {
 		this.subtitle = subtitle;
+	}
+
+	public String getThumbnailUrl() {
+		return thumbnailUrl;
+	}
+
+	public void setThumbnailUrl(String thumbnailUrl) {
+		this.thumbnailUrl = thumbnailUrl;
+	}
+
+	public String getThumbnailFilename() {
+		return thumbnailFilename;
+	}
+
+	public void setThumbnail(String thumbnailFilename) {
+		this.thumbnailFilename = thumbnailFilename;
 	}
 
 	public double getFunds() {

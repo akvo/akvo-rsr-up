@@ -3,6 +3,7 @@ package org.akvo.rsr.android;
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.service.GetProjecDataService;
 import org.akvo.rsr.android.view.adapter.ProjectListCursorAdapter;
+import org.akvo.rsr.android.xml.Downloader;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -41,8 +42,7 @@ public class ProjectListActivity extends ListActivity {
 			public void onClick(View view) {
 				ad.clearAllData();
 				//fetch new data
-				//TODO
-				
+				startGetProjectsService();
 				//redisplay list
 				getData();
 			}
@@ -112,9 +112,15 @@ public class ProjectListActivity extends ListActivity {
 	 * Start the service fetching new project data
 	 */
 	private void startGetProjectsService() {
-		Intent i = new Intent(this, GetProjecDataService.class);
-		i.putExtra(URL_KEY, "http://test.akvo.org/api/v1/project/?format=xml");
-		getApplicationContext().startService(i);
+		//TODO start a real service, register a listener for a completion intent
+//		Intent i = new Intent(this, GetProjecDataService.class);
+//		i.putExtra(SERVER_KEY, "http://test.akvo.org");
+//		i.putExtra(URL_KEY, "/api/v1/project/?format=xml"); //get first 20 by default
+//		getApplicationContext().startService(i);
+		//meanwhile:
+		Downloader dl = new Downloader();
+		dl.FetchProjectList(this,"http://test.akvo.org","/api/v1/project/?format=xml");
+	
 	}
 
 
