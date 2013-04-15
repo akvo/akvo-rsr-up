@@ -23,6 +23,7 @@ public class ProjectListActivity extends ListActivity {
 
 
 	private static final String TAG = "ProjectListActivity";
+	private static final String URL_KEY = "UrlKey"; //TODO move to constant utility class
 
 	private RsrDbAdapter ad;
 	private Cursor dataCursor;
