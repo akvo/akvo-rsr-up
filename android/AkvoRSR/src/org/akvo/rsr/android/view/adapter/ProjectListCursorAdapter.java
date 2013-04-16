@@ -18,6 +18,8 @@ import android.widget.TextView;
 
 public class ProjectListCursorAdapter extends CursorAdapter{
 
+	private static final String imageCache = "/sdcard/akvorsr/imagecache";
+
 /**
  * This adaptor formats Project list items. It can format date strings using the device's locale settings prior
  * to displaying them to the screen
@@ -46,15 +48,15 @@ public class ProjectListCursorAdapter extends CursorAdapter{
  */
 
 		ImageView thumbnail = (ImageView) view.findViewById(R.id.list_item_thumbnail);
-		//TODO Find file containing thumbnail
-		/*
-		File f = new File(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.IMAGE_FILE_COL);
+		//Find file containing thumbnail
+		
+		File f = new File(imageCache+"/"+cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL)));
 		if (f.exists()) {
 			Bitmap bm = new BitmapFactory().decodeFile(f.getAbsolutePath());
 			if (bm != null)
 				thumbnail.setImageBitmap(bm);
 		} else
-		*/
+
 		//Fall back to generic logo
 		thumbnail.setImageResource(R.drawable.ic_launcher);
 

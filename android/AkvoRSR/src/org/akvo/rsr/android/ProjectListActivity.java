@@ -25,6 +25,7 @@ public class ProjectListActivity extends ListActivity {
 
 	private static final String TAG = "ProjectListActivity";
 	private static final String URL_KEY = "UrlKey"; //TODO move to constant utility class
+	private static final String imageCache = "/sdcard/akvorsr/imagecache";
 
 	private RsrDbAdapter ad;
 	private Cursor dataCursor;
@@ -91,20 +92,19 @@ public class ProjectListActivity extends ListActivity {
 	 * show all the projects in the database
 	 */
 	private void getData() {
-		try{
-		if(dataCursor != null){
-			dataCursor.close();
-		}
-		}catch(Exception e){
+		try {
+			if (dataCursor != null) {
+				dataCursor.close();
+			}
+		} catch(Exception e) {
 			Log.w(TAG, "Could not close old cursor before reloading list",e);
 		}
 		dataCursor = ad.findAllProjects();
-
+		//Show count
 		projCountLabel.setText(Integer.valueOf(dataCursor.getCount()).toString());
-
+		//Populate list view
 		ProjectListCursorAdapter projects = new ProjectListCursorAdapter(this, dataCursor);
 		setListAdapter(projects);
-
 
 	}
 
@@ -119,7 +119,9 @@ public class ProjectListActivity extends ListActivity {
 //		getApplicationContext().startService(i);
 		//meanwhile:
 		Downloader dl = new Downloader();
+		//TODO THIS MIGHT HANG, no timeout defined...
 		dl.FetchProjectList(this,"http://test.akvo.org","/api/v1/project/?format=xml");
+		dl.FetchNewThumbnails(this, "http://test.akvo.org","/api/v1/project/?format=xml", imageCache);
 	
 	}
 

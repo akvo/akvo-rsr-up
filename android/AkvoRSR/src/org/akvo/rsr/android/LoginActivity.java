@@ -1,17 +1,31 @@
 package org.akvo.rsr.android;
 
+import java.io.File;
+
 import android.os.Bundle;
+import android.os.Environment;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 
 public class LoginActivity extends Activity {
 
+	private static final String imageCache = "/akvorsr/imagecache/";
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		File f = new File (Environment.getExternalStorageDirectory().getPath() + imageCache);
+//		File f = new File (imageCache);
+		if (!f.mkdirs())
+			Log.e("LoginActivity", "could not create cache dir");
+		
+		
 		setContentView(R.layout.activity_login);
 		
         final Button button = (Button) findViewById(R.id.btnLogin);
