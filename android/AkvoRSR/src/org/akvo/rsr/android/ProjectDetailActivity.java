@@ -1,5 +1,7 @@
 package org.akvo.rsr.android;
 
+import org.akvo.rsr.android.dao.RsrDbAdapter;
+import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.util.ConstantUtil;
 
 import android.os.Bundle;
@@ -15,6 +17,8 @@ public class ProjectDetailActivity extends Activity {
 
 	private String projId = null;
 	private TextView projTitleLabel;
+
+	private RsrDbAdapter dba;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,14 +36,36 @@ public class ProjectDetailActivity extends Activity {
 		//get the look
 		setContentView(R.layout.activity_project_detail);
 		//find the fields
-		projTitleLabel = (TextView) findViewById(R.id.projcountlabel);
+		projTitleLabel = (TextView) findViewById(R.id.text_proj_detail_title);
 
-		
+		dba = new RsrDbAdapter(this);
 		
 		// Show the Up button in the action bar.
 		//		setupActionBar();
 	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+		dba.open();
+		Project project = dba.findProject(projId);
+		
+		projTitleLabel.setText(project.getTitle());
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		dba.close();
+	}
+	
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		if (dba != null)
+			dba.close();
+	}
 	/**
 	 * Set up the {@link android.app.ActionBar}, if the API is available.
 	 *

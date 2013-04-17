@@ -27,8 +27,6 @@ public class ProjectListCursorAdapter extends CursorAdapter{
  * @author Stellan Lagerstroem
  * 
  */
-	public static final int PROJECT_ID_KEY = 1; //used send tags from this view to the activity
-
 	public ProjectListCursorAdapter(Context context, Cursor c) {
 		super(context, c);
 	}
@@ -67,7 +65,7 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 		}
 		
 		//set tag so we will know what got clicked
-		view.setTag(PROJECT_ID_KEY, cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL)));
+		view.setTag(R.id.project_id_tag, cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL)));
 
 	}
 

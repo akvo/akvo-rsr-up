@@ -332,7 +332,7 @@ public class RsrDbAdapter {
 	public Project findProject(String _id) {
 		Project project = null;
 		Cursor cursor = database.query(PROJECT_TABLE,
-										new String[] { PK_ID_COL, TITLE_COL, SUBTITLE_COL, FUNDS_COL },
+										new String[] { PK_ID_COL, TITLE_COL, SUBTITLE_COL, FUNDS_COL, THUMBNAIL_URL_COL, THUMBNAIL_FILENAME_COL },
 										PK_ID_COL + " = ?",
 										new String[] { _id }, null, null, null);
 		if (cursor != null) {

@@ -119,7 +119,7 @@ public class ProjectListActivity extends ListActivity {
 		super.onListItemClick(list, view, position, id);
 
 		Intent i = new Intent(view.getContext(), ProjectDetailActivity.class);
-		i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(ProjectListCursorAdapter.PROJECT_ID_KEY)).toString());
+		i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(R.id.project_id_tag)).toString());
 		startActivity(i);
 	}
 
