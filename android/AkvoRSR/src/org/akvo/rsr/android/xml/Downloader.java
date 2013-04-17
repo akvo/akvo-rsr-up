@@ -53,9 +53,8 @@ public class Downloader {
 	/* Populate the projects table in the db from a server URL
 	 * 
 	 */
-	public void HttpGetToFile(String server, String localUrl, File file) {
+	public void HttpGetToFile(URL url, File file) {
 		try {
-			URL url = new URL(server + localUrl);
 	
 //			File output = new File("/output/request.out");
 			HttpRequest.get(url).receive(file);		
@@ -69,13 +68,12 @@ public class Downloader {
 	/* 
 	 * Read a URL into a new file with a generated name
 	 */
-	public String HttpGetToNewFile(String server, String localUrl, String directory) {
+	public String HttpGetToNewFile(URL url, String directory) {
 		File output = new File("error");
 		try {
-			URL url = new URL(server + localUrl);
 			String extension = url.getFile().substring((url.getFile().lastIndexOf('.')));
 			output = new File(directory + System.nanoTime() + extension);
-			HttpGetToFile(server,localUrl,output.getAbsoluteFile());
+			HttpGetToFile(url,output.getAbsoluteFile());
 		} catch (Exception e) {
 			/* Display any Error to the GUI. */
 			Log.e(TAG, "HttpGetToNewFile Error", e);
@@ -85,10 +83,11 @@ public class Downloader {
 	
 	//fetch all unfetched thumbnails
 	//this may be excessive if list is long, we could be lazy until display, and do it in view adapter
-	public void FetchNewThumbnails(Context ctx, String server, String localUrl, String directory){
+	public void FetchNewThumbnails(Context ctx, String contextUrl, String directory){
 		RsrDbAdapter dba = new RsrDbAdapter(ctx);
 		dba.open();
 		try {
+			try {
 			Cursor cursor = dba.findAllProjects();
 			if (cursor != null) {
 				cursor.moveToFirst();
@@ -99,7 +98,8 @@ public class Downloader {
 					String url = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
 					if (fn == null) {
 						//not fetched yet
-						fn = HttpGetToNewFile(server, url, directory);
+//						fn = HttpGetToNewFile(new URL(new URL(contextUrl),url), directory);
+						fn = HttpGetToNewFile(new URL(url), directory);
 						//TODO can we use dba like this?
 						Project p = new Project();
 						p.setId(id);
@@ -112,6 +112,10 @@ public class Downloader {
 					cursor.moveToNext();
 				}
 			}
+		} catch (Exception e) {
+			/* Display any Error to the GUI. */
+			Log.e(TAG, "HttpGetToNewFile Error", e);
+		}
 		} finally {
 			dba.close();
 		}

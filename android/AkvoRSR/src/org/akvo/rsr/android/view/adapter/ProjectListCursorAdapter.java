@@ -27,7 +27,7 @@ public class ProjectListCursorAdapter extends CursorAdapter{
  * @author Stellan Lagerstroem
  * 
  */
-	public static final int PROJECT_ID_KEY = 1;
+	public static final int PROJECT_ID_KEY = 1; //used send tags from this view to the activity
 
 	public ProjectListCursorAdapter(Context context, Cursor c) {
 		super(context, c);
@@ -36,8 +36,14 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 	
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
-/*
- * 		long millis = cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.DELIVERED_DATE_COL));
+
+		//Text data
+		TextView titleView = (TextView) view.findViewById(R.id.list_item_title);
+		titleView.setText(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
+
+		
+		/*
+  		long millis = cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.DELIVERED_DATE_COL));
 
 		// Format the date string
 		Date date = new Date(millis);
@@ -45,26 +51,23 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 		dateView.setText(status
 				+ DateFormat.getLongDateFormat(context).format(date) + " "
 				+ DateFormat.getTimeFormat(context).format(date));
- */
-
-		ImageView thumbnail = (ImageView) view.findViewById(R.id.list_item_thumbnail);
-		//Find file containing thumbnail
+		 */
 		
-		File f = new File(imageCache+"/"+cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL)));
+		//Image
+		ImageView thumbnail = (ImageView) view.findViewById(R.id.list_item_thumbnail);
+		//Find file containing thumbnail		
+		File f = new File(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL)));
 		if (f.exists()) {
-			Bitmap bm = new BitmapFactory().decodeFile(f.getAbsolutePath());
+			Bitmap bm = BitmapFactory.decodeFile(f.getAbsolutePath());
 			if (bm != null)
 				thumbnail.setImageBitmap(bm);
-		} else
-
-		//Fall back to generic logo
-		thumbnail.setImageResource(R.drawable.ic_launcher);
-
-		TextView titleView = (TextView) view.findViewById(R.id.list_item_title);
-		titleView.setText(cursor.getString(cursor
-				.getColumnIndex(RsrDbAdapter.TITLE_COL)));
-		//set tag so selection can find item
-		//view.setTag(PROJECT_ID_KEY, cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL)));
+		} else {
+			//Fall back to generic logo
+			thumbnail.setImageResource(R.drawable.ic_launcher);
+		}
+		
+		//set tag so we will know what got clicked
+		view.setTag(PROJECT_ID_KEY, cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL)));
 
 	}
 

@@ -14,15 +14,25 @@ import android.widget.Button;
 
 public class LoginActivity extends Activity {
 
-	private static final String imageCache = "/akvorsr/imagecache/";
+	private static final String TAG = "LoginActivity";
+	private static final String imageCache1 = "/akvorsr/";
+	private static final String imageCache2 = "/akvorsr/imagecache/";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		File f = new File (Environment.getExternalStorageDirectory().getPath() + imageCache);
-//		File f = new File (imageCache);
-		if (!f.mkdirs())
+		Log.i(TAG, "External storage: " + Environment.getExternalStorageState() );
+		File f = new File (Environment.getExternalStorageDirectory().getPath() + imageCache1);
+		if (f.mkdir() || f.isDirectory() ){
+			f = new File (Environment.getExternalStorageDirectory().getPath() + imageCache2);
+			if (f.mkdir() || f.isDirectory()){
+				Log.i(TAG, "Found/created cache dir "+f.getAbsolutePath());
+
+			} else
+				Log.e("LoginActivity", "could not create cache dir");
+			
+		} else
 			Log.e("LoginActivity", "could not create cache dir");
 		
 		

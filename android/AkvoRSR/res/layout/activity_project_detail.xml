@@ -11,7 +11,7 @@
             android:layout_gravity="left"
             android:background="@color/lt_gray"
             android:padding="5dip"
-            android:text="@string/proj3_txt"
+            android:id="@+id/label_proj_detail_title"
             android:typeface="sans" />
 
       	<ScrollView
@@ -25,71 +25,75 @@
 		    android:orientation="vertical"
 			>
       	    
-			    <LinearLayout
-			        android:layout_width="fill_parent"
-			        android:layout_height="wrap_content"
-			        android:orientation="horizontal" >
+		    <LinearLayout
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:orientation="horizontal" >
 
-				    <!-- Project image  -->
+			    <!-- Project image  -->
 
-		            <ImageView
-		                android:layout_width="wrap_content"
-		                android:layout_height="wrap_content"
-		                android:layout_gravity="left"
-		                android:background="@layout/gray_gradient"
-		                android:contentDescription="@string/app_name"
-		                android:src="@drawable/proj3" />
+	            <ImageView
+		            android:id="@+id/image_proj_detail"
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:layout_gravity="left"
+	                android:background="@layout/gray_gradient"
+	                android:contentDescription="@string/app_name"
+			        />
 
-				    <ImageButton
-				        android:layout_width="0dp"
-				        android:layout_height="fill_parent"
-				        android:layout_weight="1"
-				        android:src="@drawable/ic_menu_forward"
-			            />
-	           </LinearLayout>	        
+			    <ImageButton
+		            android:id="@+id/btn_proj_sideways"
+			        android:layout_width="0dp"
+			        android:layout_height="fill_parent"
+			        android:layout_weight="1"
+			        android:src="@drawable/ic_menu_forward"
+		            />
+           </LinearLayout>	        
 
-			   <TextView
-			       android:layout_width="fill_parent"
-			       android:layout_height="wrap_content"
-			       android:layout_gravity="left"
-			       android:text="Location"
-			       android:textColor="@color/dk_gray"
-			       android:textSize="18sp"
-			       android:textStyle="italic"
-			       android:typeface="sans" />
+		   <TextView
+		       android:layout_width="fill_parent"
+		       android:layout_height="wrap_content"
+		       android:layout_gravity="left"
+		       android:text="Location"
+		       android:textColor="@color/dk_gray"
+		       android:textSize="18sp"
+		       android:textStyle="italic"
+		       android:typeface="sans" />
 
-      	        	<TextView
-      	        	    android:layout_width="fill_parent"
-      	        	    android:layout_height="wrap_content"
-      	        	    android:layout_gravity="left"
-      	        	    android:text="South America. Bolivia. Plurinational state of Beni, Baures"
-      	        	    android:textColor="@color/dk_gray"
-      	        	    android:textSize="14sp"
-      	        	    android:typeface="sans" />
+	      	<TextView
+	            android:id="@+id/text_proj_location"
+  	        	    android:layout_width="fill_parent"
+  	        	    android:layout_height="wrap_content"
+  	        	    android:layout_gravity="left"
+  	        	    android:textColor="@color/dk_gray"
+  	        	    android:textSize="14sp"
+  	        	    android:typeface="sans" />
 	
-	    <LinearLayout
-	        android:layout_width="fill_parent"
-	        android:layout_height="80dip"
-	        android:orientation="horizontal" >
-
-	    <Button
-	        android:layout_width="0dp"
-	        android:layout_height="fill_parent"
-	        android:layout_weight="1"
-	        android:drawableTop="@drawable/ic_menu_view"
-	        android:text="VIEW ALL UPDATES"
-            />
-	    <!-- View updates button -->
-
-	    <Button
-	        android:layout_width="0dp"
-	        android:layout_height="fill_parent"
-	        android:layout_weight="1"
-	        android:drawableTop="@drawable/ic_menu_add"
-	        android:text="ADD UPDATE"
-            />
-	    	    	
-    	</LinearLayout>
-    	</LinearLayout>
-	    </ScrollView>
+		    <LinearLayout
+		        android:layout_width="fill_parent"
+		        android:layout_height="80dip"
+		        android:orientation="horizontal" >
+	
+			    <Button
+		            android:id="@+id/btn_view_updates"
+			        android:layout_width="0dp"
+			        android:layout_height="fill_parent"
+			        android:layout_weight="1"
+			        android:drawableTop="@drawable/ic_menu_view"
+			        android:text="VIEW ALL UPDATES"
+		            />
+			    <!-- View updates button -->
+		
+			    <Button
+		            android:id="@+id/btn_add_update"
+			        android:layout_width="0dp"
+			        android:layout_height="fill_parent"
+			        android:layout_weight="1"
+			        android:drawableTop="@drawable/ic_menu_add"
+			        android:text="ADD UPDATE"
+		            />
+		    	    	
+   			</LinearLayout>
+	   	</LinearLayout>
+    </ScrollView>
 </LinearLayout>

@@ -2,6 +2,7 @@ package org.akvo.rsr.android;
 
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.service.GetProjecDataService;
+import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.view.adapter.ProjectListCursorAdapter;
 import org.akvo.rsr.android.xml.Downloader;
 
@@ -13,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.support.v4.app.NavUtils;
 import android.annotation.TargetApi;
@@ -25,7 +27,7 @@ public class ProjectListActivity extends ListActivity {
 
 	private static final String TAG = "ProjectListActivity";
 	private static final String URL_KEY = "UrlKey"; //TODO move to constant utility class
-	private static final String imageCache = "/sdcard/akvorsr/imagecache";
+	private static final String imageCache = "/sdcard/akvorsr/imagecache/";
 
 	private RsrDbAdapter ad;
 	private Cursor dataCursor;
@@ -108,6 +110,20 @@ public class ProjectListActivity extends ListActivity {
 
 	}
 
+	/**
+	 * when a list item is clicked, get the id of the selected
+	 * item and open one-project activity.
+	 */
+	@Override
+	protected void onListItemClick(ListView list, View view, int position, long id) {
+		super.onListItemClick(list, view, position, id);
+
+		Intent i = new Intent(view.getContext(), ProjectDetailActivity.class);
+		i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(ProjectListCursorAdapter.PROJECT_ID_KEY)).toString());
+		startActivity(i);
+	}
+
+	
 	/*
 	 * Start the service fetching new project data
 	 */
@@ -120,8 +136,8 @@ public class ProjectListActivity extends ListActivity {
 		//meanwhile:
 		Downloader dl = new Downloader();
 		//TODO THIS MIGHT HANG, no timeout defined...
-		dl.FetchProjectList(this,"http://test.akvo.org","/api/v1/project/?format=xml");
-		dl.FetchNewThumbnails(this, "http://test.akvo.org","/api/v1/project/?format=xml", imageCache);
+		dl.FetchProjectList(this,"http://test.akvo.org","/api/v1/project/?format=xml&partnerships__organisation=42");//Akvo projs
+		dl.FetchNewThumbnails(this, "http://test.akvo.org", imageCache);
 	
 	}
 
