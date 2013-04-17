@@ -18,7 +18,7 @@ package org.akvo.rsr.android.domain;
 
 import java.util.Date;
 
-public class Project {
+public class Update {
 	private String id;
 	private String serverId;
 	private String title;
