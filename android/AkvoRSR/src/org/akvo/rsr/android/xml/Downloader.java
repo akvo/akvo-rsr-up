@@ -50,21 +50,50 @@ public class Downloader {
 		}
 	}
 
-	/* Populate the projects table in the db from a server URL
+	
+	/* Populate the updates table in the db from a server URL
 	 * 
+	 */
+	public void FetchUpdateList(Context ctx, String server, String localUrl) {
+		try {
+			URL url = new URL(server + localUrl);
+		
+			/* Get a SAXParser from the SAXPArserFactory. */
+			SAXParserFactory spf = SAXParserFactory.newInstance();
+			SAXParser sp = spf.newSAXParser();
+		
+			/* Get the XMLReader of the SAXParser we created. */
+			XMLReader xr = sp.getXMLReader();
+			/* Create a new ContentHandler and apply it to the XML-Reader*/ 
+			UpdateListHandler myUpdateListHandler = new UpdateListHandler(new RsrDbAdapter(ctx));
+			xr.setContentHandler(myUpdateListHandler);
+			/* Parse the xml-data from our URL. */
+			xr.parse(new InputSource(url.openStream()));
+			/* Parsing has finished. */
+		
+			/* Check if anything went wrong. */
+			boolean err = myUpdateListHandler.getError();
+	
+		} catch (Exception e) {
+			/* Display any Error to the GUI. */
+			Log.e(TAG, "FetchProjectList Error", e);
+		}
+	}
+
+	
+	/* 
+	 * Fetch one file form a URL
 	 */
 	public void HttpGetToFile(URL url, File file) {
 		try {
-	
-//			File output = new File("/output/request.out");
 			HttpRequest.get(url).receive(file);		
-		
 		} catch (Exception e) {
 			/* Display any Error to the GUI. */
 			Log.e(TAG, "HttpGetToFile Error", e);
 		}
 	}
 
+	
 	/* 
 	 * Read a URL into a new file with a generated name
 	 */
@@ -81,6 +110,7 @@ public class Downloader {
 		return output.getAbsolutePath();
 	}
 	
+
 	//fetch all unfetched thumbnails
 	//this may be excessive if list is long, we could be lazy until display, and do it in view adapter
 	public void FetchNewThumbnails(Context ctx, String contextUrl, String directory){

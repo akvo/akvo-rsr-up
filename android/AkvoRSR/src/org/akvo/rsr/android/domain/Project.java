@@ -7,6 +7,7 @@ public class Project {
 	private String serverId;
 	private String title;
 	private String subtitle;
+	private String location;
 	private String thumbnailUrl;
 	private String thumbnailFilename;	
 	private Date startDate;
@@ -43,6 +44,14 @@ public class Project {
 
 	public void setSubtitle(String subtitle) {
 		this.subtitle = subtitle;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
 	}
 
 	public String getThumbnailUrl() {

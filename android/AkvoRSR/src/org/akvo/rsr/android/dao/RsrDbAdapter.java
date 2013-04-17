@@ -2,6 +2,7 @@ package org.akvo.rsr.android.dao;
 
 import org.akvo.rsr.android.domain.Project;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -19,7 +20,6 @@ import android.util.Log;
  */
 public class RsrDbAdapter {
 	public static final String PK_ID_COL = "_id";
-//	public static final String SERVER_ID_COL = "server_id";
 	public static final String TITLE_COL = "title";
 	public static final String SUBTITLE_COL = "subtitle";
 	public static final String FUNDS_COL = "funds";
@@ -37,6 +37,10 @@ public class RsrDbAdapter {
 			"create table project (_id integer primary key, "+
 			"title text not null, subtitle text, funds real, "+
 			"thumbnail_url text, thumbnail_fn text);";
+	private static final String UPDATE_TABLE_CREATE =
+			"create table update (_id integer primary key, "+
+			"title text not null, subtitle text, funds real, "+
+			"thumbnail_url text, thumbnail_fn text);";
 
 	private static final String[] DEFAULT_INSERTS = new String[] {
 		"insert into project values(1,'Sample Proj1', 'Sample proj 1 subtitle', 4711.00, 'url1', 'fn1')",
@@ -45,11 +49,12 @@ public class RsrDbAdapter {
 
 	private static final String DATABASE_NAME = "rsrdata";
 	private static final String PROJECT_TABLE = "project";
+	private static final String UPDATE_TABLE = "update";
 
 //	private static final String RESPONSE_JOIN = "survey_respondent LEFT OUTER JOIN survey_response ON (survey_respondent._id = survey_response.survey_respondent_id) LEFT OUTER JOIN user ON (user._id = survey_respondent.user_id)";
 //	private static final String PLOT_JOIN = "plot LEFT OUTER JOIN plot_point ON (plot._id = plot_point.plot_id) LEFT OUTER JOIN user ON (user._id = plot.user_id)";
 
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 3;
 
 	private final Context context;
 
@@ -64,6 +69,7 @@ public class RsrDbAdapter {
 	static class DatabaseHelper extends SQLiteOpenHelper {
 
 		private static SQLiteDatabase database;
+		@SuppressLint("UseValueOf")
 		private static volatile Long LOCK_OBJ = new Long(1);
 		private volatile static int instanceCount = 0;
 		private Context context;
@@ -76,6 +82,7 @@ public class RsrDbAdapter {
 		@Override
 		public void onCreate(SQLiteDatabase db) {
 			db.execSQL(PROJECT_TABLE_CREATE);
+			db.execSQL(UPDATE_TABLE_CREATE);
 			for (int i = 0; i < DEFAULT_INSERTS.length; i++) {
 				db.execSQL(DEFAULT_INSERTS[i]);
 			}			
@@ -87,8 +94,9 @@ public class RsrDbAdapter {
 					+ newVersion);
 
 			
-			if (oldVersion < 2) { //start over fresh
+			if (oldVersion < 3) { //start over fresh
 				db.execSQL("DROP TABLE IF EXISTS " + PROJECT_TABLE);
+				db.execSQL("DROP TABLE IF EXISTS " + UPDATE_TABLE);
 				onCreate(db);
 			}			
 			
@@ -327,6 +335,22 @@ public class RsrDbAdapter {
 
 
 	/**
+	 * Gets all projects, all columns
+	 */
+	public Cursor findAllUpdates() {
+		Cursor cursor = database.query(UPDATE_TABLE,
+										null,
+										null,
+										null,
+										null,
+										null,
+										null);
+
+		return cursor;
+	}
+
+
+	/**
 	 * Gets a single project from the db using its primary key
 	 */
 	public Project findProject(String _id) {
@@ -344,7 +368,9 @@ public class RsrDbAdapter {
 				project.setSubtitle(cursor.getString(cursor.getColumnIndexOrThrow(SUBTITLE_COL)));
 				project.setThumbnailUrl(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_URL_COL)));
 				project.setThumbnail(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_FILENAME_COL)));
-			}
+				//TODO funds
+				//TODO location
+						}
 			cursor.close();
 		}
 

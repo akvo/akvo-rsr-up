@@ -17,6 +17,8 @@ public class ProjectDetailActivity extends Activity {
 
 	private String projId = null;
 	private TextView projTitleLabel;
+	private TextView projLocationText;
+	private TextView projSummaryText;
 
 	private RsrDbAdapter dba;
 	
@@ -37,6 +39,7 @@ public class ProjectDetailActivity extends Activity {
 		setContentView(R.layout.activity_project_detail);
 		//find the fields
 		projTitleLabel = (TextView) findViewById(R.id.text_proj_detail_title);
+		projLocationText = (TextView) findViewById(R.id.text_proj_location);
 
 		dba = new RsrDbAdapter(this);
 		
@@ -51,6 +54,7 @@ public class ProjectDetailActivity extends Activity {
 		Project project = dba.findProject(projId);
 		
 		projTitleLabel.setText(project.getTitle());
+		projLocationText.setText(project.getLocation());
 	}
 	
 	@Override
@@ -62,10 +66,13 @@ public class ProjectDetailActivity extends Activity {
 
 	@Override
 	protected void onDestroy() {
-		super.onDestroy();
-		if (dba != null)
+		if (dba != null) {
 			dba.close();
+		}
+		super.onDestroy();
 	}
+
+	
 	/**
 	 * Set up the {@link android.app.ActionBar}, if the API is available.
 	 *
