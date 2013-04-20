@@ -17,27 +17,20 @@
 package org.akvo.rsr.android;
 
 import org.akvo.rsr.android.dao.RsrDbAdapter;
-import org.akvo.rsr.android.service.GetProjecDataService;
 import org.akvo.rsr.android.util.ConstantUtil;
-import org.akvo.rsr.android.view.adapter.ProjectListCursorAdapter;
+import org.akvo.rsr.android.view.adapter.UpdateListCursorAdapter;
 import org.akvo.rsr.android.xml.Downloader;
 
 import android.os.Bundle;
 import android.os.Environment;
-import android.app.Activity;
 import android.app.ListActivity;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.support.v4.app.NavUtils;
-import android.annotation.TargetApi;
 import android.content.Intent;
 import android.database.Cursor;
-import android.os.Build;
 
 public class UpdateListActivity extends ListActivity {
 
@@ -47,10 +40,22 @@ public class UpdateListActivity extends ListActivity {
 	private RsrDbAdapter ad;
 	private Cursor dataCursor;
 	private TextView updateCountLabel;
+	private String projId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		//find which project we will be showing updates for
+		Bundle extras = getIntent().getExtras();
+		projId = extras != null ? extras.getString(ConstantUtil.PROJECT_ID_KEY)
+				: null;
+		if (projId == null) {
+			projId = savedInstanceState != null ? savedInstanceState
+					.getString(ConstantUtil.PROJECT_ID_KEY) : null;
+		}
+
+
 		setContentView(R.layout.activity_update_list);
 
 		updateCountLabel = (TextView) findViewById(R.id.updatecountlabel);
@@ -95,22 +100,22 @@ public class UpdateListActivity extends ListActivity {
 
 
 	/**
-	 * show all the projects in the database
+	 * show all the projects in the database for this project
 	 */
 	private void getData() {
 		try {
 			if (dataCursor != null) {
 				dataCursor.close();
-			}
+			} 
 		} catch(Exception e) {
 			Log.w(TAG, "Could not close old cursor before reloading list",e);
 		}
-		dataCursor = ad.findAllUpdates();
+		dataCursor = ad.findAllUpdatesFor(projId);
 		//Show count
 		updateCountLabel.setText(Integer.valueOf(dataCursor.getCount()).toString());
 		//Populate list view
-		ProjectListCursorAdapter projects = new ProjectListCursorAdapter(this, dataCursor);
-		setListAdapter(projects);
+		UpdateListCursorAdapter updates = new UpdateListCursorAdapter(this, dataCursor);
+		setListAdapter(updates);
 
 	}
 

@@ -20,15 +20,16 @@ import java.util.Date;
 
 public class Update {
 	private String id;
-	private String serverId;
+	private String projectId;
 	private String title;
-	private String subtitle;
+	private boolean draft;
+	private boolean submitted;
+	private boolean onServer;
+	private String text;
 	private String location;
 	private String thumbnailUrl;
 	private String thumbnailFilename;	
-	private Date startDate;
-	private Date endDate;
-	private double funds;
+	private Date date;
 
 	public String getId() {
 		return id;
@@ -38,12 +39,12 @@ public class Update {
 		this.id = id;
 	}
 
-	public String getServerId() {
-		return serverId;
+	public String getProjectId() {
+		return projectId;
 	}
 
-	public void setServerId(String id) {
-		this.serverId = id;
+	public void setProjectId(String id) {
+		this.projectId = id;
 	}
 
 	public String getTitle() {
@@ -54,12 +55,12 @@ public class Update {
 		this.title = title;
 	}
 
-	public String getSubtitle() {
-		return subtitle;
+	public String getText() {
+		return text;
 	}
 
-	public void setSubtitle(String subtitle) {
-		this.subtitle = subtitle;
+	public void setText(String text) {
+		this.text= text;
 	}
 
 	public String getLocation() {
@@ -84,14 +85,6 @@ public class Update {
 
 	public void setThumbnail(String thumbnailFilename) {
 		this.thumbnailFilename = thumbnailFilename;
-	}
-
-	public double getFunds() {
-		return funds;
-	}
-
-	public void setFunds(double funds) {
-		this.funds = funds;
 	}
 
 

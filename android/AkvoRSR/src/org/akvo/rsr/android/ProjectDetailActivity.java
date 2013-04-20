@@ -16,6 +16,8 @@
 
 package org.akvo.rsr.android;
 
+import java.io.File;
+
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.util.ConstantUtil;
@@ -24,9 +26,15 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.support.v4.app.NavUtils;
 import android.annotation.TargetApi;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 
 public class ProjectDetailActivity extends Activity {
@@ -35,6 +43,10 @@ public class ProjectDetailActivity extends Activity {
 	private TextView projTitleLabel;
 	private TextView projLocationText;
 	private TextView projSummaryText;
+	private ImageView projImage;
+	private Button btnUpdates;
+	private Button btnAddUpdate;
+	
 
 	private RsrDbAdapter dba;
 	
@@ -56,7 +68,27 @@ public class ProjectDetailActivity extends Activity {
 		//find the fields
 		projTitleLabel = (TextView) findViewById(R.id.text_proj_detail_title);
 		projLocationText = (TextView) findViewById(R.id.text_proj_location);
+		projImage = (ImageView) findViewById(R.id.image_proj_detail);
+		//Activate buttons
+		btnUpdates = (Button) findViewById(R.id.btn_view_updates);
+		btnUpdates.setOnClickListener( new View.OnClickListener() {
+			public void onClick(View view) {
+				Intent i = new Intent(view.getContext(), UpdateListActivity.class);
+				i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(R.id.project_id_tag)).toString());
+				startActivity(i);
+			}
+		});
+		btnAddUpdate = (Button) findViewById(R.id.btn_add_update);
+		btnAddUpdate.setOnClickListener( new View.OnClickListener() {
+			public void onClick(View view) {
+				Intent i = new Intent(view.getContext(), UpdateAddActivity.class);
+				i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(R.id.project_id_tag)).toString());
+				startActivity(i);
+			}
+		});
+ 
 
+		
 		dba = new RsrDbAdapter(this);
 		
 		// Show the Up button in the action bar.
@@ -71,6 +103,18 @@ public class ProjectDetailActivity extends Activity {
 		
 		projTitleLabel.setText(project.getTitle());
 		projLocationText.setText(project.getLocation());
+		
+		//Find file containing thumbnail		
+		File f = new File(project.getThumbnailFilename());
+		if (f.exists()) {
+			Bitmap bm = BitmapFactory.decodeFile(f.getAbsolutePath());
+			if (bm != null)
+				projImage.setImageBitmap(bm);
+		} else {
+			//Fall back to generic logo
+			projImage.setImageResource(R.drawable.ic_launcher);
+		}
+
 	}
 	
 	@Override

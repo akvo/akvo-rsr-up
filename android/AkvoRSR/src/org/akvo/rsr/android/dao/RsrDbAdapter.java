@@ -17,6 +17,7 @@
 package org.akvo.rsr.android.dao;
 
 import org.akvo.rsr.android.domain.Project;
+import org.akvo.rsr.android.domain.Update;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
@@ -41,6 +42,8 @@ public class RsrDbAdapter {
 	public static final String FUNDS_COL = "funds";
 	public static final String THUMBNAIL_URL_COL = "thumbnail_url";
 	public static final String THUMBNAIL_FILENAME_COL = "thumbnail_fn";
+	public static final String PROJECT_COL = "project";
+	public static final String TEXT_COL = "_text";
 
 	private static final String TAG = "RsrDbAdapter";
 	private DatabaseHelper databaseHelper;
@@ -54,8 +57,8 @@ public class RsrDbAdapter {
 			"title text not null, subtitle text, funds real, "+
 			"thumbnail_url text, thumbnail_fn text);";
 	private static final String UPDATE_TABLE_CREATE =
-			"create table update (_id integer primary key, "+
-			"title text not null, subtitle text, funds real, "+
+			"create table _update (_id integer primary key, project integer not null"+
+			"title text not null, _text text, location text, "+
 			"thumbnail_url text, thumbnail_fn text);";
 
 	private static final String[] DEFAULT_INSERTS = new String[] {
@@ -65,7 +68,7 @@ public class RsrDbAdapter {
 
 	private static final String DATABASE_NAME = "rsrdata";
 	private static final String PROJECT_TABLE = "project";
-	private static final String UPDATE_TABLE = "update";
+	private static final String UPDATE_TABLE = "_update";
 
 //	private static final String RESPONSE_JOIN = "survey_respondent LEFT OUTER JOIN survey_response ON (survey_respondent._id = survey_response.survey_respondent_id) LEFT OUTER JOIN user ON (user._id = survey_respondent.user_id)";
 //	private static final String PLOT_JOIN = "plot LEFT OUTER JOIN plot_point ON (plot._id = plot_point.plot_id) LEFT OUTER JOIN user ON (user._id = plot.user_id)";
@@ -297,34 +300,66 @@ public class RsrDbAdapter {
 		return database.insert(PROJECT_TABLE, null, initialValues);
 	}
 
-
-
 	/**
-	 * updates a project in the db and resets the deleted flag to "N"
-	 * 
-	 * @param survey
-	 * @return
-	 */
+	* updates a project in the db
+	*
+	* @param project
+	* @return
+	*/
 	public void saveProject(Project project) {
 		ContentValues updatedValues = new ContentValues();
 		updatedValues.put(PK_ID_COL, project.getId());
-//		updatedValues.put(SERVER_ID_COL, project.getServerId());
+		// updatedValues.put(SERVER_ID_COL, project.getServerId());
 		updatedValues.put(TITLE_COL, project.getTitle());
 		updatedValues.put(SUBTITLE_COL, project.getSubtitle());
 		updatedValues.put(FUNDS_COL, project.getFunds());
 		updatedValues.put(THUMBNAIL_URL_COL, project.getThumbnailUrl());
 		updatedValues.put(THUMBNAIL_FILENAME_COL, project.getThumbnailFilename());
-
+		
 		Cursor cursor = database.query(PROJECT_TABLE,
+		new String[] { PK_ID_COL },
+		PK_ID_COL + " = ?",
+		new String[] { project.getId(), },
+		null, null, null);
+		
+		if (cursor != null && cursor.getCount() > 0) {
+			// if we found an item, it's an update, otherwise, it's an insert
+			database.update(PROJECT_TABLE, updatedValues, PK_ID_COL + " = ?",
+					new String[] { project.getId() });
+		} else {
+			database.insert(PROJECT_TABLE, null, updatedValues);
+		}
+		
+		if (cursor != null) {
+			cursor.close();
+		}
+	}
+
+	/**
+	 * updates an update in the db
+	 * 
+	 * @param survey
+	 * @return
+	 */
+	public void saveUpdate(Update update) {
+		ContentValues updatedValues = new ContentValues();
+		updatedValues.put(PK_ID_COL, update.getId());
+		updatedValues.put(PROJECT_COL, update.getProjectId());
+		updatedValues.put(TITLE_COL, update.getTitle());
+		updatedValues.put(TEXT_COL, update.getText());
+		updatedValues.put(THUMBNAIL_URL_COL, update.getThumbnailUrl());
+		updatedValues.put(THUMBNAIL_FILENAME_COL, update.getThumbnailFilename());
+
+		Cursor cursor = database.query(UPDATE_TABLE,
 				new String[] { PK_ID_COL },
 				PK_ID_COL + " = ?",
-				new String[] { project.getId(), },
+				new String[] { update.getId(), },
 				null, null, null);
 
 		if (cursor != null && cursor.getCount() > 0) {
 			// if we found an item, it's an update, otherwise, it's an insert
 			database.update(PROJECT_TABLE, updatedValues, PK_ID_COL + " = ?",
-					new String[] { project.getId() });
+					new String[] { update.getId() });
 		} else {
 			database.insert(PROJECT_TABLE, null, updatedValues);
 		}
@@ -351,13 +386,29 @@ public class RsrDbAdapter {
 
 
 	/**
-	 * Gets all projects, all columns
+	 * Gets all updates, all columns
 	 */
 	public Cursor findAllUpdates() {
 		Cursor cursor = database.query(UPDATE_TABLE,
 										null,
 										null,
 										null,
+										null,
+										null,
+										null);
+
+		return cursor;
+	}
+
+
+	/**
+	 * Gets updates for a specific project, all columns
+	 */
+	public Cursor findAllUpdatesFor(String _id) {
+		Cursor cursor = database.query(UPDATE_TABLE,
+										null,
+										PROJECT_COL + " = ?",
+										new String[] { _id },
 										null,
 										null,
 										null);
@@ -448,7 +499,7 @@ public class RsrDbAdapter {
 	 */
 	public void deleteAllProjects() {
 		database.delete(PROJECT_TABLE, null, null);
-		//TODO delete all updates
+		database.delete(UPDATE_TABLE, null, null);
 	}
 
 
@@ -477,7 +528,7 @@ public class RsrDbAdapter {
 	 */
 	public void clearAllData() {
 		executeSql("delete from project");
-//		executeSql("delete from updates");
+//		executeSql("delete from _update");
 //		executeSql("update preferences set value = '' where key = 'user.lastuser.id'");
 	}
 
