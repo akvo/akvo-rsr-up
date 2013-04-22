@@ -23,8 +23,8 @@ public class Update {
 	private String projectId;
 	private String title;
 	private boolean draft;
-	private boolean submitted;
-	private boolean onServer;
+	private boolean unsent;
+//	private boolean onServer;
 	private String text;
 	private String location;
 	private String thumbnailUrl;
@@ -83,8 +83,24 @@ public class Update {
 		return thumbnailFilename;
 	}
 
-	public void setThumbnail(String thumbnailFilename) {
+	public void setThumbnailFilename(String thumbnailFilename) {
 		this.thumbnailFilename = thumbnailFilename;
+	}
+
+	public boolean getDraft() {
+		return draft;
+	}
+
+	public void setDraft(boolean draft) {
+		this.draft = draft;
+	}
+
+	public boolean getUnsent() {
+		return unsent;
+	}
+
+	public void setUnsent(boolean unsent) {
+		this.unsent = unsent;
 	}
 
 

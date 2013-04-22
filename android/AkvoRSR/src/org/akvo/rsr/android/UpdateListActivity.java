@@ -17,6 +17,7 @@
 package org.akvo.rsr.android;
 
 import org.akvo.rsr.android.dao.RsrDbAdapter;
+import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.view.adapter.UpdateListCursorAdapter;
 import org.akvo.rsr.android.xml.Downloader;
@@ -39,6 +40,7 @@ public class UpdateListActivity extends ListActivity {
 
 	private RsrDbAdapter ad;
 	private Cursor dataCursor;
+	private TextView projectTitleLabel;
 	private TextView updateCountLabel;
 	private String projId;
 
@@ -58,6 +60,7 @@ public class UpdateListActivity extends ListActivity {
 
 		setContentView(R.layout.activity_update_list);
 
+		projectTitleLabel = (TextView) findViewById(R.id.ulisttitlelabel);
 		updateCountLabel = (TextView) findViewById(R.id.updatecountlabel);
  
         //Create db
@@ -100,17 +103,23 @@ public class UpdateListActivity extends ListActivity {
 
 
 	/**
-	 * show all the projects in the database for this project
+	 * show count and list of all the updates in the database for this project
 	 */
 	private void getData() {
 		try {
 			if (dataCursor != null) {
 				dataCursor.close();
-			} 
+			}
 		} catch(Exception e) {
 			Log.w(TAG, "Could not close old cursor before reloading list",e);
 		}
-		dataCursor = ad.findAllUpdatesFor(projId);
+
+		//Show title
+		//TODO: maybe more efficient to send it in the intent
+		Project p = ad.findProject(projId);
+		projectTitleLabel.setText(p.getTitle());
+		//fetch data
+		dataCursor = ad.listAllUpdatesFor(projId);
 		//Show count
 		updateCountLabel.setText(Integer.valueOf(dataCursor.getCount()).toString());
 		//Populate list view

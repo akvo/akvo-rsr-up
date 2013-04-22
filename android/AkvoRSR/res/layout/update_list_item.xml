@@ -1,0 +1,43 @@
+<!-- One update list item  -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@layout/gray_gradient"
+ 	android:padding="5dip"
+ 	>
+
+    <ImageView
+        android:id="@+id/ulist_item_thumbnail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|left"
+        android:contentDescription="@string/app_name"
+        android:paddingRight="5dp"
+	    android:background="@layout/gray_gradient_up"
+        />
+       
+	<LinearLayout
+  		android:layout_width="wrap_content"
+  		android:layout_height="wrap_content"
+	    android:orientation="vertical"
+		>
+
+       	<TextView
+	        android:id="@+id/ulist_item_title"
+       	    android:layout_width="fill_parent"
+       	    android:layout_height="wrap_content"
+       	    android:gravity="fill_horizontal"
+       	    android:paddingBottom="5dip"
+       	    android:textColor="@color/dk_gray"
+       	    android:typeface="sans" />
+
+       	<TextView
+	        android:id="@+id/ulist_item_state"
+       	    android:layout_width="wrap_content"
+       	    android:layout_height="wrap_content"
+       	    android:layout_gravity="left"
+       	    android:textSize="12sp" />
+   	</LinearLayout>
+</LinearLayout>

@@ -20,6 +20,7 @@ import java.io.File;
 
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Project;
+import org.akvo.rsr.android.domain.Update;
 import org.akvo.rsr.android.util.ConstantUtil;
 
 import android.os.Bundle;
@@ -37,51 +38,63 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 
-public class UpdateAddActivity extends Activity {
+public class UpdateEditActivity extends Activity {
 
+	private String updateId = null;
+	private Update update = null;
 	private String projId = null;
 	private TextView projTitleLabel;
 	private TextView projLocationText;
 	private TextView projSummaryText;
 	private ImageView projImage;
-	private Button btnUpdates;
-	private Button btnAddUpdate;
+	private Button btnSubmit;
+	private Button btnDraft;
 	
-
 	private RsrDbAdapter dba;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		//find which project we will be showing
+		//find which update we are editing
+		//null means create a new one
 		Bundle extras = getIntent().getExtras();
-		projId = extras != null ? extras.getString(ConstantUtil.PROJECT_ID_KEY)
+		updateId = extras != null ? extras.getString(ConstantUtil.PROJECT_ID_KEY)
 				: null;
-		if (projId == null) {
-			projId = savedInstanceState != null ? savedInstanceState
+		if (updateId == null) {
+			updateId = savedInstanceState != null ? savedInstanceState
 					.getString(ConstantUtil.PROJECT_ID_KEY) : null;
 		}
+		
+		dba = new RsrDbAdapter(this);
+		dba.open();
+		
+		if (updateId == null) { //create new
+			update = new Update();
+		} else {
+			update = dba.findUpdate(updateId);
+		}
 
+		
 		//get the look
-		setContentView(R.layout.activity_project_detail);
+		setContentView(R.layout.activity_edit_update);
 		//find the fields
 		projTitleLabel = (TextView) findViewById(R.id.text_proj_detail_title);
 		projLocationText = (TextView) findViewById(R.id.text_proj_location);
 		projImage = (ImageView) findViewById(R.id.image_proj_detail);
 		//Activate buttons
-		btnUpdates = (Button) findViewById(R.id.btn_view_updates);
-		btnUpdates.setOnClickListener( new View.OnClickListener() {
+		btnSubmit = (Button) findViewById(R.id.btn_view_updates);
+		btnSubmit.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {
 				Intent i = new Intent(view.getContext(), UpdateListActivity.class);
 				i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(R.id.project_id_tag)).toString());
 				startActivity(i);
 			}
 		});
-		btnAddUpdate = (Button) findViewById(R.id.btn_add_update);
-		btnAddUpdate.setOnClickListener( new View.OnClickListener() {
+		btnDraft = (Button) findViewById(R.id.btn_add_update);
+		btnDraft.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {
-				Intent i = new Intent(view.getContext(), UpdateAddActivity.class);
+				Intent i = new Intent(view.getContext(), UpdateEditActivity.class);
 				i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(R.id.project_id_tag)).toString());
 				startActivity(i);
 			}

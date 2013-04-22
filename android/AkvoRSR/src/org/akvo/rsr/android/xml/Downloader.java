@@ -98,7 +98,7 @@ public class Downloader {
 
 	
 	/* 
-	 * Fetch one file form a URL
+	 * Fetch one file from a URL
 	 */
 	public void HttpGetToFile(URL url, File file) {
 		try {
@@ -127,40 +127,47 @@ public class Downloader {
 	}
 	
 
-	//fetch all unfetched thumbnails
+	//fetch all unfetched thumbnails and photos
 	//this may be excessive if list is long, we could be lazy until display, and do it in view adapter
 	public void FetchNewThumbnails(Context ctx, String contextUrl, String directory){
 		RsrDbAdapter dba = new RsrDbAdapter(ctx);
 		dba.open();
 		try {
 			try {
-			Cursor cursor = dba.findAllProjects();
-			if (cursor != null) {
-				cursor.moveToFirst();
-				while (!cursor.isAfterLast()) {
-					String id = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL));
-					String fn = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
-					String tit = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL));
-					String url = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
-					if (fn == null) {
-						//not fetched yet
-//						fn = HttpGetToNewFile(new URL(new URL(contextUrl),url), directory);
-						fn = HttpGetToNewFile(new URL(url), directory);
-						//TODO can we use dba like this?
-						Project p = new Project();
-						p.setId(id);
-						p.setTitle(tit);
-						p.setThumbnail(fn);
-						//TODO, will clear other fields...
-						dba.saveProject(p);
-						
-						}
-					cursor.moveToNext();
+				URL curl = new URL(contextUrl);
+				Cursor cursor = dba.listAllProjects();
+				if (cursor != null) {
+					cursor.moveToFirst();
+					while (!cursor.isAfterLast()) {
+						String id = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL));
+						String fn = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
+						String url = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
+						if (fn == null) {
+							//not fetched yet
+							fn = HttpGetToNewFile(new URL(curl,url), directory);
+							dba.updateProjectThumbnailFile(id,fn);						
+							}
+						cursor.moveToNext();
+					}
 				}
-			}
+				cursor = dba.listAllUpdates();
+				if (cursor != null) {
+					cursor.moveToFirst();
+					while (!cursor.isAfterLast()) {
+						String id = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL));
+						String fn = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
+						String url = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
+						if (fn == null) {
+							//not fetched yet
+							fn = HttpGetToNewFile(new URL(curl,url), directory);
+							dba.updateUpdateThumbnailFile(id,fn);						
+							}
+						cursor.moveToNext();
+					}
+				}
 		} catch (Exception e) {
-			/* Display any Error to the GUI. */
-			Log.e(TAG, "HttpGetToNewFile Error", e);
+			//TODO Display any Error to the GUI
+			Log.e(TAG, "FetchNewThumbnails Error", e);
 		}
 		} finally {
 			dba.close();

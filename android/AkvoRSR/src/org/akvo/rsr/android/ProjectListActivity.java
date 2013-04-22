@@ -117,7 +117,7 @@ public class ProjectListActivity extends ListActivity {
 		} catch(Exception e) {
 			Log.w(TAG, "Could not close old cursor before reloading list",e);
 		}
-		dataCursor = ad.findAllProjects();
+		dataCursor = ad.listAllProjects();
 		//Show count
 		projCountLabel.setText(Integer.valueOf(dataCursor.getCount()).toString());
 		//Populate list view
@@ -153,6 +153,7 @@ public class ProjectListActivity extends ListActivity {
 		Downloader dl = new Downloader();
 		//TODO THIS MIGHT HANG, no timeout defined...
 		dl.FetchProjectList(this,"http://test.akvo.org","/api/v1/project/?format=xml&partnerships__organisation=42");//Akvo projs
+		dl.FetchUpdateList(this,"http://test.akvo.org","/api/v1/project_updates/?format=xml&partnerships__organisation=42");//Akvo projs updates
 		dl.FetchNewThumbnails(this, "http://test.akvo.org", imageCache);
 	
 	}

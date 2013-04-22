@@ -44,6 +44,8 @@ public class RsrDbAdapter {
 	public static final String THUMBNAIL_FILENAME_COL = "thumbnail_fn";
 	public static final String PROJECT_COL = "project";
 	public static final String TEXT_COL = "_text";
+	public static final String DRAFT_COL = "draft";
+	public static final String UNSENT_COL = "unsent";
 
 	private static final String TAG = "RsrDbAdapter";
 	private DatabaseHelper databaseHelper;
@@ -57,9 +59,10 @@ public class RsrDbAdapter {
 			"title text not null, subtitle text, funds real, "+
 			"thumbnail_url text, thumbnail_fn text);";
 	private static final String UPDATE_TABLE_CREATE =
-			"create table _update (_id integer primary key, project integer not null"+
+			"create table _update (_id integer primary key, project integer not null, "+
 			"title text not null, _text text, location text, "+
-			"thumbnail_url text, thumbnail_fn text);";
+			"thumbnail_url text, thumbnail_fn text," +
+			"draft integer, unsent integer);";
 
 	private static final String[] DEFAULT_INSERTS = new String[] {
 		"insert into project values(1,'Sample Proj1', 'Sample proj 1 subtitle', 4711.00, 'url1', 'fn1')",
@@ -70,10 +73,7 @@ public class RsrDbAdapter {
 	private static final String PROJECT_TABLE = "project";
 	private static final String UPDATE_TABLE = "_update";
 
-//	private static final String RESPONSE_JOIN = "survey_respondent LEFT OUTER JOIN survey_response ON (survey_respondent._id = survey_response.survey_respondent_id) LEFT OUTER JOIN user ON (user._id = survey_respondent.user_id)";
-//	private static final String PLOT_JOIN = "plot LEFT OUTER JOIN plot_point ON (plot._id = plot_point.plot_id) LEFT OUTER JOIN user ON (user._id = plot.user_id)";
-
-	private static final int DATABASE_VERSION = 3;
+	private static final int DATABASE_VERSION = 4;
 
 	private final Context context;
 
@@ -113,7 +113,7 @@ public class RsrDbAdapter {
 					+ newVersion);
 
 			
-			if (oldVersion < 3) { //start over fresh
+			if (oldVersion < 4) { //start over fresh
 				db.execSQL("DROP TABLE IF EXISTS " + PROJECT_TABLE);
 				db.execSQL("DROP TABLE IF EXISTS " + UPDATE_TABLE);
 				onCreate(db);
@@ -335,6 +335,30 @@ public class RsrDbAdapter {
 		}
 	}
 
+	/*
+	 *  Update the local filename of a cached image
+	 */
+	public void updateProjectThumbnailFile(String id, String filename) {
+		ContentValues updatedValues = new ContentValues();
+		updatedValues.put(THUMBNAIL_FILENAME_COL, filename);
+
+		Cursor cursor = database.query(PROJECT_TABLE,
+				new String[] { PK_ID_COL },
+				PK_ID_COL + " = ?",
+				new String[] { id },
+				null, null, null);
+
+		if (cursor != null && cursor.getCount() > 0) {
+			// if we found an item, update it
+			database.update(PROJECT_TABLE, updatedValues, PK_ID_COL + " = ?",
+					new String[] { id });
+		}
+
+		if (cursor != null) {
+			cursor.close();
+		}
+	}
+
 	/**
 	 * updates an update in the db
 	 * 
@@ -349,6 +373,8 @@ public class RsrDbAdapter {
 		updatedValues.put(TEXT_COL, update.getText());
 		updatedValues.put(THUMBNAIL_URL_COL, update.getThumbnailUrl());
 		updatedValues.put(THUMBNAIL_FILENAME_COL, update.getThumbnailFilename());
+		updatedValues.put(DRAFT_COL, update.getDraft());
+		updatedValues.put(UNSENT_COL, update.getUnsent());
 
 		Cursor cursor = database.query(UPDATE_TABLE,
 				new String[] { PK_ID_COL },
@@ -368,11 +394,36 @@ public class RsrDbAdapter {
 			cursor.close();
 		}
 	}
+	
+	/*
+	 *  Update the local filename of a cached image
+	 */
+	public void updateUpdateThumbnailFile(String id, String filename) {
+		ContentValues updatedValues = new ContentValues();
+		updatedValues.put(THUMBNAIL_FILENAME_COL, filename);
+
+		Cursor cursor = database.query(UPDATE_TABLE,
+				new String[] { PK_ID_COL },
+				PK_ID_COL + " = ?",
+				new String[] { id },
+				null, null, null);
+
+		if (cursor != null && cursor.getCount() > 0) {
+			// if we found an item, update it
+			database.update(UPDATE_TABLE, updatedValues, PK_ID_COL + " = ?",
+					new String[] { id });
+		}
+
+		if (cursor != null) {
+			cursor.close();
+		}
+	}
+
 
 	/**
 	 * Gets all projects, all columns
 	 */
-	public Cursor findAllProjects() {
+	public Cursor listAllProjects() {
 		Cursor cursor = database.query(PROJECT_TABLE,
 										null,
 										null,
@@ -380,7 +431,6 @@ public class RsrDbAdapter {
 										null,
 										null,
 										null);
-
 		return cursor;
 	}
 
@@ -388,7 +438,7 @@ public class RsrDbAdapter {
 	/**
 	 * Gets all updates, all columns
 	 */
-	public Cursor findAllUpdates() {
+	public Cursor listAllUpdates() {
 		Cursor cursor = database.query(UPDATE_TABLE,
 										null,
 										null,
@@ -396,7 +446,6 @@ public class RsrDbAdapter {
 										null,
 										null,
 										null);
-
 		return cursor;
 	}
 
@@ -404,7 +453,7 @@ public class RsrDbAdapter {
 	/**
 	 * Gets updates for a specific project, all columns
 	 */
-	public Cursor findAllUpdatesFor(String _id) {
+	public Cursor listAllUpdatesFor(String _id) {
 		Cursor cursor = database.query(UPDATE_TABLE,
 										null,
 										PROJECT_COL + " = ?",
@@ -442,6 +491,31 @@ public class RsrDbAdapter {
 		}
 
 		return project;
+	}
+
+
+	/**
+	 * Gets a single update from the db using its primary key
+	 */
+	public Update findUpdate(String _id) {
+		Update update = null;
+		Cursor cursor = database.query(UPDATE_TABLE,
+										new String[] { PK_ID_COL, TITLE_COL, THUMBNAIL_URL_COL, THUMBNAIL_FILENAME_COL, DRAFT_COL, UNSENT_COL },
+										PK_ID_COL + " = ?",
+										new String[] { _id }, null, null, null);
+		if (cursor != null) {
+			if (cursor.getCount() > 0) {
+				cursor.moveToFirst();
+				update = new Update();
+				update.setId(_id);
+				update.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(TITLE_COL)));
+				update.setThumbnailUrl(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_URL_COL)));
+				update.setThumbnailFilename(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_FILENAME_COL)));
+						}
+			cursor.close();
+		}
+
+		return update;
 	}
 
 
@@ -523,13 +597,14 @@ public class RsrDbAdapter {
 	}
 
 	/**
-	 * permanently deletes all surveys, responses, users and transmission
-	 * history from the database
+	 * permanently deletes all projects, updates
+	 * from the database
 	 */
 	public void clearAllData() {
 		executeSql("delete from project");
-//		executeSql("delete from _update");
+		executeSql("delete from _update");
 //		executeSql("update preferences set value = '' where key = 'user.lastuser.id'");
 	}
+
 
 }

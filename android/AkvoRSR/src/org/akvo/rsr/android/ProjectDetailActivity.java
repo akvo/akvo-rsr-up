@@ -74,15 +74,15 @@ public class ProjectDetailActivity extends Activity {
 		btnUpdates.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {
 				Intent i = new Intent(view.getContext(), UpdateListActivity.class);
-				i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(R.id.project_id_tag)).toString());
+				i.putExtra(ConstantUtil.PROJECT_ID_KEY, projId);
 				startActivity(i);
 			}
 		});
 		btnAddUpdate = (Button) findViewById(R.id.btn_add_update);
 		btnAddUpdate.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {
-				Intent i = new Intent(view.getContext(), UpdateAddActivity.class);
-				i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(R.id.project_id_tag)).toString());
+				Intent i = new Intent(view.getContext(), UpdateEditActivity.class);
+				i.putExtra(ConstantUtil.PROJECT_ID_KEY, projId);
 				startActivity(i);
 			}
 		});

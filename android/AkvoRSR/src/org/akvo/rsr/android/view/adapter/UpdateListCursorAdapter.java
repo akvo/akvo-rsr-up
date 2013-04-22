@@ -35,8 +35,7 @@ import android.widget.TextView;
 public class UpdateListCursorAdapter extends CursorAdapter{
 
 /**
- * This adaptor formats Project list items. It can format date strings using the device's locale settings prior
- * to displaying them to the screen
+ * This adaptor formats Update list items using the update_list_item.xml template
  * 
  * @author Stellan Lagerstroem
  * 
@@ -50,9 +49,18 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 	public void bindView(View view, Context context, Cursor cursor) {
 
 		//Text data
-		TextView titleView = (TextView) view.findViewById(R.id.list_item_title);
+		TextView titleView = (TextView) view.findViewById(R.id.ulist_item_title);
 		titleView.setText(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
 
+		TextView stateView = (TextView) view.findViewById(R.id.ulist_item_state);
+		if (String.valueOf("true").equals(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.DRAFT_COL)))){
+			stateView.setText(R.string.state_draft);
+		} else
+			if (String.valueOf("true").equals(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.UNSENT_COL)))){
+				stateView.setText(R.string.state_unsent);
+		}
+		
+			
 				
 		//Image
 		ImageView thumbnail = (ImageView) view.findViewById(R.id.list_item_thumbnail);
@@ -74,8 +82,7 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
-		LayoutInflater inflater = (LayoutInflater) context
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View view = inflater.inflate(R.layout.project_list_item, null);
 		bindView(view, context, cursor);
 		

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item
+        type="id"
+        name="project_id_tag" />
+    <item
+        type="id"
+        name="update_id_tag" />
+</resources>
+
