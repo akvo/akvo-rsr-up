@@ -29,7 +29,9 @@ import org.xml.sax.XMLReader;
 
 import com.github.kevinsawicki.http.HttpRequest;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.util.Log;
 
@@ -37,6 +39,20 @@ public class Downloader {
 
 	private static final String TAG = "Downloader";
 
+	private void errorAlert(Context ctx, Exception e) {
+		/* Display any Error to the GUI. */
+		AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
+	    alert.setTitle("Error fetching project list");
+	    alert.setMessage(e.toString());
+	
+	    alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+		    public void onClick(DialogInterface dialog, int whichButton) {
+		    	dialog.cancel();
+		    	}
+		    });
+	    alert.show();
+	}
+	
 	/* Populate the projects table in the db from a server URL
 	 * 
 	 */
@@ -62,6 +78,7 @@ public class Downloader {
 	
 		} catch (Exception e) {
 			/* Display any Error to the GUI. */
+			errorAlert(ctx, e);
 			Log.e(TAG, "FetchProjectList Error", e);
 		}
 	}
@@ -92,6 +109,7 @@ public class Downloader {
 	
 		} catch (Exception e) {
 			/* Display any Error to the GUI. */
+			errorAlert(ctx, e);
 			Log.e(TAG, "FetchProjectList Error", e);
 		}
 	}
@@ -149,24 +167,28 @@ public class Downloader {
 							}
 						cursor.moveToNext();
 					}
+					cursor.close();
 				}
-				cursor = dba.listAllUpdates();
-				if (cursor != null) {
-					cursor.moveToFirst();
-					while (!cursor.isAfterLast()) {
-						String id = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL));
-						String fn = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
-						String url = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
+				//get update photos
+				Cursor cursor2 = dba.listAllUpdates();
+				if (cursor2 != null) {
+					cursor2.moveToFirst();
+					while (!cursor2.isAfterLast()) {
+						String id = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.PK_ID_COL));
+						String fn = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
+						String url = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
 						if (fn == null) {
 							//not fetched yet
 							fn = HttpGetToNewFile(new URL(curl,url), directory);
 							dba.updateUpdateThumbnailFile(id,fn);						
 							}
-						cursor.moveToNext();
+						cursor2.moveToNext();
 					}
+					cursor2.close();
 				}
 		} catch (Exception e) {
-			//TODO Display any Error to the GUI
+			/* Display any Error to the GUI. */
+			errorAlert(ctx, e);
 			Log.e(TAG, "FetchNewThumbnails Error", e);
 		}
 		} finally {

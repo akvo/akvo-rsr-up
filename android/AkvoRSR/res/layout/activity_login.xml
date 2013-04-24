@@ -101,7 +101,7 @@
 		                android:layout_marginBottom="40dip"
 		                android:text="@string/forgot_password_"
 		                android:gravity="center"
-		                android:textSize="20dip"
+		                android:textSize="20sp"
 		                android:textColor="@color/rsr_blue"/>
 		 
 		</LinearLayout>

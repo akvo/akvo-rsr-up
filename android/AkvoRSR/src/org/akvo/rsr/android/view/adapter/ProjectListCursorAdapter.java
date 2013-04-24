@@ -34,17 +34,17 @@ import android.widget.TextView;
 
 public class ProjectListCursorAdapter extends CursorAdapter{
 
-	private static final String imageCache = "/sdcard/akvorsr/imagecache";
-
 /**
- * This adaptor formats Project list items. It can format date strings using the device's locale settings prior
- * to displaying them to the screen
+ * This adapter formats Project list items.
  * 
  * @author Stellan Lagerstroem
  * 
  */
+	private RsrDbAdapter dba;
+	
 	public ProjectListCursorAdapter(Context context, Cursor c) {
 		super(context, c);
+		dba = new RsrDbAdapter(context);
 	}
 
 	
@@ -69,14 +69,21 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 		
 		//Image
 		ImageView thumbnail = (ImageView) view.findViewById(R.id.list_item_thumbnail);
-		//Find file containing thumbnail		
-		File f = new File(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL)));
-		if (f.exists()) {
-			Bitmap bm = BitmapFactory.decodeFile(f.getAbsolutePath());
-			if (bm != null)
-				thumbnail.setImageBitmap(bm);
+		//Find file containing thumbnail
+		String fna = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
+		if (fna != null) {
+			File f = new File(fna);
+			if (f.exists()) {
+				Bitmap bm = BitmapFactory.decodeFile(f.getAbsolutePath());
+				if (bm != null)
+					thumbnail.setImageBitmap(bm);
+			} else {
+				//Broken ref, fall back to generic logo
+				//TODO could show error img
+				thumbnail.setImageResource(R.drawable.ic_launcher);
+			}
 		} else {
-			//Fall back to generic logo
+			//Not set, fall back to generic logo
 			thumbnail.setImageResource(R.drawable.ic_launcher);
 		}
 		

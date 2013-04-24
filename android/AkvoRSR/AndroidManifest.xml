@@ -33,13 +33,27 @@
                 android:value="org.akvo.rsr.android.LoginActivity" />
         </activity>
         <activity
+        	android:name="org.akvo.rsr.android.UpdateListActivity"
+            android:label="@string/title_activity_update_list" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.akvo.rsr.android.ProjectDetailActivity" />
+        </activity>
+        <activity
             android:name="org.akvo.rsr.android.ProjectDetailActivity"
             android:label="@string/title_activity_project_detail" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.akvo.rsr.android.ProjectListActivity" />
         </activity>
-
+        <activity
+            android:name="org.akvo.rsr.android.UpdateEditActivity"
+            android:label="@string/title_activity_update_edit" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.akvo.rsr.android.UpdateListActivity" />
+        </activity>
+        
         <service
             android:name="org.akvo.rsr.android.service.SubmitProjectUpdateService"
             android:enabled="true"

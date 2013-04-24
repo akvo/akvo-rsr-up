@@ -384,10 +384,10 @@ public class RsrDbAdapter {
 
 		if (cursor != null && cursor.getCount() > 0) {
 			// if we found an item, it's an update, otherwise, it's an insert
-			database.update(PROJECT_TABLE, updatedValues, PK_ID_COL + " = ?",
+			database.update(UPDATE_TABLE, updatedValues, PK_ID_COL + " = ?",
 					new String[] { update.getId() });
 		} else {
-			database.insert(PROJECT_TABLE, null, updatedValues);
+			database.insert(UPDATE_TABLE, null, updatedValues);
 		}
 
 		if (cursor != null) {
@@ -463,6 +463,35 @@ public class RsrDbAdapter {
 										null);
 
 		return cursor;
+	}
+
+
+	/**
+	 * Counts state sums for updates for a specific project
+	 */
+	public int[] countAllUpdatesFor(String _id) {
+		int draftCount = 0;
+		int unsentCount = 0;
+		int otherCount = 0;
+		Cursor cursor = listAllUpdatesFor(_id);
+		if (cursor.getCount() > 0) {
+			int draftCol = cursor.getColumnIndexOrThrow(DRAFT_COL);
+			int unsentCol = cursor.getColumnIndexOrThrow(UNSENT_COL);
+			cursor.moveToFirst();
+			while (!cursor.isAfterLast()) {
+				if (cursor.getInt(draftCol) > 0) {
+					draftCount++;
+				} else	if (cursor.getInt(unsentCol) > 0) {
+					unsentCount++;
+				} else {
+					otherCount++;
+				cursor.moveToNext();
+				}
+			}
+			cursor.close();
+		}
+		
+		return new int[] { draftCount, unsentCount, otherCount };
 	}
 
 

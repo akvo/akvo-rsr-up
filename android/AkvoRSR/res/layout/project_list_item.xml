@@ -15,7 +15,6 @@
         android:layout_gravity="top|left"
         android:contentDescription="@string/app_name"
         android:paddingRight="5dp"
-        android:src="@drawable/proj1"
         />
        
 	<LinearLayout
@@ -30,7 +29,6 @@
        	    android:layout_height="wrap_content"
        	    android:gravity="fill_horizontal"
        	    android:paddingBottom="5dip"
-       	    android:text="@string/proj1_txt"
        	    android:textColor="@color/dk_gray"
        	    android:typeface="sans" />
 
@@ -39,7 +37,7 @@
 	        android:layout_height="wrap_content"
             android:layout_gravity="left"
             android:text="@string/updates_txt"
-	        android:textSize="10sp"
+	        android:textSize="12sp"
 	        android:textColor="@color/dk_gray"
 	        android:typeface="sans"/>
 
@@ -55,7 +53,7 @@
         	    android:paddingRight="5dp"
         	    android:text="@string/unsynch"
         	    android:textColor="#ff0000"
-        	    android:textSize="10sp"
+        	    android:textSize="12sp"
         	    android:typeface="sans" />
 
         	<TextView
@@ -63,7 +61,7 @@
 		        android:layout_height="wrap_content"
 	            android:layout_gravity="left"
 	            android:text="@string/drafts"
-		        android:textSize="10sp"
+		        android:textSize="12sp"
 		        android:textColor="#0000ff"
 		        android:typeface="sans"/>
     	</LinearLayout>

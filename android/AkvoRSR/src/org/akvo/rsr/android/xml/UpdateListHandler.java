@@ -130,15 +130,15 @@ public class UpdateListHandler extends DefaultHandler {
 	public void endElement(String namespaceURI, String localName, String qName)
 			throws SAXException {
 		if (localName.equals("id")) {
-			this.in_id= false;
+			this.in_id = false;
 		} else if (localName.equals("title")) {
 				this.in_title = false;
 		} else if (localName.equals("text")) {
 			this.in_text = false;
-		} else if (localName.equals("project_id")) {
+		} else if (localName.equals("project")) {
 			this.in_project_id = false;
 		} else if (localName.equals("object")) {
-			this.in_update= false;
+			this.in_update = false;
 			if (currentUpd != null) {
 				dba.saveUpdate(currentUpd);
 				currentUpd = null;

@@ -152,8 +152,8 @@ public class ProjectListActivity extends ListActivity {
 		//meanwhile:
 		Downloader dl = new Downloader();
 		//TODO THIS MIGHT HANG, no timeout defined...
-		dl.FetchProjectList(this,"http://test.akvo.org","/api/v1/project/?format=xml&partnerships__organisation=42");//Akvo projs
-		dl.FetchUpdateList(this,"http://test.akvo.org","/api/v1/project_updates/?format=xml&partnerships__organisation=42");//Akvo projs updates
+		dl.FetchProjectList(this,"http://test.akvo.org","/api/v1/project/?format=xml&limit=0&partnerships__organisation=42");//Akvo projs
+		dl.FetchUpdateList(this,"http://test.akvo.org","/api/v1/project_update/?format=xml&limit=0&partnerships__organisation=42");//Akvo projs updates
 		dl.FetchNewThumbnails(this, "http://test.akvo.org", imageCache);
 	
 	}
