@@ -23,6 +23,7 @@ import org.akvo.rsr.android.view.adapter.ProjectListCursorAdapter;
 import org.akvo.rsr.android.xml.Downloader;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.app.Activity;
 import android.app.ListActivity;
 import android.util.Log;
@@ -42,8 +43,6 @@ public class ProjectListActivity extends ListActivity {
 
 
 	private static final String TAG = "ProjectListActivity";
-	private static final String URL_KEY = "UrlKey"; //TODO move to constant utility class
-	private static final String imageCache = "/sdcard/akvorsr/imagecache/";
 
 	private RsrDbAdapter ad;
 	private Cursor dataCursor;
@@ -80,6 +79,14 @@ public class ProjectListActivity extends ListActivity {
 		return true;
 	}
 
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		if (dataCursor != null) {
+			dataCursor.close();
+		}	
+	}
 	
 	@Override
 	public void onResume() {
@@ -153,8 +160,8 @@ public class ProjectListActivity extends ListActivity {
 		Downloader dl = new Downloader();
 		//TODO THIS MIGHT HANG, no timeout defined...
 		dl.FetchProjectList(this,"http://test.akvo.org","/api/v1/project/?format=xml&limit=0&partnerships__organisation=42");//Akvo projs
-		dl.FetchUpdateList(this,"http://test.akvo.org","/api/v1/project_update/?format=xml&limit=0&partnerships__organisation=42");//Akvo projs updates
-		dl.FetchNewThumbnails(this, "http://test.akvo.org", imageCache);
+		dl.FetchUpdateList(this,"http://test.akvo.org","/api/v1/project_update/?format=xml&limit=0&project__partnerships__organisation=42");//Akvo projs updates
+		dl.FetchNewThumbnails(this, "http://test.akvo.org", Environment.getExternalStorageDirectory().getPath() + "/" + ConstantUtil.IMAGECACHE_DIR);
 	
 	}
 

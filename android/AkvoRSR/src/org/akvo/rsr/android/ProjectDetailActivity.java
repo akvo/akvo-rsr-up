@@ -30,12 +30,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.support.v4.app.NavUtils;
-import android.annotation.TargetApi;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Build;
 
 public class ProjectDetailActivity extends Activity {
 
@@ -68,6 +65,7 @@ public class ProjectDetailActivity extends Activity {
 		//find the fields
 		projTitleLabel = (TextView) findViewById(R.id.text_proj_detail_title);
 		projLocationText = (TextView) findViewById(R.id.text_proj_location);
+		projSummaryText= (TextView) findViewById(R.id.text_proj_summary);
 		projImage = (ImageView) findViewById(R.id.image_proj_detail);
 		//Activate buttons
 		btnUpdates = (Button) findViewById(R.id.btn_view_updates);
@@ -102,7 +100,8 @@ public class ProjectDetailActivity extends Activity {
 		Project project = dba.findProject(projId);
 		
 		projTitleLabel.setText(project.getTitle());
-		projLocationText.setText(project.getLocation());
+//		projLocationText.setText(project.getLocation());
+		projLocationText.setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras metus orci, luctus sed venenatis non, iaculis at neque. Mauris aliquet aliquam nisi, non consequat leo mollis vitae.");
 		
 		//Find file containing thumbnail		
 		File f = new File(project.getThumbnailFilename());

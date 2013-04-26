@@ -78,6 +78,7 @@ public class ProjectListHandler extends DefaultHandler {
 	private boolean in_id = false;
 	private boolean in_title = false;
 	private boolean in_subtitle = false;
+	private boolean in_summary = false;
 	private boolean in_funds = false;
 	private boolean in_current_image = false;
 	private boolean in_thumbnails = false;
@@ -86,7 +87,7 @@ public class ProjectListHandler extends DefaultHandler {
 	private Project currentProj;
 	
 	private boolean syntaxError = false;
-	
+
 	//where to store results
 	private RsrDbAdapter dba;
 	
@@ -146,6 +147,8 @@ public class ProjectListHandler extends DefaultHandler {
 			int i = Integer.parseInt(attrValue);
 			myParsedExampleDataSet.setExtractedInt(i);
 			*/
+		} else if (localName.equals("project_plan_summary")) {
+			this.in_summary = true;
 		} else if (localName.equals("current_image")) {
 			this.in_current_image = true;
 		} else if (localName.equals("thumbnails") && in_current_image) {
@@ -154,6 +157,7 @@ public class ProjectListHandler extends DefaultHandler {
 			this.in_thumbnail_url = true;
 		}
 	}
+		
 	
 	/** Gets called on closing tags like: 
 	 * </tag> */
@@ -174,6 +178,8 @@ public class ProjectListHandler extends DefaultHandler {
 				dba.saveProject(currentProj);
 				currentProj = null;
 			}
+		} else if (localName.equals("project_plan_summary")) {
+			this.in_summary = false;
 		} else if (localName.equals("current_image")) {
 			this.in_current_image = false;
 		} else if (localName.equals("thumbnails") && in_current_image) {
@@ -194,6 +200,8 @@ public class ProjectListHandler extends DefaultHandler {
 		    		currentProj.setTitle(new String(ch, start, length));
 			} else if(this.in_subtitle) {
 				currentProj.setTitle(new String(ch, start, length));
+			} else if(this.in_summary) {
+				currentProj.setSummary(new String(ch, start, length));
 			} else if(this.in_thumbnail_url) {
 				currentProj.setThumbnailUrl(new String(ch, start, length));
 			} else if(this.in_funds) {

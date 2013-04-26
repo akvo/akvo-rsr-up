@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+ 
     <string name="app_name">AkvoRSR</string>
     <string name="app_version">0.3</string>
     <string name="app_subtitle">Really Simple Reporting</string>
@@ -10,6 +10,8 @@
     <string name="title_activity_project_detail">Akvo RSR</string>
     <string name="title_activity_update_list">Akvo RSR</string>
     <string name="title_activity_update_edit">Akvo RSR</string>
+    <string name="hint_update_title">Title</string>
+    <string name="hint_update_description">Description</string>
     <string name="state_draft">● Draft</string>
     <string name="action_settings">Settings</string>
     <string name="state_unsent">● Unsynchronized</string>

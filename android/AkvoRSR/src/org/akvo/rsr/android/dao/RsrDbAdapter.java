@@ -283,6 +283,7 @@ public class RsrDbAdapter {
 		databaseHelper.close();
 	}
 
+	
 	/**
 	 * Create a new project using the title and body provided. If the project is
 	 * successfully created return the new id, otherwise return a -1 to indicate
@@ -301,7 +302,7 @@ public class RsrDbAdapter {
 	}
 
 	/**
-	* updates a project in the db
+	* creates or updates a project in the db
 	*
 	* @param project
 	* @return
@@ -335,30 +336,17 @@ public class RsrDbAdapter {
 		}
 	}
 
+	
 	/*
 	 *  Update the local filename of a cached image
 	 */
 	public void updateProjectThumbnailFile(String id, String filename) {
 		ContentValues updatedValues = new ContentValues();
 		updatedValues.put(THUMBNAIL_FILENAME_COL, filename);
-
-		Cursor cursor = database.query(PROJECT_TABLE,
-				new String[] { PK_ID_COL },
-				PK_ID_COL + " = ?",
-				new String[] { id },
-				null, null, null);
-
-		if (cursor != null && cursor.getCount() > 0) {
-			// if we found an item, update it
-			database.update(PROJECT_TABLE, updatedValues, PK_ID_COL + " = ?",
-					new String[] { id });
-		}
-
-		if (cursor != null) {
-			cursor.close();
-		}
+		database.update(PROJECT_TABLE, updatedValues, PK_ID_COL + " = ?", new String[] { id });
 	}
 
+	
 	/**
 	 * updates an update in the db
 	 * 
@@ -401,22 +389,7 @@ public class RsrDbAdapter {
 	public void updateUpdateThumbnailFile(String id, String filename) {
 		ContentValues updatedValues = new ContentValues();
 		updatedValues.put(THUMBNAIL_FILENAME_COL, filename);
-
-		Cursor cursor = database.query(UPDATE_TABLE,
-				new String[] { PK_ID_COL },
-				PK_ID_COL + " = ?",
-				new String[] { id },
-				null, null, null);
-
-		if (cursor != null && cursor.getCount() > 0) {
-			// if we found an item, update it
-			database.update(UPDATE_TABLE, updatedValues, PK_ID_COL + " = ?",
-					new String[] { id });
-		}
-
-		if (cursor != null) {
-			cursor.close();
-		}
+		database.update(UPDATE_TABLE, updatedValues, PK_ID_COL + " = ?", new String[] { id });
 	}
 
 

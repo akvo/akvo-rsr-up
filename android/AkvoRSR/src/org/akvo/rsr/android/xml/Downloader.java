@@ -177,8 +177,11 @@ public class Downloader {
 						String id = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.PK_ID_COL));
 						String fn = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
 						String url = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
-						if (fn == null) {
+						if (url == null) {
+							Log.w(TAG, "Null image URL for update: "+id);
+						} else if (fn == null) {
 							//not fetched yet
+							Log.i(TAG, "URL: "+url);
 							fn = HttpGetToNewFile(new URL(curl,url), directory);
 							dba.updateUpdateThumbnailFile(id,fn);						
 							}
@@ -186,11 +189,11 @@ public class Downloader {
 					}
 					cursor2.close();
 				}
-		} catch (Exception e) {
-			/* Display any Error to the GUI. */
-			errorAlert(ctx, e);
-			Log.e(TAG, "FetchNewThumbnails Error", e);
-		}
+			} catch (Exception e) {
+				/* Display any Error to the GUI. */
+				errorAlert(ctx, e);
+				Log.e(TAG, "FetchNewThumbnails Error", e);
+			}
 		} finally {
 			dba.close();
 		}

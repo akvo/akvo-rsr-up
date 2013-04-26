@@ -3,97 +3,109 @@
   		android:layout_width="fill_parent"
   		android:layout_height="fill_parent"
         android:orientation="vertical"
+        android:background="@color/lt_gray"
 		>
 
-        <TextView
-            android:id="@+id/text_proj_detail_title"
+		<!-- The project title -->	
+   	 	<TextView
+            android:id="@+id/projupd_edit_proj_title"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:background="@color/lt_gray"
+	        android:textColor="@color/dk_gray"
             android:padding="5dip"
             android:typeface="sans" />
 
-      	<ScrollView
-		  android:layout_width="fill_parent"
-		  android:layout_height="fill_parent"
-		   >
-			<LinearLayout
-	  		android:layout_width="fill_parent"
-	  		android:layout_height="wrap_content"
-			android:background="@color/lt_gray"
-		    android:orientation="vertical"
-			>
-      	    
-		    <LinearLayout
-		        android:layout_width="fill_parent"
-		        android:layout_height="wrap_content"
-		        android:orientation="horizontal" >
+		<!-- The update title entry -->	
+        <TextView
+	        android:layout_width="fill_parent"
+	       	android:layout_height="wrap_content"
+	        android:layout_gravity="left"
+	        android:text="Update Title:"
+	        android:textColor="@color/dk_gray"
+	        android:textSize="18sp"
+	        android:textStyle="italic"
+	        android:typeface="sans" />
 
-			    <!-- Project image  -->
+        <EditText
+            android:id="@+id/edit_projupd_title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:layout_margin="5dip"
+            android:singleLine="true"
+            android:hint="@string/hint_update_title"
+            android:padding="5dip"/>
+  
+		<!-- The update text entry -->	
+        <TextView
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="left"
+	        android:text="Update Description:"
+	        android:textColor="@color/dk_gray"
+	        android:textSize="18sp"
+	        android:textStyle="italic"
+	        android:typeface="sans" />
 
-	            <ImageView
-		            android:id="@+id/image_proj_detail"
-	                android:layout_width="wrap_content"
-	                android:layout_height="wrap_content"
-	                android:layout_gravity="left"
-	                android:background="@layout/gray_gradient"
-	                android:contentDescription="@string/app_name"
-			        />
+        <EditText
+            android:id="@+id/edit_projupd_description"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:layout_margin="5dip"
+            android:singleLine="false"
+			android:layout_weight="2"
+            android:hint="@string/hint_update_description"
+            android:padding="5dip"/>
+        
+		<!-- The photo button -->	
+        <TextView
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="left"
+	        android:text="Add photo:"
+	        android:textColor="@color/dk_gray"
+	        android:textSize="18sp"
+	        android:textStyle="italic"
+	        android:typeface="sans" />
 
-			    <ImageButton
-		            android:id="@+id/btn_proj_sideways"
-			        android:layout_width="0dp"
-			        android:layout_height="fill_parent"
-			        android:layout_weight="1"
-			        android:src="@drawable/ic_menu_forward"
-		            />
-           </LinearLayout>	        
+	    <Button
+	        android:id="@+id/btn_take_photo"
+	        android:layout_width="wrap_content"
+	        android:layout_height="50dip"
+            android:layout_margin="5dip"
+	        android:layout_gravity="center_horizontal"
+	        android:drawableLeft="@drawable/ic_menu_camera"
+	        android:text="TAKE PHOTO NOW"
+	        android:background="@color/rsr_blue"
+	        android:textColor="@color/rsr_purple" />
 
-		   <TextView
-		       android:layout_width="fill_parent"
-		       android:layout_height="wrap_content"
-		       android:layout_gravity="left"
-		       android:text="Location"
-		       android:textColor="@color/dk_gray"
-		       android:textSize="18sp"
-		       android:textStyle="italic"
-		       android:typeface="sans" />
+	    <!-- The two save buttons -->	
+	    <LinearLayout
+	        android:layout_width="fill_parent"
+	        android:layout_height="80dip"
+	        android:orientation="horizontal"
+	        android:layout_gravity="bottom"
+	        >
 
-	      	<TextView
-	            android:id="@+id/text_proj_location"
-  	        	    android:layout_width="fill_parent"
-  	        	    android:layout_height="wrap_content"
-  	        	    android:layout_gravity="left"
-  	        	    android:textColor="@color/dk_gray"
-  	        	    android:textSize="14sp"
-  	        	    android:typeface="sans" />
+		    <Button
+	            android:id="@+id/btn_send_update"
+		        android:layout_width="0dp"
+		        android:layout_height="fill_parent"
+		        android:layout_weight="1"
+		        android:drawableTop="@drawable/ic_menu_share"
+		        android:text="SEND UPDATE"
+	            />
 	
-		    <LinearLayout
-		        android:layout_width="fill_parent"
-		        android:layout_height="80dip"
-		        android:orientation="horizontal" >
-	
-			    <Button
-		            android:id="@+id/btn_view_updates"
-			        android:layout_width="0dp"
-			        android:layout_height="fill_parent"
-			        android:layout_weight="1"
-			        android:drawableTop="@drawable/ic_menu_view"
-			        android:text="VIEW ALL UPDATES"
-		            />
-			    <!-- View updates button -->
-		
-			    <Button
-		            android:id="@+id/btn_add_update"
-			        android:layout_width="0dp"
-			        android:layout_height="fill_parent"
-			        android:layout_weight="1"
-			        android:drawableTop="@drawable/ic_menu_add"
-			        android:text="ADD UPDATE"
-		            />
-		    	    	
-   			</LinearLayout>
+		    <Button
+	            android:id="@+id/btn_save_draft"
+		        android:layout_width="0dp"
+		        android:layout_height="fill_parent"
+		        android:layout_weight="1"
+		        android:drawableTop="@drawable/ic_menu_save"
+		        android:text="SAVE DRAFT"
+	            />
+	    	    	
 	   	</LinearLayout>
-    </ScrollView>
 </LinearLayout>

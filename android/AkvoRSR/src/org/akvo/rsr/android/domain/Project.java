@@ -29,6 +29,7 @@ public class Project {
 	private Date startDate;
 	private Date endDate;
 	private double funds;
+	private String summary;
 
 	public String getId() {
 		return id;
@@ -92,6 +93,14 @@ public class Project {
 
 	public void setFunds(double funds) {
 		this.funds = funds;
+	}
+
+	public String getSummary() {
+		return summary;
+	}
+
+	public void setSummary(String summary) {
+		this.summary = summary;
 	}
 
 

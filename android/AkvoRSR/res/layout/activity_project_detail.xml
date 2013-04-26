@@ -1,35 +1,43 @@
 <LinearLayout
-	  	xmlns:android="http://schemas.android.com/apk/res/android"
-  		android:layout_width="fill_parent"
-  		android:layout_height="fill_parent"
-        android:orientation="vertical"
+	xmlns:android="http://schemas.android.com/apk/res/android"
+  	android:layout_width="fill_parent"
+  	android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="@color/lt_gray"
+	>
+
+    <TextView
+    	android:id="@+id/text_proj_detail_title"
+   	    android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:background="@color/lt_gray"
+        android:padding="5dip"
+        android:typeface="sans"
+        android:text="Project title here"
+         />
+
+  	<ScrollView
+		android:layout_width="fill_parent"
+		android:layout_height="0dp"
+		android:layout_weight="1"
 		>
 
-        <TextView
-            android:id="@+id/text_proj_detail_title"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left"
-            android:background="@color/lt_gray"
-            android:padding="5dip"
-            android:typeface="sans" />
-
-      	<ScrollView
-		  android:layout_width="fill_parent"
-		  android:layout_height="fill_parent"
-		   >
-			<LinearLayout
-	  		android:layout_width="fill_parent"
-	  		android:layout_height="wrap_content"
-			android:background="@color/lt_gray"
-		    android:orientation="vertical"
-			>
+  	    <LinearLayout
+  		android:layout_width="fill_parent"
+  		android:layout_height="wrap_content"
+		android:background="@color/lt_gray"
+	    android:orientation="vertical"
+        android:layout_weight="1"
+		>
       	    
 		    <LinearLayout
 		        android:layout_width="fill_parent"
 		        android:layout_height="wrap_content"
-		        android:orientation="horizontal" >
-
+		        android:orientation="horizontal"
+	            android:background="@layout/gray_gradient"
+		        >
+		        
 			    <!-- Project image  -->
 
 	            <ImageView
@@ -37,10 +45,10 @@
 	                android:layout_width="wrap_content"
 	                android:layout_height="wrap_content"
 	                android:layout_gravity="left"
-	                android:background="@layout/gray_gradient"
 	                android:contentDescription="@string/app_name"
+	                android:src="@drawable/ic_launcher"
 			        />
-
+<!-- 
 			    <ImageButton
 		            android:id="@+id/btn_proj_sideways"
 			        android:layout_width="0dp"
@@ -48,6 +56,7 @@
 			        android:layout_weight="1"
 			        android:src="@drawable/ic_menu_forward"
 		            />
+		             -->
            </LinearLayout>	        
 
 		   <TextView
@@ -61,23 +70,46 @@
 		       android:typeface="sans" />
 
 	      	<TextView
-	            android:id="@+id/text_proj_location"
-  	        	    android:layout_width="fill_parent"
-  	        	    android:layout_height="wrap_content"
-  	        	    android:layout_gravity="left"
-  	        	    android:textColor="@color/dk_gray"
-  	        	    android:textSize="14sp"
-  	        	    android:typeface="sans" />
-	
+			   android:id="@+id/text_proj_location"
+			   android:layout_width="fill_parent"
+			   android:layout_height="wrap_content"
+			   android:layout_gravity="left"
+			   android:textColor="@color/dk_gray"
+			   android:textSize="14sp"
+			   android:typeface="sans"
+			   />
+		   <TextView
+		       android:layout_width="fill_parent"
+		       android:layout_height="wrap_content"
+		       android:layout_gravity="left"
+		       android:text="Summary"
+		       android:textColor="@color/dk_gray"
+		       android:textSize="18sp"
+		       android:textStyle="italic"
+		       android:typeface="sans" />
+
+	      	<TextView
+			   android:id="@+id/text_proj_summary"
+			   android:layout_width="fill_parent"
+			   android:layout_height="wrap_content"
+			   android:layout_gravity="left"
+			   android:textColor="@color/dk_gray"
+			   android:textSize="14sp"
+			   android:typeface="sans"
+			   />
+	   	</LinearLayout>
+	</ScrollView>
+	<!-- the bottom buttons -->      		      		
 		    <LinearLayout
 		        android:layout_width="fill_parent"
-		        android:layout_height="80dip"
+		        android:layout_height="wrap_content"
+			   android:layout_gravity="bottom"
 		        android:orientation="horizontal" >
 	
 			    <Button
 		            android:id="@+id/btn_view_updates"
 			        android:layout_width="0dp"
-			        android:layout_height="fill_parent"
+			        android:layout_height="wrap_content"
 			        android:layout_weight="1"
 			        android:drawableTop="@drawable/ic_menu_view"
 			        android:text="VIEW ALL UPDATES"
@@ -87,13 +119,11 @@
 			    <Button
 		            android:id="@+id/btn_add_update"
 			        android:layout_width="0dp"
-			        android:layout_height="fill_parent"
+			        android:layout_height="wrap_content"
 			        android:layout_weight="1"
 			        android:drawableTop="@drawable/ic_menu_add"
 			        android:text="ADD UPDATE"
 		            />
 		    	    	
    			</LinearLayout>
-	   	</LinearLayout>
-    </ScrollView>
 </LinearLayout>
