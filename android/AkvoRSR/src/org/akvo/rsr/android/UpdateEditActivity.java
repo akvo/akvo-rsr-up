@@ -48,9 +48,8 @@ public class UpdateEditActivity extends Activity {
 
 	private String projectId = null;
 	private String updateId = null;
-//	private Project project = null;
 	private Update update = null;
-	private String projId = null;
+	//UI
 	private TextView projTitleLabel;
 	private EditText projupdTitleText;
 	private EditText projupdDescriptionText;
@@ -58,7 +57,7 @@ public class UpdateEditActivity extends Activity {
 	private Button btnSubmit;
 	private Button btnDraft;
 	private Button btnPhoto;
-	
+	//Database
 	private RsrDbAdapter dba;
 	
 	@Override
@@ -151,9 +150,12 @@ public class UpdateEditActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		dba.open();
-		Project project = dba.findProject(projId);
-		
-		projTitleLabel.setText(project.getTitle());
+		if (projectId != null) {
+			Project project = dba.findProject(projectId);
+			projTitleLabel.setText(project.getTitle());
+		} else {
+			projTitleLabel.setText("<NO PROJECT ID>");
+		}
 /*		
 		//Find file containing thumbnail		
 		File f = new File(project.getThumbnailFilename());

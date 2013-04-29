@@ -122,7 +122,8 @@ public class Downloader {
 		try {
 			HttpRequest.get(url).receive(file);		
 		} catch (Exception e) {
-			/* Display any Error to the GUI. */
+			/* TODO:Display any Error to the GUI. */
+			//Will come here with a "file not found" if card is full
 			Log.e(TAG, "HttpGetToFile Error", e);
 		}
 	}
@@ -177,13 +178,15 @@ public class Downloader {
 						String id = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.PK_ID_COL));
 						String fn = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
 						String url = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
-						if (url == null) {
-							Log.w(TAG, "Null image URL for update: "+id);
-						} else if (fn == null) {
+						if (fn == null) {
 							//not fetched yet
-							Log.i(TAG, "URL: "+url);
-							fn = HttpGetToNewFile(new URL(curl,url), directory);
-							dba.updateUpdateThumbnailFile(id,fn);						
+							if (url == null) {
+								Log.w(TAG, "Null image URL for update: "+id);
+							} else {
+//								Log.i(TAG, "URL: "+url);
+								fn = HttpGetToNewFile(new URL(curl,url), directory);
+								dba.updateUpdateThumbnailFile(id,fn);						
+								}
 							}
 						cursor2.moveToNext();
 					}

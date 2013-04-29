@@ -84,15 +84,14 @@
 	    <!-- The two save buttons -->	
 	    <LinearLayout
 	        android:layout_width="fill_parent"
-	        android:layout_height="80dip"
+	        android:layout_height="wrap_content"
 	        android:orientation="horizontal"
-	        android:layout_gravity="bottom"
 	        >
 
 		    <Button
 	            android:id="@+id/btn_send_update"
 		        android:layout_width="0dp"
-		        android:layout_height="fill_parent"
+		        android:layout_height="wrap_content"
 		        android:layout_weight="1"
 		        android:drawableTop="@drawable/ic_menu_share"
 		        android:text="SEND UPDATE"
@@ -101,7 +100,7 @@
 		    <Button
 	            android:id="@+id/btn_save_draft"
 		        android:layout_width="0dp"
-		        android:layout_height="fill_parent"
+		        android:layout_height="wrap_content"
 		        android:layout_weight="1"
 		        android:drawableTop="@drawable/ic_menu_save"
 		        android:text="SAVE DRAFT"
