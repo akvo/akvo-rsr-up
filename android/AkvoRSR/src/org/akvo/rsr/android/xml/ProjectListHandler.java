@@ -85,7 +85,8 @@ public class ProjectListHandler extends DefaultHandler {
 	private boolean in_thumbnail_url = false;
 
 	private Project currentProj;
-	
+
+	private int projectCount = 0;
 	private boolean syntaxError = false;
 
 	//where to store results
@@ -109,12 +110,17 @@ public class ProjectListHandler extends DefaultHandler {
 		return syntaxError;
 	}
 
+	public int getCount() {
+		return projectCount;
+	}
+
 	// ===========================================================
 	// Methods
 	// ===========================================================
 	@Override
 	public void startDocument() throws SAXException {
 		dba.open();
+		projectCount = 0;
 	}
 
 	@Override
@@ -177,6 +183,7 @@ public class ProjectListHandler extends DefaultHandler {
 			if (currentProj != null) {
 				dba.saveProject(currentProj);
 				currentProj = null;
+				projectCount++;
 			}
 		} else if (localName.equals("project_plan_summary")) {
 			this.in_summary = false;

@@ -16,7 +16,9 @@
 
 package org.akvo.rsr.android;
 
+import java.io.Closeable;
 import java.io.File;
+import java.util.Currency;
 
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Project;
@@ -26,6 +28,7 @@ import org.akvo.rsr.android.util.DialogUtil;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.app.Activity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -45,7 +48,9 @@ import android.provider.MediaStore;
 public class UpdateEditActivity extends Activity {
 	
 	private final int photoRequest = 777;
-
+	private  String captureFilename = null;
+	
+	private int nextLocalId = -1; //TODO load from /save to variable store
 	private String projectId = null;
 	private String updateId = null;
 	private Update update = null;
@@ -79,6 +84,41 @@ public class UpdateEditActivity extends Activity {
 					.getString(ConstantUtil.UPDATE_ID_KEY) : null;
 		}
 		
+		
+		//get the look
+		setContentView(R.layout.activity_edit_update);
+		//find the fields
+		projTitleLabel = (TextView) findViewById(R.id.projupd_edit_proj_title);
+		projupdTitleText = (EditText) findViewById(R.id.edit_projupd_title);
+		projupdDescriptionText = (EditText) findViewById(R.id.edit_projupd_description);
+		projImage = (ImageView) findViewById(R.id.image_proj_detail);
+
+		//Activate buttons
+		btnSubmit = (Button) findViewById(R.id.btn_send_update);
+		btnSubmit.setOnClickListener( new View.OnClickListener() {
+			public void onClick(View view) {
+				sendUpdate();
+			}
+		});
+		
+		btnDraft = (Button) findViewById(R.id.btn_save_draft);
+		btnDraft.setOnClickListener( new View.OnClickListener() {
+			public void onClick(View view) {
+				saveAsDraft();
+			}
+		});
+		
+		btnPhoto = (Button) findViewById(R.id.btn_take_photo);
+		btnPhoto.setOnClickListener( new View.OnClickListener() {
+			public void onClick(View view) {
+			    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+			    // generate unique filename
+			    captureFilename = Environment.getExternalStorageDirectory() + ConstantUtil.PHOTO_DIR + "capture" + System.nanoTime() + ".jpg";
+			    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(captureFilename)));
+			    startActivityForResult(takePictureIntent, photoRequest);
+			}
+		});
+		
 		dba = new RsrDbAdapter(this);
 		dba.open();
 		
@@ -90,41 +130,8 @@ public class UpdateEditActivity extends Activity {
 				//TODO raise error
 			}
 			
-			//TODOI populate fields
+			//TODO populate fields
 		}
-		
-		//get the look
-		setContentView(R.layout.activity_edit_update);
-		//find the fields
-		projTitleLabel = (TextView) findViewById(R.id.projupd_edit_proj_title);
-		projupdTitleText = (EditText) findViewById(R.id.edit_projupd_title);
-		projupdDescriptionText = (EditText) findViewById(R.id.edit_projupd_title);
-		projImage = (ImageView) findViewById(R.id.image_proj_detail);
-
-		//Activate buttons
-		btnSubmit = (Button) findViewById(R.id.btn_send_update);
-		btnSubmit.setOnClickListener( new View.OnClickListener() {
-			public void onClick(View view) {
-				//TODO
-			}
-		});
-		
-		btnDraft = (Button) findViewById(R.id.btn_save_draft);
-		btnDraft.setOnClickListener( new View.OnClickListener() {
-			public void onClick(View view) {
-				//TODO
-			}
-		});
-		
-		btnPhoto = (Button) findViewById(R.id.btn_take_photo);
-		btnDraft.setOnClickListener( new View.OnClickListener() {
-			public void onClick(View view) {
-			    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-			    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File("/sdcard/akvorsr/taken.jpg")));
-			    startActivityForResult(takePictureIntent, photoRequest);
-			}
-		});
-		
 		
 		// Show the Up button in the action bar.
 		//		setupActionBar();
@@ -132,19 +139,55 @@ public class UpdateEditActivity extends Activity {
 
 	/*
 	 * (non-Javadoc)
-	 * Get notofication of photo taken
+	 * Get notification of photo taken
 	 */
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		
 		if (requestCode == photoRequest) {
-			//TODO check if resultCode is ok, not canceled
+			if (resultCode == RESULT_CANCELED) {
+				return;
+			}
 			//Handle taken photo
-			DialogUtil.errorAlert(this, "Photo returned", "Got a photo");
-			//TODO
+			if (new File(captureFilename).exists()) {
+				update.setThumbnailFilename(captureFilename);
+				DialogUtil.infoAlert(this, "Photo returned", "Got a photo");
+			}
+			//TODO take thumbnail in intent and show it on form
 		}
 	}
+
+	/*
+	 * Save current update
+	 */
+	private void saveAsDraft() {
+		update.setDraft(true);
+		update.setTitle(projupdTitleText.getText().toString());
+		update.setText(projupdDescriptionText.getText().toString());
+		//MUST have project and a local update id
+		update.setProjectId(projectId);
+		update.setId(Integer.toString(nextLocalId));
+		nextLocalId--;
+		dba.saveUpdate(update);
+		DialogUtil.errorAlert(this, "Update saved as draft", "You can edit and submit it later");
+		finish();
+	}
+
+	/*
+	 * Save current update
+	 */
+	private void sendUpdate() {
+		update.setUnsent(true);
+		update.setTitle(projupdTitleText.getText().toString());
+		update.setText(projupdDescriptionText.getText().toString());
+		dba.saveUpdate(update);
+		//TODO start synch service
+		finish();
+		
+	}
+
+	
 	
 	@Override
 	protected void onResume() {

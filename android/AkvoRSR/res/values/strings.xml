@@ -17,7 +17,7 @@
     <string name="state_unsent">● Unsynchronized</string>
     <string name="updates_txt">UPDATES STATUS</string>
     <string name="unsynch">0 Unsynchronized</string>
-    <string name="drafts">1 Drafts</string>
+    <string name="drafts">0 Drafts</string>
     <string name="email_address">Email Address</string>
     <string name="password">Password</string>
     <string name="sign_in">SIGN IN</string>

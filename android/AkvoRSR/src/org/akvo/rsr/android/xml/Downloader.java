@@ -18,12 +18,16 @@ package org.akvo.rsr.android.xml;
 
 import java.io.File;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Project;
+import org.akvo.rsr.android.domain.Update;
+import org.akvo.rsr.android.util.DialogUtil;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
@@ -39,19 +43,6 @@ public class Downloader {
 
 	private static final String TAG = "Downloader";
 
-	private void errorAlert(Context ctx, Exception e) {
-		/* Display any Error to the GUI. */
-		AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
-	    alert.setTitle("Error fetching project list");
-	    alert.setMessage(e.toString());
-	
-	    alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int whichButton) {
-		    	dialog.cancel();
-		    	}
-		    });
-	    alert.show();
-	}
 	
 	/* Populate the projects table in the db from a server URL
 	 * 
@@ -75,10 +66,12 @@ public class Downloader {
 		
 			/* Check if anything went wrong. */
 			boolean err = myProjectListHandler.getError();
-	
+
+			Log.i(TAG, "Fetched "+myProjectListHandler.getCount()+" projects");
+
 		} catch (Exception e) {
 			/* Display any Error to the GUI. */
-			errorAlert(ctx, e);
+			DialogUtil.errorAlert(ctx, "Error fetching project list", e);
 			Log.e(TAG, "FetchProjectList Error", e);
 		}
 	}
@@ -106,10 +99,11 @@ public class Downloader {
 		
 			/* Check if anything went wrong. */
 			boolean err = myUpdateListHandler.getError();
+			Log.i(TAG, "Fetched "+myUpdateListHandler.getCount()+" updates");
 	
 		} catch (Exception e) {
 			/* Display any Error to the GUI. */
-			errorAlert(ctx, e);
+			DialogUtil.errorAlert(ctx, "Error fetching update list", e);
 			Log.e(TAG, "FetchProjectList Error", e);
 		}
 	}
@@ -119,13 +113,13 @@ public class Downloader {
 	 * Fetch one file from a URL
 	 */
 	public void HttpGetToFile(URL url, File file) {
-		try {
+//		try {
 			HttpRequest.get(url).receive(file);		
-		} catch (Exception e) {
+//		} catch (Exception e) {
 			/* TODO:Display any Error to the GUI. */
 			//Will come here with a "file not found" if card is full
-			Log.e(TAG, "HttpGetToFile Error", e);
-		}
+//			Log.e(TAG, "HttpGetToFile Error", e);
+//		}
 	}
 
 	
@@ -134,14 +128,14 @@ public class Downloader {
 	 */
 	public String HttpGetToNewFile(URL url, String directory) {
 		File output = new File("error");
-		try {
+//		try {
 			String extension = url.getFile().substring((url.getFile().lastIndexOf('.')));
 			output = new File(directory + System.nanoTime() + extension);
 			HttpGetToFile(url,output.getAbsoluteFile());
-		} catch (Exception e) {
-			/* Display any Error to the GUI. */
-			Log.e(TAG, "HttpGetToNewFile Error", e);
-		}
+//		} catch (Exception e) {
+//			/* Display any Error to the GUI. */
+//			Log.e(TAG, "HttpGetToNewFile Error", e);
+//		}
 		return output.getAbsolutePath();
 	}
 	
@@ -194,15 +188,27 @@ public class Downloader {
 				}
 			} catch (Exception e) {
 				/* Display any Error to the GUI. */
-				errorAlert(ctx, e);
+				DialogUtil.errorAlert(ctx, "Error fetching images", e);
 				Log.e(TAG, "FetchNewThumbnails Error", e);
 			}
 		} finally {
 			dba.close();
 		}
 		
-		
-		
 	}
 
+	
+	/* 
+	 * Publish an update, return new ID
+	 */
+	public String PostUpdate(URL url, Update update) {
+		Map<String, String> data = new HashMap<String, String>();
+		data.put("title", update.getTitle());
+		data.put("text", update.getText());
+		if (HttpRequest.post(url).form(data).created())
+			System.out.println("User was created");
+		return "666";
+	}
+	
+	
 }

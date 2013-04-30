@@ -67,7 +67,7 @@ public class UpdateListHandler extends DefaultHandler {
 	private boolean in_text = false;
 
 	private Update currentUpd;
-	
+	private int updateCount;
 	private boolean syntaxError = false;
 	
 	//where to store results
@@ -88,12 +88,17 @@ public class UpdateListHandler extends DefaultHandler {
 		return syntaxError;
 	}
 
+	public int getCount() {
+		return updateCount;
+	}
+
 	// ===========================================================
 	// Methods
 	// ===========================================================
 	@Override
 	public void startDocument() throws SAXException {
 		dba.open();
+		updateCount = 0;
 	}
 
 	@Override
@@ -141,6 +146,7 @@ public class UpdateListHandler extends DefaultHandler {
 			this.in_update = false;
 			if (currentUpd != null) {
 				dba.saveUpdate(currentUpd);
+				updateCount++;
 				currentUpd = null;
 			}
 		} else if (localName.equals("photo")) {

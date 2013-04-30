@@ -64,7 +64,7 @@ public class ProjectDetailActivity extends Activity {
 		setContentView(R.layout.activity_project_detail);
 		//find the fields
 		projTitleLabel = (TextView) findViewById(R.id.text_proj_detail_title);
-		projLocationText = (TextView) findViewById(R.id.text_proj_location);
+//		projLocationText = (TextView) findViewById(R.id.text_proj_location);
 		projSummaryText= (TextView) findViewById(R.id.text_proj_summary);
 		projImage = (ImageView) findViewById(R.id.image_proj_detail);
 		//Activate buttons
@@ -101,7 +101,7 @@ public class ProjectDetailActivity extends Activity {
 		
 		projTitleLabel.setText(project.getTitle());
 //		projLocationText.setText(project.getLocation()); //not sure what this is supposed to match in XML
-		projLocationText.setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras metus orci, luctus sed venenatis non, iaculis at neque. Mauris aliquet aliquam nisi, non consequat leo mollis vitae.");
+//		projLocationText.setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras metus orci, luctus sed venenatis non, iaculis at neque. Mauris aliquet aliquam nisi, non consequat leo mollis vitae.");
 		projSummaryText.setText(project.getSummary());
 		
 		//Find file containing thumbnail		
