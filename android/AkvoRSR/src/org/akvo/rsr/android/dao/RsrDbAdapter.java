@@ -39,6 +39,7 @@ public class RsrDbAdapter {
 	public static final String PK_ID_COL = "_id";
 	public static final String TITLE_COL = "title";
 	public static final String SUBTITLE_COL = "subtitle";
+	public static final String SUMMARY_COL = "summary";
 	public static final String FUNDS_COL = "funds";
 	public static final String THUMBNAIL_URL_COL = "thumbnail_url";
 	public static final String THUMBNAIL_FILENAME_COL = "thumbnail_fn";
@@ -56,7 +57,7 @@ public class RsrDbAdapter {
 	 */
 	private static final String PROJECT_TABLE_CREATE =
 			"create table project (_id integer primary key, "+
-			"title text not null, subtitle text, funds real, "+
+			"title text not null, subtitle text, summary text, funds real, "+
 			"thumbnail_url text, thumbnail_fn text);";
 	private static final String UPDATE_TABLE_CREATE =
 			"create table _update (_id integer primary key, project integer not null, "+
@@ -65,15 +66,15 @@ public class RsrDbAdapter {
 			"draft integer, unsent integer);";
 
 	private static final String[] DEFAULT_INSERTS = new String[] {
-		"insert into project values(1,'Sample Proj1', 'Sample proj 1 subtitle', 4711.00, 'url1', 'fn1')",
-		"insert into project values(2,'Sample Proj2', 'Sample proj 2 subtitle', 4712.00, 'url2', 'fn2')"
+		"insert into project values(1,'Sample Proj1', 'Sample proj 1 subtitle', 'sum1', 4711.00, 'url1', 'fn1')",
+		"insert into project values(2,'Sample Proj2', 'Sample proj 2 subtitle', 'sum2', 4712.00, 'url2', 'fn2')"
 		};
 
 	private static final String DATABASE_NAME = "rsrdata";
 	private static final String PROJECT_TABLE = "project";
 	private static final String UPDATE_TABLE = "_update";
 
-	private static final int DATABASE_VERSION = 4;
+	private static final int DATABASE_VERSION = 5;
 
 	private final Context context;
 
@@ -113,7 +114,7 @@ public class RsrDbAdapter {
 					+ newVersion);
 
 			
-			if (oldVersion < 4) { //start over fresh
+			if (oldVersion < DATABASE_VERSION) { //start over fresh
 				db.execSQL("DROP TABLE IF EXISTS " + PROJECT_TABLE);
 				db.execSQL("DROP TABLE IF EXISTS " + UPDATE_TABLE);
 				onCreate(db);
@@ -313,6 +314,7 @@ public class RsrDbAdapter {
 		// updatedValues.put(SERVER_ID_COL, project.getServerId());
 		updatedValues.put(TITLE_COL, project.getTitle());
 		updatedValues.put(SUBTITLE_COL, project.getSubtitle());
+		updatedValues.put(SUMMARY_COL, project.getSummary());
 		updatedValues.put(FUNDS_COL, project.getFunds());
 		updatedValues.put(THUMBNAIL_URL_COL, project.getThumbnailUrl());
 		updatedValues.put(THUMBNAIL_FILENAME_COL, project.getThumbnailFilename());
@@ -361,8 +363,8 @@ public class RsrDbAdapter {
 		updatedValues.put(TEXT_COL, update.getText());
 		updatedValues.put(THUMBNAIL_URL_COL, update.getThumbnailUrl());
 		updatedValues.put(THUMBNAIL_FILENAME_COL, update.getThumbnailFilename());
-		updatedValues.put(DRAFT_COL, update.getDraft());
-		updatedValues.put(UNSENT_COL, update.getUnsent());
+		updatedValues.put(DRAFT_COL, update.getDraft()?"1":"0");
+		updatedValues.put(UNSENT_COL, update.getUnsent()?"1":"0");
 
 		Cursor cursor = database.query(UPDATE_TABLE,
 				new String[] { PK_ID_COL },
@@ -456,10 +458,9 @@ public class RsrDbAdapter {
 					draftCount++;
 				} else	if (cursor.getInt(unsentCol) > 0) {
 					unsentCount++;
-				} else {
+				} else
 					otherCount++;
 				cursor.moveToNext();
-				}
 			}
 			cursor.close();
 		}
@@ -474,7 +475,7 @@ public class RsrDbAdapter {
 	public Project findProject(String _id) {
 		Project project = null;
 		Cursor cursor = database.query(PROJECT_TABLE,
-										new String[] { PK_ID_COL, TITLE_COL, SUBTITLE_COL, FUNDS_COL, THUMBNAIL_URL_COL, THUMBNAIL_FILENAME_COL },
+										new String[] { PK_ID_COL, TITLE_COL, SUBTITLE_COL, SUMMARY_COL, FUNDS_COL, THUMBNAIL_URL_COL, THUMBNAIL_FILENAME_COL },
 										PK_ID_COL + " = ?",
 										new String[] { _id }, null, null, null);
 		if (cursor != null) {
@@ -484,13 +485,14 @@ public class RsrDbAdapter {
 				project.setId(_id);
 				project.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(TITLE_COL)));
 				project.setSubtitle(cursor.getString(cursor.getColumnIndexOrThrow(SUBTITLE_COL)));
+				project.setSummary(cursor.getString(cursor.getColumnIndexOrThrow(SUMMARY_COL)));
 				project.setThumbnailUrl(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_URL_COL)));
 				project.setThumbnail(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_FILENAME_COL)));
 				//TODO funds
 				//TODO location
-						}
+				}
 			cursor.close();
-		}
+			}
 
 		return project;
 	}
@@ -513,7 +515,9 @@ public class RsrDbAdapter {
 				update.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(TITLE_COL)));
 				update.setThumbnailUrl(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_URL_COL)));
 				update.setThumbnailFilename(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_FILENAME_COL)));
-						}
+				update.setDraft(0 != cursor.getInt(cursor.getColumnIndexOrThrow(DRAFT_COL)));
+				update.setUnsent(0 != cursor.getInt(cursor.getColumnIndexOrThrow(UNSENT_COL)));
+				}
 			cursor.close();
 		}
 

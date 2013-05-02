@@ -19,6 +19,7 @@ package org.akvo.rsr.android;
 import java.io.Closeable;
 import java.io.File;
 import java.util.Currency;
+import java.util.Random;
 
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Project;
@@ -113,7 +114,7 @@ public class UpdateEditActivity extends Activity {
 			public void onClick(View view) {
 			    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 			    // generate unique filename
-			    captureFilename = Environment.getExternalStorageDirectory() + ConstantUtil.PHOTO_DIR + "capture" + System.nanoTime() + ".jpg";
+			    captureFilename = Environment.getExternalStorageDirectory() + "/" + ConstantUtil.PHOTO_DIR + "capture" + System.nanoTime() + ".jpg";
 			    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(captureFilename)));
 			    startActivityForResult(takePictureIntent, photoRequest);
 			}
@@ -167,7 +168,8 @@ public class UpdateEditActivity extends Activity {
 		update.setText(projupdDescriptionText.getText().toString());
 		//MUST have project and a local update id
 		update.setProjectId(projectId);
-		update.setId(Integer.toString(nextLocalId));
+//		update.setId(Integer.toString(nextLocalId)); //TODO persist this
+		update.setId(Integer.toString(- new Random().nextInt(100000000)));
 		nextLocalId--;
 		dba.saveUpdate(update);//TODO update fails w illegalArgument (? or illegalState?)
 		DialogUtil.errorAlert(this, "Update saved as draft", "You can edit and submit it later");//TODO only visible momentarily before activity is closed

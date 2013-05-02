@@ -45,12 +45,12 @@ public class LoginActivity extends Activity {
 		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 			Log.i(TAG, "External storage: mounted ");
 			File f = new File (Environment.getExternalStorageDirectory().getPath() + imageFolder1);
-			if (f.mkdir() || f.isDirectory() ) {
+			if (f.mkdirs() || f.isDirectory() ) {
 				Log.i(TAG, "Found/created photo dir "+f.getAbsolutePath());
 			} else
 				Log.e("LoginActivity", "could not find/create photo dir");
 			f = new File (Environment.getExternalStorageDirectory().getPath() + imageCache2);
-			if (f.mkdir() || f.isDirectory()) {
+			if (f.mkdirs() || f.isDirectory()) {
 				Log.i(TAG, "Found/created image cache dir "+f.getAbsolutePath());
 			} else
 				Log.e("LoginActivity", "could not find/create image cache dir");

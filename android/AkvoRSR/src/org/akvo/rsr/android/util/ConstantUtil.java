@@ -30,13 +30,14 @@ public class ConstantUtil {
 	/**
 	 * server constants
 	 */
-	public static final String TEST_API_KEY = "?api_key=9527895794156530589a28e5fa43e9cc5ecaca46&username=stellanl";
+	public static final String TEST_API_KEY = "?api_key=9527895794156530589a28e5fa43e9cc5ecaca46&username=stellanl ";
 
 	/**
 	 * file system constants
 	 */
 	public static final String XML_SUFFIX = ".xml";
 	public static final String JPG_SUFFIX = ".jpg";
+	public static final String TOP_DIR = "akvorsr/";
 	public static final String PHOTO_DIR = "akvorsr/photos/";
 	public static final String IMAGECACHE_DIR = "akvorsr/imagecache/";
 	
@@ -77,31 +78,12 @@ public class ConstantUtil {
 	 * settings keys
 	 */
 	public static final String SURVEY_LANG_SETTING_KEY = "survey.language";
-	public static final String USER_SAVE_SETTING_KEY = "user.storelast";
-	public static final String CELL_UPLOAD_SETTING_KEY = "data.cellular.upload";
-	public static final String PLOT_MODE_SETTING_KEY = "plot.default.mode";
-	public static final String PLOT_INTERVAL_SETTING_KEY = "plot.interval";
-	public static final String LAST_USER_SETTING_KEY = "user.lastuser.id";
-	public static final String LOCATION_BEACON_SETTING_KEY = "location.sendbeacon";
-	public static final String PRECACHE_SETTING_KEY = "survey.precachehelp";
-	public static final String SERVER_SETTING_KEY = "upload.server";
-	public static final String SCREEN_ON_KEY = "screen.keepon";
-	public static final String PRECACHE_POINT_COUNTRY_KEY = "precache.points.countries";
-	public static final String PRECACHE_POINT_LIMIT_KEY = "precache.points.limit";
-	public static final String DEVICE_IDENT_KEY = "device.identifier";
-	public static final String SURVEY_TEXT_SIZE_KEY = "survey.textsize";
-	public static final String CHECK_FOR_SURVEYS = "survey.checkforupdates";
-	public static final String UPLOAD_ERRORS = "remoteexception.upload";
-	public static final String NEARBY_RADIUS = "nearby.points.radius";
-	public static final String PHOTO_SIZE_REMINDER_KEY = "survey.media.photo.sizereminder";
-	public static final String SHRINK_PHOTOS_KEY = "survey.media.photo.shrink";
 	
 	
 
 	/**
 	 * intents
 	 */
-	public static final String DATA_AVAILABLE_INTENT = "com.gallatinsystems.survey.device.DATA_SUBMITTED";
 	public static final String GPS_STATUS_INTENT = "com.eclipsim.gpsstatus.VIEW";
 	public static final String BARCODE_SCAN_INTENT = "com.google.zxing.client.android.SCAN";
 

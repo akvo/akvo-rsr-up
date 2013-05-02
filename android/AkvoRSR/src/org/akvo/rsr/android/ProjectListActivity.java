@@ -162,7 +162,7 @@ public class ProjectListActivity extends ListActivity {
 		Downloader dl = new Downloader();
 		//TODO THIS MIGHT HANG, no timeout defined...
 		dl.FetchProjectList(this,"http://uat.akvo.org","/api/v1/project/?format=xml&limit=0&partnerships__organisation=42");//Akvo projs
-		dl.FetchUpdateList(this,"http://uat.akvo.org","/api/v1/project_update/?format=xml&limit=0&project__partnerships__organisation=42");//Akvo projs updates
+		dl.FetchUpdateList(this,"http://uat.akvo.org","/api/v1/project_update/?format=xml&limit=50&project__partnerships__organisation=42");//Akvo projs updates
 		try {
 			dl.FetchNewThumbnails(this, "http://uat.akvo.org", Environment.getExternalStorageDirectory().getPath() + "/" + ConstantUtil.IMAGECACHE_DIR);
 		} catch (MalformedURLException e) {

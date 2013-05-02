@@ -146,6 +146,7 @@ public class ProjectListHandler extends DefaultHandler {
 		} else if (localName.equals("object")) {
 			this.in_project = true;
 			currentProj = new Project();
+			currentProj.setSummary("");
 /*
  		} else if (localName.equals("tagwithnumber")) {
 			// Extract an Attribute
@@ -208,7 +209,7 @@ public class ProjectListHandler extends DefaultHandler {
 			} else if(this.in_subtitle) {
 				currentProj.setTitle(new String(ch, start, length));
 			} else if(this.in_summary) {
-				currentProj.setSummary(new String(ch, start, length));
+				currentProj.setSummary(currentProj.getSummary() + new String(ch, start, length));
 			} else if(this.in_thumbnail_url) {
 				currentProj.setThumbnailUrl(new String(ch, start, length));
 			} else if(this.in_funds) {

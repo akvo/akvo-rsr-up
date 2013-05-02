@@ -2,7 +2,7 @@
 <resources>
  
     <string name="app_name">AkvoRSR</string>
-    <string name="app_version">0.6</string>
+    <string name="app_version">0.8</string>
     <string name="app_subtitle">Really Simple Reporting</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_login">Akvo RSR</string>
@@ -13,13 +13,16 @@
     <string name="hint_update_title">Title</string>
     <string name="hint_update_description">Description</string>
     <string name="state_draft">● Draft</string>
-    <string name="action_settings">Settings</string>
     <string name="state_unsent">● Unsynchronized</string>
     <string name="state_published">● Published</string>
+    <string name="count_draft"> Draft</string>
+    <string name="count_unsent"> Unsynchronized</string>
+    <string name="count_published"> Published</string>
+    <string name="action_settings">Settings</string>
     <string name="updates_txt">UPDATES STATUS</string>
-    <string name="published">0 Published</string>
-    <string name="unsynch">0 Unsynchronized</string>
-    <string name="drafts">0 Drafts</string>
+    <string name="published"> Published</string>
+    <string name="unsynch"> Unsynchronized</string>
+    <string name="drafts"> Drafts</string>
     <string name="email_address">Email Address</string>
     <string name="password">Password</string>
     <string name="sign_in">SIGN IN</string>

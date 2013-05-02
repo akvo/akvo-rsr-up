@@ -148,7 +148,7 @@ public class UpdateListHandler extends DefaultHandler {
 				dba.saveUpdate(currentUpd);
 				updateCount++;
 				currentUpd = null;
-			}
+			} else syntaxError=true;
 		} else if (localName.equals("photo")) {
 			this.in_photo = false;
 		}
@@ -163,8 +163,15 @@ public class UpdateListHandler extends DefaultHandler {
 				currentUpd.setId(new String(ch, start, length));
 			} else if(this.in_title) {
 				currentUpd.setTitle(new String(ch, start, length));
-			} else if(this.in_project_id) {
-				currentUpd.setProjectId(new String(ch, start, length));
+			} else if(this.in_project_id) { // <project>/api/v1/project/574/</project>
+				String s = new String(ch, start, length);
+				if (s.endsWith("/")) {
+					int i = s.lastIndexOf('/',s.length()-2);
+					if (i>=0) {
+						s = s.substring(i+1, s.length()-1);
+						currentUpd.setProjectId(s);
+					} else syntaxError = true;
+				} else syntaxError = true;
 			} else if(this.in_photo) {
 				currentUpd.setThumbnailUrl(new String(ch, start, length));
 			} else if(this.in_text) {

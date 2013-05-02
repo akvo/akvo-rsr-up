@@ -22,6 +22,7 @@ import org.akvo.rsr.android.R;
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -45,8 +46,10 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 	public ProjectListCursorAdapter(Context context, Cursor c) {
 		super(context, c);
 		dba = new RsrDbAdapter(context);
+		dba.open();
 	}
 
+	
 	
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
@@ -56,13 +59,20 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 		titleView.setText(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
 
 		String projId = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL));
-		int [] stateCounts = dba.countAllUpdatesFor(projId);
+		dba.open();
+		int [] stateCounts = {0,0,0};
+		try {
+			stateCounts = dba.countAllUpdatesFor(projId);
+		} finally {
+			dba.close();	
+		}
+		Resources res = context.getResources();
 		TextView publishedCountView = (TextView) view.findViewById(R.id.list_item_published_count);
-		publishedCountView.setText(stateCounts[0]);
+		publishedCountView.setText(Integer.toString(stateCounts[2]) + res.getString(R.string.count_published));
 		TextView unsynchCountView = (TextView) view.findViewById(R.id.list_item_unsynchronized_count);
-		unsynchCountView.setText(stateCounts[1]);
+		unsynchCountView.setText(Integer.toString(stateCounts[1]) + res.getString(R.string.count_unsent));
 		TextView draftCountView = (TextView) view.findViewById(R.id.list_item_draft_count);
-		draftCountView.setText(stateCounts[2]);
+		draftCountView.setText(Integer.toString(stateCounts[0]) + res.getString(R.string.count_draft));
 				
 		//Image
 		ImageView thumbnail = (ImageView) view.findViewById(R.id.list_item_thumbnail);

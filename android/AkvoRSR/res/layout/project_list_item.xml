@@ -10,10 +10,10 @@
 
     <ImageView
         android:id="@+id/list_item_thumbnail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|left"
+        android:layout_width="100dip"
+        android:layout_height="80dip"
         android:contentDescription="@string/app_name"
+        android:scaleType="centerInside"
         android:paddingRight="5dp"
         />
        
