@@ -55,18 +55,15 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 		TextView titleView = (TextView) view.findViewById(R.id.list_item_title);
 		titleView.setText(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
 
-		
-		/*
-  		long millis = cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.DELIVERED_DATE_COL));
-
-		// Format the date string
-		Date date = new Date(millis);
-		TextView dateView = (TextView) view.findViewById(R.id.text2);
-		dateView.setText(status
-				+ DateFormat.getLongDateFormat(context).format(date) + " "
-				+ DateFormat.getTimeFormat(context).format(date));
-		 */
-		
+		String projId = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL));
+		int [] stateCounts = dba.countAllUpdatesFor(projId);
+		TextView publishedCountView = (TextView) view.findViewById(R.id.list_item_published_count);
+		publishedCountView.setText(stateCounts[0]);
+		TextView unsynchCountView = (TextView) view.findViewById(R.id.list_item_unsynchronized_count);
+		unsynchCountView.setText(stateCounts[1]);
+		TextView draftCountView = (TextView) view.findViewById(R.id.list_item_draft_count);
+		draftCountView.setText(stateCounts[2]);
+				
 		//Image
 		ImageView thumbnail = (ImageView) view.findViewById(R.id.list_item_thumbnail);
 		//Find file containing thumbnail

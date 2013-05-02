@@ -28,12 +28,16 @@ import java.util.HashMap;
 public class ConstantUtil {
 
 	/**
+	 * server constants
+	 */
+	public static final String TEST_API_KEY = "?api_key=9527895794156530589a28e5fa43e9cc5ecaca46&username=stellanl";
+
+	/**
 	 * file system constants
 	 */
-//	public static final String DATA_DIR = "fieldsurvey/data/";
-//	public static final String APK_DIR = "fieldsurvey/apk/";
 	public static final String XML_SUFFIX = ".xml";
 	public static final String JPG_SUFFIX = ".jpg";
+	public static final String PHOTO_DIR = "akvorsr/photos/";
 	public static final String IMAGECACHE_DIR = "akvorsr/imagecache/";
 	
 	

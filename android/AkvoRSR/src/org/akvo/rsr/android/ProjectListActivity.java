@@ -16,6 +16,8 @@
 
 package org.akvo.rsr.android;
 
+import java.net.MalformedURLException;
+
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.service.GetProjecDataService;
 import org.akvo.rsr.android.util.ConstantUtil;
@@ -159,9 +161,14 @@ public class ProjectListActivity extends ListActivity {
 		//meanwhile:
 		Downloader dl = new Downloader();
 		//TODO THIS MIGHT HANG, no timeout defined...
-		dl.FetchProjectList(this,"http://test.akvo.org","/api/v1/project/?format=xml&limit=0&partnerships__organisation=42");//Akvo projs
-		dl.FetchUpdateList(this,"http://test.akvo.org","/api/v1/project_update/?format=xml&limit=0&project__partnerships__organisation=42");//Akvo projs updates
-		dl.FetchNewThumbnails(this, "http://test.akvo.org", Environment.getExternalStorageDirectory().getPath() + "/" + ConstantUtil.IMAGECACHE_DIR);
+		dl.FetchProjectList(this,"http://uat.akvo.org","/api/v1/project/?format=xml&limit=0&partnerships__organisation=42");//Akvo projs
+		dl.FetchUpdateList(this,"http://uat.akvo.org","/api/v1/project_update/?format=xml&limit=0&project__partnerships__organisation=42");//Akvo projs updates
+		try {
+			dl.FetchNewThumbnails(this, "http://uat.akvo.org", Environment.getExternalStorageDirectory().getPath() + "/" + ConstantUtil.IMAGECACHE_DIR);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	
 	}
 

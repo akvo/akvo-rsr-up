@@ -27,7 +27,7 @@
 			        android:layout_weight="1"
 		            android:background="@color/lt_gray"
 		            android:padding="5dip"
-		            android:text="Your Projects:"
+		            android:text="Updates:"
 		            android:textStyle="italic"
 		            android:typeface="serif" />
 
@@ -38,7 +38,7 @@
 		            android:layout_gravity="right"
 			        android:layout_weight="0"
 		            android:padding="5dip"
-		            android:text="03"
+		            android:text="##"
 			        android:background="@color/lt_gray"
 			        android:typeface="sans"/>
 		</LinearLayout>

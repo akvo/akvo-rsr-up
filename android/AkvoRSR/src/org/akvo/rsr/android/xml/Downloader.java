@@ -17,6 +17,7 @@
 package org.akvo.rsr.android.xml;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,10 +29,12 @@ import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.domain.Update;
 import org.akvo.rsr.android.util.DialogUtil;
+import org.apache.http.HttpResponse;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
 import com.github.kevinsawicki.http.HttpRequest;
+import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -113,13 +116,7 @@ public class Downloader {
 	 * Fetch one file from a URL
 	 */
 	public void HttpGetToFile(URL url, File file) {
-//		try {
-			HttpRequest.get(url).receive(file);		
-//		} catch (Exception e) {
-			/* TODO:Display any Error to the GUI. */
-			//Will come here with a "file not found" if card is full
-//			Log.e(TAG, "HttpGetToFile Error", e);
-//		}
+		HttpRequest.get(url).receive(file);		
 	}
 
 	
@@ -127,26 +124,24 @@ public class Downloader {
 	 * Read a URL into a new file with a generated name
 	 */
 	public String HttpGetToNewFile(URL url, String directory) {
-		File output = new File("error");
-//		try {
-			String extension = url.getFile().substring((url.getFile().lastIndexOf('.')));
-			output = new File(directory + System.nanoTime() + extension);
-			HttpGetToFile(url,output.getAbsoluteFile());
-//		} catch (Exception e) {
-//			/* Display any Error to the GUI. */
-//			Log.e(TAG, "HttpGetToNewFile Error", e);
-//		}
+		String extension = null;
+		int i = url.getFile().lastIndexOf('.');
+		if (i >= 0) {
+			extension = url.getFile().substring((url.getFile().lastIndexOf('.')));
+		}
+		File output = new File(directory + System.nanoTime() + extension);
+		HttpGetToFile(url,output.getAbsoluteFile());
 		return output.getAbsolutePath();
 	}
 	
 
 	//fetch all unfetched thumbnails and photos
 	//this may be excessive if list is long, we could be lazy until display, and do it in view adapter
-	public void FetchNewThumbnails(Context ctx, String contextUrl, String directory){
+	public void FetchNewThumbnails(Context ctx, String contextUrl, String directory) throws MalformedURLException{
 		RsrDbAdapter dba = new RsrDbAdapter(ctx);
 		dba.open();
+		int count = 0;
 		try {
-			try {
 				URL curl = new URL(contextUrl);
 				Cursor cursor = dba.listAllProjects();
 				if (cursor != null) {
@@ -157,9 +152,19 @@ public class Downloader {
 						String url = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
 						if (fn == null) {
 							//not fetched yet
-							fn = HttpGetToNewFile(new URL(curl,url), directory);
-							dba.updateProjectThumbnailFile(id,fn);						
+							if (url == null) {
+								Log.w(TAG, "Null image URL for update: "+id);
+							} else try{
+								fn = HttpGetToNewFile(new URL(curl,url), directory);
+								dba.updateProjectThumbnailFile(id,fn);	
+								count++;
+							} catch (Exception e) {
+								/* Display any Error to the GUI. */
+								DialogUtil.errorAlert(ctx, "Error fetching proj image from URL " + url, e);
+								Log.e(TAG, "FetchNewThumbnails p Error", e);
 							}
+
+						}
 						cursor.moveToNext();
 					}
 					cursor.close();
@@ -175,25 +180,27 @@ public class Downloader {
 						if (fn == null) {
 							//not fetched yet
 							if (url == null) {
-								Log.w(TAG, "Null image URL for update: "+id);
-							} else {
-//								Log.i(TAG, "URL: "+url);
+								Log.w(TAG, "Null image URL for update: " + id);
+							} else try{
 								fn = HttpGetToNewFile(new URL(curl,url), directory);
 								dba.updateUpdateThumbnailFile(id,fn);						
-								}
+								count++;
+							} catch (Exception e) {
+								/* Display any Error to the GUI. */
+								//TODO only once??
+								DialogUtil.errorAlert(ctx, "Error fetching update image from URL " + url, e);
+								Log.e(TAG, "FetchNewThumbnails u Error", e);
+							}
+
 							}
 						cursor2.moveToNext();
 					}
 					cursor2.close();
 				}
-			} catch (Exception e) {
-				/* Display any Error to the GUI. */
-				DialogUtil.errorAlert(ctx, "Error fetching images", e);
-				Log.e(TAG, "FetchNewThumbnails Error", e);
-			}
 		} finally {
 			dba.close();
 		}
+		Log.i(TAG, "Fetched " + count + " images");
 		
 	}
 
@@ -201,13 +208,19 @@ public class Downloader {
 	/* 
 	 * Publish an update, return new ID
 	 */
-	public String PostUpdate(URL url, Update update) {
+	public String PostUpdate(Context ctx, URL url, Update update) {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("title", update.getTitle());
 		data.put("text", update.getText());
-		if (HttpRequest.post(url).form(data).created())
-			System.out.println("User was created");
-		return "666";
+//		if (HttpRequest.post(url).form(data).created())
+//			System.out.println("User was created");
+		HttpRequest h = HttpRequest.post(url).form(data);
+		int code = h.code();
+		String s = h.body();//TODO: is this XML or just an ID?
+		if (code != 200){
+			DialogUtil.errorAlert(ctx, "Unable to post update", code + h.message());
+		}
+		return s;
 	}
 	
 	

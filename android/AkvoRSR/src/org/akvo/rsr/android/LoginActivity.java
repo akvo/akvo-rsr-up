@@ -19,6 +19,7 @@ package org.akvo.rsr.android;
 import java.io.File;
 
 import org.akvo.rsr.android.util.ConstantUtil;
+import org.akvo.rsr.android.util.DialogUtil;
 
 import android.os.Bundle;
 import android.os.Environment;
@@ -33,25 +34,30 @@ import android.widget.Button;
 public class LoginActivity extends Activity {
 
 	private static final String TAG = "LoginActivity";
-	private static final String imageFolder1 = "/akvorsr/photos/";
-	private static final String imageCache2 = "/akvorsr/imagecache/";
+	private static final String imageFolder1 = "/akvorsr/photos";
+	private static final String imageCache2 = "/akvorsr/imagecache";
 	private String rsrApiKey;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		Log.i(TAG, "External storage: " + Environment.getExternalStorageState() );
-		File f = new File (Environment.getExternalStorageDirectory().getPath() + imageFolder1);
-		if (f.mkdir() || f.isDirectory() ) {
-			f = new File (Environment.getExternalStorageDirectory().getPath() + imageCache2);
-			if (f.mkdir() || f.isDirectory()) {
+		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+			Log.i(TAG, "External storage: mounted ");
+			File f = new File (Environment.getExternalStorageDirectory().getPath() + imageFolder1);
+			if (f.mkdir() || f.isDirectory() ) {
 				Log.i(TAG, "Found/created photo dir "+f.getAbsolutePath());
 			} else
-				Log.e("LoginActivity", "could not find/create cache dir");
-		} else
-			Log.e("LoginActivity", "could not find/create cache dir");
-		
+				Log.e("LoginActivity", "could not find/create photo dir");
+			f = new File (Environment.getExternalStorageDirectory().getPath() + imageCache2);
+			if (f.mkdir() || f.isDirectory()) {
+				Log.i(TAG, "Found/created image cache dir "+f.getAbsolutePath());
+			} else
+				Log.e("LoginActivity", "could not find/create image cache dir");
+		} else {
+			DialogUtil.errorAlert(this, "No storage available", "Akvo RSR requires a mounted storage card for image files. Mount card and restart app.");
+			
+		}
 		
 		setContentView(R.layout.activity_login);
 		

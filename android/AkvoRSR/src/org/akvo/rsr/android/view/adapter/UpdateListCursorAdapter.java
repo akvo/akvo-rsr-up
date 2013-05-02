@@ -53,37 +53,40 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 		titleView.setText(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
 
 		TextView stateView = (TextView) view.findViewById(R.id.ulist_item_state);
-		if (String.valueOf("true").equals(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.DRAFT_COL)))){
+		if (0 != cursor.getInt(cursor.getColumnIndex(RsrDbAdapter.DRAFT_COL))) {
 			stateView.setText(R.string.state_draft);
+			stateView.setTextColor(0x0000ff);//BLUE
 		} else
-			if (String.valueOf("true").equals(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.UNSENT_COL)))){
-				stateView.setText(R.string.state_unsent);
+			if (0 != cursor.getInt(cursor.getColumnIndex(RsrDbAdapter.UNSENT_COL))) {
+				stateView.setText(R.string.state_unsent);	
+				stateView.setTextColor(0xff0000);//RED
 		}
 		
 			
 				
 		//Image
-		ImageView thumbnail = (ImageView) view.findViewById(R.id.list_item_thumbnail);
-		//Find file containing thumbnail		
-		File f = new File(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL)));
-		if (f.exists()) {
-			Bitmap bm = BitmapFactory.decodeFile(f.getAbsolutePath());
+		ImageView thumbnail = (ImageView) view.findViewById(R.id.ulist_item_thumbnail);
+		//Find file containing thumbnail
+		String fn = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
+		if (fn != null && new File(fn).exists()) {
+			Bitmap bm = BitmapFactory.decodeFile(fn);
 			if (bm != null)
 				thumbnail.setImageBitmap(bm);
 		} else {
 			//Fall back to generic logo
+			//TODO different for null and broken ref
 			thumbnail.setImageResource(R.drawable.ic_launcher);
 		}
 		
 		//set tag so we will know what got clicked
-		view.setTag(R.id.project_id_tag, cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL)));
+		view.setTag(R.id.update_id_tag, cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL)));
 
 	}
 
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View view = inflater.inflate(R.layout.project_list_item, null);
+		View view = inflater.inflate(R.layout.update_list_item, null);
 		bindView(view, context, cursor);
 		
 		return view;

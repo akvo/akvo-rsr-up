@@ -15,7 +15,9 @@
     <string name="state_draft">● Draft</string>
     <string name="action_settings">Settings</string>
     <string name="state_unsent">● Unsynchronized</string>
+    <string name="state_published">● Published</string>
     <string name="updates_txt">UPDATES STATUS</string>
+    <string name="published">0 Published</string>
     <string name="unsynch">0 Unsynchronized</string>
     <string name="drafts">0 Drafts</string>
     <string name="email_address">Email Address</string>

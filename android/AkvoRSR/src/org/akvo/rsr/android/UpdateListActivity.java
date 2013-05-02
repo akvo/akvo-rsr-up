@@ -142,21 +142,6 @@ public class UpdateListActivity extends ListActivity {
 	}
 
 	
-	/*
-	 * Start the service fetching new update data
-	 */
-	private void startGetProjectsService() {
-		//TODO start a real service, register a listener for a completion intent
-//		Intent i = new Intent(this, GetProjecDataService.class);
-//		i.putExtra(SERVER_KEY, "http://test.akvo.org");
-//		i.putExtra(URL_KEY, "/api/v1/project/?format=xml"); //get first 20 by default
-//		getApplicationContext().startService(i);
-		//meanwhile:
-		Downloader dl = new Downloader();
-		//TODO THIS MIGHT HANG, no timeout defined...
-		dl.FetchUpdateList(this,"http://test.akvo.org","/api/v1/update/?format=xml&partnerships__organisation=42");//Akvo updates
-		dl.FetchNewThumbnails(this, "http://test.akvo.org", Environment.getExternalStorageDirectory()+"/"+ConstantUtil.IMAGECACHE_DIR);	
-	}
 
 
 

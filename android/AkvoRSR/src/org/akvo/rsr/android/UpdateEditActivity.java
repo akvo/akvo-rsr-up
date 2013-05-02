@@ -169,8 +169,8 @@ public class UpdateEditActivity extends Activity {
 		update.setProjectId(projectId);
 		update.setId(Integer.toString(nextLocalId));
 		nextLocalId--;
-		dba.saveUpdate(update);
-		DialogUtil.errorAlert(this, "Update saved as draft", "You can edit and submit it later");
+		dba.saveUpdate(update);//TODO update fails w illegalArgument (? or illegalState?)
+		DialogUtil.errorAlert(this, "Update saved as draft", "You can edit and submit it later");//TODO only visible momentarily before activity is closed
 		finish();
 	}
 
