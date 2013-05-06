@@ -49,12 +49,12 @@ public class LoginActivity extends Activity {
 			Log.i(TAG, "External storage: mounted ");
 			File f = new File (Environment.getExternalStorageDirectory().getPath() + imageFolder1);
 			if (f.mkdirs() || f.isDirectory() ) {
-				Log.i(TAG, "Found/created photo dir "+f.getAbsolutePath());
+				Log.i(TAG, "Found/created photo dir " + f.getAbsolutePath());
 			} else
 				Log.e("LoginActivity", "could not find/create photo dir");
 			f = new File (Environment.getExternalStorageDirectory().getPath() + imageCache2);
 			if (f.mkdirs() || f.isDirectory()) {
-				Log.i(TAG, "Found/created image cache dir "+f.getAbsolutePath());
+				Log.i(TAG, "Found/created image cache dir " + f.getAbsolutePath());
 			} else
 				Log.e("LoginActivity", "could not find/create image cache dir");
 		} else {

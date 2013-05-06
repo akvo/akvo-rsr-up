@@ -181,7 +181,7 @@ public class Downloader {
 							//not fetched yet
 							if (url == null) {
 								Log.w(TAG, "Null image URL for update: " + id);
-							} else try{
+							} else try {
 								fn = HttpGetToNewFile(new URL(curl,url), directory);
 								dba.updateUpdateThumbnailFile(id,fn);						
 								count++;
@@ -212,6 +212,9 @@ public class Downloader {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("title", update.getTitle());
 		data.put("text", update.getText());
+		String projectPath = "/api/v1/project/" + update.getProjectId() + "/";//todo move to constantutil
+		data.put("project", projectPath);
+
 //		if (HttpRequest.post(url).form(data).created())
 //			System.out.println("User was created");
 		HttpRequest h = HttpRequest.post(url).form(data);

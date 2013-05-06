@@ -130,14 +130,15 @@ public class UpdateListActivity extends ListActivity {
 
 	/**
 	 * when a list item is clicked, get the id of the selected
-	 * item and open one-project activity.
+	 * item and open the edit/review update activity.
 	 */
 	@Override
 	protected void onListItemClick(ListView list, View view, int position, long id) {
 		super.onListItemClick(list, view, position, id);
 
-		Intent i = new Intent(view.getContext(), ProjectDetailActivity.class);
+		Intent i = new Intent(view.getContext(), UpdateEditActivity.class);
 		i.putExtra(ConstantUtil.UPDATE_ID_KEY, ((Long) view.getTag(R.id.update_id_tag)).toString());
+		i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(R.id.project_id_tag)).toString());
 		startActivity(i);
 	}
 

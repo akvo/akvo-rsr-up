@@ -10,16 +10,17 @@
 
     <ImageView
         android:id="@+id/ulist_item_thumbnail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|left"
-        android:contentDescription="@string/app_name"
+        android:layout_width="100dip"
+        android:layout_height="80dip"
+        android:scaleType="centerInside"
         android:paddingRight="5dp"
+        android:contentDescription="@string/app_name"
 	    android:background="@layout/gray_gradient_up"
         />
        
 	<LinearLayout
-  		android:layout_width="wrap_content"
+  		android:layout_width="0dp"
+  		android:layout_weight="1"
   		android:layout_height="wrap_content"
 	    android:orientation="vertical"
 		>

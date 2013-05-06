@@ -47,6 +47,13 @@
                 android:value="org.akvo.rsr.android.ProjectListActivity" />
         </activity>
         <activity
+            android:name="org.akvo.rsr.android.DiagnosticActivity"
+            android:label="@string/title_activity_project_detail" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.akvo.rsr.android.ProjectListActivity" />
+        </activity>
+        <activity
             android:name="org.akvo.rsr.android.UpdateEditActivity"
             android:label="@string/title_activity_update_edit" >
             <meta-data

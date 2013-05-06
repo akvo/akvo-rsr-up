@@ -18,6 +18,7 @@ package org.akvo.rsr.android;
 
 import java.io.Closeable;
 import java.io.File;
+import java.net.URL;
 import java.util.Currency;
 import java.util.Random;
 
@@ -26,6 +27,7 @@ import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.domain.Update;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.DialogUtil;
+import org.akvo.rsr.android.xml.Downloader;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -55,11 +57,12 @@ public class UpdateEditActivity extends Activity {
 	private String projectId = null;
 	private String updateId = null;
 	private Update update = null;
+	private boolean editable;
 	//UI
 	private TextView projTitleLabel;
 	private EditText projupdTitleText;
 	private EditText projupdDescriptionText;
-	private ImageView projImage;
+	private ImageView projImage;//TODO
 	private Button btnSubmit;
 	private Button btnDraft;
 	private Button btnPhoto;
@@ -76,7 +79,7 @@ public class UpdateEditActivity extends Activity {
 		projectId = extras != null ? extras.getString(ConstantUtil.PROJECT_ID_KEY)
 				: null;
 		if (projectId == null) {
-			DialogUtil.errorAlert(this,"","");
+			DialogUtil.errorAlert(this,"No project id", "Caller did not specify a project");
 		}
 		updateId = extras != null ? extras.getString(ConstantUtil.UPDATE_ID_KEY)
 				: null;
@@ -122,17 +125,32 @@ public class UpdateEditActivity extends Activity {
 		
 		dba = new RsrDbAdapter(this);
 		dba.open();
-		
+
+		Project project = dba.findProject(projectId);
+		projTitleLabel.setText(project.getTitle());
+
 		if (updateId == null) { //create new
 			update = new Update();
+			editable = true;
 		} else {
 			update = dba.findUpdate(updateId);
-			if (updateId == null) {
-				//TODO raise error
+			if (update == null) {
+				DialogUtil.errorAlert(this, "Update missing", "Cannot open for review update "+updateId);
+			} else {
+				//populate fields
+				editable = update.getDraft();
+				projupdTitleText.setText(update.getTitle());	
+				projupdDescriptionText.setText(update.getText());
 			}
-			
-			//TODO populate fields
 		}
+		projupdTitleText.setEnabled(editable);
+		projupdDescriptionText.setEnabled(editable);
+		btnDraft.setEnabled(editable);
+		btnSubmit.setEnabled(editable);
+		btnPhoto.setEnabled(editable);
+		btnDraft.setVisibility(editable?View.VISIBLE:View.GONE);
+		btnSubmit.setVisibility(editable?View.VISIBLE:View.GONE);
+		btnPhoto.setVisibility(editable?View.VISIBLE:View.GONE);
 		
 		// Show the Up button in the action bar.
 		//		setupActionBar();
@@ -171,8 +189,8 @@ public class UpdateEditActivity extends Activity {
 //		update.setId(Integer.toString(nextLocalId)); //TODO persist this
 		update.setId(Integer.toString(- new Random().nextInt(100000000)));
 		nextLocalId--;
-		dba.saveUpdate(update);//TODO update fails w illegalArgument (? or illegalState?)
-		DialogUtil.errorAlert(this, "Update saved as draft", "You can edit and submit it later");//TODO only visible momentarily before activity is closed
+		dba.saveUpdate(update);
+		DialogUtil.infoAlert(this, "Update saved as draft", "You can edit and submit it later");//TODO only visible momentarily before activity is closed
 		finish();
 	}
 
@@ -183,8 +201,19 @@ public class UpdateEditActivity extends Activity {
 		update.setUnsent(true);
 		update.setTitle(projupdTitleText.getText().toString());
 		update.setText(projupdDescriptionText.getText().toString());
+		update.setProjectId(projectId);
+		//TODO, fix this
+		update.setId(Integer.toString(- new Random().nextInt(100000000)));
 		dba.saveUpdate(update);
+		DialogUtil.infoAlert(this, "Update being sent", "Bye bye");
 		//TODO start synch service
+		Downloader u = new Downloader();
+		try {
+			u.PostUpdate(this, new URL(ConstantUtil.HOST+ConstantUtil.POST_UPDATE_URL+ConstantUtil.TEST_API_KEY), update);
+		} catch (Exception e) {
+			DialogUtil.errorAlert(this,"Error posting update:" , e);
+		}
+				
 		finish();
 		
 	}

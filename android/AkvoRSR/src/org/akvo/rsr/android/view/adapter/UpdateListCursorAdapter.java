@@ -25,6 +25,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapFactory.Options;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,7 +70,13 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 		//Find file containing thumbnail
 		String fn = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
 		if (fn != null && new File(fn).exists()) {
-			Bitmap bm = BitmapFactory.decodeFile(fn);
+			//need to subsample if large to prevent filling memory
+			Options option = new Options();
+			option.inJustDecodeBounds = true;
+			BitmapFactory.decodeFile(fn,option);//fetch dimensions
+			option.inJustDecodeBounds = false;
+			option.inSampleSize = Math.max(option.outHeight, option.outWidth) / 100; //only need 100 pixels for a thumbnail
+			Bitmap bm = BitmapFactory.decodeFile(fn, option);
 			if (bm != null)
 				thumbnail.setImageBitmap(bm);
 		} else {
@@ -78,7 +85,8 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 			thumbnail.setImageResource(R.drawable.ic_launcher);
 		}
 		
-		//set tag so we will know what got clicked
+		//set tags so we will know what got clicked
+		view.setTag(R.id.project_id_tag, cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PROJECT_COL)));
 		view.setTag(R.id.update_id_tag, cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL)));
 
 	}
