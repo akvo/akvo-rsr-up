@@ -124,6 +124,7 @@ public class UpdateListHandler extends DefaultHandler {
 		} else if (localName.equals("object")) {
 			this.in_update = true;
 			currentUpd = new Update();
+			currentUpd.setText("");//for appending
 		} else if (localName.equals("photo")) {
 			this.in_photo = true;
 		}
@@ -175,7 +176,7 @@ public class UpdateListHandler extends DefaultHandler {
 			} else if(this.in_photo) {
 				currentUpd.setThumbnailUrl(new String(ch, start, length));
 			} else if(this.in_text) {
-				currentUpd.setText(new String(ch, start, length));
+				currentUpd.setText(currentUpd.getText() + new String(ch, start, length)); //append
 			}
 		} else
 			syntaxError = true; //set error flag

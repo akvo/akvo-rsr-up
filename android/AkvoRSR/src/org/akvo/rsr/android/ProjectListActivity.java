@@ -78,9 +78,23 @@ public class ProjectListActivity extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.activity_project_list, menu);
+//		Button btnDiag = (Button) findViewById(R.menu.menu_diagnostics
 		return true;
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	        case R.id.menu_diagnostics:
+				Intent i = new Intent(this, DiagnosticActivity.class);
+				startActivity(i);
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
+
+	}
+	
 	@Override
 	protected void onPause() {
 		// TODO Auto-generated method stub
@@ -161,10 +175,19 @@ public class ProjectListActivity extends ListActivity {
 		//meanwhile:
 		Downloader dl = new Downloader();
 		//TODO THIS MIGHT HANG, no timeout defined...
-		dl.FetchProjectList(this,"http://uat.akvo.org","/api/v1/project/?format=xml&limit=0&partnerships__organisation=42");//Akvo projs
-		dl.FetchUpdateList(this,"http://uat.akvo.org","/api/v1/project_update/?format=xml&limit=50&project__partnerships__organisation=42");//Akvo projs updates
+		dl.FetchProjectList(this,ConstantUtil.HOST,"/api/v1/project/?format=xml&limit=0&partnerships__organisation=42");//Akvo projs
+		//We only get published projects from that URL, so we need to iterate on them and get corresponding updates
+		Cursor c=ad.listAllProjects();
+		while (c.moveToNext()) {
+			dl.FetchUpdateList(this,
+								ConstantUtil.HOST,
+								"/api/v1/project_update/?format=xml&limit=0&project="+
+								c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL))
+								);
+		}
+		c.close();
 		try {
-			dl.FetchNewThumbnails(this, "http://uat.akvo.org", Environment.getExternalStorageDirectory().getPath() + "/" + ConstantUtil.IMAGECACHE_DIR);
+			dl.FetchNewThumbnails(this, ConstantUtil.HOST, Environment.getExternalStorageDirectory().getPath() + "/" + ConstantUtil.IMAGECACHE_DIR);
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -449,22 +449,23 @@ public class RsrDbAdapter {
 		int unsentCount = 0;
 		int otherCount = 0;
 		Cursor cursor = listAllUpdatesFor(_id);
-		if (cursor.getCount() > 0) {
-			int draftCol = cursor.getColumnIndexOrThrow(DRAFT_COL);
-			int unsentCol = cursor.getColumnIndexOrThrow(UNSENT_COL);
-			cursor.moveToFirst();
-			while (!cursor.isAfterLast()) {
-				if (cursor.getInt(draftCol) > 0) {
-					draftCount++;
-				} else	if (cursor.getInt(unsentCol) > 0) {
-					unsentCount++;
-				} else
-					otherCount++;
-				cursor.moveToNext();
+		if (cursor !=null) {
+			if (cursor.getCount() > 0) {
+				int draftCol = cursor.getColumnIndexOrThrow(DRAFT_COL);
+				int unsentCol = cursor.getColumnIndexOrThrow(UNSENT_COL);
+				cursor.moveToFirst();
+				while (!cursor.isAfterLast()) {
+					if (cursor.getInt(draftCol) > 0) {
+						draftCount++;
+					} else	if (cursor.getInt(unsentCol) > 0) {
+						unsentCount++;
+					} else
+						otherCount++;
+					cursor.moveToNext();
+				}
 			}
 			cursor.close();
-		}
-		
+		}	
 		return new int[] { draftCount, unsentCount, otherCount };
 	}
 
@@ -504,7 +505,7 @@ public class RsrDbAdapter {
 	public Update findUpdate(String _id) {
 		Update update = null;
 		Cursor cursor = database.query(UPDATE_TABLE,
-										new String[] { PK_ID_COL, TITLE_COL, THUMBNAIL_URL_COL, THUMBNAIL_FILENAME_COL, DRAFT_COL, UNSENT_COL },
+										null,
 										PK_ID_COL + " = ?",
 										new String[] { _id }, null, null, null);
 		if (cursor != null) {
@@ -513,6 +514,8 @@ public class RsrDbAdapter {
 				update = new Update();
 				update.setId(_id);
 				update.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(TITLE_COL)));
+				update.setProjectId(cursor.getString(cursor.getColumnIndexOrThrow(PROJECT_COL)));
+				update.setText(cursor.getString(cursor.getColumnIndexOrThrow(TEXT_COL)));
 				update.setThumbnailUrl(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_URL_COL)));
 				update.setThumbnailFilename(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_FILENAME_COL)));
 				update.setDraft(0 != cursor.getInt(cursor.getColumnIndexOrThrow(DRAFT_COL)));

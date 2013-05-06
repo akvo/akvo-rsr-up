@@ -31,19 +31,16 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-public class ProjectDetailActivity extends Activity {
+public class DiagnosticActivity extends Activity {
 
 	private String projId = null;
-	private TextView projTitleLabel;
-	private TextView projLocationText;
-	private TextView projSummaryText;
-	private ImageView projImage;
+	private TextView txt;
 	private Button btnUpdates;
 	private Button btnAddUpdate;
-	
 
 	private RsrDbAdapter dba;
 	
@@ -51,37 +48,25 @@ public class ProjectDetailActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		//find which project we will be showing
-		Bundle extras = getIntent().getExtras();
-		projId = extras != null ? extras.getString(ConstantUtil.PROJECT_ID_KEY)
-				: null;
-		if (projId == null) {
-			projId = savedInstanceState != null ? savedInstanceState
-					.getString(ConstantUtil.PROJECT_ID_KEY) : null;
-		}
-
 		//get the look
-		setContentView(R.layout.activity_project_detail);
+		setContentView(R.layout.activity_diagnostic);
 		//find the fields
-		projTitleLabel = (TextView) findViewById(R.id.text_proj_detail_title);
-//		projLocationText = (TextView) findViewById(R.id.text_proj_location);
-		projSummaryText= (TextView) findViewById(R.id.text_proj_summary);
-		projImage = (ImageView) findViewById(R.id.image_proj_detail);
+		txt = (TextView) findViewById(R.id.text_field);
 		//Activate buttons
 		btnUpdates = (Button) findViewById(R.id.btn_view_updates);
 		btnUpdates.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {
-				Intent i = new Intent(view.getContext(), UpdateListActivity.class);
-				i.putExtra(ConstantUtil.PROJECT_ID_KEY, projId);
-				startActivity(i);
+//				Intent i = new Intent(view.getContext(), UpdateListActivity.class);
+//				i.putExtra(ConstantUtil.PROJECT_ID_KEY, projId);
+//				startActivity(i);
 			}
 		});
 		btnAddUpdate = (Button) findViewById(R.id.btn_add_update);
 		btnAddUpdate.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {
-				Intent i = new Intent(view.getContext(), UpdateEditActivity.class);
-				i.putExtra(ConstantUtil.PROJECT_ID_KEY, projId);
-				startActivity(i);
+//				Intent i = new Intent(view.getContext(), UpdateEditActivity.class);
+//				i.putExtra(ConstantUtil.PROJECT_ID_KEY, projId);
+//				startActivity(i);
 			}
 		});
  
@@ -97,25 +82,14 @@ public class ProjectDetailActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		dba.open();
-		Project project = dba.findProject(projId);
-		
-		projTitleLabel.setText("'"+ projId+"' "+project.getTitle());
-//		projTitleLabel.setText(project.getTitle());
-//		projLocationText.setText(project.getLocation()); //not sure what this is supposed to match in XML
-//		projLocationText.setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras metus orci, luctus sed venenatis non, iaculis at neque. Mauris aliquet aliquam nisi, non consequat leo mollis vitae.");
-		projSummaryText.setText(project.getSummary());
-		
-		//Find file containing thumbnail		
-		File f = new File(project.getThumbnailFilename());
-		if (f.exists()) {
-			Bitmap bm = BitmapFactory.decodeFile(f.getAbsolutePath());
-			if (bm != null)
-				projImage.setImageBitmap(bm);
-		} else {
-			//Fall back to generic logo
-			projImage.setImageResource(R.drawable.ic_launcher);
-		}
-
+		Cursor c = dba.listAllUpdates();
+		txt.append("\nUpdates in db: " + String.valueOf(c.getCount())+"\n");
+		while (c.moveToNext())
+			txt.append("'"+c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL))+"' for '"+c.getString(c.getColumnIndex(RsrDbAdapter.PROJECT_COL))+"' ");
+		c.close();
+		Cursor d = dba.listAllUpdatesFor("609");
+		txt.append("\nUpdates in db for 609: " + String.valueOf(d.getCount())+"\n");
+		d.close();
 	}
 	
 	@Override

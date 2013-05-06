@@ -17,10 +17,12 @@
 package org.akvo.rsr.android;
 
 import java.io.File;
+import java.net.URL;
 
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.DialogUtil;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
@@ -30,6 +32,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class LoginActivity extends Activity {
 
@@ -68,6 +71,15 @@ public class LoginActivity extends Activity {
             }
         });
 
+        final TextView forgot = (TextView) findViewById(R.id.link_to_forgot);
+        forgot.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ConstantUtil.HOST+ConstantUtil.PWD_URL));
+                startActivity(myIntent);                
+            }
+        });
+
+        
 	}
 
 	@Override
