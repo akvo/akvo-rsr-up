@@ -21,8 +21,11 @@ import java.io.File;
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.util.ConstantUtil;
+import org.akvo.rsr.android.util.DialogUtil;
 
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StatFs;
 import android.app.Activity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -53,15 +56,13 @@ public class DiagnosticActivity extends Activity {
 		//find the fields
 		txt = (TextView) findViewById(R.id.text_field);
 		//Activate buttons
-		btnUpdates = (Button) findViewById(R.id.btn_view_updates);
+		btnUpdates = (Button) findViewById(R.id.btn_diag_a);
 		btnUpdates.setOnClickListener( new View.OnClickListener() {
-			public void onClick(View view) {
-//				Intent i = new Intent(view.getContext(), UpdateListActivity.class);
-//				i.putExtra(ConstantUtil.PROJECT_ID_KEY, projId);
-//				startActivity(i);
+			public void onClick(View view) {//delete image cache files
+				clearCache();
 			}
 		});
-		btnAddUpdate = (Button) findViewById(R.id.btn_add_update);
+		btnAddUpdate = (Button) findViewById(R.id.btn_diag_b);
 		btnAddUpdate.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {
 //				Intent i = new Intent(view.getContext(), UpdateEditActivity.class);
@@ -78,6 +79,16 @@ public class DiagnosticActivity extends Activity {
 		//		setupActionBar();
 	}
 
+	private void clearCache(){
+		File f = new File(Environment.getExternalStorageDirectory() + ConstantUtil.IMAGECACHE_DIR);
+		File [] files = f.listFiles();
+		for (int i = 0; i < files.length; i++) { 
+			files[i].delete();
+		}
+		DialogUtil.infoAlert(this, "Cache cleared", files.length+" files deleted");
+
+	}
+	
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -90,6 +101,13 @@ public class DiagnosticActivity extends Activity {
 		Cursor d = dba.listAllUpdatesFor("609");
 		txt.append("\nUpdates in db for 609: " + String.valueOf(d.getCount())+"\n");
 		d.close();
+		
+		StatFs stat = new StatFs(Environment.getExternalStorageDirectory().getPath());
+		double sdAvailSize = (double)stat.getAvailableBlocks()
+		                   * (double)stat.getBlockSize();
+		//One binary gigabyte equals 1,073,741,824 bytes.
+		double gigaAvailable = sdAvailSize / 1073741824;
+		txt.append(gigaAvailable + " GB free on card\n");
 	}
 	
 	@Override

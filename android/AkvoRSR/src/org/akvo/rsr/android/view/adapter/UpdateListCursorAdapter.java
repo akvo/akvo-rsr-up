@@ -56,11 +56,14 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 		TextView stateView = (TextView) view.findViewById(R.id.ulist_item_state);
 		if (0 != cursor.getInt(cursor.getColumnIndex(RsrDbAdapter.DRAFT_COL))) {
 			stateView.setText(R.string.state_draft);
-			stateView.setTextColor(0x0000ff);//BLUE
+			stateView.setTextColor(context.getResources().getColor(R.color.blue));
 		} else
 			if (0 != cursor.getInt(cursor.getColumnIndex(RsrDbAdapter.UNSENT_COL))) {
 				stateView.setText(R.string.state_unsent);	
-				stateView.setTextColor(0xff0000);//RED
+				stateView.setTextColor(context.getResources().getColor(R.color.red));
+		} else {
+			stateView.setText(R.string.state_published);	
+			stateView.setTextColor(context.getResources().getColor(R.color.dk_gray));
 		}
 		
 			
@@ -75,7 +78,7 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 			option.inJustDecodeBounds = true;
 			BitmapFactory.decodeFile(fn,option);//fetch dimensions
 			option.inJustDecodeBounds = false;
-			option.inSampleSize = Math.max(option.outHeight, option.outWidth) / 100; //only need 100 pixels for a thumbnail
+			option.inSampleSize = Math.max(option.outHeight, option.outWidth) / 120; //only need 120 pixels for a thumbnail
 			Bitmap bm = BitmapFactory.decodeFile(fn, option);
 			if (bm != null)
 				thumbnail.setImageBitmap(bm);

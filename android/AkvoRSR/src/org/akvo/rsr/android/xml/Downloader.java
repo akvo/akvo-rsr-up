@@ -123,13 +123,13 @@ public class Downloader {
 	/* 
 	 * Read a URL into a new file with a generated name
 	 */
-	public String HttpGetToNewFile(URL url, String directory) {
+	public String HttpGetToNewFile(URL url, String directory, String prefix) {
 		String extension = null;
 		int i = url.getFile().lastIndexOf('.');
 		if (i >= 0) {
 			extension = url.getFile().substring((url.getFile().lastIndexOf('.')));
 		}
-		File output = new File(directory + System.nanoTime() + extension);
+		File output = new File(directory + prefix + System.nanoTime() + extension);
 		HttpGetToFile(url,output.getAbsoluteFile());
 		return output.getAbsolutePath();
 	}
@@ -155,7 +155,7 @@ public class Downloader {
 							if (url == null) {
 								Log.w(TAG, "Null image URL for update: "+id);
 							} else try{
-								fn = HttpGetToNewFile(new URL(curl,url), directory);
+								fn = HttpGetToNewFile(new URL(curl,url), directory, "prj" + id + "_");
 								dba.updateProjectThumbnailFile(id,fn);	
 								count++;
 							} catch (Exception e) {
@@ -177,12 +177,12 @@ public class Downloader {
 						String id = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.PK_ID_COL));
 						String fn = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
 						String url = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
-						if (fn == null) {
-							//not fetched yet
+						if (fn == null || ! new File(fn).exists()) {
+							//not fetched yet, or deleted
 							if (url == null) {
 								Log.w(TAG, "Null image URL for update: " + id);
 							} else try {
-								fn = HttpGetToNewFile(new URL(curl,url), directory);
+								fn = HttpGetToNewFile(new URL(curl,url), directory, "upd"+id+"_");
 								dba.updateUpdateThumbnailFile(id,fn);						
 								count++;
 							} catch (Exception e) {

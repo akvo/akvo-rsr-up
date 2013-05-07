@@ -37,8 +37,6 @@ import android.widget.TextView;
 public class LoginActivity extends Activity {
 
 	private static final String TAG = "LoginActivity";
-	private static final String imageFolder1 = "/akvorsr/photos";
-	private static final String imageCache2 = "/akvorsr/imagecache";
 	private String rsrApiKey;
 
 	@Override
@@ -47,12 +45,12 @@ public class LoginActivity extends Activity {
 		
 		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 			Log.i(TAG, "External storage: mounted ");
-			File f = new File (Environment.getExternalStorageDirectory().getPath() + imageFolder1);
+			File f = new File (Environment.getExternalStorageDirectory().getPath() + ConstantUtil.PHOTO_DIR);
 			if (f.mkdirs() || f.isDirectory() ) {
 				Log.i(TAG, "Found/created photo dir " + f.getAbsolutePath());
 			} else
 				Log.e("LoginActivity", "could not find/create photo dir");
-			f = new File (Environment.getExternalStorageDirectory().getPath() + imageCache2);
+			f = new File (Environment.getExternalStorageDirectory().getPath() + ConstantUtil.IMAGECACHE_DIR);
 			if (f.mkdirs() || f.isDirectory()) {
 				Log.i(TAG, "Found/created image cache dir " + f.getAbsolutePath());
 			} else

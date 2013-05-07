@@ -107,7 +107,7 @@ public class ProjectDetailActivity extends Activity {
 		
 		//Find file containing thumbnail		
 		File f = new File(project.getThumbnailFilename());
-		if (f.exists()) {
+		if (f != null && f.exists()) {
 			Bitmap bm = BitmapFactory.decodeFile(f.getAbsolutePath());
 			if (bm != null)
 				projImage.setImageBitmap(bm);

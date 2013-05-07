@@ -68,11 +68,11 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 		}
 		Resources res = context.getResources();
 		TextView publishedCountView = (TextView) view.findViewById(R.id.list_item_published_count);
-		publishedCountView.setText(Integer.toString(stateCounts[2]) + res.getString(R.string.count_published));
+		publishedCountView.setText(Integer.toString(stateCounts[2]) + "" + res.getString(R.string.count_published));
 		TextView unsynchCountView = (TextView) view.findViewById(R.id.list_item_unsynchronized_count);
-		unsynchCountView.setText(Integer.toString(stateCounts[1]) + res.getString(R.string.count_unsent));
+		unsynchCountView.setText(Integer.toString(stateCounts[1]) + "" + res.getString(R.string.count_unsent));
 		TextView draftCountView = (TextView) view.findViewById(R.id.list_item_draft_count);
-		draftCountView.setText(Integer.toString(stateCounts[0]) + res.getString(R.string.count_draft));
+		draftCountView.setText(Integer.toString(stateCounts[0]) + "" + res.getString(R.string.count_draft));
 				
 		//Image
 		ImageView thumbnail = (ImageView) view.findViewById(R.id.list_item_thumbnail);

@@ -33,16 +33,16 @@
 		        android:orientation="horizontal" >
 	
 			    <Button
-		            android:id="@+id/btn_view_updates"
+		            android:id="@+id/btn_diag_a"
 			        android:layout_width="0dp"
 			        android:layout_height="wrap_content"
 			        android:layout_weight="1"
-			        android:text="A"
+			        android:text="Clear image cache"
 		            />
 			    <!-- View updates button -->
 		
 			    <Button
-		            android:id="@+id/btn_add_update"
+		            android:id="@+id/btn_diag_b"
 			        android:layout_width="0dp"
 			        android:layout_height="wrap_content"
 			        android:layout_weight="1"

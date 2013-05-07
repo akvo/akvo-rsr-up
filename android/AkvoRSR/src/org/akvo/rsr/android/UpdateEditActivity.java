@@ -117,7 +117,7 @@ public class UpdateEditActivity extends Activity {
 			public void onClick(View view) {
 			    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 			    // generate unique filename
-			    captureFilename = Environment.getExternalStorageDirectory() + "/" + ConstantUtil.PHOTO_DIR + "capture" + System.nanoTime() + ".jpg";
+			    captureFilename = Environment.getExternalStorageDirectory() + ConstantUtil.PHOTO_DIR + "capture" + System.nanoTime() + ".jpg";
 			    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(captureFilename)));
 			    startActivityForResult(takePictureIntent, photoRequest);
 			}
@@ -182,13 +182,16 @@ public class UpdateEditActivity extends Activity {
 	 */
 	private void saveAsDraft() {
 		update.setDraft(true);
+		update.setUnsent(false);
 		update.setTitle(projupdTitleText.getText().toString());
 		update.setText(projupdDescriptionText.getText().toString());
+		if (update.getId() == null) {//new
 		//MUST have project and a local update id
-		update.setProjectId(projectId);
-//		update.setId(Integer.toString(nextLocalId)); //TODO persist this
-		update.setId(Integer.toString(- new Random().nextInt(100000000)));
-		nextLocalId--;
+			update.setProjectId(projectId);
+//		    update.setId(Integer.toString(nextLocalId)); //TODO persist this
+			update.setId(Integer.toString(- new Random().nextInt(100000000)));
+			nextLocalId--;
+		}
 		dba.saveUpdate(update);
 		DialogUtil.infoAlert(this, "Update saved as draft", "You can edit and submit it later");//TODO only visible momentarily before activity is closed
 		finish();
@@ -199,17 +202,20 @@ public class UpdateEditActivity extends Activity {
 	 */
 	private void sendUpdate() {
 		update.setUnsent(true);
+		update.setDraft(false);
 		update.setTitle(projupdTitleText.getText().toString());
 		update.setText(projupdDescriptionText.getText().toString());
 		update.setProjectId(projectId);
-		//TODO, fix this
-		update.setId(Integer.toString(- new Random().nextInt(100000000)));
+		if (update.getId() == null) {//new
+			//TODO, improve this
+			update.setId(Integer.toString(- new Random().nextInt(100000000)));
+		}
 		dba.saveUpdate(update);
 		DialogUtil.infoAlert(this, "Update being sent", "Bye bye");
 		//TODO start synch service
 		Downloader u = new Downloader();
 		try {
-			u.PostUpdate(this, new URL(ConstantUtil.HOST+ConstantUtil.POST_UPDATE_URL+ConstantUtil.TEST_API_KEY), update);
+			u.PostUpdate(this, new URL(ConstantUtil.HOST + ConstantUtil.POST_UPDATE_URL + ConstantUtil.TEST_API_KEY), update);
 		} catch (Exception e) {
 			DialogUtil.errorAlert(this,"Error posting update:" , e);
 		}

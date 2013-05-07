@@ -34,14 +34,16 @@ public class ConstantUtil {
 	public static final String PWD_URL = "/rsr/accounts/password/reset/";	
 	public static final String TEST_API_KEY = "&api_key=9527895794156530589a28e5fa43e9cc5ecaca46&username=stellanl ";
 	public static final String POST_UPDATE_URL = "/api/v1/project_update/&format=xml";
+	public static final String FETCH_PROJ_URL = "/api/v1/project/?format=xml&limit=0&partnerships__organisation=42";//TODO: Hardcoded Akvo org
+
 	/**
 	 * file system constants
 	 */
 	public static final String XML_SUFFIX = ".xml";
 	public static final String JPG_SUFFIX = ".jpg";
-	public static final String TOP_DIR = "akvorsr/";
-	public static final String PHOTO_DIR = "akvorsr/photos/";
-	public static final String IMAGECACHE_DIR = "akvorsr/imagecache/";
+	public static final String TOP_DIR = "/akvorsr/";
+	public static final String PHOTO_DIR = "/akvorsr/photos/";
+	public static final String IMAGECACHE_DIR = "/akvorsr/imagecache/";
 	
 	
 	/**
