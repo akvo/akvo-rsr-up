@@ -19,7 +19,7 @@ package org.akvo.rsr.android;
 import java.net.MalformedURLException;
 
 import org.akvo.rsr.android.dao.RsrDbAdapter;
-import org.akvo.rsr.android.service.GetProjecDataService;
+import org.akvo.rsr.android.service.GetProjectDataService;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.view.adapter.ProjectListCursorAdapter;
 import org.akvo.rsr.android.xml.Downloader;
@@ -169,7 +169,7 @@ public class ProjectListActivity extends ListActivity {
 	 */
 	private void startGetProjectsService() {
 		//TODO start a real service, register a listener for a completion intent
-//		Intent i = new Intent(this, GetProjecDataService.class);
+//		Intent i = new Intent(this, GetProjectDataService.class);
 //		i.putExtra(SERVER_KEY, "http://test.akvo.org");
 //		i.putExtra(URL_KEY, "/api/v1/project/?format=xml"); //get first 20 by default
 //		getApplicationContext().startService(i);

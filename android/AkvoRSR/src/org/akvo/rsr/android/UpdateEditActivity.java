@@ -215,7 +215,7 @@ public class UpdateEditActivity extends Activity {
 		//TODO start synch service
 		Downloader u = new Downloader();
 		try {
-			u.PostUpdate(this, new URL(ConstantUtil.HOST + ConstantUtil.POST_UPDATE_URL + ConstantUtil.TEST_API_KEY), update);
+			u.PostXmlUpdate(this, new URL(ConstantUtil.HOST + ConstantUtil.POST_UPDATE_URL + ConstantUtil.TEST_API_KEY), update);
 		} catch (Exception e) {
 			DialogUtil.errorAlert(this,"Error posting update:" , e);
 		}

@@ -99,15 +99,15 @@ public class ProjectDetailActivity extends Activity {
 		dba.open();
 		Project project = dba.findProject(projId);
 		
-		projTitleLabel.setText("'"+ projId+"' "+project.getTitle());
+		projTitleLabel.setText("'"+ projId+"' "+project.getTitle());//DEBUG only
 //		projTitleLabel.setText(project.getTitle());
 //		projLocationText.setText(project.getLocation()); //not sure what this is supposed to match in XML
-//		projLocationText.setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras metus orci, luctus sed venenatis non, iaculis at neque. Mauris aliquet aliquam nisi, non consequat leo mollis vitae.");
 		projSummaryText.setText(project.getSummary());
 		
-		//Find file containing thumbnail		
-		File f = new File(project.getThumbnailFilename());
-		if (f != null && f.exists()) {
+		//Find file containing thumbnail
+		String fn = project.getThumbnailFilename();
+		File f;
+		if (fn != null && (f = new File(fn)) != null && f.exists()) {
 			Bitmap bm = BitmapFactory.decodeFile(f.getAbsolutePath());
 			if (bm != null)
 				projImage.setImageBitmap(bm);

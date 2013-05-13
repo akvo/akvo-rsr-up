@@ -20,6 +20,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.parsers.SAXParser;
@@ -218,6 +219,50 @@ public class Downloader {
 //		if (HttpRequest.post(url).form(data).created())
 //			System.out.println("User was created");
 		HttpRequest h = HttpRequest.post(url).form(data);
+		int code = h.code();
+		String s = h.body();//TODO: is this XML or just an ID?
+		if (code != 200){
+			DialogUtil.errorAlert(ctx, "Unable to post update", code + h.message());
+		}
+		return s;
+	}
+	
+	/* 
+	 * Publish an update, return new ID
+	 * What to submit:
+	 * 
+	<object>
+	<update_method>W</update_method>
+	<project>/api/v1/project/277/</project>
+	<user>/api/v1/project/1/</user>
+	<title>The Rain in Spain...</title>
+	<photo_location>E</photo_location>
+	<text>
+	The rain in Spain stays mainly in the plain!
+
+	By George, she's got it! By George, she's got it!
+	</text>
+	</object>
+
+	 * To URL:
+	/api/v1/project_update/?format=xml&api_key=62a101a36893397300cbf62fbbf0debaa2818496&username=gabriel
+
+	 * As:  
+	application/xml
+	    
+	  */
+	private static final String contentType = "application/xml";
+	private static final String bodyTemplate =	"<object><update_method>W</update_method><project>%s</project>" +
+												"<photo_location>E</photo_location><user>%s</user><title>%s</title>" +
+												"<text>%s</text></object>";
+	
+	public String PostXmlUpdate(Context ctx, URL url, Update update) {
+		String projectPath = "/api/v1/project/" + update.getProjectId() + "/";//todo move to constantutil
+		String userPath = "/api/v1/user/" + "825" + "/";//todo move to constantutil
+
+		String body = String.format(Locale.US,bodyTemplate,projectPath,userPath,update.getTitle(),update.getText());
+
+		HttpRequest h = HttpRequest.post(url).contentType(contentType).send(body);
 		int code = h.code();
 		String s = h.body();//TODO: is this XML or just an ID?
 		if (code != 200){
