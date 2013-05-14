@@ -16,11 +16,10 @@ import android.util.Log;
 
 public class GetProjectDataService extends IntentService {
 	
-	private final String TAG = "GetProjectDataService";
+	private static final String TAG = "GetProjectDataService";
 
-	public GetProjectDataService(String name) {
-		super(name);
-		// TODO Auto-generated constructor stub
+	public GetProjectDataService() {
+		super(TAG);
 	}
 
 	@Override

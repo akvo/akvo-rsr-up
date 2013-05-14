@@ -207,9 +207,9 @@ public class Downloader {
 
 	
 	/* 
-	 * Publish an update, return new ID
+	 * Publish an update, return true if success
 	 */
-	public String PostUpdate(Context ctx, URL url, Update update) {
+	public boolean PostUpdate(Context ctx, URL url, Update update) {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("title", update.getTitle());
 		data.put("text", update.getText());
@@ -221,14 +221,17 @@ public class Downloader {
 		HttpRequest h = HttpRequest.post(url).form(data);
 		int code = h.code();
 		String s = h.body();//TODO: is this XML or just an ID?
-		if (code != 200){
+		if (code != 201){
 			DialogUtil.errorAlert(ctx, "Unable to post update", code + h.message());
+			return false;
 		}
-		return s;
+		return true;
 	}
 	
 	/* 
-	 * Publish an update, return new ID
+	 * Publish an update, return true if success
+	 * TODO posting of images
+	 * 
 	 * What to submit:
 	 * 
 	<object>
@@ -256,7 +259,7 @@ public class Downloader {
 												"<photo_location>E</photo_location><user>%s</user><title>%s</title>" +
 												"<text>%s</text></object>";
 	
-	public String PostXmlUpdate(Context ctx, URL url, Update update) {
+	public boolean PostXmlUpdate(Context ctx, URL url, Update update) {
 		String projectPath = "/api/v1/project/" + update.getProjectId() + "/";//todo move to constantutil
 		String userPath = "/api/v1/user/" + "825" + "/";//todo move to constantutil
 
@@ -264,12 +267,43 @@ public class Downloader {
 
 		HttpRequest h = HttpRequest.post(url).contentType(contentType).send(body);
 		int code = h.code();
-		String s = h.body();//TODO: is this XML or just an ID?
-		if (code != 200){
+		String b = h.body();//XML
+		if (code == 201) {//Created
+			update.setUnsent(false);
+			String idPath = h.header(h.HEADER_LOCATION);//Path-ified ID
+			int penSlash = idPath.lastIndexOf('/', idPath.length()-2);
+			String id = idPath.substring(penSlash+1,idPath.length()-2);
+			update.setId(id);
+			return true;
+		} else {
 			DialogUtil.errorAlert(ctx, "Unable to post update", code + h.message());
+			return false;
 		}
-		return s;
 	}
-	
+
+
+	//Send all unsent updates
+	public void SendUnsentUpdates(Context ctx, URL url) {
+		RsrDbAdapter dba = new RsrDbAdapter(ctx);
+		dba.open();
+		int count = 0;
+		try {
+			Cursor cursor2 = dba.listAllUpdatesUnsent();
+			if (cursor2 != null) {
+				while (cursor2.moveToNext()) {
+					String id = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.PK_ID_COL));
+					Update u = dba.findUpdate(id);
+					if (PostUpdate(ctx, url, u)) {
+						dba.saveUpdate(u); //remember new ID and status
+					}
+					cursor2.moveToNext();
+				}
+				cursor2.close();
+			}
+		} finally {
+			dba.close();
+		}
+		Log.i(TAG, "Sent " + count + " updates");
+	}
 	
 }

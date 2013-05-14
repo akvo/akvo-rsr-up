@@ -40,8 +40,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.support.v4.app.NavUtils;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -193,7 +195,13 @@ public class UpdateEditActivity extends Activity {
 			nextLocalId--;
 		}
 		dba.saveUpdate(update);
-		DialogUtil.infoAlert(this, "Update saved as draft", "You can edit and submit it later");//TODO only visible momentarily before activity is closed
+		//Tell user what happened
+		Context context = getApplicationContext();
+		CharSequence text = "Update saved as draft";
+		Toast toast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
+		toast.show();
+		
+//		DialogUtil.infoAlert(this, "Update saved as draft", "You can edit and submit it later");//TODO only visible momentarily before activity is closed
 		finish();
 	}
 

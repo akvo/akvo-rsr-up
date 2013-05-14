@@ -440,6 +440,21 @@ public class RsrDbAdapter {
 		return cursor;
 	}
 
+	/**
+	 * Gets updates for a specific project, all columns
+	 */
+	public Cursor listAllUpdatesUnsent() {
+		Cursor cursor = database.query(UPDATE_TABLE,
+										null,
+										UNSENT_COL + " <> 0",
+										new String[] { },
+										null,
+										null,
+										null);
+
+		return cursor;
+	}
+
 
 	/**
 	 * Counts state sums for updates for a specific project

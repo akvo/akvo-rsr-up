@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -168,12 +169,21 @@ public class ProjectListActivity extends ListActivity {
 	 * Start the service fetching new project data
 	 */
 	private void startGetProjectsService() {
-		//TODO start a real service, register a listener for a completion intent
-//		Intent i = new Intent(this, GetProjectDataService.class);
+		//start a service
+		//TODO register a listener for a completion intent
+		Intent i = new Intent(this, GetProjectDataService.class);
 //		i.putExtra(SERVER_KEY, "http://test.akvo.org");
-//		i.putExtra(URL_KEY, "/api/v1/project/?format=xml"); //get first 20 by default
-//		getApplicationContext().startService(i);
+		getApplicationContext().startService(i);
+		
+		//TODO: start a "progress" animation
+		ProgressDialog progress = new ProgressDialog(this);
+		progress.setTitle("Updating");
+		progress.setMessage("Wait while loading...");
+		progress.show();
+		
+		
 		//meanwhile:
+		/*
 		Downloader dl = new Downloader();
 		//TODO THIS MIGHT HANG, no timeout defined...
 		dl.FetchProjectList(this,ConstantUtil.HOST,ConstantUtil.FETCH_PROJ_URL);//Akvo projs
@@ -182,7 +192,7 @@ public class ProjectListActivity extends ListActivity {
 		while (c.moveToNext()) {
 			dl.FetchUpdateList(this,
 								ConstantUtil.HOST,
-								"/api/v1/project_update/?format=xml&limit=0&project="+
+								"/api/v1/project_update/?format=xml&limit=0&project=" +
 								c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL))
 								);
 		}
@@ -193,6 +203,7 @@ public class ProjectListActivity extends ListActivity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		*/
 	
 	}
 
