@@ -88,6 +88,9 @@ public class ConstantUtil {
 	/**
 	 * intents
 	 */
+    public static final String PROJECTS_FETCHED_ACTION = "org.akvo.rsr.android.PROJECTS_FETCHED";
+    public static final String UPDATES_SENT_ACTION = "org.akvo.rsr.android.UPDATES_SENT";
+
 	public static final String GPS_STATUS_INTENT = "com.eclipsim.gpsstatus.VIEW";
 	public static final String BARCODE_SCAN_INTENT = "com.google.zxing.client.android.SCAN";
 

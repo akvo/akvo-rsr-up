@@ -65,9 +65,7 @@ public class DiagnosticActivity extends Activity {
 		btnAddUpdate = (Button) findViewById(R.id.btn_diag_b);
 		btnAddUpdate.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {
-//				Intent i = new Intent(view.getContext(), UpdateEditActivity.class);
-//				i.putExtra(ConstantUtil.PROJECT_ID_KEY, projId);
-//				startActivity(i);
+				dba.clearAllData();
 			}
 		});
  

@@ -317,7 +317,8 @@ public class RsrDbAdapter {
 		updatedValues.put(SUMMARY_COL, project.getSummary());
 		updatedValues.put(FUNDS_COL, project.getFunds());
 		updatedValues.put(THUMBNAIL_URL_COL, project.getThumbnailUrl());
-		updatedValues.put(THUMBNAIL_FILENAME_COL, project.getThumbnailFilename());
+		//not done here to preserve a cache connection
+//		updatedValues.put(THUMBNAIL_FILENAME_COL, project.getThumbnailFilename());
 		
 		Cursor cursor = database.query(PROJECT_TABLE,
 		new String[] { PK_ID_COL },
@@ -362,7 +363,8 @@ public class RsrDbAdapter {
 		updatedValues.put(TITLE_COL, update.getTitle());
 		updatedValues.put(TEXT_COL, update.getText());
 		updatedValues.put(THUMBNAIL_URL_COL, update.getThumbnailUrl());
-		updatedValues.put(THUMBNAIL_FILENAME_COL, update.getThumbnailFilename());
+		//not done here to preserve a cache connection
+//		updatedValues.put(THUMBNAIL_FILENAME_COL, update.getThumbnailFilename());
 		updatedValues.put(DRAFT_COL, update.getDraft()?"1":"0");
 		updatedValues.put(UNSENT_COL, update.getUnsent()?"1":"0");
 

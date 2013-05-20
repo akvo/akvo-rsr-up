@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Environment;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 public class GetProjectDataService extends IntentService {
@@ -29,6 +30,7 @@ public class GetProjectDataService extends IntentService {
 		Downloader dl = new Downloader();
 		//TODO THIS MIGHT HANG, no timeout defined...
 		dl.FetchProjectList(this,ConstantUtil.HOST,ConstantUtil.FETCH_PROJ_URL);//Akvo projs
+		
 		//We only get published projects from that URL, so we need to iterate on them and get corresponding updates
 		ad.open();
 		Cursor c = ad.listAllProjects();
@@ -46,8 +48,9 @@ public class GetProjectDataService extends IntentService {
 			Log.e(TAG,"Bad URL:",e);
 		}
 
-		//TODO broadcast completion
-		//TODO send a notification?
-		
+		//broadcast completion
+		Intent i = new Intent(ConstantUtil.PROJECTS_FETCHED_ACTION);
+	    LocalBroadcastManager.getInstance(this).sendBroadcast(i);
+
 	}
 }

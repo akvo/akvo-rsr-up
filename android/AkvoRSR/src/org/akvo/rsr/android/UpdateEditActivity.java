@@ -219,6 +219,7 @@ public class UpdateEditActivity extends Activity {
 			update.setId(Integer.toString(- new Random().nextInt(100000000)));
 		}
 		dba.saveUpdate(update);
+		//TODO use app context so it outlives finish()
 		DialogUtil.infoAlert(this, "Update being sent", "Bye bye");
 		//TODO start synch service
 		Downloader u = new Downloader();

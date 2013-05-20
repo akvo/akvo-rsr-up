@@ -37,8 +37,12 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.LocalBroadcastManager;
 import android.annotation.TargetApi;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Build;
 
@@ -51,7 +55,8 @@ public class ProjectListActivity extends ListActivity {
 	private RsrDbAdapter ad;
 	private Cursor dataCursor;
 	private TextView projCountLabel;
-
+	private ProgressDialog progress;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -62,11 +67,8 @@ public class ProjectListActivity extends ListActivity {
 		Button refreshButton = (Button) findViewById(R.id.button_refresh_projects);		
 		refreshButton.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {
-				ad.clearAllData();
 				//fetch new data
 				startGetProjectsService();
-				//redisplay list
-				getData();
 			}
 		});
  
@@ -87,10 +89,14 @@ public class ProjectListActivity extends ListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
-	        case R.id.menu_diagnostics:
-				Intent i = new Intent(this, DiagnosticActivity.class);
-				startActivity(i);
-	            return true;
+        case R.id.menu_settings:
+			Intent i = new Intent(this, SettingsActivity.class);
+			startActivity(i);
+            return true;
+        case R.id.menu_diagnostics:
+			Intent i2 = new Intent(this, DiagnosticActivity.class);
+			startActivity(i2);
+            return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
 	    }
@@ -171,42 +177,44 @@ public class ProjectListActivity extends ListActivity {
 	private void startGetProjectsService() {
 		//start a service
 		//TODO register a listener for a completion intent
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                new ResponseReceiver(),
+                new IntentFilter(ConstantUtil.PROJECTS_FETCHED_ACTION));
+		
 		Intent i = new Intent(this, GetProjectDataService.class);
 //		i.putExtra(SERVER_KEY, "http://test.akvo.org");
 		getApplicationContext().startService(i);
 		
-		//TODO: start a "progress" animation
-		ProgressDialog progress = new ProgressDialog(this);
+		//start a "progress" animation
+		//TODO: a real filling progress bar?
+		progress = new ProgressDialog(this);
 		progress.setTitle("Updating");
 		progress.setMessage("Wait while loading...");
 		progress.show();
-		
-		
-		//meanwhile:
-		/*
-		Downloader dl = new Downloader();
-		//TODO THIS MIGHT HANG, no timeout defined...
-		dl.FetchProjectList(this,ConstantUtil.HOST,ConstantUtil.FETCH_PROJ_URL);//Akvo projs
-		//We only get published projects from that URL, so we need to iterate on them and get corresponding updates
-		Cursor c=ad.listAllProjects();
-		while (c.moveToNext()) {
-			dl.FetchUpdateList(this,
-								ConstantUtil.HOST,
-								"/api/v1/project_update/?format=xml&limit=0&project=" +
-								c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL))
-								);
-		}
-		c.close();
-		try {
-			dl.FetchNewThumbnails(this, ConstantUtil.HOST, Environment.getExternalStorageDirectory().getPath() + ConstantUtil.IMAGECACHE_DIR);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		*/
-	
+		//Now we wait...
 	}
 
+private void onfetchfinished(){
+	// Dismiss any in-progress dialog
+	if (progress != null)
+		progress.dismiss();
+	//Refresh the list
+	getData();
+}
 
+//Broadcast receiver for receiving status updates from the IntentService
+private class ResponseReceiver extends BroadcastReceiver {
+	// Prevents instantiation
+	private ResponseReceiver() {
+	}
+	// Called when the BroadcastReceiver gets an Intent it's registered to receive
+	public void onReceive(Context context, Intent intent) {
+		/*
+		 * Handle Intents here.
+		 */
+		if (intent.getAction() == ConstantUtil.PROJECTS_FETCHED_ACTION)
+			onfetchfinished();
+	}
+}
 
 }
