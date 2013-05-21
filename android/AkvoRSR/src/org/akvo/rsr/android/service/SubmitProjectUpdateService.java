@@ -10,6 +10,7 @@ import android.app.IntentService;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 
@@ -23,14 +24,17 @@ public class SubmitProjectUpdateService extends IntentService {
 	}
 
 	@Override
-	protected void onHandleIntent(Intent i) {
+	protected void onHandleIntent(Intent intent) {
 		Downloader dl = new Downloader();
 		try {
 			dl.SendUnsentUpdates(this, new URL(ConstantUtil.HOST + ConstantUtil.POST_UPDATE_URL + ConstantUtil.TEST_API_KEY));
 		} catch (Exception e) {
 			Log.e(TAG,"Error making post URL",e);
 		}
-		//TODO broadcast completion
+
+		//broadcast completion
+		Intent i = new Intent(ConstantUtil.UPDATES_SENT_ACTION);
+	    LocalBroadcastManager.getInstance(this).sendBroadcast(i);
 
 	}
 }

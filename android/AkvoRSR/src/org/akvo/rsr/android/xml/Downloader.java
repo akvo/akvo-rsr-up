@@ -261,7 +261,7 @@ public class Downloader {
 	
 	public boolean PostXmlUpdate(Context ctx, URL url, Update update) {
 		String projectPath = "/api/v1/project/" + update.getProjectId() + "/";//todo move to constantutil
-		String userPath = "/api/v1/user/" + "825" + "/";//todo move to constantutil
+		String userPath = "/api/v1/user/" + "825" + "/";//TODO move to constantutil
 
 		String body = String.format(Locale.US,bodyTemplate,projectPath,userPath,update.getTitle(),update.getText());
 
@@ -293,8 +293,9 @@ public class Downloader {
 				while (cursor2.moveToNext()) {
 					String id = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.PK_ID_COL));
 					Update u = dba.findUpdate(id);
-					if (PostUpdate(ctx, url, u)) {
+					if (PostXmlUpdate(ctx, url, u)) {
 						dba.saveUpdate(u); //remember new ID and status
+						count++;
 					}
 					cursor2.moveToNext();
 				}

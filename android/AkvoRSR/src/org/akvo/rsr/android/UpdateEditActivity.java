@@ -25,6 +25,8 @@ import java.util.Random;
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.domain.Update;
+import org.akvo.rsr.android.service.GetProjectDataService;
+import org.akvo.rsr.android.service.SubmitProjectUpdateService;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.DialogUtil;
 import org.akvo.rsr.android.xml.Downloader;
@@ -33,6 +35,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -42,9 +45,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.LocalBroadcastManager;
 import android.annotation.TargetApi;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -70,6 +76,7 @@ public class UpdateEditActivity extends Activity {
 	private Button btnPhoto;
 	//Database
 	private RsrDbAdapter dba;
+	ProgressDialog progress;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -219,17 +226,23 @@ public class UpdateEditActivity extends Activity {
 			update.setId(Integer.toString(- new Random().nextInt(100000000)));
 		}
 		dba.saveUpdate(update);
-		//TODO use app context so it outlives finish()
-		DialogUtil.infoAlert(this, "Update being sent", "Bye bye");
-		//TODO start synch service
-		Downloader u = new Downloader();
-		try {
-			u.PostXmlUpdate(this, new URL(ConstantUtil.HOST + ConstantUtil.POST_UPDATE_URL + ConstantUtil.TEST_API_KEY), update);
-		} catch (Exception e) {
-			DialogUtil.errorAlert(this,"Error posting update:" , e);
-		}
-				
-		finish();
+		
+		//start synch service
+		//register a listener for a completion intent
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                new ResponseReceiver(),
+                new IntentFilter(ConstantUtil.UPDATES_SENT_ACTION));
+		
+		Intent i = new Intent(this, SubmitProjectUpdateService.class);
+		getApplicationContext().startService(i);
+		
+		//start a "progress" animation
+		//TODO: a real filling progress bar?
+		progress = new ProgressDialog(this);
+		progress.setTitle("Synchronizing");
+		progress.setMessage("Sending all unsent updates...");
+		progress.show();
+		//Now we wait...
 		
 	}
 
@@ -259,6 +272,31 @@ public class UpdateEditActivity extends Activity {
 		*/
 
 	}
+	
+	private void onSendFinished(){
+		// Dismiss any in-progress dialog
+		if (progress != null)
+			progress.dismiss();
+		//Return to project
+		finish();
+		Toast.makeText(getApplicationContext(), "Updates sent", Toast.LENGTH_SHORT).show();
+	}
+
+	//Broadcast receiver for receiving status updates from the IntentService
+	private class ResponseReceiver extends BroadcastReceiver {
+		// Prevents instantiation
+		private ResponseReceiver() {
+		}
+		// Called when the BroadcastReceiver gets an Intent it's registered to receive
+		public void onReceive(Context context, Intent intent) {
+			/*
+			 * Handle Intents here.
+			 */
+			if (intent.getAction() == ConstantUtil.UPDATES_SENT_ACTION)
+				onSendFinished();
+		}
+	}
+
 	
 	@Override
 	protected void onPause() {

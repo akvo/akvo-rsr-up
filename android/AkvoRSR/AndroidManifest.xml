@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.akvo.rsr.android"
     android:versionCode="1"
-    android:versionName="0.9" >
+    android:versionName="0.17" >
 
     <uses-sdk
         android:minSdkVersion="6"
@@ -19,7 +19,9 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="org.akvo.rsr.android.LoginActivity"
-            android:label="@string/title_activity_login" >
+            android:label="@string/title_activity_login"
+            android:theme="@android:style/Theme.Black.NoTitleBar"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
