@@ -17,12 +17,14 @@
 package org.akvo.rsr.android.xml;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -32,6 +34,7 @@ import org.akvo.rsr.android.domain.Update;
 import org.akvo.rsr.android.util.DialogUtil;
 import org.apache.http.HttpResponse;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import com.github.kevinsawicki.http.HttpRequest;
@@ -47,69 +50,55 @@ public class Downloader {
 
 	private static final String TAG = "Downloader";
 
+	public boolean err = false;
 	
 	/* Populate the projects table in the db from a server URL
 	 * 
 	 */
-	public void FetchProjectList(Context ctx, String server, String localUrl) {
-		try {
-			URL url = new URL(server + localUrl);
-		
-			/* Get a SAXParser from the SAXPArserFactory. */
-			SAXParserFactory spf = SAXParserFactory.newInstance();
-			SAXParser sp = spf.newSAXParser();
-		
-			/* Get the XMLReader of the SAXParser we created. */
-			XMLReader xr = sp.getXMLReader();
-			/* Create a new ContentHandler and apply it to the XML-Reader*/ 
-			ProjectListHandler myProjectListHandler = new ProjectListHandler(new RsrDbAdapter(ctx));
-			xr.setContentHandler(myProjectListHandler);
-			/* Parse the xml-data from our URL. */
-			xr.parse(new InputSource(url.openStream()));
-			/* Parsing has finished. */
-		
-			/* Check if anything went wrong. */
-			boolean err = myProjectListHandler.getError();
+	public void FetchProjectList(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
+	
+		/* Get a SAXParser from the SAXPArserFactory. */
+		SAXParserFactory spf = SAXParserFactory.newInstance();
+		SAXParser sp = spf.newSAXParser();
+	
+		/* Get the XMLReader of the SAXParser we created. */
+		XMLReader xr = sp.getXMLReader();
+		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
+		ProjectListHandler myProjectListHandler = new ProjectListHandler(new RsrDbAdapter(ctx));
+		xr.setContentHandler(myProjectListHandler);
+		/* Parse the xml-data from our URL. */
+		//TODO THIS MIGHT HANG, no timeout defined...
+		xr.parse(new InputSource(url.openStream()));
+		/* Parsing has finished. */
+	
+		/* Check if anything went wrong. */
+		err = myProjectListHandler.getError();
 
-			Log.i(TAG, "Fetched "+myProjectListHandler.getCount()+" projects");
-
-		} catch (Exception e) {
-			/* Display any Error to the GUI. */
-			DialogUtil.errorAlert(ctx, "Error fetching project list", e);
-			Log.e(TAG, "FetchProjectList Error", e);
-		}
+		Log.i(TAG, "Fetched "+myProjectListHandler.getCount()+" projects");
 	}
 
 	
 	/* Populate the updates table in the db from a server URL
 	 * 
 	 */
-	public void FetchUpdateList(Context ctx, String server, String localUrl) {
-		try {
-			URL url = new URL(server + localUrl);
-		
-			/* Get a SAXParser from the SAXPArserFactory. */
-			SAXParserFactory spf = SAXParserFactory.newInstance();
-			SAXParser sp = spf.newSAXParser();
-		
-			/* Get the XMLReader of the SAXParser we created. */
-			XMLReader xr = sp.getXMLReader();
-			/* Create a new ContentHandler and apply it to the XML-Reader*/ 
-			UpdateListHandler myUpdateListHandler = new UpdateListHandler(new RsrDbAdapter(ctx));
-			xr.setContentHandler(myUpdateListHandler);
-			/* Parse the xml-data from our URL. */
-			xr.parse(new InputSource(url.openStream()));
-			/* Parsing has finished. */
-		
-			/* Check if anything went wrong. */
-			boolean err = myUpdateListHandler.getError();
-			Log.i(TAG, "Fetched "+myUpdateListHandler.getCount()+" updates");
+	public void FetchUpdateList(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
 	
-		} catch (Exception e) {
-			/* Display any Error to the GUI. */
-			DialogUtil.errorAlert(ctx, "Error fetching update list", e);
-			Log.e(TAG, "FetchProjectList Error", e);
-		}
+		/* Get a SAXParser from the SAXPArserFactory. */
+		SAXParserFactory spf = SAXParserFactory.newInstance();
+		SAXParser sp = spf.newSAXParser();
+	
+		/* Get the XMLReader of the SAXParser we created. */
+		XMLReader xr = sp.getXMLReader();
+		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
+		UpdateListHandler myUpdateListHandler = new UpdateListHandler(new RsrDbAdapter(ctx));
+		xr.setContentHandler(myUpdateListHandler);
+		/* Parse the xml-data from our URL. */
+		xr.parse(new InputSource(url.openStream()));
+		/* Parsing has finished. */
+	
+		/* Check if anything went wrong. */
+		err = myUpdateListHandler.getError();
+		Log.i(TAG, "Fetched "+myUpdateListHandler.getCount()+" updates");
 	}
 
 	
@@ -181,7 +170,7 @@ public class Downloader {
 						if (fn == null || ! new File(fn).exists()) {
 							//not fetched yet, or deleted
 							if (url == null) {
-								Log.w(TAG, "Null image URL for update: " + id);
+								Log.i(TAG, "Null image URL for update: " + id);
 							} else try {
 								fn = HttpGetToNewFile(new URL(curl,url), directory, "upd"+id+"_");
 								dba.updateUpdateThumbnailFile(id,fn);						
@@ -272,7 +261,7 @@ public class Downloader {
 			update.setUnsent(false);
 			String idPath = h.header(h.HEADER_LOCATION);//Path-ified ID
 			int penSlash = idPath.lastIndexOf('/', idPath.length()-2);
-			String id = idPath.substring(penSlash+1,idPath.length()-2);
+			String id = idPath.substring(penSlash+1,idPath.length()-1);
 			update.setId(id);
 			return true;
 		} else {
@@ -294,7 +283,7 @@ public class Downloader {
 					String id = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.PK_ID_COL));
 					Update u = dba.findUpdate(id);
 					if (PostXmlUpdate(ctx, url, u)) {
-						dba.saveUpdate(u); //remember new ID and status
+						dba.updateUpdateIdSent(u,id); //remember new ID and status
 						count++;
 					}
 					cursor2.moveToNext();

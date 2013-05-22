@@ -86,6 +86,7 @@ public class ProjectListHandler extends DefaultHandler {
 
 	private Project currentProj;
 
+	private int depth = 0;
 	private int projectCount = 0;
 	private boolean syntaxError = false;
 
@@ -120,6 +121,7 @@ public class ProjectListHandler extends DefaultHandler {
 	@Override
 	public void startDocument() throws SAXException {
 		dba.open();
+		depth = 0;
 		projectCount = 0;
 	}
 
@@ -135,15 +137,15 @@ public class ProjectListHandler extends DefaultHandler {
 	@Override
 	public void startElement(String namespaceURI, String localName,
 			String qName, Attributes atts) throws SAXException {
-		if (localName.equals("id")) {
+		if (localName.equals("id") && depth == 3) {
 			this.in_id = true;
-		} else if (localName.equals("title")) {
+		} else if (localName.equals("title") && depth == 3) {
 			this.in_title = true;
-		} else if (localName.equals("subtitle")) {
+		} else if (localName.equals("subtitle") && depth == 3) {
 			this.in_subtitle = true;
 		} else if (localName.equals("funds")) {
 			this.in_funds = true;
-		} else if (localName.equals("object")) {
+		} else if (localName.equals("object") && depth == 2) {
 			this.in_project = true;
 			currentProj = new Project();
 			currentProj.setSummary("");
@@ -154,15 +156,16 @@ public class ProjectListHandler extends DefaultHandler {
 			int i = Integer.parseInt(attrValue);
 			myParsedExampleDataSet.setExtractedInt(i);
 			*/
-		} else if (localName.equals("project_plan_summary")) {
+		} else if (localName.equals("project_plan_summary") && depth==3) {
 			this.in_summary = true;
-		} else if (localName.equals("current_image")) {
+		} else if (localName.equals("current_image") && depth==3) {
 			this.in_current_image = true;
 		} else if (localName.equals("thumbnails") && in_current_image) {
 			this.in_thumbnails = true;
 		} else if (localName.equals("map_thumb") && in_thumbnails) {
 			this.in_thumbnail_url = true;
 		}
+		depth++;
 	}
 		
 	
@@ -171,24 +174,25 @@ public class ProjectListHandler extends DefaultHandler {
 	@Override
 	public void endElement(String namespaceURI, String localName, String qName)
 			throws SAXException {
-		if (localName.equals("id")) {
+		depth--;
+		if (localName.equals("id") && depth==3) {
 			this.in_id= false;
-		} else if (localName.equals("title")) {
+		} else if (localName.equals("title") && depth==3) {
 				this.in_title = false;
-		} else if (localName.equals("subtitle")) {
+		} else if (localName.equals("subtitle") && depth==3) {
 			this.in_subtitle = false;
 		} else if (localName.equals("funds")) {
 			this.in_funds = false;
-		} else if (localName.equals("object")) {
+		} else if (localName.equals("object") && depth==2) {
 			this.in_project = false;
 			if (currentProj != null) {
 				dba.saveProject(currentProj);
 				currentProj = null;
 				projectCount++;
 			}
-		} else if (localName.equals("project_plan_summary")) {
+		} else if (localName.equals("project_plan_summary") && depth==3) {
 			this.in_summary = false;
-		} else if (localName.equals("current_image")) {
+		} else if (localName.equals("current_image") && depth==3) {
 			this.in_current_image = false;
 		} else if (localName.equals("thumbnails") && in_current_image) {
 			this.in_thumbnails = false;

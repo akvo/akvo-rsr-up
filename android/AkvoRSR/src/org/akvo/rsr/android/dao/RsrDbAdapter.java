@@ -386,6 +386,36 @@ public class RsrDbAdapter {
 			cursor.close();
 		}
 	}
+
+	/**
+	 * updates an update in the db
+	 * 
+	 * @param survey
+	 * @return
+	 */
+	public void updateUpdateIdSent(Update update, String old_id) {
+		ContentValues updatedValues = new ContentValues();
+		updatedValues.put(PK_ID_COL, update.getId());
+		updatedValues.put(UNSENT_COL, update.getUnsent()?"1":"0");
+
+		Cursor cursor = database.query(UPDATE_TABLE,
+				new String[] { PK_ID_COL },
+				PK_ID_COL + " = ?",
+				new String[] { old_id, },
+				null, null, null);
+
+		if (cursor != null && cursor.getCount() > 0) {
+			// if we found an item, it's an update, otherwise, it's an insert
+			database.update(UPDATE_TABLE, updatedValues, PK_ID_COL + " = ?",
+					new String[] { old_id });
+		} else {
+			Log.e(TAG, "Tried to update id/sent sts of nonexistent update "+old_id);
+		}
+
+		if (cursor != null) {
+			cursor.close();
+		}
+	}
 	
 	/*
 	 *  Update the local filename of a cached image

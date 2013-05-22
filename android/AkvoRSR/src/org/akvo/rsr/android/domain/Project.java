@@ -20,7 +20,6 @@ import java.util.Date;
 
 public class Project {
 	private String id;
-	private String serverId;
 	private String title;
 	private String subtitle;
 	private String location;
@@ -37,14 +36,6 @@ public class Project {
 
 	public void setId(String id) {
 		this.id = id;
-	}
-
-	public String getServerId() {
-		return serverId;
-	}
-
-	public void setServerId(String id) {
-		this.serverId = id;
 	}
 
 	public String getTitle() {

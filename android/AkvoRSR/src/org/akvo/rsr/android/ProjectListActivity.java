@@ -176,7 +176,7 @@ public class ProjectListActivity extends ListActivity {
 	 */
 	private void startGetProjectsService() {
 		//start a service
-		//TODO register a listener for a completion intent
+		//register a listener for the completion intent
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 new ResponseReceiver(),
                 new IntentFilter(ConstantUtil.PROJECTS_FETCHED_ACTION));
@@ -194,7 +194,7 @@ public class ProjectListActivity extends ListActivity {
 		//Now we wait...
 	}
 
-private void onfetchfinished(){
+private void onfetchfinished() {
 	// Dismiss any in-progress dialog
 	if (progress != null)
 		progress.dismiss();
