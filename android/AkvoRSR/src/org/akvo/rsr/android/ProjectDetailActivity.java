@@ -21,6 +21,7 @@ import java.io.File;
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.util.ConstantUtil;
+import org.akvo.rsr.android.util.SettingsUtil;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -43,13 +44,15 @@ public class ProjectDetailActivity extends Activity {
 	private ImageView projImage;
 	private Button btnUpdates;
 	private Button btnAddUpdate;
-	
+	private boolean debug;
 
 	private RsrDbAdapter dba;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		debug = SettingsUtil.ReadBoolean(this, "setting_debug", false);
 
 		//find which project we will be showing
 		Bundle extras = getIntent().getExtras();
@@ -99,8 +102,11 @@ public class ProjectDetailActivity extends Activity {
 		dba.open();
 		Project project = dba.findProject(projId);
 		
-		projTitleLabel.setText("'"+ projId+"' "+project.getTitle());//DEBUG only
-//		projTitleLabel.setText(project.getTitle());
+		if (debug) {
+			projTitleLabel.setText("["+ projId+"] "+project.getTitle());
+		} else {
+			projTitleLabel.setText(project.getTitle());
+		}
 //		projLocationText.setText(project.getLocation()); //not sure what this is supposed to match in XML
 		projSummaryText.setText(project.getSummary());
 		
@@ -109,8 +115,9 @@ public class ProjectDetailActivity extends Activity {
 		File f;
 		if (fn != null && (f = new File(fn)) != null && f.exists()) {
 			Bitmap bm = BitmapFactory.decodeFile(f.getAbsolutePath());
-			if (bm != null)
+			if (bm != null) {
 				projImage.setImageBitmap(bm);
+			}
 		} else {
 			//Fall back to generic logo
 			projImage.setImageResource(R.drawable.ic_launcher);

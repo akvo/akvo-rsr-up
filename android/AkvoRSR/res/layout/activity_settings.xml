@@ -6,10 +6,10 @@
      android:title="Options">
 
      <CheckBoxPreference
-       android:key="pref_opt1"
-       android:title="Option 1"
-       android:summary="Tick to set this option"
-       android:defaultValue="true"
+       android:key="setting_debug"
+       android:title="Debug"
+       android:summary="Show extra debug info"
+       android:defaultValue="false"
        />
     <CheckBoxPreference
        android:key="pref_opt2"

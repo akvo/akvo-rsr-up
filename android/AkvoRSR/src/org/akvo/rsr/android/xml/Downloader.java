@@ -149,8 +149,7 @@ public class Downloader {
 								dba.updateProjectThumbnailFile(id,fn);	
 								count++;
 							} catch (Exception e) {
-								/* Display any Error to the GUI. */
-								DialogUtil.errorAlert(ctx, "Error fetching proj image from URL " + url, e);
+								//DialogUtil.errorAlert(ctx, "Error fetching proj image from URL " + url, e);
 								Log.e(TAG, "FetchNewThumbnails p Error", e);
 							}
 
@@ -176,9 +175,8 @@ public class Downloader {
 								dba.updateUpdateThumbnailFile(id,fn);						
 								count++;
 							} catch (Exception e) {
-								/* Display any Error to the GUI. */
 								//TODO only once??
-								DialogUtil.errorAlert(ctx, "Error fetching update image from URL " + url, e);
+								//DialogUtil.errorAlert(ctx, "Error fetching update image from URL " + url, e);
 								Log.e(TAG, "FetchNewThumbnails u Error", e);
 							}
 
@@ -198,7 +196,7 @@ public class Downloader {
 	/* 
 	 * Publish an update, return true if success
 	 */
-	public boolean PostUpdate(Context ctx, URL url, Update update) {
+	public boolean BadPostUpdate(Context ctx, URL url, Update update) {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("title", update.getTitle());
 		data.put("text", update.getText());
@@ -265,7 +263,7 @@ public class Downloader {
 			update.setId(id);
 			return true;
 		} else {
-			DialogUtil.errorAlert(ctx, "Unable to post update", code + h.message());
+			Log.e(TAG, "Unable to post update");
 			return false;
 		}
 	}
