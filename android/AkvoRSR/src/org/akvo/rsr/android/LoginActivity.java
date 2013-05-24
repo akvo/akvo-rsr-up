@@ -21,6 +21,7 @@ import java.net.URL;
 
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.DialogUtil;
+import org.akvo.rsr.android.xml.Downloader;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,12 +33,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class LoginActivity extends Activity {
 
 	private static final String TAG = "LoginActivity";
 	private String rsrApiKey;
+	private EditText usernameEdit;
+	private EditText passwordEdit;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,8 +66,11 @@ public class LoginActivity extends Activity {
 		}
 		
 		setContentView(R.layout.activity_login);
-		
-        final Button button = (Button) findViewById(R.id.btnLogin);
+
+		usernameEdit = (EditText) findViewById(R.id.edit_username);
+		passwordEdit = (EditText) findViewById(R.id.edit_password);
+        final Button button = (Button) findViewById(R.id.btn_login);
+
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	SignIn(v);
@@ -89,7 +97,21 @@ public class LoginActivity extends Activity {
 
     //Sign In button pushed
     public void SignIn(View view) {
-    	//TODO request API key from server
+    	//request API key from server
+    	Downloader dl = new Downloader();
+    	try {
+    		String newApiKey = dl.authorize(new URL(ConstantUtil.HOST + ConstantUtil.AUTH_URL), usernameEdit.getText().toString(), passwordEdit.getText().toString());
+    		if (newApiKey != null) {
+    			Toast.makeText(getApplicationContext(), "Logged in as  "+usernameEdit.getText().toString(), Toast.LENGTH_SHORT).show();    			
+    		}
+    		else
+    			Toast.makeText(getApplicationContext(), "Login failed, using Demo credentials", Toast.LENGTH_SHORT).show();
+
+    	}
+    	catch (Exception e) {
+    		Log.e(TAG,"SignIn() error:",e);
+    	}
+    	
     	rsrApiKey = ConstantUtil.TEST_API_KEY;
 	    Intent intent = new Intent(this, ProjectListActivity.class);
 	    startActivity(intent);

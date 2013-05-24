@@ -29,6 +29,7 @@
             </intent-filter>
         </activity>
         <activity
+            android:configChanges="keyboardHidden|orientation"
             android:name="org.akvo.rsr.android.ProjectListActivity"
             android:label="@string/title_activity_project_list" >
             <meta-data
@@ -57,6 +58,7 @@
                 android:value="org.akvo.rsr.android.ProjectListActivity" />
         </activity>
         <activity
+            android:configChanges="keyboardHidden|orientation"
             android:name="org.akvo.rsr.android.UpdateEditActivity"
             android:label="@string/title_activity_update_edit" >
             <meta-data

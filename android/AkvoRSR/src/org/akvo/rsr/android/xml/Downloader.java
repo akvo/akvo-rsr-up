@@ -246,7 +246,7 @@ public class Downloader {
 												"<photo_location>E</photo_location><user>%s</user><title>%s</title>" +
 												"<text>%s</text></object>";
 	
-	public boolean PostXmlUpdate(Context ctx, URL url, Update update) {
+	public boolean PostXmlUpdate(URL url, Update update) {
 		String projectPath = "/api/v1/project/" + update.getProjectId() + "/";//todo move to constantutil
 		String userPath = "/api/v1/user/" + "825" + "/";//TODO move to constantutil
 
@@ -280,7 +280,7 @@ public class Downloader {
 				while (cursor2.moveToNext()) {
 					String id = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.PK_ID_COL));
 					Update u = dba.findUpdate(id);
-					if (PostXmlUpdate(ctx, url, u)) {
+					if (PostXmlUpdate(url, u)) {
 						dba.updateUpdateIdSent(u,id); //remember new ID and status
 						count++;
 					}
@@ -293,5 +293,44 @@ public class Downloader {
 		}
 		Log.i(TAG, "Sent " + count + " updates");
 	}
+
+	public String authorize(URL url, String username, String password) {
+		Map<String, String> data = new HashMap<String, String>();
+		data.put("username", username);
+		data.put("password", password);
+
+		HttpRequest h = HttpRequest.post(url).form(data).connectTimeout(10000); //10 sec timeout
+		int code = h.code();
+		String apiKey = null;
+		if (code == 200) {
+			try {
+				/* Get a SAXParser from the SAXPArserFactory. */
+				SAXParserFactory spf = SAXParserFactory.newInstance();
+				SAXParser sp = spf.newSAXParser();
+				/* Get the XMLReader of the SAXParser we created. */
+				XMLReader xr = sp.getXMLReader();
+				/* Create a new ContentHandler and apply it to the XML-Reader*/ 
+				AuthHandler myAuthHandler = new AuthHandler();
+				xr.setContentHandler(myAuthHandler);
+				/* Parse the xml-data from our URL. */
+				xr.parse(new InputSource(h.stream()));
+				/* Parsing has finished. */
+				apiKey = myAuthHandler.getApiKey();
+			}
+			catch (Exception e) {
+				Log.e(TAG, "Auth fetch error: ", e);
+			}
+			/* Check if anything went wrong. */
+			
+			Log.i(TAG, "Fetched API key");
+			
+			return apiKey;
+		} else {
+			Log.e(TAG, "Unable to authorize");
+			return null;
+		}
+	}
+
+
 	
 }
