@@ -28,7 +28,9 @@
     <string name="sign_in">SIGN IN</string>
     <string name="forgot_password_">Forgot Password?</string>
     <string name="title_activity_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="btncaption_photo">TAKE PHOTO NOW</string>
+    <string name="btncaption_rephoto">RETAKE PHOTO</string>
+    
     <string-array name="types">
      <item>Type 1</item>
      <item>Type 2</item>

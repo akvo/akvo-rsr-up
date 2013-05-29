@@ -19,8 +19,10 @@ package org.akvo.rsr.android;
 import java.io.File;
 import java.net.URL;
 
+import org.akvo.rsr.android.domain.User;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.DialogUtil;
+import org.akvo.rsr.android.util.SettingsUtil;
 import org.akvo.rsr.android.xml.Downloader;
 
 import android.net.Uri;
@@ -40,7 +42,6 @@ import android.widget.Toast;
 public class LoginActivity extends Activity {
 
 	private static final String TAG = "LoginActivity";
-	private String rsrApiKey;
 	private EditText usernameEdit;
 	private EditText passwordEdit;
 
@@ -73,14 +74,14 @@ public class LoginActivity extends Activity {
 
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	SignIn(v);
+            	signIn(v);
             }
         });
 
         final TextView forgot = (TextView) findViewById(R.id.link_to_forgot);
         forgot.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ConstantUtil.HOST+ConstantUtil.PWD_URL));
+                Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ConstantUtil.HOST + ConstantUtil.PWD_URL));
                 startActivity(myIntent);                
             }
         });
@@ -96,24 +97,43 @@ public class LoginActivity extends Activity {
 	}
 
     //Sign In button pushed
-    public void SignIn(View view) {
+    public void signIn(View view) {
     	//request API key from server
     	Downloader dl = new Downloader();
     	try {
-    		String newApiKey = dl.authorize(new URL(ConstantUtil.HOST + ConstantUtil.AUTH_URL), usernameEdit.getText().toString(), passwordEdit.getText().toString());
-    		if (newApiKey != null) {
-    			Toast.makeText(getApplicationContext(), "Logged in as  "+usernameEdit.getText().toString(), Toast.LENGTH_SHORT).show();    			
-    		}
-    		else
-    			Toast.makeText(getApplicationContext(), "Login failed, using Demo credentials", Toast.LENGTH_SHORT).show();
+    		User user = new User();
+    		if (dl.authorize(new URL(ConstantUtil.HOST + ConstantUtil.AUTH_URL),
+    						usernameEdit.getText().toString(),
+    						passwordEdit.getText().toString(),
+    						user)) {
+    			//Yes!
+    			SettingsUtil.Write(this, "authorized_username", user.getUsername());
+    			SettingsUtil.Write(this, "authorized_userid",   user.getId());
+    			SettingsUtil.Write(this, "authorized_orgid",    user.getOrgId());
+    			SettingsUtil.Write(this, "authorized_apikey",   user.getApiKey());
 
+    			Toast.makeText(getApplicationContext(), "Logged in as " + user.getUsername(), Toast.LENGTH_SHORT).show();    			
+    		}
+    		else {
+    			//TODO: stay on this page?
+    			Toast.makeText(getApplicationContext(), "Login failed, posting will be impossible", Toast.LENGTH_SHORT).show();
+    		}
     	}
     	catch (Exception e) {
     		Log.e(TAG,"SignIn() error:",e);
     	}
     	
-    	rsrApiKey = ConstantUtil.TEST_API_KEY;
 	    Intent intent = new Intent(this, ProjectListActivity.class);
 	    startActivity(intent);
+    }
+    
+    public void signOut() {
+    	//destroy credentials
+		SettingsUtil.Write(this, "authorized_username", "");
+		SettingsUtil.Write(this, "authorized_userid",   "");
+		SettingsUtil.Write(this, "authorized_orgid",    "");
+		SettingsUtil.Write(this, "authorized_apikey",   "");
+		
+		passwordEdit.setText("");
     }
 }

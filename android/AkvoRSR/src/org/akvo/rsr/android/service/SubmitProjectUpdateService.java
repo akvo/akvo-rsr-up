@@ -2,8 +2,10 @@ package org.akvo.rsr.android.service;
 
 import java.net.URL;
 
+import org.akvo.rsr.android.domain.User;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.DialogUtil;
+import org.akvo.rsr.android.util.SettingsUtil;
 import org.akvo.rsr.android.xml.Downloader;
 
 import android.app.IntentService;
@@ -25,12 +27,16 @@ public class SubmitProjectUpdateService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
+		boolean sendImg = SettingsUtil.ReadBoolean(this, "setting_send_images", true);
+		
+		User user = new User();
+		user.setUsername(SettingsUtil.Read(this, "authorized_username"));
+		user.setId(SettingsUtil.Read(this, "authorized_userid"));
+		user.setOrgId(SettingsUtil.Read(this, "authorized_orgid"));
+		user.setApiKey(SettingsUtil.Read(this, "authorized_apikey"));
+		
 		Downloader dl = new Downloader();
-		try {
-			dl.SendUnsentUpdates(this, new URL(ConstantUtil.HOST + ConstantUtil.POST_UPDATE_URL + ConstantUtil.TEST_API_KEY));
-		} catch (Exception e) {
-			Log.e(TAG,"Error making post URL",e);
-		}
+		dl.SendUnsentUpdates(this, ConstantUtil.HOST + ConstantUtil.POST_UPDATE_URL + ConstantUtil.API_KEY_PATTERN, sendImg, user);
 
 		//broadcast completion
 		Intent i = new Intent(ConstantUtil.UPDATES_SENT_ACTION);

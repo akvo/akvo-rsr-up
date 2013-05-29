@@ -31,13 +31,17 @@ import javax.xml.parsers.SAXParserFactory;
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.domain.Update;
+import org.akvo.rsr.android.domain.User;
 import org.akvo.rsr.android.util.DialogUtil;
+import org.akvo.rsr.android.util.FileUtil;
+import org.akvo.rsr.android.util.SettingsUtil;
 import org.apache.http.HttpResponse;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import com.github.kevinsawicki.http.HttpRequest;
+import com.github.kevinsawicki.http.HttpRequest.Base64;
 import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
 
 import android.app.AlertDialog;
@@ -243,14 +247,39 @@ public class Downloader {
 	  */
 	private static final String contentType = "application/xml";
 	private static final String bodyTemplate =	"<object><update_method>W</update_method><project>%s</project>" +
-												"<photo_location>E</photo_location><user>%s</user><title>%s</title>" +
-												"<text>%s</text></object>";
+			"<photo_location>E</photo_location><user>%s</user><title>%s</title>" +
+			"<text>%s</text>%s</object>";
+	private static final String imageTemplate =	"<skronk>%s</skronk>";
 	
-	public boolean PostXmlUpdate(URL url, Update update) {
+	public boolean PostXmlUpdate(String urlTemplate, Update update, boolean sendImage, User u) {
+		URL url;
+		try {
+			url = new URL(String.format(Locale.US, urlTemplate, u.getApiKey(), u.getUsername()));
+		} catch (MalformedURLException e1) {
+			Log.e(TAG, "Unable to make post URL:",e1);
+			return false;
+		}
 		String projectPath = "/api/v1/project/" + update.getProjectId() + "/";//todo move to constantutil
-		String userPath = "/api/v1/user/" + "825" + "/";//TODO move to constantutil
-
-		String body = String.format(Locale.US,bodyTemplate,projectPath,userPath,update.getTitle(),update.getText());
+		String userPath = "/api/v1/user/" + u.getId() + "/";
+		String imageData = "";
+		
+		if (sendImage) {
+			String fn = update.getThumbnailFilename();
+			if (fn != null) {
+				File f = new File (fn);
+				if (f.exists()){
+					byte[] barr;
+					try {
+						barr = FileUtil.readFile(f);
+						String b64string = Base64.encodeBytes(barr);
+						imageData = String.format(Locale.US, imageTemplate, b64string);
+					} catch (IOException e) {
+						Log.e(TAG, "Image encoding problem", e);
+					}
+				}
+			}
+		}
+		String body = String.format(Locale.US, bodyTemplate, projectPath, userPath, update.getTitle(), update.getText(), imageData);
 
 		HttpRequest h = HttpRequest.post(url).contentType(contentType).send(body);
 		int code = h.code();
@@ -270,7 +299,7 @@ public class Downloader {
 
 
 	//Send all unsent updates
-	public void SendUnsentUpdates(Context ctx, URL url) {
+	public void SendUnsentUpdates(Context ctx, String urlTemplate, boolean sendImages, User user) {
 		RsrDbAdapter dba = new RsrDbAdapter(ctx);
 		dba.open();
 		int count = 0;
@@ -279,9 +308,9 @@ public class Downloader {
 			if (cursor2 != null) {
 				while (cursor2.moveToNext()) {
 					String id = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.PK_ID_COL));
-					Update u = dba.findUpdate(id);
-					if (PostXmlUpdate(url, u)) {
-						dba.updateUpdateIdSent(u,id); //remember new ID and status
+					Update upd = dba.findUpdate(id);
+					if (PostXmlUpdate(urlTemplate, upd, sendImages, user)) {
+						dba.updateUpdateIdSent(upd, id); //remember new ID and status for this update
 						count++;
 					}
 					cursor2.moveToNext();
@@ -294,7 +323,7 @@ public class Downloader {
 		Log.i(TAG, "Sent " + count + " updates");
 	}
 
-	public String authorize(URL url, String username, String password) {
+	public boolean authorize(URL url, String username, String password, User user) {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("username", username);
 		data.put("password", password);
@@ -315,19 +344,23 @@ public class Downloader {
 				/* Parse the xml-data from our URL. */
 				xr.parse(new InputSource(h.stream()));
 				/* Parsing has finished. */
-				apiKey = myAuthHandler.getApiKey();
+				user.setUsername(username);
+				user.setId(myAuthHandler.getUserId());
+				user.setOrgId(myAuthHandler.getOrgId());
+				user.setApiKey(myAuthHandler.getApiKey());
 			}
 			catch (Exception e) {
-				Log.e(TAG, "Auth fetch error: ", e);
+				Log.e(TAG, "Authorization fetch/parse error: ", e);
+				return false;
 			}
 			/* Check if anything went wrong. */
 			
 			Log.i(TAG, "Fetched API key");
 			
-			return apiKey;
+			return true;
 		} else {
-			Log.e(TAG, "Unable to authorize");
-			return null;
+			Log.e(TAG, "Authorization HTTP error:" + code);
+			return false;
 		}
 	}
 

@@ -12,9 +12,9 @@
        android:defaultValue="false"
        />
     <CheckBoxPreference
-       android:key="pref_opt2"
-       android:title="Option 2"
-       android:summary="Tick to set this option"
+       android:key="setting_send_images"
+       android:title="Send images"
+       android:summary="Embeds images in uploads as base-64"
        android:defaultValue="true"
        />
   </PreferenceCategory>

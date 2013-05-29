@@ -61,17 +61,25 @@
             android:gravity="top|left"
             />
         
-		<!-- The photo button -->	
+		<!-- The photo -->	
         <TextView
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
 	        android:layout_gravity="left"
-	        android:text="Add photo:"
+	        android:text="Photo:"
 	        android:textColor="@color/dk_gray"
 	        android:textSize="18sp"
 	        android:textStyle="italic"
 	        android:typeface="sans" />
 
+		<ImageView
+        	android:id="@+id/image_update_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+	        android:layout_gravity="center_horizontal"
+            android:contentDescription="@string/app_name"
+	        />
+        
 	    <Button
 	        android:id="@+id/btn_take_photo"
 	        android:layout_width="wrap_content"
@@ -79,10 +87,10 @@
             android:layout_margin="5dip"
 	        android:layout_gravity="center_horizontal"
 	        android:drawableLeft="@drawable/ic_menu_camera"
-	        android:text="TAKE PHOTO NOW"
+	        android:text="@string/btncaption_photo"
 	        android:background="@color/rsr_blue"
 	        android:textColor="@color/rsr_purple" />
-
+	    
 	    <!-- The two save buttons -->	
 	    <LinearLayout
 	        android:layout_width="fill_parent"

@@ -18,7 +18,6 @@ package org.akvo.rsr.android.xml;
 
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Project;
-import org.akvo.rsr.android.domain.Update;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -26,37 +25,45 @@ import org.xml.sax.helpers.DefaultHandler;
 /*
  * Example input:
  * 
-<credentials>
-	<api_key>asdjklfhlasufhkjasdjfnhalkjdnkjsdhfkjsdnkjfnsdfkjhsdkjfs</api_key>
-	<user_id>666</user_id>
-	<org_id>42</org_id>
-</credentials>
-
+<response>
+<objects type="list">
+<object>
+.........................................
+</object>
+</objects>
+<meta type="hash">
+<next>/api/v1/project/?offset=1&limit=1&partnerships__organisation=42&format=xml</next>
+<total_count type="integer">2</total_count>
+<previous type="null"/>
+<limit type="integer">1</limit>
+<offset type="integer">0</offset>
+</meta>
+</response>
  */
 
 
 
-public class AuthHandler extends DefaultHandler {
+public class ProjectCountHandler extends DefaultHandler {
 
 
 	// ===========================================================
 	// Fields
 	// ===========================================================
 	
-	private boolean in_cred = false;
-	private boolean in_apikey = false;
-	private boolean in_userid = false;
-	private boolean in_orgid = false;
+	private boolean in_meta = false;
+	private boolean in_count = false;
+	private int depth = 0;
+	private int projectCount = 0;
 	private boolean syntaxError = false;
-	private String apiKey = null;
-	private String userId = null;
-	private String orgId = null;
-	private int level;
 
+	
+//	private ParsedExampleDataSet myParsedExampleDataSet = new ParsedExampleDataSet();
+
+	
 	/*
 	 * constructor
 	 */
-	AuthHandler(){
+	ProjectCountHandler(RsrDbAdapter aDba){
 		super();
 	}
 	// ===========================================================
@@ -67,16 +74,8 @@ public class AuthHandler extends DefaultHandler {
 		return syntaxError;
 	}
 
-	public String getApiKey() {
-		return apiKey;
-	}
-	
-	public String getUserId() {
-		return userId;
-	}
-
-	public String getOrgId() {
-		return orgId;
+	public int getCount() {
+		return projectCount;
 	}
 
 	// ===========================================================
@@ -84,7 +83,8 @@ public class AuthHandler extends DefaultHandler {
 	// ===========================================================
 	@Override
 	public void startDocument() throws SAXException {
-		level = 0;
+		depth = 0;
+		projectCount = 0;
 	}
 
 	@Override
@@ -97,45 +97,39 @@ public class AuthHandler extends DefaultHandler {
 	 * <tag attribute="attributeValue">*/
 	@Override
 	public void startElement(String namespaceURI, String localName,	String qName, Attributes atts) throws SAXException {
-		if (localName.equals("credentials") && level == 0) {
-			this.in_cred = true;
-		} else if (in_cred && localName.equals("api_key")) {
-			this.in_apikey = true;
-		} else if (in_cred && localName.equals("user_id")) {
-			this.in_userid = true;
-		} else if (in_cred && localName.equals("org_id")) {
-			this.in_orgid = true;
+		if (localName.equals("meta") && depth == 1) {
+			this.in_meta = true;
+		} else if (in_meta && localName.equals("total_count")) {
+			this.in_count = true;
 		}
-		level++;
+		depth++;
 	}
+		
 	
 	/** Gets called on closing tags like: 
 	 * </tag> */
 	@Override
 	public void endElement(String namespaceURI, String localName, String qName)	throws SAXException {
-		level--;
-		if (localName.equals("credentials")) {
-			this.in_cred = false;
-		} else if (localName.equals("api_key")) {
-			this.in_apikey = false;
-		} else if (localName.equals("user_id")) {
-			this.in_userid = false;
-		} else if (localName.equals("org_id")) {
-			this.in_orgid = false;
+		depth--;
+		if (localName.equals("meta") && in_meta) {
+			this.in_meta = false;
+		} else if (in_count && localName.equals("total_count")) {
+			this.in_count = false;
 		}
 	}
-	
+		
 	/** Gets called on the following structure: 
 	 * <tag>characters</tag> */
 	@Override
     public void characters(char ch[], int start, int length) {
-		if (this.in_apikey) {
-			apiKey = new String(ch, start, length);
-		} else if (this.in_userid) {
-			userId = new String(ch, start, length);
-		} else if (this.in_orgid) {
-			orgId = new String(ch, start, length);
-		}
+			if(this.in_count) {
+				try {
+					projectCount = Integer.parseInt(new String(ch, start, length));
+				} catch (NumberFormatException e) {
+					syntaxError = true;
+				}
+				
+	    	}
     }
 
 }
