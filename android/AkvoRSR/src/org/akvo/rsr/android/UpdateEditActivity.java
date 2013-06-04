@@ -70,7 +70,7 @@ public class UpdateEditActivity extends Activity {
 	private TextView projTitleLabel;
 	private EditText projupdTitleText;
 	private EditText projupdDescriptionText;
-	private ImageView projImage;//TODO
+	private ImageView projupdImage;//TODO
 	private Button btnSubmit;
 	private Button btnDraft;
 	private Button btnPhoto;
@@ -104,7 +104,7 @@ public class UpdateEditActivity extends Activity {
 		projTitleLabel = (TextView) findViewById(R.id.projupd_edit_proj_title);
 		projupdTitleText = (EditText) findViewById(R.id.edit_projupd_title);
 		projupdDescriptionText = (EditText) findViewById(R.id.edit_projupd_description);
-		projImage = (ImageView) findViewById(R.id.image_proj_detail);
+		projupdImage = (ImageView) findViewById(R.id.image_update_detail);
 
 		//Activate buttons
 		btnSubmit = (Button) findViewById(R.id.btn_send_update);
@@ -150,6 +150,14 @@ public class UpdateEditActivity extends Activity {
 				editable = update.getDraft();
 				projupdTitleText.setText(update.getTitle());	
 				projupdDescriptionText.setText(update.getText());
+				
+				//show preexisting image
+				btnPhoto.setText(R.string.btncaption_rephoto);
+				Bitmap bm = BitmapFactory.decodeFile(update.getThumbnailFilename());
+				if (bm != null) {
+					projupdImage.setImageBitmap(bm);
+				}
+
 			}
 		}
 		projupdTitleText.setEnabled(editable);
@@ -171,7 +179,7 @@ public class UpdateEditActivity extends Activity {
 	 */
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
+//		super.onActivityResult(requestCode, resultCode, data);
 		
 		if (requestCode == photoRequest) {
 			if (resultCode == RESULT_CANCELED) {
@@ -181,8 +189,14 @@ public class UpdateEditActivity extends Activity {
 			if (new File(captureFilename).exists()) {
 				update.setThumbnailFilename(captureFilename);
 				DialogUtil.infoAlert(this, "Photo returned", "Got a photo");
+				btnPhoto.setText(R.string.btncaption_rephoto);
+				//make thumbnail and show it on page
+				//TODO: shrink to save memory
+				Bitmap bm = BitmapFactory.decodeFile(captureFilename);
+				if (bm != null) {
+					projupdImage.setImageBitmap(bm);
+				}
 			}
-			//TODO take thumbnail in intent and show it on form
 		}
 	}
 

@@ -248,8 +248,9 @@ public class Downloader {
 	private static final String contentType = "application/xml";
 	private static final String bodyTemplate =	"<object><update_method>W</update_method><project>%s</project>" +
 			"<photo_location>E</photo_location><user>%s</user><title>%s</title>" +
-			"<text>%s</text>%s</object>";
-	private static final String imageTemplate =	"<skronk>%s</skronk>";
+			"<text>%s</text>%s%s%s</object>";
+	private static final String imagePreamble =	 "<photo content_type=\"image/jpeg\" encoding=\"base64\">%s</photo>";
+	private static final String imagePostamble = "<photo content_type=\"image/jpeg\" encoding=\"base64\">%s</photo>";
 	
 	public boolean PostXmlUpdate(String urlTemplate, Update update, boolean sendImage, User u) {
 		URL url;
@@ -261,7 +262,9 @@ public class Downloader {
 		}
 		String projectPath = "/api/v1/project/" + update.getProjectId() + "/";//todo move to constantutil
 		String userPath = "/api/v1/user/" + u.getId() + "/";
-		String imageData = "";
+		String imageData1 = "";
+		String imageData2 = "";
+		String imageData3 = "";
 		
 		if (sendImage) {
 			String fn = update.getThumbnailFilename();
@@ -271,28 +274,32 @@ public class Downloader {
 					byte[] barr;
 					try {
 						barr = FileUtil.readFile(f);
-						String b64string = Base64.encodeBytes(barr);
-						imageData = String.format(Locale.US, imageTemplate, b64string);
+						imageData2 = Base64.encodeBytes(barr);
+						imageData1 = imagePreamble;
+						imageData3 = imagePostamble;
 					} catch (IOException e) {
 						Log.e(TAG, "Image encoding problem", e);
 					}
 				}
 			}
 		}
-		String body = String.format(Locale.US, bodyTemplate, projectPath, userPath, update.getTitle(), update.getText(), imageData);
+		String requestBody = String.format(Locale.US, bodyTemplate,
+				projectPath, userPath, update.getTitle(), update.getText(),
+				imageData1, imageData2, imageData3);
 
-		HttpRequest h = HttpRequest.post(url).contentType(contentType).send(body);
+		HttpRequest h = HttpRequest.post(url).contentType(contentType).send(requestBody);
 		int code = h.code();
-		String b = h.body();//XML
+		String msg = h.message();
+		String b = h.body(); //On success, XML representation of created object
 		if (code == 201) {//Created
 			update.setUnsent(false);
-			String idPath = h.header(h.HEADER_LOCATION);//Path-ified ID
+			String idPath = h.header(HttpRequest.HEADER_LOCATION);//Path-ified ID
 			int penSlash = idPath.lastIndexOf('/', idPath.length()-2);
 			String id = idPath.substring(penSlash+1,idPath.length()-1);
 			update.setId(id);
 			return true;
 		} else {
-			Log.e(TAG, "Unable to post update");
+			Log.e(TAG, "Unable to post update, code " + code + msg);
 			return false;
 		}
 	}

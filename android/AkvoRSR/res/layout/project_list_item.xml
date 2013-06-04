@@ -54,7 +54,9 @@
         	    android:paddingRight="5dp"
         	    android:text="@string/published"
         	    android:textSize="12sp"
-        	    android:typeface="sans" />
+        	    android:textColor="@color/green"
+        	    android:typeface="sans"
+        	    />
 
         	<TextView
 	     		android:id="@+id/list_item_unsynchronized_count"
@@ -65,7 +67,8 @@
         	    android:text="@string/unsynch"
         	    android:textColor="@color/red"
         	    android:textSize="12sp"
-        	    android:typeface="sans" />
+        	    android:typeface="sans"
+        	    />
 
         	<TextView
 	        	android:id="@+id/list_item_draft_count"
@@ -75,7 +78,8 @@
 	            android:text="@string/drafts"
 		        android:textSize="12sp"
 		        android:textColor="@color/blue"
-		        android:typeface="sans"/>
+		        android:typeface="sans"
+		        />
     	</LinearLayout>
    	</LinearLayout>
 </LinearLayout>

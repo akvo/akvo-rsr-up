@@ -30,7 +30,8 @@
     <string name="title_activity_settings">Settings</string>
     <string name="btncaption_photo">TAKE PHOTO NOW</string>
     <string name="btncaption_rephoto">RETAKE PHOTO</string>
-    
+    <string name="btncaption_add_update">ADD UPDATE</string>
+        
     <string-array name="types">
      <item>Type 1</item>
      <item>Type 2</item>

@@ -30,4 +30,17 @@ public class SettingsUtil {
           editor.putBoolean(key, value);
           editor.commit();        
     }
+    
+    // Integer
+    public static int ReadInt(Context context, final String key, final int defaultValue) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        return settings.getInt(key, defaultValue);
+    }
+ 
+    public static void WriteInt(Context context, final String key, final int value) {
+          SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+          SharedPreferences.Editor editor = settings.edit();
+          editor.putInt(key, value);
+          editor.commit();        
+    }
 }

@@ -15,7 +15,20 @@
 	        android:textColor="@color/dk_gray"
             android:padding="5dip"
             android:typeface="sans" />
-
+  	<ScrollView
+		android:layout_width="fill_parent"
+		android:layout_height="0dp"
+		android:layout_weight="1"
+		>
+   
+  	    <LinearLayout
+  		android:layout_width="fill_parent"
+  		android:layout_height="wrap_content"
+		android:background="@color/lt_gray"
+	    android:orientation="vertical"
+        android:layout_weight="1"
+		>
+			 	
 		<!-- The update title entry -->	
         <TextView
 	        android:layout_width="fill_parent"
@@ -76,8 +89,11 @@
         	android:id="@+id/image_update_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:maxWidth="100sp"
+            android:maxHeight="100sp"
 	        android:layout_gravity="center_horizontal"
             android:contentDescription="@string/app_name"
+            android:scaleType="centerInside"
 	        />
         
 	    <Button
@@ -90,7 +106,8 @@
 	        android:text="@string/btncaption_photo"
 	        android:background="@color/rsr_blue"
 	        android:textColor="@color/rsr_purple" />
-	    
+	</LinearLayout>
+	</ScrollView>	    
 	    <!-- The two save buttons -->	
 	    <LinearLayout
 	        android:layout_width="fill_parent"

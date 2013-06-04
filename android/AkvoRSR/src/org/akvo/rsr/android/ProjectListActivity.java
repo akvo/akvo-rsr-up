@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.service.GetProjectDataService;
+import org.akvo.rsr.android.service.SubmitProjectUpdateService;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.view.adapter.ProjectListCursorAdapter;
 import org.akvo.rsr.android.xml.Downloader;
@@ -92,9 +93,14 @@ public class ProjectListActivity extends ListActivity {
 			Intent i = new Intent(this, SettingsActivity.class);
 			startActivity(i);
             return true;
+        case R.id.menu_sendall:
+    		Intent i2 = new Intent(this, SubmitProjectUpdateService.class);
+    		getApplicationContext().startService(i2);
+    		//TODO: completion reception and progress dialog
+            return true;
         case R.id.menu_diagnostics:
-			Intent i2 = new Intent(this, DiagnosticActivity.class);
-			startActivity(i2);
+			Intent i3 = new Intent(this, DiagnosticActivity.class);
+			startActivity(i3);
             return true;
 	        default:
 	            return super.onOptionsItemSelected(item);

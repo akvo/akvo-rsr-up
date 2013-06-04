@@ -115,15 +115,15 @@
 			        android:drawableTop="@drawable/ic_menu_view"
 			        android:text="VIEW ALL UPDATES"
 		            />
-			    <!-- View updates button -->
-		
+
+   			    <!-- Add update button -->
 			    <Button
 		            android:id="@+id/btn_add_update"
 			        android:layout_width="0dp"
 			        android:layout_height="wrap_content"
 			        android:layout_weight="1"
 			        android:drawableTop="@drawable/ic_menu_add"
-			        android:text="ADD UPDATE"
+			        android:text="@string/btncaption_add_update"
 		            />
 		    	    	
    			</LinearLayout>
