@@ -32,6 +32,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
@@ -41,6 +42,9 @@ public class ProjectDetailActivity extends Activity {
 	private TextView projTitleLabel;
 	private TextView projLocationText;
 	private TextView projSummaryText;
+	private TextView publishedCountView;
+	private TextView unsynchCountView;
+	private TextView draftCountView;
 	private ImageView projImage;
 	private Button btnUpdates;
 	private Button btnAddUpdate;
@@ -66,10 +70,14 @@ public class ProjectDetailActivity extends Activity {
 		//get the look
 		setContentView(R.layout.activity_project_detail);
 		//find the fields
-		projTitleLabel = (TextView) findViewById(R.id.text_proj_detail_title);
-//		projLocationText = (TextView) findViewById(R.id.text_proj_location);
-		projSummaryText= (TextView) findViewById(R.id.text_proj_summary);
-		projImage = (ImageView) findViewById(R.id.image_proj_detail);
+		projTitleLabel		= (TextView) findViewById(R.id.text_proj_detail_title);
+//		projLocationText 	= (TextView) findViewById(R.id.text_proj_location);
+		projSummaryText		= (TextView) findViewById(R.id.text_proj_summary);
+		projImage 			= (ImageView) findViewById(R.id.image_proj_detail);
+		publishedCountView 	= (TextView) findViewById(R.id.text_proj_detail_published_count);
+		unsynchCountView 	= (TextView) findViewById(R.id.text_proj_detail_unsynchronized_count);
+		draftCountView 		= (TextView) findViewById(R.id.text_proj_detail_draft_count);
+
 		//Activate buttons
 		btnUpdates = (Button) findViewById(R.id.btn_view_updates);
 		btnUpdates.setOnClickListener( new View.OnClickListener() {
@@ -109,6 +117,19 @@ public class ProjectDetailActivity extends Activity {
 		}
 //		projLocationText.setText(project.getLocation()); //not sure what this is supposed to match in XML
 		projSummaryText.setText(project.getSummary());
+		
+		dba.open();
+		int [] stateCounts = {0,0,0};
+		try {
+			stateCounts = dba.countAllUpdatesFor(projId);
+		} finally {
+			dba.close();	
+		}
+		Resources res = getResources();
+		publishedCountView.setText(Integer.toString(stateCounts[2]) + " " + res.getString(R.string.count_published));
+		unsynchCountView.setText(Integer.toString(stateCounts[1]) + " " + res.getString(R.string.count_unsent));
+		draftCountView.setText(Integer.toString(stateCounts[0]) + " " + res.getString(R.string.count_draft));
+
 		
 		//Find file containing thumbnail
 		String fn = project.getThumbnailFilename();

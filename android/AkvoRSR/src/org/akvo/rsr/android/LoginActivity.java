@@ -20,6 +20,7 @@ import java.io.File;
 import java.net.URL;
 
 import org.akvo.rsr.android.domain.User;
+import org.akvo.rsr.android.service.SubmitProjectUpdateService;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.DialogUtil;
 import org.akvo.rsr.android.util.SettingsUtil;
@@ -33,6 +34,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -86,6 +88,13 @@ public class LoginActivity extends Activity {
             }
         });
 
+        final TextView about = (TextView) findViewById(R.id.link_to_about);
+        about.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+            	showAbout();
+            }
+        });
+
         
 	}
 
@@ -96,6 +105,28 @@ public class LoginActivity extends Activity {
 		return true;
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+        case R.id.action_settings:
+			Intent i = new Intent(this, SettingsActivity.class);
+			startActivity(i);
+            return true;
+        case R.id.action_about:
+        	showAbout();
+            return true;
+	    default:
+	    	return super.onOptionsItemSelected(item);
+	    }
+
+	}
+
+	private void showAbout(){
+		Intent i3 = new Intent(this, AboutActivity.class);
+		startActivity(i3);
+		
+	}
+	
     //Sign In button pushed
     public void signIn(View view) {
     	//request API key from server

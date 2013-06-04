@@ -20,8 +20,7 @@
         <activity
             android:name="org.akvo.rsr.android.LoginActivity"
             android:label="@string/title_activity_login"
-            android:theme="@android:style/Theme.Black.NoTitleBar"
-            >
+            android:theme="@android:style/Theme.Black.NoTitleBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -29,8 +28,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:configChanges="keyboardHidden|orientation"
             android:name="org.akvo.rsr.android.ProjectListActivity"
+            android:configChanges="keyboardHidden|orientation"
             android:label="@string/title_activity_project_list" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -58,8 +57,8 @@
                 android:value="org.akvo.rsr.android.ProjectListActivity" />
         </activity>
         <activity
-            android:configChanges="keyboardHidden|orientation"
             android:name="org.akvo.rsr.android.UpdateEditActivity"
+            android:configChanges="keyboardHidden|orientation"
             android:label="@string/title_activity_update_edit" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -83,6 +82,13 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.akvo.rsr.android.ProjectListActivity" />
+        </activity>
+        <activity
+            android:name="org.akvo.rsr.android.AboutActivity"
+            android:label="@string/title_activity_about" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.akvo.rsr.android.LoginActivity" />
         </activity>
     </application>
 

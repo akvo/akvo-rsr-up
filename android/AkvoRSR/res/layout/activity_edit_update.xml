@@ -26,7 +26,6 @@
   		android:layout_height="wrap_content"
 		android:background="@color/lt_gray"
 	    android:orientation="vertical"
-        android:layout_weight="1"
 		>
 			 	
 		<!-- The update title entry -->	
@@ -64,11 +63,10 @@
         <EditText
             android:id="@+id/edit_projupd_description"
             android:layout_width="fill_parent"
-            android:layout_height="0dip"
+            android:layout_height="wrap_content"
             android:background="@android:color/white"
             android:layout_margin="5dip"
             android:singleLine="false"
-			android:layout_weight="2"
             android:hint="@string/hint_update_description"
             android:padding="5dip"
             android:gravity="top|left"
@@ -89,8 +87,8 @@
         	android:id="@+id/image_update_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxWidth="100sp"
-            android:maxHeight="100sp"
+            android:maxWidth="80dip"
+            android:maxHeight="80dip"
 	        android:layout_gravity="center_horizontal"
             android:contentDescription="@string/app_name"
             android:scaleType="centerInside"

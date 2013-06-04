@@ -48,15 +48,47 @@
 	                android:contentDescription="@string/app_name"
 	                android:src="@drawable/ic_launcher"
 			        />
-<!-- 
-			    <ImageButton
-		            android:id="@+id/btn_proj_sideways"
-			        android:layout_width="0dp"
-			        android:layout_height="fill_parent"
-			        android:layout_weight="1"
-			        android:src="@drawable/ic_menu_forward"
-		            />
-		             -->
+	    <LinearLayout
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="vertical" >
+
+        	<TextView
+	        	android:id="@+id/text_proj_detail_published_count"
+        	    android:layout_width="wrap_content"
+        	    android:layout_height="wrap_content"
+        	    android:layout_gravity="left"
+        	    android:paddingRight="5dp"
+        	    android:text="@string/published"
+        	    android:textSize="12sp"
+        	    android:textColor="@color/green"
+        	    android:typeface="sans"
+        	    />
+
+        	<TextView
+	     		android:id="@+id/text_proj_detail_unsynchronized_count"
+        	    android:layout_width="wrap_content"
+        	    android:layout_height="wrap_content"
+        	    android:layout_gravity="left"
+        	    android:paddingRight="5dp"
+        	    android:text="@string/unsynch"
+        	    android:textColor="@color/red"
+        	    android:textSize="12sp"
+        	    android:typeface="sans"
+        	    />
+
+        	<TextView
+	        	android:id="@+id/text_proj_detail_draft_count"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+	            android:layout_gravity="left"
+	            android:text="@string/drafts"
+		        android:textSize="12sp"
+		        android:textColor="@color/blue"
+		        android:typeface="sans"
+		        />
+    	</LinearLayout>
+
            </LinearLayout>	        
 <!-- location TODO
 		   <TextView

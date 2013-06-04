@@ -67,6 +67,7 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 			dba.close();	
 		}
 		Resources res = context.getResources();
+		//TODO maybe hide counts of 0?
 		TextView publishedCountView = (TextView) view.findViewById(R.id.list_item_published_count);
 		publishedCountView.setText(Integer.toString(stateCounts[2]) + " " + res.getString(R.string.count_published));
 		TextView unsynchCountView = (TextView) view.findViewById(R.id.list_item_unsynchronized_count);
