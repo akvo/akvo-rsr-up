@@ -356,15 +356,16 @@ public class RsrDbAdapter {
 	 * @param survey
 	 * @return
 	 */
-	public void saveUpdate(Update update) {
+	public void saveUpdate(Update update, boolean saveFn) {
 		ContentValues updatedValues = new ContentValues();
 		updatedValues.put(PK_ID_COL, update.getId());
 		updatedValues.put(PROJECT_COL, update.getProjectId());
 		updatedValues.put(TITLE_COL, update.getTitle());
 		updatedValues.put(TEXT_COL, update.getText());
 		updatedValues.put(THUMBNAIL_URL_COL, update.getThumbnailUrl());
-		//not done here to preserve a cache connection
-//		updatedValues.put(THUMBNAIL_FILENAME_COL, update.getThumbnailFilename());
+		//not always done here to preserve a cache connection
+		if (saveFn)
+			updatedValues.put(THUMBNAIL_FILENAME_COL, update.getThumbnailFilename());
 		updatedValues.put(DRAFT_COL, update.getDraft()?"1":"0");
 		updatedValues.put(UNSENT_COL, update.getUnsent()?"1":"0");
 

@@ -146,7 +146,7 @@ public class UpdateListHandler extends DefaultHandler {
 		} else if (localName.equals("object")) {
 			this.in_update = false;
 			if (currentUpd != null) {
-				dba.saveUpdate(currentUpd);
+				dba.saveUpdate(currentUpd, false); //preserve name of any cached image
 				updateCount++;
 				currentUpd = null;
 			} else syntaxError=true;

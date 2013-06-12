@@ -182,9 +182,11 @@ public class ProjectListActivity extends ListActivity {
 	private void startGetProjectsService() {
 		//start a service
 		//register a listener for the completion intent
+		IntentFilter f = new IntentFilter(ConstantUtil.PROJECTS_FETCHED_ACTION);
+		f.addAction(ConstantUtil.PROJECTS_PROGRESS_ACTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 new ResponseReceiver(),
-                new IntentFilter(ConstantUtil.PROJECTS_FETCHED_ACTION));
+                f);
 		
 		Intent i = new Intent(this, GetProjectDataService.class);
 //		i.putExtra(SERVER_KEY, "http://test.akvo.org");
@@ -193,33 +195,46 @@ public class ProjectListActivity extends ListActivity {
 		//start a "progress" animation
 		//TODO: a real filling progress bar?
 		progress = new ProgressDialog(this);
+		//progress.
 		progress.setTitle("Updating");
-		progress.setMessage("Wait while loading...");
+		progress.setMessage("Fetching projects");
 		progress.show();
 		//Now we wait...
 	}
 
-private void onfetchfinished() {
-	// Dismiss any in-progress dialog
-	if (progress != null)
-		progress.dismiss();
-	//Refresh the list
-	getData();
-}
+	private void onFetchFinished() {
+		// Dismiss any in-progress dialog
+		if (progress != null)
+			progress.dismiss();
+		//Refresh the list
+		getData();
+	}
+
+	private void onFetchProgress(int done, int total) {
+		if (progress != null) {
+			progress.setMessage("Fetching images");
+			progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			progress.setMax(total);
+			progress.setProgress(done);
+			}
+		}
 
 //Broadcast receiver for receiving status updates from the IntentService
-private class ResponseReceiver extends BroadcastReceiver {
-	// Prevents instantiation
-	private ResponseReceiver() {
+	private class ResponseReceiver extends BroadcastReceiver {
+		// Prevents instantiation
+		private ResponseReceiver() {
+		}
+		
+		// Called when the BroadcastReceiver gets an Intent it's registered to receive
+		public void onReceive(Context context, Intent intent) {
+			/*
+			 * Handle Intents here.
+			 */
+			if (intent.getAction() == ConstantUtil.PROJECTS_FETCHED_ACTION)
+				onFetchFinished();
+			else if (intent.getAction() == ConstantUtil.PROJECTS_PROGRESS_ACTION)
+				onFetchProgress(intent.getExtras().getInt(ConstantUtil.SOFAR_KEY, 0),
+						        intent.getExtras().getInt(ConstantUtil.TOTAL_KEY, 100));
+		}
 	}
-	// Called when the BroadcastReceiver gets an Intent it's registered to receive
-	public void onReceive(Context context, Intent intent) {
-		/*
-		 * Handle Intents here.
-		 */
-		if (intent.getAction() == ConstantUtil.PROJECTS_FETCHED_ACTION)
-			onfetchfinished();
-	}
-}
-
 }

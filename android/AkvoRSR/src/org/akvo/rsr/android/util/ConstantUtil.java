@@ -91,16 +91,17 @@ public class ConstantUtil {
 	 * intents
 	 */
     public static final String PROJECTS_FETCHED_ACTION = "org.akvo.rsr.android.PROJECTS_FETCHED";
+    public static final String PROJECTS_PROGRESS_ACTION = "org.akvo.rsr.android.PROJECTS_PROGRESS";
     public static final String UPDATES_SENT_ACTION = "org.akvo.rsr.android.UPDATES_SENT";
 
 	public static final String GPS_STATUS_INTENT = "com.eclipsim.gpsstatus.VIEW";
 	public static final String BARCODE_SCAN_INTENT = "com.google.zxing.client.android.SCAN";
 
 	/**
-	 * zxing barcode extra keys
+	 * progress extra keys
 	 */
-	public static final String BARCODE_CONTENT = "SCAN_RESULT";
-	public static final String BARCODE_FORMAT = "SCAN_RESULT_FORMAT";
+	public static final String SOFAR_KEY = "SOFAR_KEY";
+	public static final String TOTAL_KEY = "TOTAL_KEY";
 
 
 	/**

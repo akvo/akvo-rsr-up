@@ -128,71 +128,73 @@ public class Downloader {
 		return output.getAbsolutePath();
 	}
 	
-
+	public abstract static interface ProgressReporter {
+		  public abstract void sendUpdate(int sofar, int total);
+		}
+	
 	//fetch all unfetched thumbnails and photos
 	//this may be excessive if list is long, we could be lazy until display, and do it in view adapter
-	public void FetchNewThumbnails(Context ctx, String contextUrl, String directory) throws MalformedURLException{
+	public void FetchNewThumbnails(Context ctx, String contextUrl, String directory, ProgressReporter prog) throws MalformedURLException{
 		RsrDbAdapter dba = new RsrDbAdapter(ctx);
 		dba.open();
-		int count = 0;
+		int count = 0, fetchCount = 0;
+		int total = 0;
 		try {
-				URL curl = new URL(contextUrl);
-				Cursor cursor = dba.listAllProjects();
-				if (cursor != null) {
-					cursor.moveToFirst();
-					while (!cursor.isAfterLast()) {
-						String id = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL));
-						String fn = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
-						String url = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
-						if (fn == null) {
-							//not fetched yet
-							if (url == null) {
-								Log.w(TAG, "Null image URL for update: "+id);
-							} else try{
-								fn = HttpGetToNewFile(new URL(curl,url), directory, "prj" + id + "_");
-								dba.updateProjectThumbnailFile(id,fn);	
-								count++;
-							} catch (Exception e) {
-								//DialogUtil.errorAlert(ctx, "Error fetching proj image from URL " + url, e);
-								Log.e(TAG, "FetchNewThumbnails p Error", e);
-							}
-
-						}
-						cursor.moveToNext();
+			URL curl = new URL(contextUrl);
+			Cursor cursor = dba.listAllProjects();
+			Cursor cursor2 = dba.listAllUpdates();
+			total = cursor.getCount() + cursor2.getCount();
+			while (cursor.moveToNext()) {
+				count++;
+				String id = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL));
+				String fn = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
+				String url = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
+				if (fn == null) {
+					//not fetched yet
+					if (url == null) {
+						Log.w(TAG, "Null image URL for update: "+id);
+					} else try{
+						fn = HttpGetToNewFile(new URL(curl,url), directory, "prj" + id + "_");
+						dba.updateProjectThumbnailFile(id,fn);	
+						fetchCount++;
+					} catch (Exception e) {
+						//DialogUtil.errorAlert(ctx, "Error fetching proj image from URL " + url, e);
+						Log.e(TAG, "FetchNewThumbnails p Error", e);
 					}
-					cursor.close();
-				}
-				//get update photos
-				Cursor cursor2 = dba.listAllUpdates();
-				if (cursor2 != null) {
-					cursor2.moveToFirst();
-					while (!cursor2.isAfterLast()) {
-						String id = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.PK_ID_COL));
-						String fn = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
-						String url = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
-						if (fn == null || ! new File(fn).exists()) {
-							//not fetched yet, or deleted
-							if (url == null) {
-								Log.i(TAG, "Null image URL for update: " + id);
-							} else try {
-								fn = HttpGetToNewFile(new URL(curl,url), directory, "upd"+id+"_");
-								dba.updateUpdateThumbnailFile(id,fn);						
-								count++;
-							} catch (Exception e) {
-								//TODO only once??
-								//DialogUtil.errorAlert(ctx, "Error fetching update image from URL " + url, e);
-								Log.e(TAG, "FetchNewThumbnails u Error", e);
-							}
 
-							}
-						cursor2.moveToNext();
-					}
-					cursor2.close();
 				}
+				prog.sendUpdate(count, total);
+			}
+			cursor.close();
+			//get update photos
+
+			while (cursor2.moveToNext()) {
+				count++;
+				String id = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.PK_ID_COL));
+				String fn = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
+				String url = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
+				if (fn == null || ! new File(fn).exists()) {
+		
+					//not fetched yet, or deleted
+					if (url == null) {
+						Log.i(TAG, "Null image URL for update: " + id);
+					} else try {
+						fn = HttpGetToNewFile(new URL(curl,url), directory, "upd"+id+"_");
+						dba.updateUpdateThumbnailFile(id,fn);						
+						fetchCount++;
+					} catch (Exception e) {
+						//TODO only once??
+						//DialogUtil.errorAlert(ctx, "Error fetching update image from URL " + url, e);
+						Log.e(TAG, "FetchNewThumbnails u Error", e);
+					}
+				}
+				prog.sendUpdate(count, total);
+			}
+			cursor2.close();
 		} finally {
 			dba.close();
 		}
-		Log.i(TAG, "Fetched " + count + " images");
+		Log.i(TAG, "Fetched " + fetchCount + " images");
 		
 	}
 
@@ -246,11 +248,11 @@ public class Downloader {
 	    
 	  */
 	private static final String contentType = "application/xml";
-	private static final String bodyTemplate =	"<object><update_method>W</update_method><project>%s</project>" +
+	private static final String bodyTemplate =	"<object><update_method>S</update_method><project>%s</project>" +
 			"<photo_location>E</photo_location><user>%s</user><title>%s</title>" +
 			"<text>%s</text>%s%s%s</object>";
-	private static final String imagePreamble =	 "<photo content_type=\"image/jpeg\" encoding=\"base64\">%s</photo>";
-	private static final String imagePostamble = "<photo content_type=\"image/jpeg\" encoding=\"base64\">%s</photo>";
+	private static final String imagePreamble =	 "<photo type=\"hash\"><name>dummy.jpg</name><content_type>image/jpeg</content_type><file>";
+	private static final String imagePostamble = "</file></photo>";
 	
 	public boolean PostXmlUpdate(String urlTemplate, Update update, boolean sendImage, User u) {
 		URL url;
@@ -337,7 +339,6 @@ public class Downloader {
 
 		HttpRequest h = HttpRequest.post(url).form(data).connectTimeout(10000); //10 sec timeout
 		int code = h.code();
-		String apiKey = null;
 		if (code == 200) {
 			try {
 				/* Get a SAXParser from the SAXPArserFactory. */

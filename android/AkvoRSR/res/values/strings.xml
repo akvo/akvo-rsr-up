@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">AkvoRSR</string>
-    <string name="app_version">0.24</string>
+    <string name="app_version">0.32</string>
     <string name="app_subtitle">Really Simple Reporting</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_login">Akvo RSR</string>
@@ -30,7 +30,7 @@
     <string name="username">Username</string>
     <string name="email_address">Email Address</string>
     <string name="password">Password</string>
-    <string name="sign_in">SIGN IN</string>
+    <string name="btncaption_sign_in">SIGN IN</string>
     <string name="forgot_password_">Forgot Password?</string>
     <string name="btncaption_photo">TAKE PHOTO NOW</string>
     <string name="btncaption_rephoto">RETAKE PHOTO</string>

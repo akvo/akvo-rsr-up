@@ -97,6 +97,15 @@ public class LoginActivity extends Activity {
 
         
 	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (haveCredentials()) { //skip login
+		    Intent intent = new Intent(this, ProjectListActivity.class);
+		    startActivity(intent);
+		}
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -146,8 +155,10 @@ public class LoginActivity extends Activity {
     			Toast.makeText(getApplicationContext(), "Logged in as " + user.getUsername(), Toast.LENGTH_SHORT).show();    			
     		}
     		else {
-    			//TODO: stay on this page?
-    			Toast.makeText(getApplicationContext(), "Login failed, posting will be impossible", Toast.LENGTH_SHORT).show();
+    			Toast.makeText(getApplicationContext(), "Login failed", Toast.LENGTH_SHORT).show();
+    			signOut();
+    			//stay on this page
+    			return;
     		}
     	}
     	catch (Exception e) {
@@ -165,6 +176,18 @@ public class LoginActivity extends Activity {
 		SettingsUtil.Write(this, "authorized_orgid",    "");
 		SettingsUtil.Write(this, "authorized_apikey",   "");
 		
-		passwordEdit.setText("");
+		if (passwordEdit != null)
+			passwordEdit.setText("");
+    }
+    
+    public boolean haveCredentials() {
+    	String u = SettingsUtil.Read(this, "authorized_username");
+		String i = SettingsUtil.Read(this, "authorized_userid");
+		String o = SettingsUtil.Read(this, "authorized_orgid");
+		String k = SettingsUtil.Read(this, "authorized_apikey");
+		return u != null && !u.equals("")
+			&& i != null && !i.equals("")
+			&& o != null && !o.equals("")
+			&& k != null && !k.equals("");
     }
 }

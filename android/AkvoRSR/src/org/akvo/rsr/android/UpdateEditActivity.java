@@ -188,7 +188,8 @@ public class UpdateEditActivity extends Activity {
 			//Handle taken photo
 			if (new File(captureFilename).exists()) {
 				update.setThumbnailFilename(captureFilename);
-				DialogUtil.infoAlert(this, "Photo returned", "Got a photo");
+				//DialogUtil.infoAlert(this, "Photo returned", "Got a photo");
+				
 				btnPhoto.setText(R.string.btncaption_rephoto);
 				//make thumbnail and show it on page
 				//TODO: shrink to save memory
@@ -215,7 +216,7 @@ public class UpdateEditActivity extends Activity {
 			update.setId(Integer.toString(- new Random().nextInt(100000000)));
 			nextLocalId--;
 		}
-		dba.saveUpdate(update);
+		dba.saveUpdate(update, true);
 		//Tell user what happened
 		Context context = getApplicationContext();
 		CharSequence text = "Update saved as draft";
@@ -239,7 +240,7 @@ public class UpdateEditActivity extends Activity {
 			//TODO, improve this
 			update.setId(Integer.toString(- new Random().nextInt(100000000)));
 		}
-		dba.saveUpdate(update);
+		dba.saveUpdate(update, true);
 		
 		//start synch service
 		//register a listener for a completion intent
