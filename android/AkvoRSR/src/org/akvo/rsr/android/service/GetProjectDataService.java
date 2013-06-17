@@ -53,7 +53,7 @@ public class GetProjectDataService extends IntentService {
 		}
 		//broadcast completion
 		Intent i = new Intent(ConstantUtil.PROJECTS_PROGRESS_ACTION);
-		i.putExtra(ConstantUtil.SOFAR_KEY, 1);
+		i.putExtra(ConstantUtil.SOFAR_KEY, 0);
 		i.putExtra(ConstantUtil.TOTAL_KEY, 2);
 	    LocalBroadcastManager.getInstance(this).sendBroadcast(i);
 		try {
@@ -63,8 +63,8 @@ public class GetProjectDataService extends IntentService {
 					new Downloader.ProgressReporter() {
 						public void sendUpdate(int sofar, int total) {
 							Intent i = new Intent(ConstantUtil.PROJECTS_PROGRESS_ACTION);
-							i.putExtra(ConstantUtil.SOFAR_KEY, 1);
-							i.putExtra(ConstantUtil.TOTAL_KEY, 2);
+							i.putExtra(ConstantUtil.SOFAR_KEY, sofar);
+							i.putExtra(ConstantUtil.TOTAL_KEY, total);
 						    LocalBroadcastManager.getInstance(myself).sendBroadcast(i);							
 						}
 					}

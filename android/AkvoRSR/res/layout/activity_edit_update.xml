@@ -14,7 +14,9 @@
             android:layout_gravity="left"
 	        android:textColor="@color/dk_gray"
             android:padding="5dip"
-            android:typeface="sans" />
+            android:typeface="sans"
+          	android:text="Update Title: dummy title"
+          	/>
   	<ScrollView
 		android:layout_width="fill_parent"
 		android:layout_height="0dp"
@@ -64,13 +66,13 @@
             android:id="@+id/edit_projupd_description"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/white"
             android:layout_margin="5dip"
-            android:singleLine="false"
-            android:hint="@string/hint_update_description"
-            android:padding="5dip"
+            android:background="@android:color/white"
             android:gravity="top|left"
-            />
+            android:hint="@string/hint_update_description"
+            android:minLines="3"
+            android:padding="5dip"
+            android:singleLine="false" />
         
 		<!-- The photo -->	
         <TextView
@@ -87,8 +89,9 @@
         	android:id="@+id/image_update_detail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxWidth="80dip"
-            android:maxHeight="80dip"
+            android:maxWidth="60dip"
+            android:maxHeight="60dip"
+            android:minHeight="30dip"
 	        android:layout_gravity="center_horizontal"
             android:contentDescription="@string/app_name"
             android:scaleType="centerInside"
@@ -104,8 +107,6 @@
 	        android:text="@string/btncaption_photo"
 	        android:background="@color/rsr_blue"
 	        android:textColor="@color/rsr_purple" />
-	</LinearLayout>
-	</ScrollView>	    
 	    <!-- The two save buttons -->	
 	    <LinearLayout
 	        android:layout_width="fill_parent"
@@ -132,4 +133,6 @@
 	            />
 	    	    	
 	   	</LinearLayout>
+	</LinearLayout>
+	</ScrollView>	    
 </LinearLayout>

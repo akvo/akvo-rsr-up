@@ -93,6 +93,10 @@ public class ProjectListActivity extends ListActivity {
 			Intent i = new Intent(this, SettingsActivity.class);
 			startActivity(i);
             return true;
+        case R.id.menu_logout:
+        	LoginActivity.signOut(this);
+        	finish();
+            return true;
         case R.id.menu_sendall:
     		Intent i2 = new Intent(this, SubmitProjectUpdateService.class);
     		getApplicationContext().startService(i2);
@@ -198,6 +202,7 @@ public class ProjectListActivity extends ListActivity {
 		//progress.
 		progress.setTitle("Updating");
 		progress.setMessage("Fetching projects");
+		progress.setCancelable(false);
 		progress.show();
 		//Now we wait...
 	}
@@ -213,9 +218,10 @@ public class ProjectListActivity extends ListActivity {
 	private void onFetchProgress(int done, int total) {
 		if (progress != null) {
 			progress.setMessage("Fetching images");
-			progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-			progress.setMax(total);
-			progress.setProgress(done);
+//			progress.setIndeterminate(false);
+//			progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+//			progress.setMax(total);
+//			progress.setProgress(done);
 			}
 		}
 

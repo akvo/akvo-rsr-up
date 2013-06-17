@@ -104,6 +104,8 @@ public class LoginActivity extends Activity {
 		if (haveCredentials()) { //skip login
 		    Intent intent = new Intent(this, ProjectListActivity.class);
 		    startActivity(intent);
+		} else {
+			passwordEdit.setText("");
 		}
 	}
 
@@ -156,7 +158,9 @@ public class LoginActivity extends Activity {
     		}
     		else {
     			Toast.makeText(getApplicationContext(), "Login failed", Toast.LENGTH_SHORT).show();
-    			signOut();
+    			signOut(this);
+    			passwordEdit.setText("");
+    			//Let user keep username
     			//stay on this page
     			return;
     		}
@@ -169,15 +173,13 @@ public class LoginActivity extends Activity {
 	    startActivity(intent);
     }
     
-    public void signOut() {
+    public static void signOut(Context c) {
     	//destroy credentials
-		SettingsUtil.Write(this, "authorized_username", "");
-		SettingsUtil.Write(this, "authorized_userid",   "");
-		SettingsUtil.Write(this, "authorized_orgid",    "");
-		SettingsUtil.Write(this, "authorized_apikey",   "");
+		SettingsUtil.Write(c, "authorized_username", "");
+		SettingsUtil.Write(c, "authorized_userid",   "");
+		SettingsUtil.Write(c, "authorized_orgid",    "");
+		SettingsUtil.Write(c, "authorized_apikey",   "");
 		
-		if (passwordEdit != null)
-			passwordEdit.setText("");
     }
     
     public boolean haveCredentials() {
