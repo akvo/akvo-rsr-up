@@ -35,11 +35,16 @@ public class SubmitProjectUpdateService extends IntentService {
 		user.setOrgId(SettingsUtil.Read(this, "authorized_orgid"));
 		user.setApiKey(SettingsUtil.Read(this, "authorized_apikey"));
 		
+		Intent i = new Intent(ConstantUtil.UPDATES_SENT_ACTION);
+
 		Downloader dl = new Downloader();
-		dl.SendUnsentUpdates(this, ConstantUtil.HOST + ConstantUtil.POST_UPDATE_URL + ConstantUtil.API_KEY_PATTERN, sendImg, user);
+		try {
+			dl.SendUnsentUpdates(this, ConstantUtil.HOST + ConstantUtil.POST_UPDATE_URL + ConstantUtil.API_KEY_PATTERN, sendImg, user);
+		} catch (Exception e) {
+			i.putExtra(ConstantUtil.POST_ERRMSG_KEY, e.getMessage());
+		}
 
 		//broadcast completion
-		Intent i = new Intent(ConstantUtil.UPDATES_SENT_ACTION);
 	    LocalBroadcastManager.getInstance(this).sendBroadcast(i);
 
 	}

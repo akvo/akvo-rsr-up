@@ -10,7 +10,7 @@
          />
     <item android:id="@+id/menu_sendall"
         android:title="@string/menu_sendall"
-        android:icon="@drawable/ic_menu_save"        
+        android:icon="@drawable/ic_menu_share"        
         />
     <item android:id="@+id/menu_diagnostics"
         android:title="Diagnostics"

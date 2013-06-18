@@ -126,9 +126,9 @@ public class ProjectDetailActivity extends Activity {
 			dba.close();	
 		}
 		Resources res = getResources();
-		publishedCountView.setText(Integer.toString(stateCounts[2]) + " " + res.getString(R.string.count_published));
-		unsynchCountView.setText(Integer.toString(stateCounts[1]) + " " + res.getString(R.string.count_unsent));
-		draftCountView.setText(Integer.toString(stateCounts[0]) + " " + res.getString(R.string.count_draft));
+		publishedCountView.setText(Integer.toString(stateCounts[2]) + res.getString(R.string.count_published));
+		unsynchCountView.setText(Integer.toString(stateCounts[1]) + res.getString(R.string.count_unsent));
+		draftCountView.setText(Integer.toString(stateCounts[0]) + res.getString(R.string.count_draft));
 
 		
 		//Find file containing thumbnail

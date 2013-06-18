@@ -16,45 +16,36 @@
 
 package org.akvo.rsr.android;
 
-import java.io.Closeable;
 import java.io.File;
-import java.net.URL;
-import java.util.Currency;
 import java.util.Random;
 
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.domain.Update;
-import org.akvo.rsr.android.service.GetProjectDataService;
 import org.akvo.rsr.android.service.SubmitProjectUpdateService;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.DialogUtil;
-import org.akvo.rsr.android.xml.Downloader;
-
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
-import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Build;
 import android.provider.MediaStore;
+import android.text.InputType;
 
 public class UpdateEditActivity extends Activity {
 	
@@ -70,7 +61,7 @@ public class UpdateEditActivity extends Activity {
 	private TextView projTitleLabel;
 	private EditText projupdTitleText;
 	private EditText projupdDescriptionText;
-	private ImageView projupdImage;//TODO
+	private ImageView projupdImage;
 	private Button btnSubmit;
 	private Button btnDraft;
 	private Button btnPhoto;
@@ -144,7 +135,7 @@ public class UpdateEditActivity extends Activity {
 		} else {
 			update = dba.findUpdate(updateId);
 			if (update == null) {
-				DialogUtil.errorAlert(this, "Update missing", "Cannot open for review update "+updateId);
+				DialogUtil.errorAlert(this, "Update missing", "Cannot open for review update " + updateId);
 			} else {
 				//populate fields
 				editable = update.getDraft();
@@ -160,8 +151,9 @@ public class UpdateEditActivity extends Activity {
 
 			}
 		}
-		projupdTitleText.setEnabled(editable);
-		projupdDescriptionText.setEnabled(editable);
+		
+		projupdTitleText.setInputType(editable?InputType.TYPE_CLASS_TEXT:InputType.TYPE_NULL);
+		projupdDescriptionText.setInputType(editable?InputType.TYPE_CLASS_TEXT:InputType.TYPE_NULL);
 		btnDraft.setEnabled(editable);
 		btnSubmit.setEnabled(editable);
 		btnPhoto.setEnabled(editable);
@@ -205,6 +197,9 @@ public class UpdateEditActivity extends Activity {
 	 * Save current update
 	 */
 	private void saveAsDraft() {
+		if (untitled()) {
+			return;
+		}
 		update.setDraft(true);
 		update.setUnsent(false);
 		update.setTitle(projupdTitleText.getText().toString());
@@ -222,8 +217,6 @@ public class UpdateEditActivity extends Activity {
 		CharSequence text = "Update saved as draft";
 		Toast toast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
 		toast.show();
-		
-//		DialogUtil.infoAlert(this, "Update saved as draft", "You can edit and submit it later");//TODO only visible momentarily before activity is closed
 		finish();
 	}
 
@@ -231,6 +224,9 @@ public class UpdateEditActivity extends Activity {
 	 * Save current update
 	 */
 	private void sendUpdate() {
+		if (untitled()) {
+			return;
+		}
 		update.setUnsent(true);
 		update.setDraft(false);
 		update.setTitle(projupdTitleText.getText().toString());
@@ -242,12 +238,12 @@ public class UpdateEditActivity extends Activity {
 		}
 		dba.saveUpdate(update, true);
 		
-		//start synch service
 		//register a listener for a completion intent
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 new ResponseReceiver(),
                 new IntentFilter(ConstantUtil.UPDATES_SENT_ACTION));
 		
+		//start upload service
 		Intent i = new Intent(this, SubmitProjectUpdateService.class);
 		getApplicationContext().startService(i);
 		
@@ -261,6 +257,18 @@ public class UpdateEditActivity extends Activity {
 		
 	}
 
+	// if update has no title it must not be sent or saved
+	private boolean untitled() {
+		if (projupdTitleText.getText().toString().length() == 0) {
+			//Tell user what happened
+			Context context = getApplicationContext();
+			CharSequence text = "Update must have a title";
+			Toast toast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
+			toast.show();
+			return true;
+		} else
+			return false;
+	}
 	
 	
 	@Override
@@ -288,13 +296,18 @@ public class UpdateEditActivity extends Activity {
 
 	}
 	
-	private void onSendFinished(){
+	private void onSendFinished(Intent i) {
 		// Dismiss any in-progress dialog
 		if (progress != null)
 			progress.dismiss();
 		//Return to project
 		finish();
-		Toast.makeText(getApplicationContext(), "Updates sent", Toast.LENGTH_SHORT).show();
+		String err = i.getStringExtra(ConstantUtil.POST_ERRMSG_KEY);
+		if (err == null) {
+			Toast.makeText(getApplicationContext(), "Updates sent", Toast.LENGTH_SHORT).show();
+		} else {
+			Toast.makeText(getApplicationContext(), err, Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	//Broadcast receiver for receiving status updates from the IntentService
@@ -308,7 +321,7 @@ public class UpdateEditActivity extends Activity {
 			 * Handle Intents here.
 			 */
 			if (intent.getAction() == ConstantUtil.UPDATES_SENT_ACTION)
-				onSendFinished();
+				onSendFinished(intent);
 		}
 	}
 

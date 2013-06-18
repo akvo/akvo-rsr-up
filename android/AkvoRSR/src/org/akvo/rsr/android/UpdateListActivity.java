@@ -18,6 +18,7 @@ package org.akvo.rsr.android;
 
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Project;
+import org.akvo.rsr.android.service.SubmitProjectUpdateService;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.view.adapter.UpdateListCursorAdapter;
 import org.akvo.rsr.android.xml.Downloader;
@@ -27,6 +28,7 @@ import android.os.Environment;
 import android.app.ListActivity;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -72,9 +74,36 @@ public class UpdateListActivity extends ListActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_project_list, menu);
+		getMenuInflater().inflate(R.menu.activity_update_list, menu);
 		return true;
 	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+        case R.id.menu_settings:
+			Intent i = new Intent(this, SettingsActivity.class);
+			startActivity(i);
+            return true;
+        case R.id.menu_logout:
+        	LoginActivity.signOut(this);
+        	finish();
+            return true;
+        case R.id.menu_sendall:
+    		Intent i2 = new Intent(this, SubmitProjectUpdateService.class);
+    		getApplicationContext().startService(i2);
+    		//TODO: completion reception and progress dialog
+            return true;
+        case R.id.menu_diagnostics:
+			Intent i3 = new Intent(this, DiagnosticActivity.class);
+			startActivity(i3);
+            return true;
+	    default:
+	        return super.onOptionsItemSelected(item);
+	    }
+
+	}
+	
 
 	
 	@Override

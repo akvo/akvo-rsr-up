@@ -254,14 +254,14 @@ public class Downloader {
 	private static final String imagePreamble =	 "<photo type=\"hash\"><name>dummy.jpg</name><content_type>image/jpeg</content_type><file>";
 	private static final String imagePostamble = "</file></photo>";
 	
-	public boolean PostXmlUpdate(String urlTemplate, Update update, boolean sendImage, User u) {
+	public void PostXmlUpdate(String urlTemplate, Update update, boolean sendImage, User u) throws Exception {
 		URL url;
-		try {
+//		try {
 			url = new URL(String.format(Locale.US, urlTemplate, u.getApiKey(), u.getUsername()));
-		} catch (MalformedURLException e1) {
-			Log.e(TAG, "Unable to make post URL:",e1);
-			return false;
-		}
+//		} catch (MalformedURLException e1) {
+//			Log.e(TAG, "Unable to make post URL:",e1);
+//			return false;
+//		}
 		String projectPath = "/api/v1/project/" + update.getProjectId() + "/";//todo move to constantutil
 		String userPath = "/api/v1/user/" + u.getId() + "/";
 		String imageData1 = "";
@@ -299,16 +299,16 @@ public class Downloader {
 			int penSlash = idPath.lastIndexOf('/', idPath.length()-2);
 			String id = idPath.substring(penSlash+1,idPath.length()-1);
 			update.setId(id);
-			return true;
 		} else {
-			Log.e(TAG, "Unable to post update, code " + code + msg);
-			return false;
+			String e = "Unable to post update, code " + code + " " +  msg;
+			Log.e(TAG, e);
+			throw new Exception(e);
 		}
 	}
 
 
 	//Send all unsent updates
-	public void SendUnsentUpdates(Context ctx, String urlTemplate, boolean sendImages, User user) {
+	public void SendUnsentUpdates(Context ctx, String urlTemplate, boolean sendImages, User user) throws Exception {
 		RsrDbAdapter dba = new RsrDbAdapter(ctx);
 		dba.open();
 		int count = 0;
@@ -318,11 +318,9 @@ public class Downloader {
 				while (cursor2.moveToNext()) {
 					String id = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.PK_ID_COL));
 					Update upd = dba.findUpdate(id);
-					if (PostXmlUpdate(urlTemplate, upd, sendImages, user)) {
-						dba.updateUpdateIdSent(upd, id); //remember new ID and status for this update
-						count++;
-					}
-					cursor2.moveToNext();
+					PostXmlUpdate(urlTemplate, upd, sendImages, user);
+					dba.updateUpdateIdSent(upd, id); //remember new ID and status for this update
+					count++;
 				}
 				cursor2.close();
 			}
