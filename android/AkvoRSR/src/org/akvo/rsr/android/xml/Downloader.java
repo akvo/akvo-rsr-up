@@ -61,6 +61,8 @@ public class Downloader {
 	 */
 	public void FetchProjectList(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
 	
+		Log.i(TAG, "Fetching project list from " + url);
+
 		/* Get a SAXParser from the SAXPArserFactory. */
 		SAXParserFactory spf = SAXParserFactory.newInstance();
 		SAXParser sp = spf.newSAXParser();
@@ -309,6 +311,7 @@ public class Downloader {
 
 	//Send all unsent updates
 	public void SendUnsentUpdates(Context ctx, String urlTemplate, boolean sendImages, User user) throws Exception {
+		Log.i(TAG, "Sending unsent updates");
 		RsrDbAdapter dba = new RsrDbAdapter(ctx);
 		dba.open();
 		int count = 0;
@@ -330,6 +333,7 @@ public class Downloader {
 		Log.i(TAG, "Sent " + count + " updates");
 	}
 
+	
 	public boolean authorize(URL url, String username, String password, User user) {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("username", username);

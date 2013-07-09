@@ -94,10 +94,6 @@ public class UpdateListActivity extends ListActivity {
     		getApplicationContext().startService(i2);
     		//TODO: completion reception and progress dialog
             return true;
-        case R.id.menu_diagnostics:
-			Intent i3 = new Intent(this, DiagnosticActivity.class);
-			startActivity(i3);
-            return true;
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }

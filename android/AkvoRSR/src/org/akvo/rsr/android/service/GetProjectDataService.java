@@ -29,6 +29,7 @@ public class GetProjectDataService extends IntentService {
 		// TODO get the URL?
 		RsrDbAdapter ad = new RsrDbAdapter(this);
 		Downloader dl = new Downloader();
+		String errMsg = null;
 		try {
 			dl.FetchProjectList(this, new URL(ConstantUtil.HOST+String.format(ConstantUtil.FETCH_PROJ_URL,SettingsUtil.Read(this, "authorized_orgid"))));
 			
@@ -38,7 +39,7 @@ public class GetProjectDataService extends IntentService {
 			try {
 			while (c.moveToNext()) {
 				dl.FetchUpdateList(	this,
-								   	new URL(ConstantUtil.HOST+
+								   	new URL(ConstantUtil.HOST +
 									"/api/v1/project_update/?format=xml&limit=0&project=" + //TODO move to constants
 									c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL)))
 									);
@@ -50,6 +51,7 @@ public class GetProjectDataService extends IntentService {
 			}
 		} catch (Exception e) {
 			Log.e(TAG,"Bad fetch:",e);
+			errMsg = "Fetch failed: "+ e;
 		}
 		//broadcast completion
 		Intent i = new Intent(ConstantUtil.PROJECTS_PROGRESS_ACTION);
@@ -71,11 +73,15 @@ public class GetProjectDataService extends IntentService {
 					);
 		} catch (MalformedURLException e) {
 			Log.e(TAG,"Bad thumbnail URL:",e);
+			errMsg = "Thumbnail url problem: "+ e;
 		}
 
 		//broadcast completion
-		Intent i2 = new Intent(ConstantUtil.PROJECTS_FETCHED_ACTION);
-	    LocalBroadcastManager.getInstance(this).sendBroadcast(i2);
+		Intent intent2 = new Intent(ConstantUtil.PROJECTS_FETCHED_ACTION);
+		if (errMsg != null)
+			intent2.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, errMsg);
+
+	    LocalBroadcastManager.getInstance(this).sendBroadcast(intent2);
 
 	}
 }

@@ -16,18 +16,13 @@
 
 package org.akvo.rsr.android;
 
-import java.net.MalformedURLException;
-
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.service.GetProjectDataService;
 import org.akvo.rsr.android.service.SubmitProjectUpdateService;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.view.adapter.ProjectListCursorAdapter;
-import org.akvo.rsr.android.xml.Downloader;
 
 import android.os.Bundle;
-import android.os.Environment;
-import android.app.Activity;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.util.Log;
@@ -37,15 +32,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.support.v4.app.NavUtils;
+import android.widget.Toast;
 import android.support.v4.content.LocalBroadcastManager;
-import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-import android.os.Build;
 
 public class ProjectListActivity extends ListActivity {
 
@@ -82,7 +75,6 @@ public class ProjectListActivity extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.activity_project_list, menu);
-//		Button btnDiag = (Button) findViewById(R.menu.menu_diagnostics
 		return true;
 	}
 
@@ -102,19 +94,14 @@ public class ProjectListActivity extends ListActivity {
     		getApplicationContext().startService(i2);
     		//TODO: completion reception and progress dialog
             return true;
-        case R.id.menu_diagnostics:
-			Intent i3 = new Intent(this, DiagnosticActivity.class);
-			startActivity(i3);
-            return true;
-	        default:
-	            return super.onOptionsItemSelected(item);
+        default:
+        	return super.onOptionsItemSelected(item);
 	    }
 
 	}
 	
 	@Override
 	protected void onPause() {
-		// TODO Auto-generated method stub
 		super.onPause();
 		if (dataCursor != null) {
 			dataCursor.close();
@@ -207,10 +194,18 @@ public class ProjectListActivity extends ListActivity {
 		//Now we wait...
 	}
 
-	private void onFetchFinished() {
+	private void onFetchFinished(Intent intent) {
 		// Dismiss any in-progress dialog
 		if (progress != null)
 			progress.dismiss();
+		
+		String err = intent.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
+		if (err == null) {
+			Toast.makeText(getApplicationContext(), "Fetch complete", Toast.LENGTH_SHORT);
+		} else {
+			Toast.makeText(getApplicationContext(), err, Toast.LENGTH_SHORT).show();
+		}
+
 		//Refresh the list
 		getData();
 	}
@@ -237,7 +232,7 @@ public class ProjectListActivity extends ListActivity {
 			 * Handle Intents here.
 			 */
 			if (intent.getAction() == ConstantUtil.PROJECTS_FETCHED_ACTION)
-				onFetchFinished();
+				onFetchFinished(intent);
 			else if (intent.getAction() == ConstantUtil.PROJECTS_PROGRESS_ACTION)
 				onFetchProgress(intent.getExtras().getInt(ConstantUtil.SOFAR_KEY, 0),
 						        intent.getExtras().getInt(ConstantUtil.TOTAL_KEY, 100));
