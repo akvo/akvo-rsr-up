@@ -19,7 +19,6 @@ package org.akvo.rsr.android;
 import java.io.File;
 
 import org.akvo.rsr.android.dao.RsrDbAdapter;
-import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.DialogUtil;
 
@@ -28,19 +27,13 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.app.Activity;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
-import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 public class DiagnosticActivity extends Activity {
 
-	private String projId = null;
 	private TextView txt;
 	private Button btnUpdates;
 	private Button btnAddUpdate;

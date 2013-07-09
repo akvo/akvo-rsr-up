@@ -66,8 +66,8 @@ public class RsrDbAdapter {
 			"draft integer, unsent integer);";
 
 	private static final String[] DEFAULT_INSERTS = new String[] {
-		"insert into project values(1,'Sample Proj1', 'Sample proj 1 subtitle', 'sum1', 4711.00, 'url1', 'fn1')",
-		"insert into project values(2,'Sample Proj2', 'Sample proj 2 subtitle', 'sum2', 4712.00, 'url2', 'fn2')"
+//		"insert into project values(1,'Sample Proj1', 'Sample proj 1 subtitle', 'sum1', 4711.00, 'url1', 'fn1')",
+//		"insert into project values(2,'Sample Proj2', 'Sample proj 2 subtitle', 'sum2', 4712.00, 'url2', 'fn2')"
 		};
 
 	private static final String DATABASE_NAME = "rsrdata";

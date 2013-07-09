@@ -302,7 +302,7 @@ public class UpdateEditActivity extends Activity {
 			progress.dismiss();
 		//Return to project
 		finish();
-		String err = i.getStringExtra(ConstantUtil.POST_ERRMSG_KEY);
+		String err = i.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
 		if (err == null) {
 			Toast.makeText(getApplicationContext(), "Updates sent", Toast.LENGTH_SHORT).show();
 		} else {

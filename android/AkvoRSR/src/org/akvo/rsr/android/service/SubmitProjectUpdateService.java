@@ -9,17 +9,13 @@ import org.akvo.rsr.android.util.SettingsUtil;
 import org.akvo.rsr.android.xml.Downloader;
 
 import android.app.IntentService;
-import android.app.Service;
 import android.content.Intent;
-import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
-
 
 
 public class SubmitProjectUpdateService extends IntentService {
 
-	private static final String TAG = "SubmitProjectDataService";
+	private static final String TAG = "SubmitProjectUpdateService";
 
 	public SubmitProjectUpdateService() {
 		super(TAG);
@@ -41,7 +37,7 @@ public class SubmitProjectUpdateService extends IntentService {
 		try {
 			dl.SendUnsentUpdates(this, ConstantUtil.HOST + ConstantUtil.POST_UPDATE_URL + ConstantUtil.API_KEY_PATTERN, sendImg, user);
 		} catch (Exception e) {
-			i.putExtra(ConstantUtil.POST_ERRMSG_KEY, e.getMessage());
+			i.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, e.getMessage());
 		}
 
 		//broadcast completion

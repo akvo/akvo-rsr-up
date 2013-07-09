@@ -77,7 +77,7 @@ public class ConstantUtil {
 	 */
 	public static final String PROJECT_ID_KEY = "org.akvo.rsr.android.PROJECT";
 	public static final String UPDATE_ID_KEY = "org.akvo.rsr.android.UPDATE";
-	public static final String POST_ERRMSG_KEY = "org.akvo.rsr.android.ERRMSG";
+	public static final String SERVICE_ERRMSG_KEY = "org.akvo.rsr.android.ERRMSG";
 //	public static final String USER_ID_KEY = "UID";
 //	public static final String ID_KEY = "_id";
 
