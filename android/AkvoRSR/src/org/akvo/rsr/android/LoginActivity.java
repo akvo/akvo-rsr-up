@@ -30,6 +30,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -140,6 +142,13 @@ public class LoginActivity extends Activity {
 	
     //Sign In button pushed
     public void signIn(View view) {
+		//start a "progress" animation
+		//TODO: was not shown since auth network activity is in same thread...
+//		ProgressDialog progress = new ProgressDialog(this);
+//		progress.setTitle("Authorizing");
+//		progress.setMessage("Sending login information");
+//		progress.show();
+    	
     	//request API key from server
     	Downloader dl = new Downloader();
     	try {
@@ -157,17 +166,20 @@ public class LoginActivity extends Activity {
     			Toast.makeText(getApplicationContext(), "Logged in as " + user.getUsername(), Toast.LENGTH_SHORT).show();    			
     		}
     		else {
-    			Toast.makeText(getApplicationContext(), "Login failed", Toast.LENGTH_SHORT).show();
+//    			Toast.makeText(getApplicationContext(), "Login failed", Toast.LENGTH_SHORT).show();
     			signOut(this);
     			passwordEdit.setText("");
     			//Let user keep username
     			//stay on this page
+    			DialogUtil.errorAlert(this, "Error", "Authoriztion failed");
     			return;
     		}
     	}
     	catch (Exception e) {
     		Log.e(TAG,"SignIn() error:",e);
     	}
+    	
+//    	progress.dismiss();
     	
 	    Intent intent = new Intent(this, ProjectListActivity.class);
 	    startActivity(intent);
@@ -192,4 +204,38 @@ public class LoginActivity extends Activity {
 			&& o != null && !o.equals("")
 			&& k != null && !k.equals("");
     }
+
+    //TODO: move auth to a service
+	private void onSendFinished(Intent i) {
+		// Dismiss any in-progress dialog
+		
+//		if (progress != null)
+//			progress.dismiss();
+		//Return to project
+		finish();
+		String err = i.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
+		if (err == null) {
+			Toast.makeText(getApplicationContext(), "Updates sent", Toast.LENGTH_SHORT).show();
+		} else {
+			Toast.makeText(getApplicationContext(), err, Toast.LENGTH_SHORT).show();
+		}
+	}
+
+	//Broadcast receiver for receiving status updates from the IntentService
+	private class ResponseReceiver extends BroadcastReceiver {
+		// Prevents instantiation
+		private ResponseReceiver() {
+		}
+		// Called when the BroadcastReceiver gets an Intent it's registered to receive
+		public void onReceive(Context context, Intent intent) {
+			/*
+			 * Handle Intents here.
+			 */
+			if (intent.getAction() == ConstantUtil.UPDATES_SENT_ACTION)
+				onSendFinished(intent);
+		}
+	}
+
+	
+
 }
