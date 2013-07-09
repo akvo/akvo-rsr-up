@@ -90,10 +90,8 @@ public class ProjectListActivity extends ListActivity {
         	finish();
             return true;
         case R.id.menu_sendall:
-    		Intent i2 = new Intent(this, SubmitProjectUpdateService.class);
-    		getApplicationContext().startService(i2);
-    		//TODO: completion reception and progress dialog
-            return true;
+        	startSendUpdatesService();
+        	return true;
         default:
         	return super.onOptionsItemSelected(item);
 	    }
@@ -167,6 +165,40 @@ public class ProjectListActivity extends ListActivity {
 	}
 
 	
+	private void startSendUpdatesService(){
+		//register a listener for a completion intent
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                new ResponseReceiver(),
+                new IntentFilter(ConstantUtil.UPDATES_SENT_ACTION));
+		
+		//start upload service
+		Intent i = new Intent(this, SubmitProjectUpdateService.class);
+		getApplicationContext().startService(i);
+		
+		//start a "progress" animation
+		//TODO: a real filling progress bar?
+		progress = new ProgressDialog(this);
+		progress.setTitle("Synchronizing");
+		progress.setMessage("Sending all unsent updates...");
+		progress.show();
+		//Now we wait...
+	}
+
+	private void onSendFinished(Intent i) {
+		// Dismiss any in-progress dialog
+		if (progress != null)
+			progress.dismiss();
+
+		String err = i.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
+		if (err == null) {
+			Toast.makeText(getApplicationContext(), "Updates sent", Toast.LENGTH_SHORT).show();
+		} else {
+			Toast.makeText(getApplicationContext(), err, Toast.LENGTH_SHORT).show();
+		}
+		//Refresh the list
+		getData();
+	}
+
 	/*
 	 * Start the service fetching new project data
 	 */
@@ -231,6 +263,9 @@ public class ProjectListActivity extends ListActivity {
 			/*
 			 * Handle Intents here.
 			 */
+			if (intent.getAction() == ConstantUtil.UPDATES_SENT_ACTION)
+				onSendFinished(intent);
+			else
 			if (intent.getAction() == ConstantUtil.PROJECTS_FETCHED_ACTION)
 				onFetchFinished(intent);
 			else if (intent.getAction() == ConstantUtil.PROJECTS_PROGRESS_ACTION)

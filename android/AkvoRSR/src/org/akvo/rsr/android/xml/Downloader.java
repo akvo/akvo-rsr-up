@@ -203,8 +203,8 @@ public class Downloader {
 	
 	/* 
 	 * Publish an update, return true if success
-	 */
-	public boolean BadPostUpdate(Context ctx, URL url, Update update) {
+	 *
+	public boolean unusedPostUpdate(Context ctx, URL url, Update update) {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("title", update.getTitle());
 		data.put("text", update.getText());
@@ -222,6 +222,7 @@ public class Downloader {
 		}
 		return true;
 	}
+	*/
 	
 	/* 
 	 * Publish an update, return true if success
