@@ -15,7 +15,7 @@
 	        android:textColor="@color/dk_gray"
             android:padding="5dip"
             android:typeface="sans"
-          	android:text="Update Title: dummy title"
+          	android:text="Project title goes here"
           	/>
   	<ScrollView
 		android:layout_width="fill_parent"
@@ -70,9 +70,10 @@
             android:background="@android:color/white"
             android:gravity="top|left"
             android:hint="@string/hint_update_description"
+            android:minHeight="30dp"
             android:minLines="3"
-            android:padding="5dip"
-            android:singleLine="false" />
+            android:inputType="textMultiLine"
+            android:padding="5dip" />
         
 		<!-- The photo -->	
         <TextView

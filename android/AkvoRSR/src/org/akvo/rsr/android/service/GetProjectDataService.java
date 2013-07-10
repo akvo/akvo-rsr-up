@@ -24,6 +24,14 @@ public class GetProjectDataService extends IntentService {
 		super(TAG);
 	}
 
+	private void progressBroadcast(int p, int s, int t){
+		Intent i1 = new Intent(ConstantUtil.PROJECTS_PROGRESS_ACTION);
+		i1.putExtra(ConstantUtil.PHASE_KEY, p);
+		i1.putExtra(ConstantUtil.SOFAR_KEY, s);
+		i1.putExtra(ConstantUtil.TOTAL_KEY, t);
+	    LocalBroadcastManager.getInstance(this).sendBroadcast(i1);		
+	}
+	
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		// TODO get the URL?
@@ -32,6 +40,7 @@ public class GetProjectDataService extends IntentService {
 		String errMsg = null;
 		try {
 			dl.FetchProjectList(this, new URL(ConstantUtil.HOST+String.format(ConstantUtil.FETCH_PROJ_URL,SettingsUtil.Read(this, "authorized_orgid"))));
+			progressBroadcast(0, 0, 0);
 			
 			//We only get published projects from that URL, so we need to iterate on them and get corresponding updates
 			ad.open();
@@ -53,11 +62,8 @@ public class GetProjectDataService extends IntentService {
 			Log.e(TAG,"Bad fetch:",e);
 			errMsg = "Fetch failed: "+ e;
 		}
-		//broadcast completion
-		Intent i = new Intent(ConstantUtil.PROJECTS_PROGRESS_ACTION);
-		i.putExtra(ConstantUtil.SOFAR_KEY, 0);
-		i.putExtra(ConstantUtil.TOTAL_KEY, 2);
-	    LocalBroadcastManager.getInstance(this).sendBroadcast(i);
+		progressBroadcast(1, 0, 0);
+		
 		try {
 			dl.FetchNewThumbnails(this,
 					ConstantUtil.HOST,

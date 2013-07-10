@@ -2,9 +2,63 @@
 	  	xmlns:android="http://schemas.android.com/apk/res/android"
   		android:layout_width="fill_parent"
   		android:layout_height="fill_parent"
-	        android:orientation="vertical"
+	    android:orientation="vertical"
 		>
+		<LinearLayout
+  			android:layout_width="fill_parent"
+  			android:layout_height="wrap_content"
+	    	android:orientation="vertical"
+            android:padding="5dip"
+            android:visibility="gone"
+	        android:id="@+id/projlistprogress"
+			>
 
+	        <TextView
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:gravity="center_horizontal"
+	            android:text="Update progress" 
+	            android:textSize="14sp"
+                android:textColor="@color/rsr_blue"
+                />
+
+	        <TextView
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:layout_gravity="left"
+	            android:text="Projects" />	        
+		    <ProgressBar
+			    android:id="@+id/progressBar1"
+			    style="?android:attr/progressBarStyleHorizontal"
+			    android:layout_width="fill_parent"
+			    android:layout_height="wrap_content" />
+
+	        <TextView
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:layout_gravity="left"
+	            android:text="Updates" />
+
+		    <ProgressBar
+		        android:id="@+id/progressBar2"
+		        style="?android:attr/progressBarStyleHorizontal"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content" />
+
+	        <TextView
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:layout_gravity="left"
+	            android:text="Images" />
+
+		    <ProgressBar
+			    android:id="@+id/progressBar3"
+			    style="?android:attr/progressBarStyleHorizontal"
+			    android:layout_width="fill_parent"
+			    android:layout_height="wrap_content" />
+			
+		</LinearLayout>
+		    
 	    <LinearLayout
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"

@@ -30,7 +30,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v4.content.LocalBroadcastManager;
@@ -50,6 +52,10 @@ public class ProjectListActivity extends ListActivity {
 	private Cursor dataCursor;
 	private TextView projCountLabel;
 	private ProgressDialog progress;
+	private LinearLayout inProgress;
+	private ProgressBar inProgress1;
+	private ProgressBar inProgress2;
+	private ProgressBar inProgress3;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +63,10 @@ public class ProjectListActivity extends ListActivity {
 		setContentView(R.layout.activity_project_list);
 
 		projCountLabel = (TextView) findViewById(R.id.projcountlabel);
+		inProgress = (LinearLayout) findViewById(R.id.projlistprogress);
+		inProgress1 = (ProgressBar) findViewById(R.id.progressBar1);
+		inProgress2 = (ProgressBar) findViewById(R.id.progressBar2);
+		inProgress3 = (ProgressBar) findViewById(R.id.progressBar3);
 
 		Button refreshButton = (Button) findViewById(R.id.button_refresh_projects);		
 		refreshButton.setOnClickListener( new View.OnClickListener() {
@@ -217,6 +227,9 @@ public class ProjectListActivity extends ListActivity {
 		
 		//start a "progress" animation
 		//TODO: a real filling progress bar?
+		inProgress.setVisibility(View.VISIBLE);
+		inProgress1.setIndeterminate(true);//no prediction of projects
+		
 		progress = new ProgressDialog(this);
 		//progress.
 		progress.setTitle("Updating");
@@ -230,6 +243,7 @@ public class ProjectListActivity extends ListActivity {
 		// Dismiss any in-progress dialog
 		if (progress != null)
 			progress.dismiss();
+		inProgress.setVisibility(View.GONE);
 		
 		String err = intent.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
 		if (err == null) {
@@ -245,10 +259,12 @@ public class ProjectListActivity extends ListActivity {
 	private void onFetchProgress(int done, int total) {
 		if (progress != null) {
 			progress.setMessage("Fetching images");
-//			progress.setIndeterminate(false);
-//			progress.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-//			progress.setMax(total);
-//			progress.setProgress(done);
+			inProgress1.setIndeterminate(false);
+			inProgress1.setProgress(100);//Done!
+			inProgress2.setIndeterminate(false);
+			inProgress2.setProgress(100);//Done!
+			inProgress2.setProgress(done);
+			inProgress2.setMax(total);
 			}
 		}
 

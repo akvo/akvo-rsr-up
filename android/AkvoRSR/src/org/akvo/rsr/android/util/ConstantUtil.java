@@ -101,6 +101,7 @@ public class ConstantUtil {
 	/**
 	 * progress extra keys
 	 */
+	public static final String PHASE_KEY = "PHASE_KEY";
 	public static final String SOFAR_KEY = "SOFAR_KEY";
 	public static final String TOTAL_KEY = "TOTAL_KEY";
 
