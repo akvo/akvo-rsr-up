@@ -229,20 +229,12 @@ public class ProjectListActivity extends ListActivity {
 		//TODO: a real filling progress bar?
 		inProgress.setVisibility(View.VISIBLE);
 		inProgress1.setIndeterminate(true);//no prediction of projects
-		
-		progress = new ProgressDialog(this);
-		//progress.
-		progress.setTitle("Updating");
-		progress.setMessage("Fetching projects");
-		progress.setCancelable(false);
-		progress.show();
-		//Now we wait...
+		inProgress2.setProgress(0);
+		inProgress3.setProgress(0);
 	}
 
 	private void onFetchFinished(Intent intent) {
-		// Dismiss any in-progress dialog
-		if (progress != null)
-			progress.dismiss();
+		// Hide in-progress indicators
 		inProgress.setVisibility(View.GONE);
 		
 		String err = intent.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
@@ -256,15 +248,23 @@ public class ProjectListActivity extends ListActivity {
 		getData();
 	}
 
-	private void onFetchProgress(int done, int total) {
-		if (progress != null) {
-			progress.setMessage("Fetching images");
+	private void onFetchProgress(int phase, int done, int total) {
+		if (phase == 0) {
 			inProgress1.setIndeterminate(false);
 			inProgress1.setProgress(100);//Done!
-			inProgress2.setIndeterminate(false);
-			inProgress2.setProgress(100);//Done!
+			}
+		if (phase == 1) {
+			inProgress1.setProgress(100);//just in case...
+//			inProgress2.setIndeterminate(false);
 			inProgress2.setProgress(done);
 			inProgress2.setMax(total);
+			}
+		if (phase == 2) {
+			inProgress2.setProgress(100);//just in case...
+			inProgress2.setMax(100);
+//			inProgress3.setIndeterminate(false);
+			inProgress3.setProgress(done);
+			inProgress3.setMax(total);
 			}
 		}
 
@@ -285,7 +285,8 @@ public class ProjectListActivity extends ListActivity {
 			if (intent.getAction() == ConstantUtil.PROJECTS_FETCHED_ACTION)
 				onFetchFinished(intent);
 			else if (intent.getAction() == ConstantUtil.PROJECTS_PROGRESS_ACTION)
-				onFetchProgress(intent.getExtras().getInt(ConstantUtil.SOFAR_KEY, 0),
+				onFetchProgress(intent.getExtras().getInt(ConstantUtil.PHASE_KEY, 0),
+								intent.getExtras().getInt(ConstantUtil.SOFAR_KEY, 0),
 						        intent.getExtras().getInt(ConstantUtil.TOTAL_KEY, 100));
 		}
 	}

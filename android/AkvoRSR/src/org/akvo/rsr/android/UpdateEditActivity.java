@@ -151,9 +151,13 @@ public class UpdateEditActivity extends Activity {
 
 			}
 		}
-		
-		projupdTitleText.setInputType(editable?InputType.TYPE_CLASS_TEXT:InputType.TYPE_NULL);
-		projupdDescriptionText.setInputType(editable?InputType.TYPE_CLASS_TEXT:InputType.TYPE_NULL);
+
+		//this was an attempt, before the whole page was made scrollable
+		// to enable scrolling but not changing of the text
+//		projupdTitleText.setInputType(editable?InputType.TYPE_CLASS_TEXT:InputType.TYPE_NULL);
+//		projupdDescriptionText.setInputType(editable?InputType.TYPE_CLASS_TEXT:InputType.TYPE_NULL);
+		projupdTitleText.setEnabled(editable);
+		projupdDescriptionText.setEnabled(editable);
 		btnDraft.setEnabled(editable);
 		btnSubmit.setEnabled(editable);
 		btnPhoto.setEnabled(editable);

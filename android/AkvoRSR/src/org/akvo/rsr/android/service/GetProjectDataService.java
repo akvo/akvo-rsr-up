@@ -40,19 +40,22 @@ public class GetProjectDataService extends IntentService {
 		String errMsg = null;
 		try {
 			dl.FetchProjectList(this, new URL(ConstantUtil.HOST+String.format(ConstantUtil.FETCH_PROJ_URL,SettingsUtil.Read(this, "authorized_orgid"))));
-			progressBroadcast(0, 0, 0);
+			progressBroadcast(0, 100, 100);//only whole operation
 			
 			//We only get published projects from that URL, so we need to iterate on them and get corresponding updates
 			ad.open();
 			Cursor c = ad.listAllProjects();
 			try {
-			while (c.moveToNext()) {
-				dl.FetchUpdateList(	this,
-								   	new URL(ConstantUtil.HOST +
-									"/api/v1/project_update/?format=xml&limit=0&project=" + //TODO move to constants
-									c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL)))
-									);
-			}
+				int i = 0;
+				while (c.moveToNext()) {
+					i++;
+					dl.FetchUpdateList(	this,
+									   	new URL(ConstantUtil.HOST +
+										"/api/v1/project_update/?format=xml&limit=0&project=" + //TODO move to constants
+										c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL)))
+										);
+					progressBroadcast(1, i, c.getCount());					
+				}
 			}
 			finally {
 				if (c != null)
@@ -62,7 +65,7 @@ public class GetProjectDataService extends IntentService {
 			Log.e(TAG,"Bad fetch:",e);
 			errMsg = "Fetch failed: "+ e;
 		}
-		progressBroadcast(1, 0, 0);
+//		progressBroadcast(1, 0, 0);
 		
 		try {
 			dl.FetchNewThumbnails(this,
@@ -70,10 +73,11 @@ public class GetProjectDataService extends IntentService {
 					Environment.getExternalStorageDirectory().getPath() + ConstantUtil.IMAGECACHE_DIR,
 					new Downloader.ProgressReporter() {
 						public void sendUpdate(int sofar, int total) {
-							Intent i = new Intent(ConstantUtil.PROJECTS_PROGRESS_ACTION);
-							i.putExtra(ConstantUtil.SOFAR_KEY, sofar);
-							i.putExtra(ConstantUtil.TOTAL_KEY, total);
-						    LocalBroadcastManager.getInstance(myself).sendBroadcast(i);							
+							Intent intent = new Intent(ConstantUtil.PROJECTS_PROGRESS_ACTION);
+							intent.putExtra(ConstantUtil.PHASE_KEY, 2);
+							intent.putExtra(ConstantUtil.SOFAR_KEY, sofar);
+							intent.putExtra(ConstantUtil.TOTAL_KEY, total);
+						    LocalBroadcastManager.getInstance(myself).sendBroadcast(intent);							
 						}
 					}
 					);

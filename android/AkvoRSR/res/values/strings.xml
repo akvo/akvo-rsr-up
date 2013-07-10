@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">AkvoRSR</string>
-    <string name="app_version">0.41</string>
+    <string name="app_version">0.42</string>
     <string name="version">Version&#160;</string>
     <string name="app_subtitle">Really Simple Reporting</string>
     <string name="menu_settings">Settings</string>
