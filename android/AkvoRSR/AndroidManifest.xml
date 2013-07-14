@@ -64,18 +64,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.akvo.rsr.android.UpdateListActivity" />
         </activity>
-
-        <service
-            android:name="org.akvo.rsr.android.service.SubmitProjectUpdateService"
-            android:enabled="true"
-            android:exported="false" >
-        </service>
-        <service
-            android:name="org.akvo.rsr.android.service.GetProjectDataService"
-            android:enabled="true"
-            android:exported="false" >
-        </service>
-
         <activity
             android:name="org.akvo.rsr.android.SettingsActivity"
             android:label="@string/title_activity_settings" >
@@ -90,6 +78,23 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.akvo.rsr.android.LoginActivity" />
         </activity>
+        
+        <service
+            android:name="org.akvo.rsr.android.service.SubmitProjectUpdateService"
+            android:enabled="true"
+            android:exported="false" >
+        </service>
+        <service
+            android:name="org.akvo.rsr.android.service.GetProjectDataService"
+            android:enabled="true"
+            android:exported="false" >
+        </service>
+        <service
+            android:name="org.akvo.rsr.android.service.SignInService"
+            android:enabled="true"
+            android:exported="false" >
+        </service>
+        
     </application>
 
 </manifest>

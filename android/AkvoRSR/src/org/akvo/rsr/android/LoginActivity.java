@@ -17,14 +17,11 @@
 package org.akvo.rsr.android;
 
 import java.io.File;
-import java.net.URL;
 
-import org.akvo.rsr.android.domain.User;
-import org.akvo.rsr.android.service.SubmitProjectUpdateService;
+import org.akvo.rsr.android.service.SignInService;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.DialogUtil;
 import org.akvo.rsr.android.util.SettingsUtil;
-import org.akvo.rsr.android.xml.Downloader;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -34,6 +31,8 @@ import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -48,6 +47,7 @@ public class LoginActivity extends Activity {
 	private static final String TAG = "LoginActivity";
 	private EditText usernameEdit;
 	private EditText passwordEdit;
+	private	ProgressDialog progress = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +96,6 @@ public class LoginActivity extends Activity {
             	showAbout();
             }
         });
-
         
 	}
 	
@@ -137,53 +136,31 @@ public class LoginActivity extends Activity {
 	private void showAbout(){
 		Intent i3 = new Intent(this, AboutActivity.class);
 		startActivity(i3);
-		
 	}
 	
     //Sign In button pushed
     public void signIn(View view) {
 		//start a "progress" animation
-		//TODO: was not shown since auth network activity is in same thread...
-//		ProgressDialog progress = new ProgressDialog(this);
-//		progress.setTitle("Authorizing");
-//		progress.setMessage("Sending login information");
-//		progress.show();
+    	progress = new ProgressDialog(this);
+		progress.setTitle("Signing in");
+		progress.setMessage("Sending login information");
+		progress.show();
     	
     	//request API key from server
-    	Downloader dl = new Downloader();
-    	try {
-    		User user = new User();
-    		if (dl.authorize(new URL(ConstantUtil.HOST + ConstantUtil.AUTH_URL),
-    						usernameEdit.getText().toString(),
-    						passwordEdit.getText().toString(),
-    						user)) {
-    			//Yes!
-    			SettingsUtil.Write(this, "authorized_username", user.getUsername());
-    			SettingsUtil.Write(this, "authorized_userid",   user.getId());
-    			SettingsUtil.Write(this, "authorized_orgid",    user.getOrgId());
-    			SettingsUtil.Write(this, "authorized_apikey",   user.getApiKey());
+		//register a listener for the completion intent
+		IntentFilter f = new IntentFilter(ConstantUtil.AUTHORIZATION_RESULT_ACTION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                new ResponseReceiver(),
+                f);
+		
+		Intent intent = new Intent(this, SignInService.class);
+		intent.putExtra(ConstantUtil.USERNAME_KEY, usernameEdit.getText().toString());
+		intent.putExtra(ConstantUtil.PASSWORD_KEY, passwordEdit.getText().toString());
+		getApplicationContext().startService(intent);
+		//now we wait for a broadcast...
 
-    			Toast.makeText(getApplicationContext(), "Logged in as " + user.getUsername(), Toast.LENGTH_SHORT).show();    			
-    		}
-    		else {
-//    			Toast.makeText(getApplicationContext(), "Login failed", Toast.LENGTH_SHORT).show();
-    			signOut(this);
-    			passwordEdit.setText("");
-    			//Let user keep username
-    			//stay on this page
-    			DialogUtil.errorAlert(this, "Error", "Authoriztion failed");
-    			return;
-    		}
-    	}
-    	catch (Exception e) {
-    		Log.e(TAG,"SignIn() error:",e);
-    	}
-    	
-//    	progress.dismiss();
-    	
-	    Intent intent = new Intent(this, ProjectListActivity.class);
-	    startActivity(intent);
     }
+
     
     public static void signOut(Context c) {
     	//destroy credentials
@@ -191,8 +168,8 @@ public class LoginActivity extends Activity {
 		SettingsUtil.Write(c, "authorized_userid",   "");
 		SettingsUtil.Write(c, "authorized_orgid",    "");
 		SettingsUtil.Write(c, "authorized_apikey",   "");
-		
     }
+
     
     public boolean haveCredentials() {
     	String u = SettingsUtil.Read(this, "authorized_username");
@@ -205,19 +182,24 @@ public class LoginActivity extends Activity {
 			&& k != null && !k.equals("");
     }
 
-    //TODO: move auth to a service
-	private void onSendFinished(Intent i) {
+    
+    //Auth now done in service
+	private void onAuthFinished(Intent i) {
 		// Dismiss any in-progress dialog
-		
-//		if (progress != null)
-//			progress.dismiss();
-		//Return to project
-		finish();
+		if (progress != null)
+			progress.dismiss();
+
 		String err = i.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
 		if (err == null) {
-			Toast.makeText(getApplicationContext(), "Updates sent", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), "Logged in as " + SettingsUtil.Read(this, "authorized_username"), Toast.LENGTH_SHORT).show();
+			//Go to main screen
+		    Intent intent = new Intent(this, ProjectListActivity.class);
+		    startActivity(intent);
 		} else {
-			Toast.makeText(getApplicationContext(), err, Toast.LENGTH_SHORT).show();
+			passwordEdit.setText("");
+			//Let user keep username
+			//stay on this page
+			DialogUtil.errorAlert(this, "Error", err);
 		}
 	}
 
@@ -231,8 +213,8 @@ public class LoginActivity extends Activity {
 			/*
 			 * Handle Intents here.
 			 */
-			if (intent.getAction() == ConstantUtil.UPDATES_SENT_ACTION)
-				onSendFinished(intent);
+			if (intent.getAction() == ConstantUtil.AUTHORIZATION_RESULT_ACTION)
+				onAuthFinished(intent);
 		}
 	}
 

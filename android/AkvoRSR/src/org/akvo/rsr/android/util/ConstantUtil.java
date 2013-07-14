@@ -77,9 +77,6 @@ public class ConstantUtil {
 	 */
 	public static final String PROJECT_ID_KEY = "org.akvo.rsr.android.PROJECT";
 	public static final String UPDATE_ID_KEY = "org.akvo.rsr.android.UPDATE";
-	public static final String SERVICE_ERRMSG_KEY = "org.akvo.rsr.android.ERRMSG";
-//	public static final String USER_ID_KEY = "UID";
-//	public static final String ID_KEY = "_id";
 
 	/**
 	 * settings keys
@@ -94,16 +91,20 @@ public class ConstantUtil {
     public static final String PROJECTS_FETCHED_ACTION = "org.akvo.rsr.android.PROJECTS_FETCHED";
     public static final String PROJECTS_PROGRESS_ACTION = "org.akvo.rsr.android.PROJECTS_PROGRESS";
     public static final String UPDATES_SENT_ACTION = "org.akvo.rsr.android.UPDATES_SENT";
+    public static final String AUTHORIZATION_RESULT_ACTION = "org.akvo.rsr.android.AUTHORIZATION_RESULT";
 
 	public static final String GPS_STATUS_INTENT = "com.eclipsim.gpsstatus.VIEW";
 	public static final String BARCODE_SCAN_INTENT = "com.google.zxing.client.android.SCAN";
 
 	/**
-	 * progress extra keys
+	 * intent extra keys
 	 */
 	public static final String PHASE_KEY = "PHASE_KEY";
 	public static final String SOFAR_KEY = "SOFAR_KEY";
 	public static final String TOTAL_KEY = "TOTAL_KEY";
+	public static final String SERVICE_ERRMSG_KEY = "org.akvo.rsr.android.ERRMSG";
+	public static final String USERNAME_KEY = "org.akvo.rsr.android.USERNAME";
+	public static final String PASSWORD_KEY = "org.akvo.rsr.android.PASSWORD";
 
 
 	/**

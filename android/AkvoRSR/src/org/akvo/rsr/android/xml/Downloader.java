@@ -29,13 +29,9 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.akvo.rsr.android.dao.RsrDbAdapter;
-import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.domain.Update;
 import org.akvo.rsr.android.domain.User;
-import org.akvo.rsr.android.util.DialogUtil;
 import org.akvo.rsr.android.util.FileUtil;
-import org.akvo.rsr.android.util.SettingsUtil;
-import org.apache.http.HttpResponse;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -44,9 +40,7 @@ import com.github.kevinsawicki.http.HttpRequest;
 import com.github.kevinsawicki.http.HttpRequest.Base64;
 import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.database.Cursor;
 import android.util.Log;
 
@@ -56,8 +50,8 @@ public class Downloader {
 
 	public boolean err = false;
 	
-	/* Populate the projects table in the db from a server URL
-	 * 
+	/*
+	 *  Populate the projects table in the db from a server URL
 	 */
 	public void FetchProjectList(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
 	
@@ -84,8 +78,9 @@ public class Downloader {
 	}
 
 	
-	/* Populate the updates table in the db from a server URL
-	 * 
+	/* 
+	 * Populate the updates table in the db from a server URL
+	 * Typically the url will specify updates for a single project.
 	 */
 	public void FetchUpdateList(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
 	
@@ -224,6 +219,20 @@ public class Downloader {
 	}
 	*/
 	
+	private final char SPC = '\u0020';
+	
+	//return a string without newlines and with a maximum length
+	private String oneLine(String s, int maxLength) {
+		String result = "";
+		for (int i = 0; i < Math.min(s.length(), maxLength); i++)
+			if (s.charAt(i) < SPC)
+				result += SPC;
+			else
+				result += s.charAt(i);
+		return result;
+	}
+	
+	
 	/* 
 	 * Publish an update, return true if success
 	 * TODO posting of images
@@ -265,7 +274,7 @@ public class Downloader {
 //			Log.e(TAG, "Unable to make post URL:",e1);
 //			return false;
 //		}
-		String projectPath = "/api/v1/project/" + update.getProjectId() + "/";//todo move to constantutil
+		String projectPath = "/api/v1/project/" + update.getProjectId() + "/";//TODO move to constantutil
 		String userPath = "/api/v1/user/" + u.getId() + "/";
 		String imageData1 = "";
 		String imageData2 = "";
@@ -289,7 +298,9 @@ public class Downloader {
 			}
 		}
 		String requestBody = String.format(Locale.US, bodyTemplate,
-				projectPath, userPath, update.getTitle(), update.getText(),
+				projectPath, userPath,
+				oneLine(update.getTitle(),50), //TODO: WHAT ABOUT XML?
+				update.getText(),
 				imageData1, imageData2, imageData3);
 
 		HttpRequest h = HttpRequest.post(url).contentType(contentType).send(requestBody);
@@ -335,7 +346,7 @@ public class Downloader {
 	}
 
 	
-	public boolean authorize(URL url, String username, String password, User user) {
+	public boolean authorize(URL url, String username, String password, User user) throws ParserConfigurationException, SAXException, HttpRequestException, IOException {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("username", username);
 		data.put("password", password);
@@ -343,7 +354,7 @@ public class Downloader {
 		HttpRequest h = HttpRequest.post(url).form(data).connectTimeout(10000); //10 sec timeout
 		int code = h.code();
 		if (code == 200) {
-			try {
+//			try {
 				/* Get a SAXParser from the SAXPArserFactory. */
 				SAXParserFactory spf = SAXParserFactory.newInstance();
 				SAXParser sp = spf.newSAXParser();
@@ -359,12 +370,11 @@ public class Downloader {
 				user.setId(myAuthHandler.getUserId());
 				user.setOrgId(myAuthHandler.getOrgId());
 				user.setApiKey(myAuthHandler.getApiKey());
-			}
-			catch (Exception e) {
-				Log.e(TAG, "Authorization fetch/parse error: ", e);
-				return false;
-			}
-			/* Check if anything went wrong. */
+//			}
+//			catch (Exception e) {
+//				Log.e(TAG, "Authorization fetch/parse error: ", e);
+//				return false;
+//			}
 			
 			Log.i(TAG, "Fetched API key");
 			
