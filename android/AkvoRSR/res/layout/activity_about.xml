@@ -2,29 +2,30 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:background="@color/rsr_purple"
     android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".AboutActivity" 
-    android:background="@color/rsr_purple"
-    >
-		        <!-- Logo Start-->
-		        <ImageView android:src="@drawable/logo"
-		            android:contentDescription="@string/app_name"
-		            android:layout_width="wrap_content"
-		            android:layout_height="wrap_content"
-		            android:layout_gravity="center"
-		            />
-		        <!-- Logo Ends -->
+    tools:context=".AboutActivity" >
+
+    <!-- Logo Start-->
+    <ImageView android:src="@drawable/logo"
+        android:contentDescription="@string/app_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        />
+    <!-- Logo Ends -->
     
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="8dp"
         android:text="@string/app_name"
-        android:textColor="@android:color/white"
-         />
+        android:textColor="@android:color/white" />
+
     <LinearLayout
 	     android:layout_width="fill_parent"
 	      android:layout_height="wrap_content"
@@ -33,21 +34,32 @@
 	    <TextView
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
+	        android:padding="8dp"
 	        android:text="@string/version"
-	        android:textColor="@android:color/white"
-	         />
+	        android:textColor="@android:color/white" />
+
 	    <TextView
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
+	        android:padding="8dp"
 	        android:text="@string/app_version"
-	        android:textColor="@android:color/white"
-	         />
+	        android:textColor="@android:color/white" />
+
    	</LinearLayout>
+	    
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="8dp"
         android:text="@string/copyright"
-        android:textColor="@android:color/white"
-         />
+        android:textColor="@android:color/white" />
+
+    <ImageButton
+        android:id="@+id/btn_akvo_link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:contentDescription="@string/powered_by_akvo"
+        android:src="@drawable/akvo_badge" />
         
 </LinearLayout>

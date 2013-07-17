@@ -15,15 +15,28 @@
  */
 package org.akvo.rsr.android;
 
+import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageButton;
 import android.app.Activity;
+import android.content.Intent;
 
 public class AboutActivity extends Activity {
 
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_about);
+
+		final ImageButton btnUpdates = (ImageButton) findViewById(R.id.btn_akvo_link);
+		btnUpdates.setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+                Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.akvo.org/"));
+                startActivity(myIntent);                				
+			}
+		});
 	}
 
 

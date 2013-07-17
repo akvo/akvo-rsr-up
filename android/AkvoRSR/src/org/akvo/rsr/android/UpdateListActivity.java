@@ -27,9 +27,12 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.app.ListActivity;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.content.Intent;
@@ -44,6 +47,7 @@ public class UpdateListActivity extends ListActivity {
 	private Cursor dataCursor;
 	private TextView projectTitleLabel;
 	private TextView updateCountLabel;
+	private View listFooter;
 	private String projId;
 
 	@Override
@@ -64,12 +68,35 @@ public class UpdateListActivity extends ListActivity {
 
 		projectTitleLabel = (TextView) findViewById(R.id.ulisttitlelabel);
 		updateCountLabel = (TextView) findViewById(R.id.updatecountlabel);
- 
+
+		View listFooter = getLayoutInflater().inflate(R.layout.update_list_footer, null, false);
+		//if the button were not the outermost view I would need to find it to set onClick
+/*		
+		listFooter = new Button(this);
+		listFooter.setWidth(ViewGroup.LayoutParams.FILL_PARENT);
+		listFooter.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+		listFooter.setText(R.string.action_add_update);
+		listFooter.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 24);
+		listFooter.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.ic_menu_add,0,0);
+		//TODO works but text is not shown
+		 */
+		listFooter.setOnClickListener( new View.OnClickListener() {
+			public void onClick(View view) {
+				startEditor();
+			}
+		});
+		
+		getListView().addFooterView(listFooter);
+		
         //Create db
         ad = new RsrDbAdapter(this);
 	}
 
-
+	private void startEditor() {
+		Intent i3 = new Intent(this, UpdateEditActivity.class);
+		i3.putExtra(ConstantUtil.PROJECT_ID_KEY, projId);
+		startActivity(i3);		
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -81,19 +108,18 @@ public class UpdateListActivity extends ListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
-        case R.id.menu_settings:
-			Intent i = new Intent(this, SettingsActivity.class);
-			startActivity(i);
-            return true;
-        case R.id.menu_logout:
-        	LoginActivity.signOut(this);
-        	finish();
+        case R.id.action_settings:
+			Intent intent = new Intent(this, SettingsActivity.class);
+			startActivity(intent);
             return true;
         case R.id.menu_sendall:
     		Intent i2 = new Intent(this, SubmitProjectUpdateService.class);
     		getApplicationContext().startService(i2);
     		//TODO: completion reception and progress dialog
             return true;
+        case R.id.action_add_update:
+        	startEditor();
+        	return true;
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }

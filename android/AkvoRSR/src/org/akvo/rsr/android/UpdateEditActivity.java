@@ -17,6 +17,11 @@
 package org.akvo.rsr.android;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Random;
 
 import org.akvo.rsr.android.dao.RsrDbAdapter;
@@ -31,6 +36,7 @@ import android.os.Environment;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,14 +48,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.provider.MediaStore;
-import android.text.InputType;
 
 public class UpdateEditActivity extends Activity {
 	
 	private final int photoRequest = 777;
+	private final int photoPick = 888;
 	private  String captureFilename = null;
 	
 	private int nextLocalId = -1; //TODO load from /save to variable store
@@ -90,7 +97,7 @@ public class UpdateEditActivity extends Activity {
 		
 		
 		//get the look
-		setContentView(R.layout.activity_edit_update);
+		setContentView(R.layout.activity_update_editor);
 		//find the fields
 		projTitleLabel = (TextView) findViewById(R.id.projupd_edit_proj_title);
 		projupdTitleText = (EditText) findViewById(R.id.edit_projupd_title);
@@ -169,31 +176,90 @@ public class UpdateEditActivity extends Activity {
 		//		setupActionBar();
 	}
 
+	private static final int IO_BUFFER_SIZE = 4 * 1024;  
+	  
+	private static void copyStream(InputStream in, OutputStream out) throws IOException {  
+	byte[] b = new byte[IO_BUFFER_SIZE];  
+	int read;  
+	while ((read = in.read(b)) != -1) {  
+	out.write(b, 0, read);  
+	}  
+	}  
+	
+	
+	private void setPhotoFile(String fn){
+		//Handle taken photo
+		if (new File(captureFilename).exists()) {
+			update.setThumbnailFilename(fn);
+			//DialogUtil.infoAlert(this, "Photo returned", "Got a photo");
+			
+			btnPhoto.setText(R.string.btncaption_rephoto);
+			//make thumbnail and show it on page
+			//TODO: shrink to save memory
+			BitmapFactory.Options o = new BitmapFactory.Options();
+	        o.inJustDecodeBounds = true;
+	        BitmapFactory.decodeFile(fn, o);
+	        // The new size we want to scale to
+	        final int REQUIRED_SIZE = 140;
+
+	        // Find the correct scale value. It should be a power of 2.
+	        int width_tmp = o.outWidth, height_tmp = o.outHeight;
+	        int scale = 1;
+	        while (true) {
+	            if (width_tmp / 2 < REQUIRED_SIZE
+	               || height_tmp / 2 < REQUIRED_SIZE) {
+	                break;
+	            }
+	            width_tmp /= 2;
+	            height_tmp /= 2;
+	            scale *= 2;
+	        }
+
+	        // Decode with inSampleSize
+	        BitmapFactory.Options o2 = new BitmapFactory.Options();
+	        o2.inSampleSize = scale;			
+			
+			Bitmap bm = BitmapFactory.decodeFile(fn,o2);
+			if (bm != null) {
+				projupdImage.setImageBitmap(bm);
+			}
+		}
+
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * Get notification of photo taken
 	 */
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//		super.onActivityResult(requestCode, resultCode, data);
+		super.onActivityResult(requestCode, resultCode, data);
 		
 		if (requestCode == photoRequest) {
 			if (resultCode == RESULT_CANCELED) {
 				return;
 			}
-			//Handle taken photo
-			if (new File(captureFilename).exists()) {
-				update.setThumbnailFilename(captureFilename);
-				//DialogUtil.infoAlert(this, "Photo returned", "Got a photo");
-				
-				btnPhoto.setText(R.string.btncaption_rephoto);
-				//make thumbnail and show it on page
-				//TODO: shrink to save memory
-				Bitmap bm = BitmapFactory.decodeFile(captureFilename);
-				if (bm != null) {
-					projupdImage.setImageBitmap(bm);
-				}
+			setPhotoFile(captureFilename);
+		}
+		if (requestCode == photoPick) {
+			if (resultCode == RESULT_CANCELED) {
+				return;
 			}
+			//Handle taken photo
+			//data.getData is a content: URI. Need to copy the content to a file.
+			InputStream imageStream;
+			try {
+				imageStream = getContentResolver().openInputStream(data.getData());
+			    captureFilename = Environment.getExternalStorageDirectory() + ConstantUtil.PHOTO_DIR + "capture" + System.nanoTime() + ".jpg";
+			    OutputStream os = new FileOutputStream(captureFilename);
+			    copyStream(imageStream,os);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			setPhotoFile(captureFilename);
 		}
 	}
 
@@ -255,7 +321,7 @@ public class UpdateEditActivity extends Activity {
 		//TODO: a real filling progress bar?
 		progress = new ProgressDialog(this);
 		progress.setTitle("Synchronizing");
-		progress.setMessage("Sending all unsent updates...");
+		progress.setMessage("Sending all unsent updates...");//TODO move to strings
 		progress.show();
 		//Now we wait...
 		
@@ -266,7 +332,7 @@ public class UpdateEditActivity extends Activity {
 		if (projupdTitleText.getText().toString().length() == 0) {
 			//Tell user what happened
 			Context context = getApplicationContext();
-			CharSequence text = "Update must have a title";
+			CharSequence text = "Update must have a title";//TODO move to strings
 			Toast toast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
 			toast.show();
 			return true;
@@ -359,9 +425,28 @@ public class UpdateEditActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.project_detail, menu);
+		getMenuInflater().inflate(R.menu.update_editor, menu);
 		return true;
 	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+        case R.id.action_settings:
+			Intent intent = new Intent(this, SettingsActivity.class);
+			startActivity(intent);
+            return true;
+        case R.id.action_attach_photo:
+        	Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        	photoPickerIntent.setType("image/*");
+        	startActivityForResult(photoPickerIntent, photoPick);    
+        	return true;
+	    default:
+	        return super.onOptionsItemSelected(item);
+	    }
+
+	}
+	
 
 
 }

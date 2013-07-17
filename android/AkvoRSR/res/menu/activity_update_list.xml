@@ -1,7 +1,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
         
-    <item android:id="@+id/menu_settings"
-        android:title="@string/menu_settings"
+    <item android:id="@+id/action_add_update"
+        android:title="@string/action_add_update"
+        android:icon="@drawable/ic_menu_add"        
+         />
+    
+    <item android:id="@+id/action_settings"
+        android:title="@string/action_settings"
         android:icon="@drawable/ic_menu_settings_holo_light"        
          />
 

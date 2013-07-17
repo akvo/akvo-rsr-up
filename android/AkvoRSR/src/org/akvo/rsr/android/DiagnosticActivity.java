@@ -58,19 +58,14 @@ public class DiagnosticActivity extends Activity {
 		btnAddUpdate = (Button) findViewById(R.id.btn_diag_b);
 		btnAddUpdate.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {
-				dba.clearAllData();
+				clearData();
 			}
 		});
  
-
-		
 		dba = new RsrDbAdapter(this);
-		
-		// Show the Up button in the action bar.
-		//		setupActionBar();
 	}
 
-	private void clearCache(){
+	private void clearCache() {
 		File f = new File(Environment.getExternalStorageDirectory() + ConstantUtil.IMAGECACHE_DIR);
 		File [] files = f.listFiles();
 		for (int i = 0; i < files.length; i++) { 
@@ -78,6 +73,11 @@ public class DiagnosticActivity extends Activity {
 		}
 		DialogUtil.infoAlert(this, "Cache cleared", files.length+" files deleted");
 
+	}
+
+	private void clearData() {
+		dba.clearAllData();
+		DialogUtil.infoAlert(this, "Data cleared", "All project and update info deleted");
 	}
 	
 	@Override

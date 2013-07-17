@@ -74,8 +74,8 @@ public class LoginActivity extends Activity {
 
 		usernameEdit = (EditText) findViewById(R.id.edit_username);
 		passwordEdit = (EditText) findViewById(R.id.edit_password);
-        final Button button = (Button) findViewById(R.id.btn_login);
 
+		final Button button = (Button) findViewById(R.id.btn_login);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
             	signIn(v);
