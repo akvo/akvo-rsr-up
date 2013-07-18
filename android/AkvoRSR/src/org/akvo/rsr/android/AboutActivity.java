@@ -19,8 +19,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager.NameNotFoundException;
 
 public class AboutActivity extends Activity {
 
@@ -29,7 +31,18 @@ public class AboutActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_about);
-
+		//plug in the version name from the manifest
+		String version = "<unset>";
+		try {
+		    version = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+		} catch (NameNotFoundException e) {
+//		    Log.e("tag", e.getMessage());
+			version = "<not found>";
+		}
+		TextView tv = (TextView) findViewById(R.id.version_name);
+		if (tv != null)
+			tv.setText(version);
+		
 		final ImageButton btnUpdates = (ImageButton) findViewById(R.id.btn_akvo_link);
 		btnUpdates.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {

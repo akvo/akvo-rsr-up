@@ -2,8 +2,8 @@
 <resources>
 
     <string name="app_name">AkvoRSR</string>
-    <string name="app_version">0.44</string>
-    <string name="version">Version&#160;</string>
+    <string name="app_version">dummyversion</string>
+    <string name="version">&#160;Version&#160;</string>
     <string name="app_subtitle">Really Simple Reporting</string>
     <string name="powered_by_akvo">Powered by Akvo</string>
     <string name="menu_logout">Log out</string>
@@ -45,6 +45,8 @@
     <string name="btncaption_photo">TAKE PHOTO NOW</string>
     <string name="btncaption_rephoto">RETAKE PHOTO</string>
     <string name="btncaption_add_update">ADD UPDATE</string>
+    <string name="btncaption_refresh">REFRESH PROJECT LIST</string>
+    
     <string name="btncaption_clear_data">Clear all data</string>
     
     <string-array name="types">
