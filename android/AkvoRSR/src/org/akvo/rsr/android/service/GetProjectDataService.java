@@ -39,7 +39,8 @@ public class GetProjectDataService extends IntentService {
 		Downloader dl = new Downloader();
 		String errMsg = null;
 		try {
-			dl.FetchProjectList(this, new URL(ConstantUtil.HOST+String.format(ConstantUtil.FETCH_PROJ_URL,SettingsUtil.Read(this, "authorized_orgid"))));
+			dl.FetchProjectList(this, new URL(SettingsUtil.host(this) +
+					                          String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN,SettingsUtil.Read(this, "authorized_orgid"))));
 			progressBroadcast(0, 100, 100);//only whole operation
 			
 			//We only get published projects from that URL, so we need to iterate on them and get corresponding updates
@@ -50,7 +51,7 @@ public class GetProjectDataService extends IntentService {
 				while (c.moveToNext()) {
 					i++;
 					dl.FetchUpdateList(	this,
-									   	new URL(ConstantUtil.HOST +
+									   	new URL(SettingsUtil.host(this) +
 										"/api/v1/project_update/?format=xml&limit=0&project=" + //TODO move to constants
 										c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL)))
 										);
@@ -69,7 +70,7 @@ public class GetProjectDataService extends IntentService {
 		
 		try {
 			dl.FetchNewThumbnails(this,
-					ConstantUtil.HOST,
+					SettingsUtil.host(this),
 					Environment.getExternalStorageDirectory().getPath() + ConstantUtil.IMAGECACHE_DIR,
 					new Downloader.ProgressReporter() {
 						public void sendUpdate(int sofar, int total) {

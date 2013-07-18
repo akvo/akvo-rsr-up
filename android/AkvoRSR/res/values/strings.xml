@@ -45,9 +45,15 @@
     <string name="btncaption_photo">TAKE PHOTO NOW</string>
     <string name="btncaption_rephoto">RETAKE PHOTO</string>
     <string name="btncaption_add_update">ADD UPDATE</string>
-    <string name="btncaption_refresh">REFRESH PROJECT LIST</string>
-    
+    <string name="btncaption_refresh">REFRESH PROJECT LIST</string>    
     <string name="btncaption_clear_data">Clear all data</string>
+
+    <string name="send_dialog_title">Sychronizing</string>
+    <string name="send_dialog_msg">Sending all unsent updates...</string>
+    
+    <string name="errmsg_empty_title">An update must have a title!</string>
+    
+    <string name="dialog_ok">OK</string>
     
     <string-array name="types">
         <item>Type 1</item>

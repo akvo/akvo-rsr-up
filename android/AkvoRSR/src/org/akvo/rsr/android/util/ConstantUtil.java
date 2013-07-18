@@ -17,8 +17,6 @@
 
 package org.akvo.rsr.android.util;
 
-import java.util.HashMap;
-
 /**
  * Class to hold all public constants used in the application
  * 
@@ -30,12 +28,13 @@ public class ConstantUtil {
 	/**
 	 * server constants
 	 */
-	public static final String HOST = "http://test.akvo.org";
+	public static final String TEST_HOST = "http://test.akvo.org";
+	public static final String LIVE_HOST = "http://www.akvo.org";
 	public static final String PWD_URL = "/rsr/accounts/password/reset/";
 	public static final String AUTH_URL = "/rsr/auth/token/";
 	public static final String API_KEY_PATTERN = "&api_key=%s&username=%s";
 	public static final String POST_UPDATE_URL = "/api/v1/project_update/?format=xml";
-	public static final String FETCH_PROJ_URL = "/api/v1/project/?format=xml&limit=0&partnerships__organisation=%s";
+	public static final String FETCH_PROJ_URL_PATTERN = "/api/v1/project/?format=xml&limit=0&partnerships__organisation=%s";
 	public static final String FETCH_PROJ_COUNT_URL = "/api/v1/project/?format=xml&limit=0&partnerships__organisation=%s";//TODO: Hardcoded Akvo org
 
 	/**
@@ -72,18 +71,23 @@ public class ConstantUtil {
 	public static final String FILE_COMPLETE = "FILE_COMPLETE";
 	public static final String ERROR = "ERROR";
 
+	
 	/**
 	 * keys for saved state and bundle extras
 	 */
 	public static final String PROJECT_ID_KEY = "org.akvo.rsr.android.PROJECT";
 	public static final String UPDATE_ID_KEY = "org.akvo.rsr.android.UPDATE";
 
+	
 	/**
 	 * settings keys
 	 */
-	public static final String SURVEY_LANG_SETTING_KEY = "survey.language";
-	
-	
+	public static final String HOST_SETTING_KEY = "data_host";
+	public static final String AUTH_USERNAME_KEY = "authorized_username";
+	public static final String AUTH_APIKEY_KEY = "authorized_apikey";
+	public static final String AUTH_USERID_KEY = "authorized_userid";
+	public static final String AUTH_ORGID_KEY = "authorized_orgid";
+	public static final String LOCAL_ID_KEY	= "next_local_id";
 
 	/**
 	 * intents

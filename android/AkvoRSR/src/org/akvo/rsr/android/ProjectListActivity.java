@@ -20,6 +20,7 @@ import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.service.GetProjectDataService;
 import org.akvo.rsr.android.service.SubmitProjectUpdateService;
 import org.akvo.rsr.android.util.ConstantUtil;
+import org.akvo.rsr.android.util.SettingsUtil;
 import org.akvo.rsr.android.view.adapter.ProjectListCursorAdapter;
 
 import android.os.Bundle;
@@ -96,7 +97,7 @@ public class ProjectListActivity extends ListActivity {
 			startActivity(i);
             return true;
         case R.id.menu_logout:
-        	LoginActivity.signOut(this);
+        	SettingsUtil.signOut(this);
         	finish();
             return true;
         case R.id.menu_sendall:

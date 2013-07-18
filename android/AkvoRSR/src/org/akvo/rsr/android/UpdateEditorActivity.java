@@ -22,7 +22,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Random;
 
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Project;
@@ -30,6 +29,8 @@ import org.akvo.rsr.android.domain.Update;
 import org.akvo.rsr.android.service.SubmitProjectUpdateService;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.DialogUtil;
+import org.akvo.rsr.android.util.SettingsUtil;
+
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -48,12 +49,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.provider.MediaStore;
 
-public class UpdateEditActivity extends Activity {
+public class UpdateEditorActivity extends Activity {
 	
 	private final int photoRequest = 777;
 	private final int photoPick = 888;
@@ -80,6 +80,8 @@ public class UpdateEditActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		nextLocalId = SettingsUtil.ReadInt(this, ConstantUtil.LOCAL_ID_KEY, -1);
+		
 		//find which update we are editing
 		//null means create a new one
 		Bundle extras = getIntent().getExtras();
@@ -195,7 +197,7 @@ public class UpdateEditActivity extends Activity {
 			
 			btnPhoto.setText(R.string.btncaption_rephoto);
 			//make thumbnail and show it on page
-			//TODO: shrink to save memory
+			//shrink to save memory
 			BitmapFactory.Options o = new BitmapFactory.Options();
 	        o.inJustDecodeBounds = true;
 	        BitmapFactory.decodeFile(fn, o);
@@ -275,11 +277,12 @@ public class UpdateEditActivity extends Activity {
 		update.setTitle(projupdTitleText.getText().toString());
 		update.setText(projupdDescriptionText.getText().toString());
 		if (update.getId() == null) {//new
-		//MUST have project and a local update id
+			//MUST have project and a local update id
 			update.setProjectId(projectId);
-//		    update.setId(Integer.toString(nextLocalId)); //TODO persist this
-			update.setId(Integer.toString(- new Random().nextInt(100000000)));
+		    update.setId(Integer.toString(nextLocalId));
 			nextLocalId--;
+			SettingsUtil.WriteInt(this, ConstantUtil.LOCAL_ID_KEY, nextLocalId);
+
 		}
 		dba.saveUpdate(update, true);
 		//Tell user what happened
@@ -304,7 +307,9 @@ public class UpdateEditActivity extends Activity {
 		update.setProjectId(projectId);
 		if (update.getId() == null) {//new
 			//TODO, improve this
-			update.setId(Integer.toString(- new Random().nextInt(100000000)));
+		    update.setId(Integer.toString(nextLocalId));
+			nextLocalId--;
+			SettingsUtil.WriteInt(this, ConstantUtil.LOCAL_ID_KEY, nextLocalId);
 		}
 		dba.saveUpdate(update, true);
 		
@@ -320,8 +325,8 @@ public class UpdateEditActivity extends Activity {
 		//start a "progress" animation
 		//TODO: a real filling progress bar?
 		progress = new ProgressDialog(this);
-		progress.setTitle("Synchronizing");
-		progress.setMessage("Sending all unsent updates...");//TODO move to strings
+		progress.setTitle(R.string.send_dialog_title);
+		progress.setMessage(getResources().getString(R.string.send_dialog_msg));
 		progress.show();
 		//Now we wait...
 		
@@ -329,11 +334,10 @@ public class UpdateEditActivity extends Activity {
 
 	// if update has no title it must not be sent or saved
 	private boolean untitled() {
-		if (projupdTitleText.getText().toString().length() == 0) {
+		if (projupdTitleText.getText().toString().trim().length() == 0) {
 			//Tell user what happened
 			Context context = getApplicationContext();
-			CharSequence text = "Update must have a title";//TODO move to strings
-			Toast toast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
+			Toast toast = Toast.makeText(context, R.string.errmsg_empty_title, Toast.LENGTH_SHORT);
 			toast.show();
 			return true;
 		} else

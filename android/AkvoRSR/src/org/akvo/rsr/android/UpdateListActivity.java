@@ -21,18 +21,12 @@ import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.service.SubmitProjectUpdateService;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.view.adapter.UpdateListCursorAdapter;
-import org.akvo.rsr.android.xml.Downloader;
-
 import android.os.Bundle;
-import android.os.Environment;
 import android.app.ListActivity;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.content.Intent;
@@ -47,7 +41,6 @@ public class UpdateListActivity extends ListActivity {
 	private Cursor dataCursor;
 	private TextView projectTitleLabel;
 	private TextView updateCountLabel;
-	private View listFooter;
 	private String projId;
 
 	@Override
@@ -70,7 +63,7 @@ public class UpdateListActivity extends ListActivity {
 		updateCountLabel = (TextView) findViewById(R.id.updatecountlabel);
 
 		View listFooter = getLayoutInflater().inflate(R.layout.update_list_footer, null, false);
-		//if the button were not the outermost view I would need to find it to set onClick
+		//if the button were not the outermost view we would need to find it to set onClick
 /*		
 		listFooter = new Button(this);
 		listFooter.setWidth(ViewGroup.LayoutParams.FILL_PARENT);
@@ -78,7 +71,7 @@ public class UpdateListActivity extends ListActivity {
 		listFooter.setText(R.string.action_add_update);
 		listFooter.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 24);
 		listFooter.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.ic_menu_add,0,0);
-		//TODO works but text is not shown
+		//this worked somewhat, but button text was not shown
 		 */
 		listFooter.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {
@@ -93,7 +86,7 @@ public class UpdateListActivity extends ListActivity {
 	}
 
 	private void startEditor() {
-		Intent i3 = new Intent(this, UpdateEditActivity.class);
+		Intent i3 = new Intent(this, UpdateEditorActivity.class);
 		i3.putExtra(ConstantUtil.PROJECT_ID_KEY, projId);
 		startActivity(i3);		
 	}
@@ -187,7 +180,7 @@ public class UpdateListActivity extends ListActivity {
 	protected void onListItemClick(ListView list, View view, int position, long id) {
 		super.onListItemClick(list, view, position, id);
 
-		Intent i = new Intent(view.getContext(), UpdateEditActivity.class);
+		Intent i = new Intent(view.getContext(), UpdateEditorActivity.class);
 		i.putExtra(ConstantUtil.UPDATE_ID_KEY, ((Long) view.getTag(R.id.update_id_tag)).toString());
 		i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(R.id.project_id_tag)).toString());
 		startActivity(i);

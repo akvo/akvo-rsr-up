@@ -1,15 +1,9 @@
 package org.akvo.rsr.android;
 
-import org.akvo.rsr.android.service.SubmitProjectUpdateService;
-
 import android.os.Bundle;
-import android.app.Activity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.support.v4.app.NavUtils;
-import android.annotation.TargetApi;
 import android.content.Intent;
-import android.os.Build;
 import android.preference.PreferenceActivity;
 
 public class SettingsActivity extends PreferenceActivity {

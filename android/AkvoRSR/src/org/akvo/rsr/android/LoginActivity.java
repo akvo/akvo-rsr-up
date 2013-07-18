@@ -70,6 +70,9 @@ public class LoginActivity extends Activity {
 			
 		}
 		
+		//temporary hack - should default to live host
+		SettingsUtil.Write(this, ConstantUtil.HOST_SETTING_KEY, ConstantUtil.TEST_HOST);
+		
 		setContentView(R.layout.activity_login);
 
 		usernameEdit = (EditText) findViewById(R.id.edit_username);
@@ -85,7 +88,7 @@ public class LoginActivity extends Activity {
         final TextView forgot = (TextView) findViewById(R.id.link_to_forgot);
         forgot.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(ConstantUtil.HOST + ConstantUtil.PWD_URL));
+                Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(SettingsUtil.host(LoginActivity.this) + ConstantUtil.PWD_URL));
                 startActivity(myIntent);                
             }
         });
@@ -102,7 +105,7 @@ public class LoginActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (haveCredentials()) { //skip login
+		if (SettingsUtil.haveCredentials(this)) { //skip login
 		    Intent intent = new Intent(this, ProjectListActivity.class);
 		    startActivity(intent);
 		} else {
@@ -159,27 +162,6 @@ public class LoginActivity extends Activity {
 		getApplicationContext().startService(intent);
 		//now we wait for a broadcast...
 
-    }
-
-    
-    public static void signOut(Context c) {
-    	//destroy credentials
-		SettingsUtil.Write(c, "authorized_username", "");
-		SettingsUtil.Write(c, "authorized_userid",   "");
-		SettingsUtil.Write(c, "authorized_orgid",    "");
-		SettingsUtil.Write(c, "authorized_apikey",   "");
-    }
-
-    
-    public boolean haveCredentials() {
-    	String u = SettingsUtil.Read(this, "authorized_username");
-		String i = SettingsUtil.Read(this, "authorized_userid");
-		String o = SettingsUtil.Read(this, "authorized_orgid");
-		String k = SettingsUtil.Read(this, "authorized_apikey");
-		return u != null && !u.equals("")
-			&& i != null && !i.equals("")
-			&& o != null && !o.equals("")
-			&& k != null && !k.equals("");
     }
 
     

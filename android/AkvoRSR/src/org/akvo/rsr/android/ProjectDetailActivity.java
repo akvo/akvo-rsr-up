@@ -26,7 +26,6 @@ import org.akvo.rsr.android.util.SettingsUtil;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -40,7 +39,6 @@ public class ProjectDetailActivity extends Activity {
 
 	private String projId = null;
 	private TextView projTitleLabel;
-	private TextView projLocationText;
 	private TextView projSummaryText;
 	private TextView publishedCountView;
 	private TextView unsynchCountView;
@@ -90,7 +88,7 @@ public class ProjectDetailActivity extends Activity {
 		btnAddUpdate = (Button) findViewById(R.id.btn_add_update);
 		btnAddUpdate.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {
-				Intent i = new Intent(view.getContext(), UpdateEditActivity.class);
+				Intent i = new Intent(view.getContext(), UpdateEditorActivity.class);
 				i.putExtra(ConstantUtil.PROJECT_ID_KEY, projId);
 				startActivity(i);
 			}

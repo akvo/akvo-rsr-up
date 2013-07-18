@@ -1,10 +1,7 @@
 package org.akvo.rsr.android.service;
 
-import java.net.URL;
-
 import org.akvo.rsr.android.domain.User;
 import org.akvo.rsr.android.util.ConstantUtil;
-import org.akvo.rsr.android.util.DialogUtil;
 import org.akvo.rsr.android.util.SettingsUtil;
 import org.akvo.rsr.android.xml.Downloader;
 
@@ -35,7 +32,7 @@ public class SubmitProjectUpdateService extends IntentService {
 
 		Downloader dl = new Downloader();
 		try {
-			dl.SendUnsentUpdates(this, ConstantUtil.HOST + ConstantUtil.POST_UPDATE_URL + ConstantUtil.API_KEY_PATTERN, sendImg, user);
+			dl.SendUnsentUpdates(this, SettingsUtil.host(this) + ConstantUtil.POST_UPDATE_URL + ConstantUtil.API_KEY_PATTERN, sendImg, user);
 		} catch (Exception e) {
 			i.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, e.getMessage());
 		}
