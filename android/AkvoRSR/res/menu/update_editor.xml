@@ -1,10 +1,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
-<!-- 
+ 
     <item android:id="@+id/action_delete_update"
         android:title="@string/action_delete_update"
         android:icon="@drawable/ic_menu_close_clear_cancel"        
          />
-     -->
+
     <item android:id="@+id/action_attach_photo"
         android:title="@string/action_attach_photo"
         android:icon="@drawable/ic_menu_camera"        

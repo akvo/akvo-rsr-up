@@ -428,6 +428,14 @@ public class RsrDbAdapter {
 	}
 
 
+	/*
+	 *  Delete an Update
+	 */
+	public void deleteUpdate(String id) {
+		database.delete(UPDATE_TABLE, PK_ID_COL + " = ?", new String[] { id });
+	}
+
+
 	/**
 	 * Gets all projects, all columns
 	 */

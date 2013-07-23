@@ -16,7 +16,7 @@
 
 package org.akvo.rsr.android.domain;
 
-import java.util.Date;
+//import java.util.Date;
 
 public class Project {
 	private String id;
@@ -25,8 +25,8 @@ public class Project {
 	private String location;
 	private String thumbnailUrl;
 	private String thumbnailFilename;	
-	private Date startDate;
-	private Date endDate;
+//	private Date startDate;
+//	private Date endDate;
 	private double funds;
 	private String summary;
 

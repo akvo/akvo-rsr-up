@@ -16,9 +16,6 @@
 
 package org.akvo.rsr.android.xml;
 
-import org.akvo.rsr.android.dao.RsrDbAdapter;
-import org.akvo.rsr.android.domain.Project;
-import org.akvo.rsr.android.domain.Update;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;

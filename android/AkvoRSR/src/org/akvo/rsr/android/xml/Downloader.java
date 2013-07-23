@@ -316,6 +316,7 @@ public class Downloader {
 		} else {
 			String e = "Unable to post update, code " + code + " " +  msg;
 			Log.e(TAG, e);
+			Log.e(TAG, b);
 			throw new Exception(e);
 		}
 	}

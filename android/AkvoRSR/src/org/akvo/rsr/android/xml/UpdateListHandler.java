@@ -17,7 +17,6 @@
 package org.akvo.rsr.android.xml;
 
 import org.akvo.rsr.android.dao.RsrDbAdapter;
-import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.domain.Update;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -69,6 +68,7 @@ public class UpdateListHandler extends DefaultHandler {
 	private Update currentUpd;
 	private int updateCount;
 	private boolean syntaxError = false;
+	private int depth = 0;
 	
 	//where to store results
 	private RsrDbAdapter dba;
@@ -99,6 +99,7 @@ public class UpdateListHandler extends DefaultHandler {
 	public void startDocument() throws SAXException {
 		dba.open();
 		updateCount = 0;
+		depth = 0;
 	}
 
 	@Override
@@ -113,21 +114,23 @@ public class UpdateListHandler extends DefaultHandler {
 	@Override
 	public void startElement(String namespaceURI, String localName,
 			String qName, Attributes atts) throws SAXException {
-		if (localName.equals("id")) {
-			this.in_id = true;
-		} else if (localName.equals("title")) {
-			this.in_title = true;
-		} else if (localName.equals("text")) {
-			this.in_text = true;
-		} else if (localName.equals("project")) {
-			this.in_project_id = true;
-		} else if (localName.equals("object")) {
+		if (localName.equals("object")) {
 			this.in_update = true;
 			currentUpd = new Update();
 			currentUpd.setText("");//for appending
-		} else if (localName.equals("photo")) {
-			this.in_photo = true;
-		}
+		} else if (in_update)
+			if (localName.equals("id")) {
+				this.in_id = true;
+			} else if (localName.equals("title")) {
+				this.in_title = true;
+			} else if (localName.equals("text")) {
+				this.in_text = true;
+			} else if (localName.equals("project")) {
+				this.in_project_id = true;
+			} else if (localName.equals("photo")) {
+				this.in_photo = true;
+			}
+		depth++;
 	}
 	
 	/** Gets called on closing tags like: 
@@ -135,6 +138,8 @@ public class UpdateListHandler extends DefaultHandler {
 	@Override
 	public void endElement(String namespaceURI, String localName, String qName)
 			throws SAXException {
+		depth--;
+
 		if (localName.equals("id")) {
 			this.in_id = false;
 		} else if (localName.equals("title")) {

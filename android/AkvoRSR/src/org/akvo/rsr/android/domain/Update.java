@@ -24,7 +24,6 @@ public class Update {
 	private String title;
 	private boolean draft;
 	private boolean unsent;
-//	private boolean onServer;
 	private String text;
 	private String location;
 	private String thumbnailUrl;
@@ -37,6 +36,14 @@ public class Update {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
 	}
 
 	public String getProjectId() {

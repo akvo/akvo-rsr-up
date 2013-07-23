@@ -21,7 +21,7 @@
     <string name="label_update_description">Update Description:</string>
     <string name="hint_update_description">Description</string>
     <string name="state_draft">● Draft</string>
-    <string name="state_unsent">● Unsynchronized</string>
+    <string name="state_unsent">● Unsynchronised</string>
     <string name="state_published">● Published</string>
     <string name="count_draft">&#160;Draft</string>
     <string name="count_unsent">&#160;Unsynchronized</string>
@@ -35,7 +35,7 @@
     <string name="action_attach_photo">Attach Photo</string>
     <string name="updates_txt">UPDATES STATUS</string>
     <string name="published">&#160;Published</string>
-    <string name="unsynch">&#160;Unsynchronized</string>
+    <string name="unsynch">&#160;Unsynchronised</string>
     <string name="drafts">&#160;Drafts</string>
     <string name="username">Username</string>
     <string name="email_address">Email Address</string>
@@ -48,12 +48,20 @@
     <string name="btncaption_refresh">REFRESH PROJECT LIST</string>    
     <string name="btncaption_clear_data">Clear all data</string>
 
-    <string name="send_dialog_title">Sychronizing</string>
+    <string name="send_dialog_title">Synchronising</string>
     <string name="send_dialog_msg">Sending all unsent updates...</string>
     
     <string name="errmsg_empty_title">An update must have a title!</string>
     
     <string name="dialog_ok">OK</string>
+    <string name="okbutton">OK</string>
+    <string name="cancelbutton">Cancel</string>
+    <string name="authtitle">Authorization required</string>
+    <string name="authtext">Please input the admin password</string>
+    <string name="authfailed">Authorization failed</string>
+    <string name="invalidpassword">Invalid password</string>
+    
+    
     
     <string-array name="types">
         <item>Type 1</item>

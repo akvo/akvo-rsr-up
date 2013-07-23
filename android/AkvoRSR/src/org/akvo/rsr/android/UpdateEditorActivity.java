@@ -144,7 +144,7 @@ public class UpdateEditorActivity extends Activity {
 		} else {
 			update = dba.findUpdate(updateId);
 			if (update == null) {
-				DialogUtil.errorAlert(this, "Update missing", "Cannot open for review update " + updateId);
+				DialogUtil.errorAlert(this, "Update missing", "Cannot open for review, update " + updateId);
 			} else {
 				//populate fields
 				editable = update.getDraft();
@@ -152,11 +152,9 @@ public class UpdateEditorActivity extends Activity {
 				projupdDescriptionText.setText(update.getText());
 				
 				//show preexisting image
-				btnPhoto.setText(R.string.btncaption_rephoto);
-				Bitmap bm = BitmapFactory.decodeFile(update.getThumbnailFilename());
-				if (bm != null) {
-					projupdImage.setImageBitmap(bm);
-				}
+				if (update.getThumbnailFilename() != null)
+					btnPhoto.setText(R.string.btncaption_rephoto);
+				setPhotoFile(update.getThumbnailFilename());
 
 			}
 		}
@@ -165,6 +163,7 @@ public class UpdateEditorActivity extends Activity {
 		// to enable scrolling but not changing of the text
 //		projupdTitleText.setInputType(editable?InputType.TYPE_CLASS_TEXT:InputType.TYPE_NULL);
 //		projupdDescriptionText.setInputType(editable?InputType.TYPE_CLASS_TEXT:InputType.TYPE_NULL);
+		
 		projupdTitleText.setEnabled(editable);
 		projupdDescriptionText.setEnabled(editable);
 		btnDraft.setEnabled(editable);
@@ -181,17 +180,17 @@ public class UpdateEditorActivity extends Activity {
 	private static final int IO_BUFFER_SIZE = 4 * 1024;  
 	  
 	private static void copyStream(InputStream in, OutputStream out) throws IOException {  
-	byte[] b = new byte[IO_BUFFER_SIZE];  
-	int read;  
-	while ((read = in.read(b)) != -1) {  
-	out.write(b, 0, read);  
-	}  
+		byte[] b = new byte[IO_BUFFER_SIZE];  
+		int read;  
+		while ((read = in.read(b)) != -1) {  
+			out.write(b, 0, read);  
+		}  
 	}  
 	
 	
-	private void setPhotoFile(String fn){
+	private void setPhotoFile(String fn) {
 		//Handle taken photo
-		if (new File(captureFilename).exists()) {
+		if (fn != null && new File(captureFilename).exists()) {
 			update.setThumbnailFilename(fn);
 			//DialogUtil.infoAlert(this, "Photo returned", "Got a photo");
 			
@@ -436,6 +435,15 @@ public class UpdateEditorActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
+        case R.id.action_delete_update:
+        	if (update.getUnsent() || update.getDraft()) {
+        		//Verify?
+        		dba.deleteUpdate(update.getId());
+        		update = null;
+        		finish();
+        	}
+        		
+        	return true;
         case R.id.action_settings:
 			Intent intent = new Intent(this, SettingsActivity.class);
 			startActivity(intent);

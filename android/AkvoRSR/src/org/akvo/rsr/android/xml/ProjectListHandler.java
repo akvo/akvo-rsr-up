@@ -137,34 +137,35 @@ public class ProjectListHandler extends DefaultHandler {
 	@Override
 	public void startElement(String namespaceURI, String localName,
 			String qName, Attributes atts) throws SAXException {
-		if (localName.equals("id") && depth == 3) {
-			this.in_id = true;
-		} else if (localName.equals("title") && depth == 3) {
-			this.in_title = true;
-		} else if (localName.equals("subtitle") && depth == 3) {
-			this.in_subtitle = true;
-		} else if (localName.equals("funds")) {
-			this.in_funds = true;
-		} else if (localName.equals("object") && depth == 2) {
+		if (localName.equals("object") && depth == 2) { //ignore root tag completely
 			this.in_project = true;
 			currentProj = new Project();
 			currentProj.setSummary("");
-/*
- 		} else if (localName.equals("tagwithnumber")) {
-			// Extract an Attribute
-			String attrValue = atts.getValue("thenumber");
-			int i = Integer.parseInt(attrValue);
-			myParsedExampleDataSet.setExtractedInt(i);
-			*/
-		} else if (localName.equals("project_plan_summary") && depth==3) {
-			this.in_summary = true;
-		} else if (localName.equals("current_image") && depth==3) {
-			this.in_current_image = true;
-		} else if (localName.equals("thumbnails") && in_current_image) {
-			this.in_thumbnails = true;
-		} else if (localName.equals("map_thumb") && in_thumbnails) {
-			this.in_thumbnail_url = true;
-		}
+		} else if (in_project)
+			if (localName.equals("id") && depth == 3) {
+				this.in_id = true;
+			} else if (localName.equals("title") && depth == 3) {
+				this.in_title = true;
+			} else if (localName.equals("subtitle") && depth == 3) {
+				this.in_subtitle = true;
+			} else if (localName.equals("funds")) {
+				this.in_funds = true;
+	/*
+	 		} else if (localName.equals("tagwithnumber")) {
+				// Extract an Attribute
+				String attrValue = atts.getValue("thenumber");
+				int i = Integer.parseInt(attrValue);
+				myParsedExampleDataSet.setExtractedInt(i);
+				*/
+			} else if (localName.equals("project_plan_summary") && depth==3) {
+				this.in_summary = true;
+			} else if (localName.equals("current_image") && depth==3) {
+				this.in_current_image = true;
+			} else if (localName.equals("thumbnails") && in_current_image) {
+				this.in_thumbnails = true;
+			} else if (localName.equals("map_thumb") && in_thumbnails) {
+				this.in_thumbnail_url = true;
+			}
 		depth++;
 	}
 		

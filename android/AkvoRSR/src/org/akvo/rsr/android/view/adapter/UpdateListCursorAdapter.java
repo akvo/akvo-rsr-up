@@ -20,6 +20,7 @@ import java.io.File;
 
 import org.akvo.rsr.android.R;
 import org.akvo.rsr.android.dao.RsrDbAdapter;
+import org.akvo.rsr.android.util.SettingsUtil;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -41,8 +42,12 @@ public class UpdateListCursorAdapter extends CursorAdapter{
  * @author Stellan Lagerstroem
  * 
  */
+	
+	private boolean debug = false;
+	
 	public UpdateListCursorAdapter(Context context, Cursor c) {
 		super(context, c);
+		debug = SettingsUtil.ReadBoolean(context, "setting_debug", false);
 	}
 
 	
@@ -51,7 +56,12 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 
 		//Text data
 		TextView titleView = (TextView) view.findViewById(R.id.ulist_item_title);
-		titleView.setText(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
+		if (debug) {
+			titleView.setText("["+ cursor.getString(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL))+"] "+cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
+		} else {
+			titleView.setText(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
+		}
+
 
 		TextView stateView = (TextView) view.findViewById(R.id.ulist_item_state);
 		if (0 != cursor.getInt(cursor.getColumnIndex(RsrDbAdapter.DRAFT_COL))) {
@@ -67,7 +77,6 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 		}
 		
 			
-				
 		//Image
 		ImageView thumbnail = (ImageView) view.findViewById(R.id.ulist_item_thumbnail);
 		//Find file containing thumbnail
@@ -84,7 +93,7 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 				thumbnail.setImageBitmap(bm);
 		} else {
 			//Fall back to generic logo
-			//TODO different for null and broken ref
+			//TODO different for null and broken ref?
 			thumbnail.setImageResource(R.drawable.ic_launcher);
 		}
 		
