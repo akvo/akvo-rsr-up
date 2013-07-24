@@ -52,12 +52,16 @@
     <string name="send_dialog_msg">Sending all unsent updates...</string>
     
     <string name="errmsg_empty_title">An update must have a title!</string>
+    <string name="errmsg_bad_url">Invalid URL!</string>
     
     <string name="dialog_ok">OK</string>
+    <string name="error_title">Error</string>
     <string name="okbutton">OK</string>
     <string name="cancelbutton">Cancel</string>
     <string name="authtitle">Authorization required</string>
     <string name="authtext">Please input the admin password</string>
+    <string name="host_dialog_title">Enter data host name</string>
+    <string name="host_dialog_text">Example: www.akvo.org or https://test.akvo.org</string>
     <string name="authfailed">Authorization failed</string>
     <string name="invalidpassword">Invalid password</string>
     

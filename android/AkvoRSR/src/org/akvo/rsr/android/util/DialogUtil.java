@@ -62,7 +62,7 @@ public class DialogUtil {
 			final AdminAuthDialogListener listener) {
 		final EditText input = new EditText(parentContext);
 		input.setSingleLine();
-		ShowTextInputDialog(parentContext,
+		showTextInputDialog(parentContext,
 				R.string.authtitle,
 				R.string.authtext,
 				input,
@@ -159,6 +159,8 @@ public class DialogUtil {
 		tipText.setText(textId);
 		builder.setView(tipText);
 		builder.setPositiveButton(R.string.okbutton, positiveListener);
+		tipText.setBackgroundColor(parentContext.getResources().getColor(R.color.rsr_blue));
+
 		if (includeNegative) {
 			builder.setNegativeButton(R.string.cancelbutton, negativeListener);
 			if (negativeListener != null) {
@@ -191,14 +193,14 @@ public class DialogUtil {
 	 * @param text
 	 * @param clickListener
 	 */
-	public static void ShowTextInputDialog(final Context parentContext,
+	public static void showTextInputDialog(final Context parentContext,
 			int title, int text, EditText inputView,
 			DialogInterface.OnClickListener clickListener) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
 		LinearLayout main = new LinearLayout(parentContext);
-		main.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
-				LayoutParams.WRAP_CONTENT));
+		main.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,	LayoutParams.WRAP_CONTENT));
 		main.setOrientation(LinearLayout.VERTICAL);
+		main.setBackgroundColor(parentContext.getResources().getColor(R.color.rsr_blue));
 		TextView tipText = new TextView(parentContext);
 		builder.setTitle(title);
 		tipText.setText(text);

@@ -17,11 +17,17 @@
        android:summary="Embeds images in uploads as base-64"
        android:defaultValue="true"
        />
+    
+    <Preference
+       android:key="data_host"
+	   android:title="Data server"
+    	/>
+    
   </PreferenceCategory>
 
+<!--       
   <PreferenceCategory
      android:title="Selection">
-      
     <ListPreference
         android:key="pref_type"
         android:title="Type"
@@ -39,7 +45,6 @@
     />
      
   </PreferenceCategory>
-
   <Preference
     android:title="Intent"
     android:summary="Open a webpage">
@@ -49,5 +54,6 @@
       android:data="http://android-elements.blogspot.com/" />
 
   </Preference>
+ -->
    
 </PreferenceScreen>
