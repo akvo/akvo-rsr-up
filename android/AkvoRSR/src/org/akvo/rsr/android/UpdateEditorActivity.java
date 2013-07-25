@@ -152,9 +152,10 @@ public class UpdateEditorActivity extends Activity {
 				projupdDescriptionText.setText(update.getText());
 				
 				//show preexisting image
-				if (update.getThumbnailFilename() != null)
+				if (update.getThumbnailFilename() != null) {
 					btnPhoto.setText(R.string.btncaption_rephoto);
-				setPhotoFile(update.getThumbnailFilename());
+					setPhotoFile(update.getThumbnailFilename());
+				}
 
 			}
 		}
@@ -190,7 +191,7 @@ public class UpdateEditorActivity extends Activity {
 	
 	private void setPhotoFile(String fn) {
 		//Handle taken photo
-		if (fn != null && new File(captureFilename).exists()) {
+		if (fn != null && new File(fn).exists()) {
 			update.setThumbnailFilename(fn);
 			//DialogUtil.infoAlert(this, "Photo returned", "Got a photo");
 			

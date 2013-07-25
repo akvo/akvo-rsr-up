@@ -52,7 +52,9 @@ public class LoginActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
+		Log.i(TAG, "External storage folder: "+ getExternalFilesDir(null));
+
 		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 			Log.i(TAG, "External storage: mounted ");
 			File f = new File (Environment.getExternalStorageDirectory().getPath() + ConstantUtil.PHOTO_DIR);
@@ -66,7 +68,7 @@ public class LoginActivity extends Activity {
 			} else
 				Log.e("LoginActivity", "could not find/create image cache dir");
 		} else {
-			DialogUtil.errorAlert(this, "No storage available", "Akvo RSR requires a mounted storage card for image files. Mount card and restart app.");
+			DialogUtil.errorAlert(this, "No storage available", "Akvo RSR requires a mounted, writable storage card for image files. Mount card and restart app.");
 			
 		}
 		
