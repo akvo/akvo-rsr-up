@@ -24,14 +24,6 @@ public class GetProjectDataService extends IntentService {
 		super(TAG);
 	}
 
-	private void progressBroadcast(int p, int s, int t){
-		Intent i1 = new Intent(ConstantUtil.PROJECTS_PROGRESS_ACTION);
-		i1.putExtra(ConstantUtil.PHASE_KEY, p);
-		i1.putExtra(ConstantUtil.SOFAR_KEY, s);
-		i1.putExtra(ConstantUtil.TOTAL_KEY, t);
-	    LocalBroadcastManager.getInstance(this).sendBroadcast(i1);		
-	}
-	
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		// TODO get the URL?
@@ -40,8 +32,8 @@ public class GetProjectDataService extends IntentService {
 		String errMsg = null;
 		try {
 			dl.FetchProjectList(this, new URL(SettingsUtil.host(this) +
-					                          String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN,SettingsUtil.Read(this, "authorized_orgid"))));
-			progressBroadcast(0, 100, 100);//only whole operation
+					                          String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN, SettingsUtil.Read(this, "authorized_orgid"))));
+			broadcastProgress(0, 100, 100);//For this phase, only whole operation
 			
 			//We only get published projects from that URL, so we need to iterate on them and get corresponding updates
 			ad.open();
@@ -55,7 +47,7 @@ public class GetProjectDataService extends IntentService {
 										"/api/v1/project_update/?format=xml&limit=0&project=" + //TODO move to constants
 										c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL)))
 										);
-					progressBroadcast(1, i, c.getCount());					
+					broadcastProgress(1, i, c.getCount());					
 				}
 			}
 			finally {
@@ -64,7 +56,7 @@ public class GetProjectDataService extends IntentService {
 			}
 		} catch (Exception e) {
 			Log.e(TAG,"Bad fetch:",e);
-			errMsg = "Fetch failed: "+ e;
+			errMsg = "Fetch failed: "+ e.getMessage();
 		}
 //		progressBroadcast(1, 0, 0);
 		
@@ -95,4 +87,15 @@ public class GetProjectDataService extends IntentService {
 	    LocalBroadcastManager.getInstance(this).sendBroadcast(intent2);
 
 	}
+
+	
+	private void broadcastProgress(int p, int s, int t){
+		Intent i1 = new Intent(ConstantUtil.PROJECTS_PROGRESS_ACTION);
+		i1.putExtra(ConstantUtil.PHASE_KEY, p);
+		i1.putExtra(ConstantUtil.SOFAR_KEY, s);
+		i1.putExtra(ConstantUtil.TOTAL_KEY, t);
+	    LocalBroadcastManager.getInstance(this).sendBroadcast(i1);		
+	}
+
+	
 }

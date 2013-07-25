@@ -20,6 +20,7 @@ import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.service.GetProjectDataService;
 import org.akvo.rsr.android.service.SubmitProjectUpdateService;
 import org.akvo.rsr.android.util.ConstantUtil;
+import org.akvo.rsr.android.util.DialogUtil;
 import org.akvo.rsr.android.util.SettingsUtil;
 import org.akvo.rsr.android.view.adapter.ProjectListCursorAdapter;
 
@@ -223,11 +224,9 @@ public class ProjectListActivity extends ListActivity {
                 f);
 		
 		Intent i = new Intent(this, GetProjectDataService.class);
-//		i.putExtra(SERVER_KEY, "http://test.akvo.org");
 		getApplicationContext().startService(i);
 		
-		//start a "progress" animation
-		//TODO: a real filling progress bar?
+		//start progress animation
 		inProgress.setVisibility(View.VISIBLE);
 		inProgress1.setIndeterminate(true);//no prediction of projects
 		inProgress2.setProgress(0);
@@ -240,9 +239,11 @@ public class ProjectListActivity extends ListActivity {
 		
 		String err = intent.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
 		if (err == null) {
-			Toast.makeText(getApplicationContext(), "Fetch complete", Toast.LENGTH_SHORT);
+			Toast.makeText(getApplicationContext(), "Fetch complete", Toast.LENGTH_SHORT).show();
 		} else {
-			Toast.makeText(getApplicationContext(), err, Toast.LENGTH_SHORT).show();
+			//show a dialog instead?
+			DialogUtil.errorAlert(this, "Error", err);
+//			Toast.makeText(getApplicationContext(), err, Toast.LENGTH_SHORT).show();
 		}
 
 		//Refresh the list

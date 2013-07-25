@@ -160,6 +160,7 @@ public class DialogUtil {
 		builder.setView(tipText);
 		builder.setPositiveButton(R.string.okbutton, positiveListener);
 		tipText.setBackgroundColor(parentContext.getResources().getColor(R.color.rsr_blue));
+		tipText.setPadding(10, 10, 10,10);
 
 		if (includeNegative) {
 			builder.setNegativeButton(R.string.cancelbutton, negativeListener);
