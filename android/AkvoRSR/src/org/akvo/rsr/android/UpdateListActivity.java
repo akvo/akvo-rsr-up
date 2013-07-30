@@ -23,13 +23,19 @@ import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.view.adapter.UpdateListCursorAdapter;
 import android.os.Bundle;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 
 public class UpdateListActivity extends ListActivity {
@@ -42,6 +48,9 @@ public class UpdateListActivity extends ListActivity {
 	private TextView projectTitleLabel;
 	private TextView updateCountLabel;
 	private String projId;
+	private BroadcastReceiver broadRec;
+	private ProgressDialog progress;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +91,12 @@ public class UpdateListActivity extends ListActivity {
 		getListView().addFooterView(listFooter);
 		
         //Create db
-        ad = new RsrDbAdapter(this);
+
+		ad = new RsrDbAdapter(this);
+		//register a listener for completion broadcasts
+		IntentFilter f = new IntentFilter(ConstantUtil.UPDATES_SENT_ACTION);
+		broadRec = new ResponseReceiver();
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadRec, f);
 	}
 
 	private void startEditor() {
@@ -106,10 +120,8 @@ public class UpdateListActivity extends ListActivity {
 			startActivity(intent);
             return true;
         case R.id.menu_sendall:
-    		Intent i2 = new Intent(this, SubmitProjectUpdateService.class);
-    		getApplicationContext().startService(i2);
-    		//TODO: completion reception and progress dialog
-            return true;
+        	startSendUpdatesService();
+        	return true;
         case R.id.action_add_update:
         	startEditor();
         	return true;
@@ -131,6 +143,7 @@ public class UpdateListActivity extends ListActivity {
 	
 	@Override
 	protected void onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadRec);
 		if (dataCursor != null) {
 			try {
 				dataCursor.close();
@@ -159,7 +172,6 @@ public class UpdateListActivity extends ListActivity {
 		}
 
 		//Show title
-		//TODO: maybe more efficient to send it in the intent
 		Project p = ad.findProject(projId);
 		projectTitleLabel.setText(p.getTitle());
 		//fetch data
@@ -171,6 +183,30 @@ public class UpdateListActivity extends ListActivity {
 		setListAdapter(updates);
 
 	}
+	
+	/**
+	 * starts service to send all pending updates
+	 */
+	private void startSendUpdatesService(){
+		//register a listener for a completion intent
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                new ResponseReceiver(),
+                new IntentFilter(ConstantUtil.UPDATES_SENT_ACTION));
+		
+		//start upload service
+		Intent i = new Intent(this, SubmitProjectUpdateService.class);
+		getApplicationContext().startService(i);
+		
+		//start a "progress" animation
+		//TODO: a real filling progress bar?
+		progress = new ProgressDialog(this);
+		progress.setTitle("Synchronizing");
+		progress.setMessage("Sending all unsent updates...");
+		progress.show();
+		//Now we wait...
+	}
+
+
 
 	/**
 	 * when a list item is clicked, get the id of the selected
@@ -186,8 +222,38 @@ public class UpdateListActivity extends ListActivity {
 		startActivity(i);
 	}
 
+	private void onSendFinished(Intent i) {
+		// Dismiss any in-progress dialog
+		if (progress != null)
+			progress.dismiss();
+
+		String err = i.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
+		if (err == null) {
+			Toast.makeText(getApplicationContext(), "Updates sent", Toast.LENGTH_SHORT).show();
+		} else {
+			Toast.makeText(getApplicationContext(), err, Toast.LENGTH_SHORT).show();
+		}
+		//Refresh the list
+		getData();
+	}
+
 	
-
-
+	
+	/**
+	 * receives status updates from any IntentService
+	 *
+	 */
+	private class ResponseReceiver extends BroadcastReceiver {
+		// Prevents instantiation
+		private ResponseReceiver() {
+		}
+		
+		// Called when the BroadcastReceiver gets an Intent it's registered to receive
+		public void onReceive(Context context, Intent intent) {
+			if (intent.getAction() == ConstantUtil.UPDATES_SENT_ACTION) {
+				onSendFinished(intent);
+			}
+		}
+	}
 
 }

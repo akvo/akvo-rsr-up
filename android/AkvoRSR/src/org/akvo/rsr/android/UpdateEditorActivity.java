@@ -75,6 +75,7 @@ public class UpdateEditorActivity extends Activity {
 	//Database
 	private RsrDbAdapter dba;
 	ProgressDialog progress;
+	private BroadcastReceiver broadRec;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -160,7 +161,14 @@ public class UpdateEditorActivity extends Activity {
 			}
 		}
 
-		//this was an attempt, before the whole page was made scrollable
+		//register a listener for a completion intent
+		broadRec = new ResponseReceiver();
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                broadRec,
+                new IntentFilter(ConstantUtil.UPDATES_SENT_ACTION));
+		
+
+        //this was an attempt, before the whole page was made scrollable
 		// to enable scrolling but not changing of the text
 //		projupdTitleText.setInputType(editable?InputType.TYPE_CLASS_TEXT:InputType.TYPE_NULL);
 //		projupdDescriptionText.setInputType(editable?InputType.TYPE_CLASS_TEXT:InputType.TYPE_NULL);
@@ -293,8 +301,8 @@ public class UpdateEditorActivity extends Activity {
 		finish();
 	}
 
-	/*
-	 * Save current update
+	/**
+	 * closes current update and seds all unsent ones
 	 */
 	private void sendUpdate() {
 		if (untitled()) {
@@ -306,17 +314,11 @@ public class UpdateEditorActivity extends Activity {
 		update.setText(projupdDescriptionText.getText().toString());
 		update.setProjectId(projectId);
 		if (update.getId() == null) {//new
-			//TODO, improve this
 		    update.setId(Integer.toString(nextLocalId));
 			nextLocalId--;
 			SettingsUtil.WriteInt(this, ConstantUtil.LOCAL_ID_KEY, nextLocalId);
 		}
 		dba.saveUpdate(update, true);
-		
-		//register a listener for a completion intent
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                new ResponseReceiver(),
-                new IntentFilter(ConstantUtil.UPDATES_SENT_ACTION));
 		
 		//start upload service
 		Intent i = new Intent(this, SubmitProjectUpdateService.class);
@@ -391,9 +393,6 @@ public class UpdateEditorActivity extends Activity {
 		}
 		// Called when the BroadcastReceiver gets an Intent it's registered to receive
 		public void onReceive(Context context, Intent intent) {
-			/*
-			 * Handle Intents here.
-			 */
 			if (intent.getAction() == ConstantUtil.UPDATES_SENT_ACTION)
 				onSendFinished(intent);
 		}
@@ -411,6 +410,9 @@ public class UpdateEditorActivity extends Activity {
 	protected void onDestroy() {
 		if (dba != null) {
 			dba.close();
+		}
+		if (broadRec != null) {
+			LocalBroadcastManager.getInstance(this).unregisterReceiver(broadRec);
 		}
 		super.onDestroy();
 	}

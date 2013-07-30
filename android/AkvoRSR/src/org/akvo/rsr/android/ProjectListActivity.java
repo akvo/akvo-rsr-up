@@ -47,7 +47,6 @@ import android.database.Cursor;
 public class ProjectListActivity extends ListActivity {
 
 
-
 	private static final String TAG = "ProjectListActivity";
 
 	private RsrDbAdapter ad;
@@ -58,6 +57,7 @@ public class ProjectListActivity extends ListActivity {
 	private ProgressBar inProgress1;
 	private ProgressBar inProgress2;
 	private ProgressBar inProgress3;
+	private BroadcastReceiver broadRec;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -80,9 +80,15 @@ public class ProjectListActivity extends ListActivity {
  
         //Create db
         ad = new RsrDbAdapter(this);
+
+		//register a listener for completion broadcasts
+		IntentFilter f = new IntentFilter(ConstantUtil.PROJECTS_FETCHED_ACTION);
+		f.addAction(ConstantUtil.PROJECTS_PROGRESS_ACTION);
+		broadRec = new ResponseReceiver();
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadRec, f);
 	}
 
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -128,6 +134,7 @@ public class ProjectListActivity extends ListActivity {
 	
 	@Override
 	protected void onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadRec);
 		if (dataCursor != null) {
 			try {
 				dataCursor.close();
@@ -144,7 +151,7 @@ public class ProjectListActivity extends ListActivity {
 
 
 	/**
-	 * show all the projects in the database
+	 * shows all the projects in the database
 	 */
 	private void getData() {
 		try {
@@ -164,8 +171,7 @@ public class ProjectListActivity extends ListActivity {
 	}
 
 	/**
-	 * when a list item is clicked, get the id of the selected
-	 * item and open one-project activity.
+	 *  gets the id of the clicked list item and opens one-project activity.
 	 */
 	@Override
 	protected void onListItemClick(ListView list, View view, int position, long id) {
@@ -176,8 +182,10 @@ public class ProjectListActivity extends ListActivity {
 		startActivity(i);
 	}
 
-	
-	private void startSendUpdatesService(){
+	/**
+	 * starts service to send all pending updates
+	 */
+	private void startSendUpdatesService() {
 		//register a listener for a completion intent
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 new ResponseReceiver(),
@@ -198,9 +206,9 @@ public class ProjectListActivity extends ListActivity {
 
 	private void onSendFinished(Intent i) {
 		// Dismiss any in-progress dialog
-		if (progress != null)
+		if (progress != null) {
 			progress.dismiss();
-
+		}
 		String err = i.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
 		if (err == null) {
 			Toast.makeText(getApplicationContext(), "Updates sent", Toast.LENGTH_SHORT).show();
@@ -216,12 +224,6 @@ public class ProjectListActivity extends ListActivity {
 	 */
 	private void startGetProjectsService() {
 		//start a service
-		//register a listener for the completion intent
-		IntentFilter f = new IntentFilter(ConstantUtil.PROJECTS_FETCHED_ACTION);
-		f.addAction(ConstantUtil.PROJECTS_PROGRESS_ACTION);
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                new ResponseReceiver(),
-                f);
 		
 		Intent i = new Intent(this, GetProjectDataService.class);
 		getApplicationContext().startService(i);
@@ -250,6 +252,13 @@ public class ProjectListActivity extends ListActivity {
 		getData();
 	}
 
+
+	/**
+	 * updates the progress bars
+	 * @param phase
+	 * @param done
+	 * @param total
+	 */
 	private void onFetchProgress(int phase, int done, int total) {
 		if (phase == 0) {
 			inProgress1.setIndeterminate(false);
@@ -257,20 +266,21 @@ public class ProjectListActivity extends ListActivity {
 			}
 		if (phase == 1) {
 			inProgress1.setProgress(100);//just in case...
-//			inProgress2.setIndeterminate(false);
 			inProgress2.setProgress(done);
 			inProgress2.setMax(total);
 			}
 		if (phase == 2) {
 			inProgress2.setProgress(100);//just in case...
 			inProgress2.setMax(100);
-//			inProgress3.setIndeterminate(false);
 			inProgress3.setProgress(done);
 			inProgress3.setMax(total);
 			}
 		}
 
-//Broadcast receiver for receiving status updates from the IntentService
+	/**
+	 * receives status updates from any IntentService
+	 *
+	 */
 	private class ResponseReceiver extends BroadcastReceiver {
 		// Prevents instantiation
 		private ResponseReceiver() {
@@ -278,9 +288,6 @@ public class ProjectListActivity extends ListActivity {
 		
 		// Called when the BroadcastReceiver gets an Intent it's registered to receive
 		public void onReceive(Context context, Intent intent) {
-			/*
-			 * Handle Intents here.
-			 */
 			if (intent.getAction() == ConstantUtil.UPDATES_SENT_ACTION)
 				onSendFinished(intent);
 			else

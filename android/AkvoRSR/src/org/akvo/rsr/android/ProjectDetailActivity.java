@@ -26,6 +26,7 @@ import org.akvo.rsr.android.util.SettingsUtil;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -177,5 +178,17 @@ public class ProjectDetailActivity extends Activity {
 		return true;
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    switch (item.getItemId()) {
+	        case R.id.action_settings:
+				Intent intent = new Intent(this, SettingsActivity.class);
+				startActivity(intent);
+	            return true;
+		    default:
+		        return super.onOptionsItemSelected(item);
+	    }
+
+	}
 
 }

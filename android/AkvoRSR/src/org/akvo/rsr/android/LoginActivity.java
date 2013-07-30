@@ -123,10 +123,11 @@ public class LoginActivity extends Activity {
 	
 	@Override
 	protected void onDestroy() {
-		// TODO super.onDestroy(); ??
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(rec);
+		super.onDestroy();
 	}
 
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -134,6 +135,7 @@ public class LoginActivity extends Activity {
 		return true;
 	}
 
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
