@@ -48,6 +48,7 @@ public class LoginActivity extends Activity {
 	private EditText usernameEdit;
 	private EditText passwordEdit;
 	private	ProgressDialog progress = null;
+	private BroadcastReceiver rec;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -102,17 +103,28 @@ public class LoginActivity extends Activity {
             }
         });
         
+		//register a listener for the completion intent
+		IntentFilter f = new IntentFilter(ConstantUtil.AUTHORIZATION_RESULT_ACTION);
+		rec = new ResponseReceiver();
+        LocalBroadcastManager.getInstance(this).registerReceiver(rec, f);
 	}
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
+
 		if (SettingsUtil.haveCredentials(this)) { //skip login
 		    Intent intent = new Intent(this, ProjectListActivity.class);
 		    startActivity(intent);
 		} else {
 			passwordEdit.setText("");
 		}
+	}
+	
+	@Override
+	protected void onDestroy() {
+		// TODO super.onDestroy(); ??
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(rec);
 	}
 
 	@Override
@@ -137,13 +149,19 @@ public class LoginActivity extends Activity {
 	    }
 
 	}
-
-	private void showAbout(){
+	
+	/**
+	 *  shows the about activity
+	 */
+	private void showAbout() {
 		Intent i3 = new Intent(this, AboutActivity.class);
 		startActivity(i3);
 	}
 	
-    //Sign In button pushed
+    /**
+     * starts the sign in process
+     * @param view
+     */
     public void signIn(View view) {
 		//start a "progress" animation
     	progress = new ProgressDialog(this);
@@ -151,13 +169,7 @@ public class LoginActivity extends Activity {
 		progress.setMessage("Sending login information");
 		progress.show();
     	
-    	//request API key from server
-		//register a listener for the completion intent
-		IntentFilter f = new IntentFilter(ConstantUtil.AUTHORIZATION_RESULT_ACTION);
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                new ResponseReceiver(),
-                f);
-		
+    	//request API key from server		
 		Intent intent = new Intent(this, SignInService.class);
 		intent.putExtra(ConstantUtil.USERNAME_KEY, usernameEdit.getText().toString());
 		intent.putExtra(ConstantUtil.PASSWORD_KEY, passwordEdit.getText().toString());
@@ -167,19 +179,22 @@ public class LoginActivity extends Activity {
     }
 
     
-    //Auth now done in service
-	private void onAuthFinished(Intent i) {
+    /**
+     * completes the sign-in process after network activity is done
+     * @param intent
+     */
+	private void onAuthFinished(Intent intent) {
 		// Dismiss any in-progress dialog
 		if (progress != null) {
 			progress.dismiss();
 		}
 
-		String err = i.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
+		String err = intent.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
 		if (err == null) {
 			Toast.makeText(getApplicationContext(), "Logged in as " + SettingsUtil.Read(this, "authorized_username"), Toast.LENGTH_SHORT).show();
 			//Go to main screen
-		    Intent intent = new Intent(this, ProjectListActivity.class);
-		    startActivity(intent);
+		    Intent mainIntent = new Intent(this, ProjectListActivity.class);
+		    startActivity(mainIntent);
 		} else {
 			passwordEdit.setText("");
 			//Let user keep username
@@ -188,6 +203,7 @@ public class LoginActivity extends Activity {
 		}
 	}
 
+	
 	//Broadcast receiver for receiving status updates from the IntentService
 	private class ResponseReceiver extends BroadcastReceiver {
 		// Prevents instantiation
