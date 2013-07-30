@@ -29,6 +29,7 @@ import org.akvo.rsr.android.domain.Update;
 import org.akvo.rsr.android.service.SubmitProjectUpdateService;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.DialogUtil;
+import org.akvo.rsr.android.util.FileUtil;
 import org.akvo.rsr.android.util.SettingsUtil;
 
 import android.net.Uri;
@@ -127,7 +128,7 @@ public class UpdateEditorActivity extends Activity {
 			public void onClick(View view) {
 			    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 			    // generate unique filename
-			    captureFilename = Environment.getExternalStorageDirectory() + ConstantUtil.PHOTO_DIR + "capture" + System.nanoTime() + ".jpg";
+			    captureFilename = FileUtil.getExternalCacheDir(UpdateEditorActivity.this) + File.separator + "capture" + System.nanoTime() + ".jpg";
 			    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(captureFilename)));
 			    startActivityForResult(takePictureIntent, photoRequest);
 			}
@@ -260,7 +261,7 @@ public class UpdateEditorActivity extends Activity {
 			InputStream imageStream;
 			try {
 				imageStream = getContentResolver().openInputStream(data.getData());
-			    captureFilename = Environment.getExternalStorageDirectory() + ConstantUtil.PHOTO_DIR + "capture" + System.nanoTime() + ".jpg";
+			    captureFilename = FileUtil.getExternalCacheDir(this) + File.separator + "capture" + System.nanoTime() + ".jpg";
 			    OutputStream os = new FileOutputStream(captureFilename);
 			    copyStream(imageStream,os);
 			} catch (FileNotFoundException e) {

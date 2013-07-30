@@ -45,7 +45,8 @@
     <string name="btncaption_photo">TAKE PHOTO NOW</string>
     <string name="btncaption_rephoto">RETAKE PHOTO</string>
     <string name="btncaption_add_update">ADD UPDATE</string>
-    <string name="btncaption_refresh">REFRESH PROJECT LIST</string>    
+    <string name="btncaption_refresh">REFRESH PROJECT LIST</string> 
+    <string name="btncaption_viewupdates">VIEW ALL UPDATES</string>   
     <string name="btncaption_clear_data">Clear all data</string>
 
     <string name="send_dialog_title">Synchronising</string>

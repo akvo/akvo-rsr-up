@@ -3,8 +3,10 @@ package org.akvo.rsr.android.service;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.akvo.rsr.android.UpdateEditorActivity;
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.util.ConstantUtil;
+import org.akvo.rsr.android.util.FileUtil;
 import org.akvo.rsr.android.util.SettingsUtil;
 import org.akvo.rsr.android.xml.Downloader;
 
@@ -63,7 +65,7 @@ public class GetProjectDataService extends IntentService {
 		try {
 			dl.fetchNewThumbnails(this,
 					SettingsUtil.host(this),
-					Environment.getExternalStorageDirectory().getPath() + ConstantUtil.IMAGECACHE_DIR,
+					FileUtil.getExternalCacheDir(this).toString(),
 					new Downloader.ProgressReporter() {
 						public void sendUpdate(int sofar, int total) {
 							Intent intent = new Intent(ConstantUtil.PROJECTS_PROGRESS_ACTION);

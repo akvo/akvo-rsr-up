@@ -35,14 +35,14 @@ public class ConstantUtil {
 	public static final String API_KEY_PATTERN = "&api_key=%s&username=%s";
 	public static final String POST_UPDATE_URL = "/api/v1/project_update/?format=xml";
 	public static final String FETCH_PROJ_URL_PATTERN = "/api/v1/project/?format=xml&limit=0&partnerships__organisation=%s";
-	public static final String FETCH_PROJ_COUNT_URL = "/api/v1/project/?format=xml&limit=0&partnerships__organisation=%s";//TODO: Hardcoded Akvo org
+	public static final String FETCH_PROJ_COUNT_URL = "/api/v1/project/?format=xml&limit=0&partnerships__organisation=%s";
 
 	/**
 	 * file system constants
 	 */
 	public static final String XML_SUFFIX = ".xml";
 	public static final String JPG_SUFFIX = ".jpg";
-	public static final String TOP_DIR = "/akvorsr/";
+//	public static final String TOP_DIR = "/akvorsr/";
 	public static final String PHOTO_DIR = "/akvorsr/photos/";
 	public static final String IMAGECACHE_DIR = "/akvorsr/imagecache/";
 	
@@ -57,13 +57,7 @@ public class ConstantUtil {
 	public static final String QUEUED_STATUS = "Queued";
 	public static final String FAILED_STATUS = "Failed";
 
-	/**
-	 * deletion indicators
-	 */
-	public static final String IS_DELETED = "Y";
-	public static final String NOT_DELETED = "N";
-
-
+	
 	/**
 	 * notification types
 	 */

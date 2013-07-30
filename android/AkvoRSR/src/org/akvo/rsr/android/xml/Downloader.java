@@ -127,7 +127,7 @@ public class Downloader {
 	/**
 	 * reads content from a URL into a new file with a generated name
 	 * @param url
-	 * @param directory
+	 * @param directory - directory filename (no final /)
 	 * @param prefix
 	 * @return
 	 */
@@ -137,7 +137,7 @@ public class Downloader {
 		if (i >= 0) {
 			extension = url.getFile().substring((url.getFile().lastIndexOf('.')));
 		}
-		File output = new File(directory + prefix + System.nanoTime() + extension);
+		File output = new File(directory + File.separator + prefix + System.nanoTime() + extension);
 		httpGetToFile(url,output.getAbsoluteFile());
 		return output.getAbsolutePath();
 	}
@@ -151,7 +151,7 @@ public class Downloader {
 	 * 
 	 * @param ctx
 	 * @param contextUrl
-	 * @param directory
+	 * @param directory - directory filename (no final /)
 	 * @param prog
 	 * @throws MalformedURLException
 	 * 

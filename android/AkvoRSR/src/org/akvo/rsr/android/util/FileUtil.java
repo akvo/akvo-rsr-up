@@ -42,18 +42,18 @@ public class FileUtil {
         if (hasExternalCacheDir()) {
             File cacheDir = context.getExternalCacheDir();
             if (cacheDir != null) {
-                return cacheDir;
+            	return cacheDir;
             }
         }
 
         // Before Froyo we need to construct the external cache dir ourselves
-        final String cacheDir = "/Android/data/" + context.getPackageName() + "/cache/";
+        final String cacheDir = "/Android/data/" + context.getPackageName() + "/cache";
         return new File(Environment.getExternalStorageDirectory().getPath() + cacheDir);
     }
 
     /**
-* Check if OS version has built-in external cache dir method.
-*/
+     * Checks if OS version has built-in external cache dir method.
+     */
     public static boolean hasExternalCacheDir() {
         return hasFroyo();
     }

@@ -21,6 +21,7 @@ import java.io.File;
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.DialogUtil;
+import org.akvo.rsr.android.util.FileUtil;
 
 import android.os.Bundle;
 import android.os.Environment;
@@ -30,6 +31,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.content.Context;
 import android.database.Cursor;
 
 public class DiagnosticActivity extends Activity {
@@ -52,7 +54,7 @@ public class DiagnosticActivity extends Activity {
 		btnUpdates = (Button) findViewById(R.id.btn_diag_a);
 		btnUpdates.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {//delete image cache files
-				clearCache();
+				clearCache(DiagnosticActivity.this);
 			}
 		});
 		btnAddUpdate = (Button) findViewById(R.id.btn_diag_b);
@@ -65,16 +67,47 @@ public class DiagnosticActivity extends Activity {
 		dba = new RsrDbAdapter(this);
 	}
 
-	private void clearCache() {
-		File f = new File(Environment.getExternalStorageDirectory() + ConstantUtil.IMAGECACHE_DIR);
+	/**
+	 * removes all files from the image cache
+	 * TODO: move to FileUtil?
+	 */
+	private void clearCache(Context context ) {
+		File f = FileUtil.getExternalCacheDir(this);
 		File [] files = f.listFiles();
-		for (int i = 0; i < files.length; i++) { 
-			files[i].delete();
+		if (files != null) { //dir might not exist
+			for (int i = 0; i < files.length; i++) { 
+				files[i].delete();
+			}
+			DialogUtil.infoAlert(context, "Cache cleared", files.length + " files deleted");
 		}
-		DialogUtil.infoAlert(this, "Cache cleared", files.length+" files deleted");
-
+		clearOldCache();
 	}
 
+	/**
+	 * removes all files from the old image cache
+	 */
+	private void clearOldCache() {
+		File f = new File(Environment.getExternalStorageDirectory() + ConstantUtil.IMAGECACHE_DIR);
+		File [] files = f.listFiles();
+		if (files != null) { //dir might not exist
+			for (int i = 0; i < files.length; i++) { 
+				files[i].delete();
+			}
+		}
+		f = new File(Environment.getExternalStorageDirectory() + ConstantUtil.PHOTO_DIR);
+		files = f.listFiles();
+		if (files != null) { //dir might not exist
+			for (int i = 0; i < files.length; i++) { 
+				files[i].delete();
+			}
+		}
+		
+	}
+
+	/*
+	 * clears the database
+	 * TODO: should we clear login credentials, too?
+	 */
 	private void clearData() {
 		dba.clearAllData();
 		DialogUtil.infoAlert(this, "Data cleared", "All project and update info deleted");

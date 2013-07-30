@@ -148,7 +148,7 @@
 			        android:layout_height="wrap_content"
 			        android:layout_weight="1"
 			        android:drawableTop="@drawable/ic_menu_view"
-			        android:text="VIEW ALL UPDATES"
+			        android:text="@string/btncaption_viewupdates"
 		            />
 
    			    <!-- Add update button -->
