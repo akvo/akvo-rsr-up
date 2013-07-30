@@ -31,7 +31,7 @@ public class GetProjectDataService extends IntentService {
 		Downloader dl = new Downloader();
 		String errMsg = null;
 		try {
-			dl.FetchProjectList(this, new URL(SettingsUtil.host(this) +
+			dl.fetchProjectList(this, new URL(SettingsUtil.host(this) +
 					                          String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN, SettingsUtil.Read(this, "authorized_orgid"))));
 			broadcastProgress(0, 100, 100);//For this phase, only whole operation
 			
@@ -42,7 +42,7 @@ public class GetProjectDataService extends IntentService {
 				int i = 0;
 				while (c.moveToNext()) {
 					i++;
-					dl.FetchUpdateList(	this,
+					dl.fetchUpdateList(	this,
 									   	new URL(SettingsUtil.host(this) +
 										"/api/v1/project_update/?format=xml&limit=0&project=" + //TODO move to constants
 										c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL)))
@@ -61,7 +61,7 @@ public class GetProjectDataService extends IntentService {
 //		progressBroadcast(1, 0, 0);
 		
 		try {
-			dl.FetchNewThumbnails(this,
+			dl.fetchNewThumbnails(this,
 					SettingsUtil.host(this),
 					Environment.getExternalStorageDirectory().getPath() + ConstantUtil.IMAGECACHE_DIR,
 					new Downloader.ProgressReporter() {

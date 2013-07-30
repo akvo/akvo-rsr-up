@@ -170,8 +170,9 @@ public class LoginActivity extends Activity {
     //Auth now done in service
 	private void onAuthFinished(Intent i) {
 		// Dismiss any in-progress dialog
-		if (progress != null)
+		if (progress != null) {
 			progress.dismiss();
+		}
 
 		String err = i.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
 		if (err == null) {
@@ -197,8 +198,9 @@ public class LoginActivity extends Activity {
 			/*
 			 * Handle Intents here.
 			 */
-			if (intent.getAction() == ConstantUtil.AUTHORIZATION_RESULT_ACTION)
+			if (intent.getAction() == ConstantUtil.AUTHORIZATION_RESULT_ACTION) {
 				onAuthFinished(intent);
+			}
 		}
 	}
 
