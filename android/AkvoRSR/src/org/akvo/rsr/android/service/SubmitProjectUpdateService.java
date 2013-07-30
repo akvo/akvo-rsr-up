@@ -32,7 +32,7 @@ public class SubmitProjectUpdateService extends IntentService {
 
 		Downloader dl = new Downloader();
 		try {
-			dl.SendUnsentUpdates(this, SettingsUtil.host(this) + ConstantUtil.POST_UPDATE_URL + ConstantUtil.API_KEY_PATTERN, sendImg, user);
+			dl.sendUnsentUpdates(this, SettingsUtil.host(this) + ConstantUtil.POST_UPDATE_URL + ConstantUtil.API_KEY_PATTERN, sendImg, user);
 		} catch (Exception e) {
 			i.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, e.getMessage());
 		}

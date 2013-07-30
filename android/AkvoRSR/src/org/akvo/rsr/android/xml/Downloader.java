@@ -49,18 +49,23 @@ public class Downloader {
 	private static final String TAG = "Downloader";
 
 	public boolean err = false;
-	
-	/*
-	 *  Populate the projects table in the db from a server URL
+
+	/**
+	 * populates the projects table in the db from a server URL
+	 * @param ctx
+	 * @param url
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
 	 */
-	public void FetchProjectList(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
-	
+	public void fetchProjectList(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
+
 		Log.i(TAG, "Fetching project list from " + url);
 
 		/* Get a SAXParser from the SAXPArserFactory. */
 		SAXParserFactory spf = SAXParserFactory.newInstance();
 		SAXParser sp = spf.newSAXParser();
-	
+
 		/* Get the XMLReader of the SAXParser we created. */
 		XMLReader xr = sp.getXMLReader();
 		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
@@ -70,24 +75,30 @@ public class Downloader {
 		//TODO THIS MIGHT HANG, no timeout defined...
 		xr.parse(new InputSource(url.openStream()));
 		/* Parsing has finished. */
-	
+
 		/* Check if anything went wrong. */
 		err = myProjectListHandler.getError();
 
 		Log.i(TAG, "Fetched "+myProjectListHandler.getCount()+" projects");
 	}
 
-	
-	/* 
-	 * Populate the updates table in the db from a server URL
+
+	/**
+	 * populates the updates table in the db from a server URL
 	 * Typically the url will specify updates for a single project.
+	 * 
+	 * @param ctx
+	 * @param url
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
 	 */
-	public void FetchUpdateList(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
-	
+	public void fetchUpdateList(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
+
 		/* Get a SAXParser from the SAXPArserFactory. */
 		SAXParserFactory spf = SAXParserFactory.newInstance();
 		SAXParser sp = spf.newSAXParser();
-	
+
 		/* Get the XMLReader of the SAXParser we created. */
 		XMLReader xr = sp.getXMLReader();
 		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
@@ -96,42 +107,60 @@ public class Downloader {
 		/* Parse the xml-data from our URL. */
 		xr.parse(new InputSource(url.openStream()));
 		/* Parsing has finished. */
-	
+
 		/* Check if anything went wrong. */
 		err = myUpdateListHandler.getError();
 		Log.i(TAG, "Fetched "+myUpdateListHandler.getCount()+" updates");
 	}
 
-	
-	/* 
-	 * Fetch one file from a URL
+
+	/**
+	 * fetches one file from a URL
+	 * @param url
+	 * @param file
 	 */
-	public void HttpGetToFile(URL url, File file) {
+	public void httpGetToFile(URL url, File file) {
 		HttpRequest.get(url).receive(file);		
 	}
 
-	
-	/* 
-	 * Read a URL into a new file with a generated name
+
+	/**
+	 * reads content from a URL into a new file with a generated name
+	 * @param url
+	 * @param directory
+	 * @param prefix
+	 * @return
 	 */
-	public String HttpGetToNewFile(URL url, String directory, String prefix) {
+	public String httpGetToNewFile(URL url, String directory, String prefix) {
 		String extension = null;
 		int i = url.getFile().lastIndexOf('.');
 		if (i >= 0) {
 			extension = url.getFile().substring((url.getFile().lastIndexOf('.')));
 		}
 		File output = new File(directory + prefix + System.nanoTime() + extension);
-		HttpGetToFile(url,output.getAbsoluteFile());
+		httpGetToFile(url,output.getAbsoluteFile());
 		return output.getAbsolutePath();
 	}
-	
+
 	public abstract static interface ProgressReporter {
-		  public abstract void sendUpdate(int sofar, int total);
-		}
-	
-	//fetch all unfetched thumbnails and photos
-	//this may be excessive if list is long, we could be lazy until display, and do it in view adapter
-	public void FetchNewThumbnails(Context ctx, String contextUrl, String directory, ProgressReporter prog) throws MalformedURLException{
+		public abstract void sendUpdate(int sofar, int total);
+	}
+
+	/**
+	 * fetches all unfetched thumbnails and photos
+	 * 
+	 * @param ctx
+	 * @param contextUrl
+	 * @param directory
+	 * @param prog
+	 * @throws MalformedURLException
+	 * 
+	 * TODO this may take excessive time if list is long
+	 * It could be made a preference, or if we sacrifice offline-usability
+	 * fetch could be lazy until display, and do it in view adapter
+
+	 */
+	public void fetchNewThumbnails(Context ctx, String contextUrl, String directory, ProgressReporter prog) throws MalformedURLException{
 		RsrDbAdapter dba = new RsrDbAdapter(ctx);
 		dba.open();
 		int count = 0, fetchCount = 0;
@@ -151,7 +180,7 @@ public class Downloader {
 					if (url == null) {
 						Log.w(TAG, "Null image URL for update: "+id);
 					} else try{
-						fn = HttpGetToNewFile(new URL(curl,url), directory, "prj" + id + "_");
+						fn = httpGetToNewFile(new URL(curl,url), directory, "prj" + id + "_");
 						dba.updateProjectThumbnailFile(id,fn);	
 						fetchCount++;
 					} catch (Exception e) {
@@ -171,12 +200,12 @@ public class Downloader {
 				String fn = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
 				String url = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
 				if (fn == null || ! new File(fn).exists()) {
-		
+
 					//not fetched yet, or deleted
 					if (url == null) {
 						Log.i(TAG, "Null image URL for update: " + id);
 					} else try {
-						fn = HttpGetToNewFile(new URL(curl,url), directory, "upd"+id+"_");
+						fn = httpGetToNewFile(new URL(curl,url), directory, "upd"+id+"_");
 						dba.updateUpdateThumbnailFile(id,fn);						
 						fetchCount++;
 					} catch (Exception e) {
@@ -192,10 +221,10 @@ public class Downloader {
 			dba.close();
 		}
 		Log.i(TAG, "Fetched " + fetchCount + " images");
-		
+
 	}
 
-	
+
 	/* 
 	 * Publish an update, return true if success
 	 *
@@ -217,26 +246,36 @@ public class Downloader {
 		}
 		return true;
 	}
-	*/
-	
+	 */
+
 	private final char SPC = '\u0020';
-	
-	//return a string without newlines and with a maximum length
+
+	/**
+	 * returns a string without newlines and with a maximum length
+	 * @param s
+	 * @param maxLength
+	 * @return
+	 */
 	private String oneLine(String s, int maxLength) {
 		String result = "";
 		for (int i = 0; i < Math.min(s.length(), maxLength); i++)
-			if (s.charAt(i) < SPC)
+			if (s.charAt(i) < SPC) {
 				result += SPC;
-			else
+			} else {
 				result += s.charAt(i);
+			}
 		return result;
 	}
-	
-	
-	/* 
-	 * Publish an update, return true if success
-	 * TODO posting of images
-	 * 
+
+
+	/**
+	 *  Publishes an update, returns true if success
+	 * @param urlTemplate
+	 * @param update
+	 * @param sendImage
+	 * @param u
+	 * @throws Exception
+
 	 * What to submit:
 	 * 
 	<object>
@@ -257,34 +296,33 @@ public class Downloader {
 
 	 * As:  
 	application/xml
-	    
-	  */
-	private static final String contentType = "application/xml";
-	private static final String bodyTemplate =	"<object><update_method>S</update_method><project>%s</project>" +
-			"<photo_location>E</photo_location><user>%s</user><title>%s</title>" +
-			"<text>%s</text>%s%s%s</object>";
-	private static final String imagePreamble =	 "<photo type=\"hash\"><name>dummy.jpg</name><content_type>image/jpeg</content_type><file>";
-	private static final String imagePostamble = "</file></photo>";
-	
-	public void PostXmlUpdate(String urlTemplate, Update update, boolean sendImage, User u) throws Exception {
+
+	 */
+	public void postXmlUpdate(String urlTemplate, Update update, boolean sendImage, User u) throws Exception {
+		final String contentType = "application/xml";
+		final String bodyTemplate =	"<object><update_method>S</update_method><project>%s</project>" +
+				"<photo_location>E</photo_location><user>%s</user><title>%s</title>" +
+				"<text>%s</text>%s%s%s</object>";
+		final String imagePreamble =	 "<photo type=\"hash\"><name>dummy.jpg</name><content_type>image/jpeg</content_type><file>";
+		final String imagePostamble = "</file></photo>";
 		URL url;
-//		try {
-			url = new URL(String.format(Locale.US, urlTemplate, u.getApiKey(), u.getUsername()));
-//		} catch (MalformedURLException e1) {
-//			Log.e(TAG, "Unable to make post URL:",e1);
-//			return false;
-//		}
+		//		try {
+		url = new URL(String.format(Locale.US, urlTemplate, u.getApiKey(), u.getUsername()));
+		//		} catch (MalformedURLException e1) {
+		//			Log.e(TAG, "Unable to make post URL:",e1);
+		//			return false;
+		//		}
 		String projectPath = "/api/v1/project/" + update.getProjectId() + "/";//TODO move to constantutil
 		String userPath = "/api/v1/user/" + u.getId() + "/";
 		String imageData1 = "";
 		String imageData2 = "";
 		String imageData3 = "";
-		
+
 		if (sendImage) {
 			String fn = update.getThumbnailFilename();
 			if (fn != null) {
 				File f = new File (fn);
-				if (f.exists()){
+				if (f.exists()) {
 					byte[] barr;
 					try {
 						barr = FileUtil.readFile(f);
@@ -322,8 +360,15 @@ public class Downloader {
 	}
 
 
-	//Send all unsent updates
-	public void SendUnsentUpdates(Context ctx, String urlTemplate, boolean sendImages, User user) throws Exception {
+	/**
+	 * Sends all unsent updates
+	 * @param ctx
+	 * @param urlTemplate
+	 * @param sendImages
+	 * @param user
+	 * @throws Exception
+	 */
+	public void sendUnsentUpdates(Context ctx, String urlTemplate, boolean sendImages, User user) throws Exception {
 		Log.i(TAG, "Sending unsent updates");
 		RsrDbAdapter dba = new RsrDbAdapter(ctx);
 		dba.open();
@@ -334,7 +379,7 @@ public class Downloader {
 				while (cursor2.moveToNext()) {
 					String id = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.PK_ID_COL));
 					Update upd = dba.findUpdate(id);
-					PostXmlUpdate(urlTemplate, upd, sendImages, user);
+					postXmlUpdate(urlTemplate, upd, sendImages, user);
 					dba.updateUpdateIdSent(upd, id); //remember new ID and status for this update
 					count++;
 				}
@@ -346,7 +391,19 @@ public class Downloader {
 		Log.i(TAG, "Sent " + count + " updates");
 	}
 
-	
+
+	/**
+	 * logs in to server and fetches API key
+	 * @param url
+	 * @param username
+	 * @param password
+	 * @param user
+	 * @return
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws HttpRequestException
+	 * @throws IOException
+	 */
 	public boolean authorize(URL url, String username, String password, User user) throws ParserConfigurationException, SAXException, HttpRequestException, IOException {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("username", username);
@@ -355,30 +412,24 @@ public class Downloader {
 		HttpRequest h = HttpRequest.post(url).form(data).connectTimeout(10000); //10 sec timeout
 		int code = h.code();
 		if (code == 200) {
-//			try {
-				/* Get a SAXParser from the SAXPArserFactory. */
-				SAXParserFactory spf = SAXParserFactory.newInstance();
-				SAXParser sp = spf.newSAXParser();
-				/* Get the XMLReader of the SAXParser we created. */
-				XMLReader xr = sp.getXMLReader();
-				/* Create a new ContentHandler and apply it to the XML-Reader*/ 
-				AuthHandler myAuthHandler = new AuthHandler();
-				xr.setContentHandler(myAuthHandler);
-				/* Parse the xml-data from our URL. */
-				xr.parse(new InputSource(h.stream()));
-				/* Parsing has finished. */
-				user.setUsername(username);
-				user.setId(myAuthHandler.getUserId());
-				user.setOrgId(myAuthHandler.getOrgId());
-				user.setApiKey(myAuthHandler.getApiKey());
-//			}
-//			catch (Exception e) {
-//				Log.e(TAG, "Authorization fetch/parse error: ", e);
-//				return false;
-//			}
-			
+			/* Get a SAXParser from the SAXPArserFactory. */
+			SAXParserFactory spf = SAXParserFactory.newInstance();
+			SAXParser sp = spf.newSAXParser();
+			/* Get the XMLReader of the SAXParser we created. */
+			XMLReader xr = sp.getXMLReader();
+			/* Create a new ContentHandler and apply it to the XML-Reader*/ 
+			AuthHandler myAuthHandler = new AuthHandler();
+			xr.setContentHandler(myAuthHandler);
+			/* Parse the xml-data from our URL. */
+			xr.parse(new InputSource(h.stream()));
+			/* Parsing has finished. */
+			user.setUsername(username);
+			user.setId(myAuthHandler.getUserId());
+			user.setOrgId(myAuthHandler.getOrgId());
+			user.setApiKey(myAuthHandler.getApiKey());
+
 			Log.i(TAG, "Fetched API key");
-			
+
 			return true;
 		} else {
 			Log.e(TAG, "Authorization HTTP error:" + code);
@@ -387,5 +438,5 @@ public class Downloader {
 	}
 
 
-	
+
 }
