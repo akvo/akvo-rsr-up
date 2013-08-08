@@ -18,6 +18,9 @@ package org.akvo.rsr.android.domain;
 
 import java.util.Date;
 
+/**
+ * Holds information about one project update
+ */
 public class Update {
 	private String id;
 	private String projectId;

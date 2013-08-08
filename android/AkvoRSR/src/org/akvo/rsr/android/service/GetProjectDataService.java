@@ -1,5 +1,6 @@
 package org.akvo.rsr.android.service;
 
+import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -56,16 +57,19 @@ public class GetProjectDataService extends IntentService {
 				if (c != null)
 					c.close();
 			}
+		} catch (FileNotFoundException e) {
+			Log.e(TAG,"Cannot find:",e);
+			errMsg = "Cannot find: "+ e.getMessage();
 		} catch (Exception e) {
 			Log.e(TAG,"Bad fetch:",e);
-			errMsg = "Fetch failed: "+ e.getMessage();
+			errMsg = "Fetch failed: "+ e;
 		}
 //		progressBroadcast(1, 0, 0);
 		
 		try {
 			dl.fetchNewThumbnails(this,
 					SettingsUtil.host(this),
-					FileUtil.getExternalCacheDir(this).toString(),
+					FileUtil.getExternalFilesDir(this).toString(),
 					new Downloader.ProgressReporter() {
 						public void sendUpdate(int sofar, int total) {
 							Intent intent = new Intent(ConstantUtil.PROJECTS_PROGRESS_ACTION);

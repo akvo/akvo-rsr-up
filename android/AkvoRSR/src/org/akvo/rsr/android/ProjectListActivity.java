@@ -58,6 +58,7 @@ public class ProjectListActivity extends ListActivity {
 	private ProgressBar inProgress2;
 	private ProgressBar inProgress3;
 	private BroadcastReceiver broadRec;
+	private Button refreshButton;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +71,7 @@ public class ProjectListActivity extends ListActivity {
 		inProgress2 = (ProgressBar) findViewById(R.id.progressBar2);
 		inProgress3 = (ProgressBar) findViewById(R.id.progressBar3);
 
-		Button refreshButton = (Button) findViewById(R.id.button_refresh_projects);		
+		refreshButton = (Button) findViewById(R.id.button_refresh_projects);		
 		refreshButton.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {
 				//fetch new data
@@ -223,6 +224,8 @@ public class ProjectListActivity extends ListActivity {
 	 * Start the service fetching new project data
 	 */
 	private void startGetProjectsService() {
+		//disable refresh button
+		refreshButton.setEnabled(false);
 		//start a service
 		
 		Intent i = new Intent(this, GetProjectDataService.class);
@@ -248,6 +251,8 @@ public class ProjectListActivity extends ListActivity {
 //			Toast.makeText(getApplicationContext(), err, Toast.LENGTH_SHORT).show();
 		}
 
+		//re-enable the refresh button
+		refreshButton.setEnabled(true);		
 		//Refresh the list
 		getData();
 	}

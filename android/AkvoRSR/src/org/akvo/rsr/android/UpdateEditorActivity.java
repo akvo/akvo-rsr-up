@@ -128,7 +128,7 @@ public class UpdateEditorActivity extends Activity {
 			public void onClick(View view) {
 			    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 			    // generate unique filename
-			    captureFilename = FileUtil.getExternalCacheDir(UpdateEditorActivity.this) + File.separator + "capture" + System.nanoTime() + ".jpg";
+			    captureFilename = FileUtil.getExternalFilesDir(UpdateEditorActivity.this) + File.separator + "capture" + System.nanoTime() + ".jpg";
 			    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(captureFilename)));
 			    startActivityForResult(takePictureIntent, photoRequest);
 			}
@@ -261,7 +261,7 @@ public class UpdateEditorActivity extends Activity {
 			InputStream imageStream;
 			try {
 				imageStream = getContentResolver().openInputStream(data.getData());
-			    captureFilename = FileUtil.getExternalCacheDir(this) + File.separator + "capture" + System.nanoTime() + ".jpg";
+			    captureFilename = FileUtil.getExternalFilesDir(this) + File.separator + "capture" + System.nanoTime() + ".jpg";
 			    OutputStream os = new FileOutputStream(captureFilename);
 			    copyStream(imageStream,os);
 			} catch (FileNotFoundException e) {

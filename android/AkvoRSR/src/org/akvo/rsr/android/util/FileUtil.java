@@ -32,12 +32,12 @@ public class FileUtil {
         }
     }
     
-/**
-* Get the external app image directory.
-*
-* @param context The context to use
-* @return The external cache dir
-*/
+	/**
+	* Get the external app image directory.
+	*
+	* @param context The context to use
+	* @return The external cache dir
+	*/
     public static File getExternalCacheDir(Context context) {
         if (hasExternalCacheDir()) {
             File cacheDir = context.getExternalCacheDir();
@@ -48,6 +48,25 @@ public class FileUtil {
 
         // Before Froyo we need to construct the external cache dir ourselves
         final String cacheDir = "/Android/data/" + context.getPackageName() + "/cache";
+        return new File(Environment.getExternalStorageDirectory().getPath() + cacheDir);
+    }
+
+	/**
+	* Get the external app image directory.
+	*
+	* @param context The context to use
+	* @return The external cache dir
+	*/
+    public static File getExternalFilesDir(Context context) {
+        if (hasExternalCacheDir()) {
+            File cacheDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            if (cacheDir != null) {
+            	return cacheDir;
+            }
+        }
+
+        // Before Froyo we need to construct the external files dir ourselves
+        final String cacheDir = "/Android/data/" + context.getPackageName() + "/Pictures";
         return new File(Environment.getExternalStorageDirectory().getPath() + cacheDir);
     }
 
