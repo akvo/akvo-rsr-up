@@ -18,6 +18,8 @@ package org.akvo.rsr.android.xml;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.RandomAccessFile;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -49,6 +51,8 @@ public class Downloader {
 	private static final String TAG = "Downloader";
 
 	public boolean err = false;
+	
+	private final int READ_TIMEOUT_MS = 60000;
 
 	/**
 	 * populates the projects table in the db from a server URL
@@ -289,6 +293,7 @@ public class Downloader {
 
 	By George, she's got it! By George, she's got it!
 	</text>
+	<photo type=\"hash\"><name>dummy.jpg</name><content_type>image/jpeg</content_type><file>AfDBGjhdfhjkjh==</file></photo>
 	</object>
 
 	 * To URL:
@@ -300,9 +305,10 @@ public class Downloader {
 	 */
 	public void postXmlUpdate(String urlTemplate, Update update, boolean sendImage, User u) throws Exception {
 		final String contentType = "application/xml";
-		final String bodyTemplate =	"<object><update_method>S</update_method><project>%s</project>" +
+		final String bodyTemplate1 =	"<object><update_method>S</update_method><project>%s</project>" +
 				"<photo_location>E</photo_location><user>%s</user><title>%s</title>" +
-				"<text>%s</text>%s%s%s</object>";
+				"<text>%s</text>";
+		final String bodyTemplate2 = "</object>";
 		final String imagePreamble =	 "<photo type=\"hash\"><name>dummy.jpg</name><content_type>image/jpeg</content_type><file>";
 		final String imagePostamble = "</file></photo>";
 		URL url;
@@ -314,10 +320,15 @@ public class Downloader {
 		//		}
 		String projectPath = "/api/v1/project/" + update.getProjectId() + "/";//TODO move to constantutil
 		String userPath = "/api/v1/user/" + u.getId() + "/";
-		String imageData1 = "";
-		String imageData2 = "";
-		String imageData3 = "";
 
+		String requestBody = String.format(Locale.US, bodyTemplate1,
+				projectPath, userPath,
+				oneLine(update.getTitle(),50), //TODO: WHAT ABOUT XML?
+				update.getText());
+
+		HttpRequest h = HttpRequest.post(url).contentType(contentType);
+		h.readTimeout(READ_TIMEOUT_MS);
+		h.send(requestBody);//OutOfMemory here...
 		if (sendImage) {
 			String fn = update.getThumbnailFilename();
 			if (fn != null) {
@@ -326,30 +337,107 @@ public class Downloader {
 					byte[] barr;
 					try {
 						barr = FileUtil.readFile(f);
-						imageData2 = Base64.encodeBytes(barr);
-						imageData1 = imagePreamble;
-						imageData3 = imagePostamble;
+						h.send(imagePreamble);
+						h.send(Base64.encodeBytes(barr));
+						barr = null; //release memory
+						h.send(imagePostamble);
 					} catch (IOException e) {
 						Log.e(TAG, "Image encoding problem", e);
 					}
 				}
 			}
 		}
-		String requestBody = String.format(Locale.US, bodyTemplate,
-				projectPath, userPath,
-				oneLine(update.getTitle(),50), //TODO: WHAT ABOUT XML?
-				update.getText(),
-				imageData1, imageData2, imageData3);
-
-		HttpRequest h = HttpRequest.post(url).contentType(contentType).send(requestBody);
+		h.send(bodyTemplate2);//terminate object
 		int code = h.code();
 		String msg = h.message();
 		String b = h.body(); //On success, XML representation of created object
 		if (code == 201) {//Created
 			update.setUnsent(false);
 			String idPath = h.header(HttpRequest.HEADER_LOCATION);//Path-ified ID
-			int penSlash = idPath.lastIndexOf('/', idPath.length()-2);
-			String id = idPath.substring(penSlash+1,idPath.length()-1);
+			int penSlash = idPath.lastIndexOf('/', idPath.length() - 2);
+			String id = idPath.substring(penSlash + 1, idPath.length() - 1);
+			update.setId(id);
+		} else {
+			String e = "Unable to post update, code " + code + " " +  msg;
+			Log.e(TAG, e);
+			Log.e(TAG, b);
+			throw new Exception(e);
+		}
+	}
+
+	/**
+	 *  Publishes an update, returns true if success
+	 * @param urlTemplate
+	 * @param update
+	 * @param sendImage
+	 * @param user
+	 * @throws Exception
+	 */
+	public void postXmlUpdateStreaming(String urlTemplate, Update update, boolean sendImage, User user) throws Exception {
+		final String contentType = "application/xml";
+		final String bodyTemplate1  =	"<object><update_method>S</update_method><project>%s</project>" +
+				"<photo_location>E</photo_location><user>%s</user><title>%s</title>" +
+				"<text>%s</text>";
+		final String bodyTemplate2  = "</object>";
+		final String imagePreamble  = "<photo type=\"hash\"><name>dummy.jpg</name><content_type>image/jpeg</content_type><file>";
+		final String imagePostamble = "</file></photo>";
+		URL url;
+		url = new URL(String.format(Locale.US, urlTemplate, user.getApiKey(), user.getUsername()));
+		String projectPath = "/api/v1/project/" + update.getProjectId() + "/";//TODO move to constantutil
+		String userPath = "/api/v1/user/" + user.getId() + "/";
+
+		String requestBody = String.format(Locale.US, bodyTemplate1,
+				projectPath, userPath,
+				oneLine(update.getTitle(),50), //TODO: WHAT ABOUT XML?
+				update.getText());
+
+		HttpRequest h = HttpRequest.post(url).contentType(contentType);//OutOfMemory here...
+		h.readTimeout(READ_TIMEOUT_MS);
+		h.send(requestBody);
+		//OutputStreamWriter strm = h.writer();//prepare to stream photo
+
+		if (sendImage) {
+			String fn = update.getThumbnailFilename();
+			if (fn != null) {
+				File f = new File (fn);
+				if (f.exists()) {
+					
+					RandomAccessFile raf = new RandomAccessFile(f, "r");
+					h.send(imagePreamble);
+					//base64-convert the photo in chunks and stream them to server
+					//use origin buffer size divisible by 3
+					final int bufSiz = 6*1024;
+					final long fsize = raf.length();
+					final int wholeChunks = (int) (fsize / bufSiz);
+					byte[] rawBuf = new byte[bufSiz];
+					try {
+						for (int i = 0; i < wholeChunks; i++) {
+							raf.readFully(rawBuf);
+							byte[] b64buf = Base64.encodeBytesToBytes(rawBuf,0,bufSiz);
+							int rSize = b64buf.length;
+							h.send(b64buf);
+						}
+						int n = raf.read(rawBuf); //read last piece
+						byte[] b64buf = Base64.encodeBytesToBytes(rawBuf,0,n);
+						h.send(b64buf);
+					} catch (IOException e) {
+						Log.e(TAG, "Image encoding problem", e);
+					}
+					h.send(imagePostamble);
+				}
+			}
+		}
+		
+		h.send(bodyTemplate2);
+		
+		int code = h.code();//closes output
+		String msg = h.message();
+		String b = h.body(); //On success, XML representation of created object
+		if (code == 201) {//Created
+			update.setUnsent(false);
+			String idPath = h.header(HttpRequest.HEADER_LOCATION);//Path-ified ID
+			int penSlash = idPath.lastIndexOf('/', idPath.length() - 2);
+			String id = idPath.substring(penSlash + 1, idPath.length() - 1);
 			update.setId(id);
 		} else {
 			String e = "Unable to post update, code " + code + " " +  msg;
@@ -379,7 +467,8 @@ public class Downloader {
 				while (cursor2.moveToNext()) {
 					String id = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.PK_ID_COL));
 					Update upd = dba.findUpdate(id);
-					postXmlUpdate(urlTemplate, upd, sendImages, user);
+//					postXmlUpdate(urlTemplate, upd, sendImages, user);
+					postXmlUpdateStreaming(urlTemplate, upd, sendImages, user);
 					dba.updateUpdateIdSent(upd, id); //remember new ID and status for this update
 					count++;
 				}
@@ -398,7 +487,7 @@ public class Downloader {
 	 * @param username
 	 * @param password
 	 * @param user
-	 * @return
+	 * @return true if success
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 * @throws HttpRequestException
