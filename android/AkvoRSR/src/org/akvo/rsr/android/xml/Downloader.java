@@ -83,7 +83,7 @@ public class Downloader {
 		/* Check if anything went wrong. */
 		err = myProjectListHandler.getError();
 
-		Log.i(TAG, "Fetched "+myProjectListHandler.getCount()+" projects");
+		Log.i(TAG, "Fetched " + myProjectListHandler.getCount() + " projects");
 	}
 
 
@@ -114,7 +114,7 @@ public class Downloader {
 
 		/* Check if anything went wrong. */
 		err = myUpdateListHandler.getError();
-		Log.i(TAG, "Fetched "+myUpdateListHandler.getCount()+" updates");
+		Log.i(TAG, "Fetched " + myUpdateListHandler.getCount() + " updates");
 	}
 
 
@@ -375,7 +375,8 @@ public class Downloader {
 	 */
 	public void postXmlUpdateStreaming(String urlTemplate, Update update, boolean sendImage, User user) throws Exception {
 		final String contentType = "application/xml";
-		final String bodyTemplate1  =	"<object><update_method>S</update_method><project>%s</project>" +
+//		final String bodyTemplate1  =	"<object><update_method>S</update_method><project>%s</project>" + //SMS update method
+		final String bodyTemplate1  =	"<object><update_method>M</update_method><project>%s</project>" + //Mobile update method
 				"<photo_location>E</photo_location><user>%s</user><title>%s</title>" +
 				"<text>%s</text>";
 		final String bodyTemplate2  = "</object>";
@@ -414,7 +415,6 @@ public class Downloader {
 						for (int i = 0; i < wholeChunks; i++) {
 							raf.readFully(rawBuf);
 							byte[] b64buf = Base64.encodeBytesToBytes(rawBuf,0,bufSiz);
-							int rSize = b64buf.length;
 							h.send(b64buf);
 						}
 						int n = raf.read(rawBuf); //read last piece

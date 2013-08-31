@@ -28,10 +28,10 @@ public class ConstantUtil {
 	/**
 	 * server constants
 	 */
-	public static final String TEST_HOST = "http://test.akvo.org";
-	public static final String LIVE_HOST = "http://www.akvo.org";
-	public static final String PWD_URL = "/rsr/accounts/password/reset/";
-	public static final String AUTH_URL = "/rsr/auth/token/";
+	public static final String TEST_HOST = "http://rsr.test.akvo.org";
+	public static final String LIVE_HOST = "http://rsr.akvo.org";
+	public static final String PWD_URL = "/accounts/password/reset/";
+	public static final String AUTH_URL = "/auth/token/";
 	public static final String API_KEY_PATTERN = "&api_key=%s&username=%s";
 	public static final String POST_UPDATE_URL = "/api/v1/project_update/?format=xml";
 	public static final String FETCH_PROJ_URL_PATTERN = "/api/v1/project/?format=xml&limit=0&partnerships__organisation=%s";
