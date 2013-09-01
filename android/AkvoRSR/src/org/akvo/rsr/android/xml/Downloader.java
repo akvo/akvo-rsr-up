@@ -33,6 +33,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Update;
 import org.akvo.rsr.android.domain.User;
+import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.FileUtil;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -375,8 +376,8 @@ public class Downloader {
 	 */
 	public void postXmlUpdateStreaming(String urlTemplate, Update update, boolean sendImage, User user) throws Exception {
 		final String contentType = "application/xml";
-//		final String bodyTemplate1  =	"<object><update_method>S</update_method><project>%s</project>" + //SMS update method
-		final String bodyTemplate1  =	"<object><update_method>M</update_method><project>%s</project>" + //Mobile update method
+		final String bodyTemplate1  =	"<object><update_method>S</update_method><project>%s</project>" + //SMS update method
+//		final String bodyTemplate1  =	"<object><update_method>M</update_method><project>%s</project>" + //New! Mobile update method
 				"<photo_location>E</photo_location><user>%s</user><title>%s</title>" +
 				"<text>%s</text>";
 		final String bodyTemplate2  = "</object>";
@@ -384,8 +385,10 @@ public class Downloader {
 		final String imagePostamble = "</file></photo>";
 		URL url;
 		url = new URL(String.format(Locale.US, urlTemplate, user.getApiKey(), user.getUsername()));
-		String projectPath = "/api/v1/project/" + update.getProjectId() + "/";//TODO move to constantutil
-		String userPath = "/api/v1/user/" + user.getId() + "/";
+
+		//user and project references have to be in URL form
+		String projectPath = String.format(Locale.US, ConstantUtil.PROJECT_PATH_PATTERN, update.getProjectId());
+		String userPath = String.format(Locale.US, ConstantUtil.USER_PATH_PATTERN, user.getId());
 
 		String requestBody = String.format(Locale.US, bodyTemplate1,
 				projectPath, userPath,
@@ -395,7 +398,6 @@ public class Downloader {
 		HttpRequest h = HttpRequest.post(url).contentType(contentType);//OutOfMemory here...
 		h.readTimeout(READ_TIMEOUT_MS);
 		h.send(requestBody);
-		//OutputStreamWriter strm = h.writer();//prepare to stream photo
 
 		if (sendImage) {
 			String fn = update.getThumbnailFilename();
@@ -406,8 +408,8 @@ public class Downloader {
 					RandomAccessFile raf = new RandomAccessFile(f, "r");
 					h.send(imagePreamble);
 					//base64-convert the photo in chunks and stream them to server
-					//use origin buffer size divisible by 3
-					final int bufSiz = 6*1024;
+					//use origin buffer size divisible by 3 so no padding is inserted in the middle
+					final int bufSiz = 6 * 1024;
 					final long fsize = raf.length();
 					final int wholeChunks = (int) (fsize / bufSiz);
 					byte[] rawBuf = new byte[bufSiz];

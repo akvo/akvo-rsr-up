@@ -75,7 +75,7 @@ public class LoginActivity extends Activity {
 		}
 		
 		//temporary hack for testing - released app should set up for LIVE_HOST
-		if (SettingsUtil.host(this).isEmpty()) {
+		if (SettingsUtil.host(this).length() == 0) {//isEmpty() is too modern
 			SettingsUtil.Write(this, ConstantUtil.HOST_SETTING_KEY, ConstantUtil.TEST_HOST);
 		}
 		
