@@ -28,7 +28,7 @@ public class ConstantUtil {
 	/**
 	 * server and API constants
 	 */
-	public static final String TEST_HOST = "http://rsr.test.akvo.org";
+	public static final String TEST_HOST = "http://rsr.uat.akvo.org";
 	public static final String LIVE_HOST = "http://rsr.akvo.org";
 	public static final String PWD_URL = "/accounts/password/reset/";
 	public static final String AUTH_URL = "/auth/token/";

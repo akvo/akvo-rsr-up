@@ -24,15 +24,17 @@
 	            android:layout_gravity="center"
 	            />
 	        <!-- Logo Ends -->
+
 	        <TextView
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
 	            android:layout_gravity="center"
 	            android:paddingTop="5dip"
-		        android:text="@string/app_subtitle"
-		        android:textColor="@android:color/white"
-		        android:textStyle="italic"
-		        android:typeface="serif"/>
+	            android:text="@string/app_subtitle"
+	            android:textColor="@android:color/white"
+	            android:textSize="20sp"
+	            android:typeface="sans" />
+
 		</LinearLayout>
 		<!--  Header Ends -->
  

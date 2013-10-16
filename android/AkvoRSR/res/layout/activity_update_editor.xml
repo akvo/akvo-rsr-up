@@ -25,6 +25,7 @@
 		android:layout_width="fill_parent"
 		android:layout_height="0dp"
 		android:layout_weight="1"
+		android:fillViewport="true"
 		>
    
 		<!-- The scrolling part -->	
@@ -74,19 +75,38 @@
 	             />
 	        
 			<!-- The photo -->	
-			<ImageView
-	        	android:id="@+id/image_update_detail"
-	            android:layout_width="wrap_content"
-	            android:layout_height="wrap_content"
-	            android:maxWidth="40dip"
-	            android:maxHeight="40dip"
-	            android:minHeight="30dip"
-		        android:layout_gravity="left"
-	            android:layout_margin="5dip"
-	            android:contentDescription="@string/app_name"
-	            android:scaleType="centerInside"
-		        />
-	        
+		    <LinearLayout
+	        	android:id="@+id/image_with_delete"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:orientation="horizontal"
+		        android:visibility="gone"
+		        >
+				<ImageView
+		        	android:id="@+id/image_update_detail"
+		            android:layout_width="80dip"
+		            android:layout_height="60dip"
+			        android:layout_gravity="left"
+		            android:layout_margin="5dip"
+		            android:contentDescription="@string/app_name"
+		            android:scaleType="centerInside"
+			        />
+			    <Button
+			        android:id="@+id/btn_delete_photo"
+			        android:layout_width="wrap_content"
+			        android:layout_height="50dip"
+		            android:layout_margin="5dip"
+			        android:layout_gravity="center_horizontal"
+			        android:drawableLeft="@drawable/ic_menu_close_clear_cancel"
+			        android:text="@string/btncaption_dephoto"
+			        android:textColor="@color/red" 
+			        android:background="@android:color/white"
+		            android:padding="15dip"
+		            android:textSize="18sp"
+			        />
+			</LinearLayout>
+<!-- 		            android:visibility="gone"
+ -->		    				        
 		    <Button
 		        android:id="@+id/btn_take_photo"
 		        android:layout_width="wrap_content"
@@ -100,20 +120,12 @@
 		        android:textColor="@android:color/white"
 		        android:textSize="18sp" />
 
-		    <Button
-		        android:id="@+id/btn_delete_photo"
-		        android:layout_width="wrap_content"
-		        android:layout_height="50dip"
-	            android:layout_margin="5dip"
-		        android:layout_gravity="center_horizontal"
-		        android:drawableLeft="@drawable/ic_menu_camera"
-		        android:text="@string/btncaption_dephoto"
-		        android:textColor="@color/red" 
-		        android:background="@android:color/white"
-	            android:padding="15dip"
-	            android:textSize="18sp"
-	            android:visibility="gone"
-		        />
+		    
+		    <!-- some fudge to fill the viewport if necessary -->
+		    <View
+		        android:layout_width="fill_parent"
+        		android:layout_height="0dp"
+        		android:layout_weight="1"/>
 		    
 		    <!-- The two save buttons -->	
 		    <LinearLayout
@@ -128,7 +140,7 @@
 			        android:layout_height="wrap_content"
 			        android:layout_weight="1"
 			        android:drawableTop="@drawable/ic_menu_share"
-			        android:text="SEND UPDATE"
+			        android:text="@string/btncaption_send_update"
 		            />
 		
 			    <Button
@@ -137,7 +149,7 @@
 			        android:layout_height="wrap_content"
 			        android:layout_weight="1"
 			        android:drawableTop="@drawable/ic_menu_save"
-			        android:text="SAVE DRAFT"
+			        android:text="@string/btncaption_save_draft"
 		            />
 		    	    	
 		   	</LinearLayout>
