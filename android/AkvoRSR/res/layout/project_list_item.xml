@@ -4,7 +4,6 @@
     android:orientation="horizontal"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@layout/gray_gradient"
  	android:padding="5dip"
  	>
 
@@ -12,9 +11,9 @@
         android:id="@+id/list_item_thumbnail"
         android:layout_width="100dip"
         android:layout_height="80dip"
+        android:layout_margin="10dp"
         android:contentDescription="@string/app_name"
         android:scaleType="centerInside"
-        android:paddingRight="5dp"
         />
        
 	<LinearLayout
@@ -29,7 +28,7 @@
        	    android:layout_height="wrap_content"
        	    android:gravity="fill_horizontal"
        	    android:paddingBottom="5dip"
-       	    android:textColor="@color/dk_gray"
+       	    android:textColor="@color/rsr_purple"
        	    android:typeface="sans" />
 
        	<TextView

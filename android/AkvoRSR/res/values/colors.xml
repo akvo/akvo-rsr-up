@@ -3,7 +3,8 @@
 	<color name="rsr_purple">#271B57</color>
 	<color name="rsr_blue"  >#007BB5</color>
 	<color name="lt_gray"   >#CCCCCC</color>
-	<color name="dk_gray"   >#666666</color>
+	<color name="pale_gray" >#EEEEEE</color>
+    <color name="dk_gray"   >#666666</color>
 	<color name="red"       >#FF0000</color>
 	<color name="blue"      >#0000FF</color>
 	<color name="green"     >#009900</color>
