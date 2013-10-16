@@ -42,7 +42,6 @@ public class ProjectDetailActivity extends Activity {
 	private TextView projTitleLabel;
 	private TextView projSummaryText;
 	private TextView publishedCountView;
-	private TextView unsynchCountView;
 	private TextView draftCountView;
 	private ImageView projImage;
 	private Button btnUpdates;
@@ -74,7 +73,6 @@ public class ProjectDetailActivity extends Activity {
 		projSummaryText		= (TextView) findViewById(R.id.text_proj_summary);
 		projImage 			= (ImageView) findViewById(R.id.image_proj_detail);
 		publishedCountView 	= (TextView) findViewById(R.id.text_proj_detail_published_count);
-		unsynchCountView 	= (TextView) findViewById(R.id.text_proj_detail_unsynchronized_count);
 		draftCountView 		= (TextView) findViewById(R.id.text_proj_detail_draft_count);
 
 		//Activate buttons
@@ -126,7 +124,6 @@ public class ProjectDetailActivity extends Activity {
 		}
 		Resources res = getResources();
 		publishedCountView.setText(Integer.toString(stateCounts[2]) + res.getString(R.string.count_published));
-		unsynchCountView.setText(Integer.toString(stateCounts[1]) + res.getString(R.string.count_unsent));
 		draftCountView.setText(Integer.toString(stateCounts[0]) + res.getString(R.string.count_draft));
 
 		

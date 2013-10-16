@@ -67,14 +67,15 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 			dba.close();	
 		}
 		Resources res = context.getResources();
-		//Testing hiding counts of 0
+		//hiding counts of 0
 		TextView publishedCountView = (TextView) view.findViewById(R.id.list_item_published_count);
 		publishedCountView.setText(Integer.toString(stateCounts[2]) + res.getString(R.string.count_published));
 		publishedCountView.setVisibility(stateCounts[2]==0?View.GONE:View.VISIBLE);
 
-		TextView unsynchCountView = (TextView) view.findViewById(R.id.list_item_unsynchronized_count);
-		unsynchCountView.setText(Integer.toString(stateCounts[1]) + res.getString(R.string.count_unsent));
-		unsynchCountView.setVisibility(stateCounts[1]==0?View.GONE:View.VISIBLE);
+//	No unsent any more - just draft and published
+//		TextView unsynchCountView = (TextView) view.findViewById(R.id.list_item_unsynchronized_count);
+// 		unsynchCountView.setText(Integer.toString(stateCounts[1]) + res.getString(R.string.count_unsent));
+//		unsynchCountView.setVisibility(stateCounts[1]==0?View.GONE:View.VISIBLE);
 
 		TextView draftCountView = (TextView) view.findViewById(R.id.list_item_draft_count);
 		draftCountView.setText(Integer.toString(stateCounts[0]) + res.getString(R.string.count_draft));

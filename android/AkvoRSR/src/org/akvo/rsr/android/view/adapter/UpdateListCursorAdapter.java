@@ -27,6 +27,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,18 +63,17 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 			titleView.setText(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
 		}
 
-
 		TextView stateView = (TextView) view.findViewById(R.id.ulist_item_state);
 		if (0 != cursor.getInt(cursor.getColumnIndex(RsrDbAdapter.DRAFT_COL))) {
+			//Show draft updates as pink with a red label "Draft"
+			view.setBackgroundColor(context.getResources().getColor(R.color.pink));
+			stateView.setVisibility(View.VISIBLE);
 			stateView.setText(R.string.state_draft);
-			stateView.setTextColor(context.getResources().getColor(R.color.blue));
-		} else
-			if (0 != cursor.getInt(cursor.getColumnIndex(RsrDbAdapter.UNSENT_COL))) {
-				stateView.setText(R.string.state_unsent);	
-				stateView.setTextColor(context.getResources().getColor(R.color.red));
+			stateView.setTextColor(context.getResources().getColor(R.color.red));
 		} else {
-			stateView.setText(R.string.state_published);	
-			stateView.setTextColor(context.getResources().getColor(R.color.dk_gray));
+			//Published updates are on white, no state label
+			view.setBackgroundColor(Color.WHITE);
+			stateView.setVisibility(View.GONE);
 		}
 		
 			

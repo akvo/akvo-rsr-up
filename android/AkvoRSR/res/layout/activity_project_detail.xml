@@ -11,7 +11,8 @@
    	    android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="left"
-        android:background="@color/lt_gray"
+		android:background="@color/lt_gray"
+        android:textColor="@color/rsr_purple"
         android:padding="5dip"
         android:typeface="sans"
         android:text="Project title here"
@@ -26,7 +27,7 @@
   	    <LinearLayout
   		android:layout_width="fill_parent"
   		android:layout_height="wrap_content"
-		android:background="@color/lt_gray"
+		android:background="@android:color/white"
 	    android:orientation="vertical"
         >
       	    
@@ -61,11 +62,11 @@
         	    android:paddingLeft="5dp"
         	    android:text="@string/published"
         	    android:textSize="12sp"
-        	    android:textColor="@color/green"
+        	    android:textColor="@color/blue"
         	    android:typeface="sans"
         	    />
 
-        	<TextView
+        	<!-- TextView
 	     		android:id="@+id/text_proj_detail_unsynchronized_count"
         	    android:layout_width="wrap_content"
         	    android:layout_height="wrap_content"
@@ -76,7 +77,7 @@
         	    android:textColor="@color/red"
         	    android:textSize="12sp"
         	    android:typeface="sans"
-        	    />
+        	    /-->
 
         	<TextView
 	        	android:id="@+id/text_proj_detail_draft_count"
@@ -87,7 +88,7 @@
         	    android:paddingLeft="5dp"
 	            android:text="@string/drafts"
 		        android:textSize="12sp"
-		        android:textColor="@color/blue"
+		        android:textColor="@color/red"
 		        android:typeface="sans"
 		        />
     	</LinearLayout>
@@ -98,10 +99,9 @@
 		       android:layout_width="fill_parent"
 		       android:layout_height="wrap_content"
 		       android:layout_gravity="left"
-		       android:text="Location"
-		       android:textColor="@color/dk_gray"
+		       android:text="Location:"
+		       android:textColor="@color/rsr_purple"
 		       android:textSize="18sp"
-		       android:textStyle="italic"
 		       android:typeface="sans" />
 
 	      	<TextView
@@ -118,10 +118,9 @@
 		       android:layout_width="fill_parent"
 		       android:layout_height="wrap_content"
 		       android:layout_gravity="left"
-		       android:text="Summary"
-		       android:textColor="@color/dk_gray"
+		       android:text="Summary:"
+		       android:textColor="@color/rsr_purple"
 		       android:textSize="18sp"
-		       android:textStyle="italic"
 		       android:typeface="sans" />
 
 	      	<TextView
@@ -149,6 +148,7 @@
 			        android:layout_weight="1"
 			        android:drawableTop="@drawable/ic_menu_view"
 			        android:text="@string/btncaption_viewupdates"
+				    android:textColor="@color/rsr_purple"
 		            />
 
    			    <!-- Add update button -->
@@ -159,6 +159,7 @@
 			        android:layout_weight="1"
 			        android:drawableTop="@drawable/ic_menu_add"
 			        android:text="@string/btncaption_add_update"
+				    android:textColor="@color/rsr_purple"
 		            />
 		    	    	
    			</LinearLayout>

@@ -84,7 +84,7 @@ public class UpdateListActivity extends ListActivity {
 		 */
 		listFooter.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {
-				startEditor();
+				startEditorNew();
 			}
 		});
 		
@@ -99,7 +99,7 @@ public class UpdateListActivity extends ListActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(broadRec, f);
 	}
 
-	private void startEditor() {
+	private void startEditorNew() {
 		Intent i3 = new Intent(this, UpdateEditorActivity.class);
 		i3.putExtra(ConstantUtil.PROJECT_ID_KEY, projId);
 		startActivity(i3);		
@@ -119,11 +119,11 @@ public class UpdateListActivity extends ListActivity {
 			Intent intent = new Intent(this, SettingsActivity.class);
 			startActivity(intent);
             return true;
-        case R.id.menu_sendall:
-        	startSendUpdatesService();
-        	return true;
+//        case R.id.menu_sendall:
+//        	startSendUpdatesService();
+//        	return true;
         case R.id.action_add_update:
-        	startEditor();
+        	startEditorNew();
         	return true;
 	    default:
 	        return super.onOptionsItemSelected(item);
@@ -186,6 +186,7 @@ public class UpdateListActivity extends ListActivity {
 	
 	/**
 	 * starts service to send all pending updates
+	 * TODO for this to work we must first set all draft updates to unsent
 	 */
 	private void startSendUpdatesService(){
 		//register a listener for a completion intent
@@ -201,7 +202,7 @@ public class UpdateListActivity extends ListActivity {
 		//TODO: a real filling progress bar?
 		progress = new ProgressDialog(this);
 		progress.setTitle("Synchronizing");
-		progress.setMessage("Sending all unsent updates...");
+		progress.setMessage("Sending all draft updates...");
 		progress.show();
 		//Now we wait...
 	}
@@ -216,7 +217,7 @@ public class UpdateListActivity extends ListActivity {
 	protected void onListItemClick(ListView list, View view, int position, long id) {
 		super.onListItemClick(list, view, position, id);
 
-		Intent i = new Intent(view.getContext(), UpdateEditorActivity.class);
+		Intent i = new Intent(view.getContext(), UpdateDetailActivity.class);
 		i.putExtra(ConstantUtil.UPDATE_ID_KEY, ((Long) view.getTag(R.id.update_id_tag)).toString());
 		i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(R.id.project_id_tag)).toString());
 		startActivity(i);

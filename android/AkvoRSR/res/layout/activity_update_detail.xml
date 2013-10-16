@@ -1,0 +1,81 @@
+<LinearLayout
+	  	xmlns:android="http://schemas.android.com/apk/res/android"
+  		android:layout_width="fill_parent"
+  		android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:background="@color/lt_gray"
+		>
+
+	<!-- The project title -->	
+ 	<TextView
+        android:id="@+id/projupd_edit_proj_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+		android:textColor="@color/rsr_purple"
+        android:padding="5dip"
+        android:typeface="sans"
+      	android:text="Project title goes here"
+      	/>
+ 	
+	<!-- The scrollview should fill all the space beween the project title and the bottom -->	
+ 	<ScrollView
+		android:layout_width="fill_parent"
+		android:layout_height="0dp"
+		android:layout_weight="1"
+		>
+   
+		<!-- The scrolling part -->	
+ 	    <LinearLayout
+	  		android:layout_width="fill_parent"
+	  		android:layout_height="wrap_content"
+			android:background="@android:color/white"
+		    android:orientation="vertical"
+			>
+			 	
+			<!-- The photo -->	
+			<ImageView
+	        	android:id="@+id/image_update_detail"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:maxWidth="40dip"
+	            android:maxHeight="40dip"
+	            android:minHeight="30dip"
+		        android:layout_gravity="left"
+	            android:contentDescription="@string/app_name"
+	            android:scaleType="centerInside"
+		        />
+
+			<!-- The update title entry -->	
+	        <TextView
+		        android:id="@+id/projupd_detail_title"
+		        android:layout_width="fill_parent"
+		       	android:layout_height="wrap_content"
+		        android:layout_gravity="left"
+	            android:text="@string/label_update_title"
+		        android:textColor="@color/rsr_purple"
+		        android:textSize="18sp"
+		        android:typeface="sans" />
+	
+			<!-- The update description -->	
+	        <TextView
+		        android:id="@+id/projupd_detail_descr"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="left"
+		        android:textColor="@android:color/black"
+		        android:textSize="12sp"
+			    />
+	        
+		    <!-- The edit button -->	
+		    <Button
+	            android:id="@+id/btn_edit_update"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:drawableTop="@drawable/ic_menu_forward"
+		        android:text="@string/btncaption_edit_update"
+	            />
+		    	    	
+		</LinearLayout>
+	</ScrollView>	    
+</LinearLayout>

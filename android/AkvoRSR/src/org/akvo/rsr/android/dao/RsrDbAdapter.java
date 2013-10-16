@@ -46,7 +46,7 @@ public class RsrDbAdapter {
 	public static final String PROJECT_COL = "project";
 	public static final String TEXT_COL = "_text";
 	public static final String DRAFT_COL = "draft";
-	public static final String UNSENT_COL = "unsent";
+	public static final String UNSENT_COL = "unsent"; //currently unused
 
 	private static final String TAG = "RsrDbAdapter";
 	private DatabaseHelper databaseHelper;
@@ -508,7 +508,7 @@ public class RsrDbAdapter {
 		if (cursor !=null) {
 			if (cursor.getCount() > 0) {
 				int draftCol = cursor.getColumnIndexOrThrow(DRAFT_COL);
-				int unsentCol = cursor.getColumnIndexOrThrow(UNSENT_COL);
+				int unsentCol = cursor.getColumnIndexOrThrow(UNSENT_COL);//Not used
 				cursor.moveToFirst();
 				while (!cursor.isAfterLast()) {
 					if (cursor.getInt(draftCol) > 0) {

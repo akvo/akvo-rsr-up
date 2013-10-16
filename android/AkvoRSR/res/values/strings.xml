@@ -13,18 +13,17 @@
     <string name="title_activity_project_detail">Akvo RSR</string>
     <string name="title_activity_update_list">Akvo RSR</string>
     <string name="title_activity_update_edit">Akvo RSR</string>
+    <string name="title_activity_update_detail">Akvo RSR</string>
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_about">AboutActivity</string>
     <string name="copyright">Copyright &#169; 2012-2013 Stichting Akvo</string>
-    <string name="label_update_title">Update Title:</string>
+    <string name="label_update_title">Add a project update:</string>
     <string name="hint_update_title">Title</string>
     <string name="label_update_description">Update Description:</string>
     <string name="hint_update_description">Description</string>
-    <string name="state_draft">● Draft</string>
-    <string name="state_unsent">● Unsynchronised</string>
-    <string name="state_published">● Published</string>
+    <string name="state_draft">Draft</string>
+    <string name="state_published">Published</string>
     <string name="count_draft">&#160;Draft</string>
-    <string name="count_unsent">&#160;Unsynchronized</string>
     <string name="count_published">&#160;Published</string>
     <string name="count_zero">No updates</string>
     <string name="action_settings">Settings</string>
@@ -42,15 +41,17 @@
     <string name="password">Password</string>
     <string name="forgot_password_">Forgot Password?</string>
     <string name="btncaption_sign_in">SIGN IN</string>
-    <string name="btncaption_photo">TAKE PHOTO NOW</string>
-    <string name="btncaption_rephoto">RETAKE PHOTO</string>
-    <string name="btncaption_add_update">ADD UPDATE</string>
-    <string name="btncaption_refresh">REFRESH PROJECT LIST</string> 
-    <string name="btncaption_viewupdates">VIEW ALL UPDATES</string>   
+    <string name="btncaption_photo">Add a photo</string>
+    <string name="btncaption_rephoto">Replace photo</string>
+    <string name="btncaption_dephoto">Delete photo</string>
+    <string name="btncaption_add_update">Add update</string>
+    <string name="btncaption_edit_update">Edit this update</string>
+    <string name="btncaption_refresh">Refresh project list</string> 
+    <string name="btncaption_viewupdates">Vew all updates</string>   
     <string name="btncaption_clear_data">Clear all data</string>
 
-    <string name="send_dialog_title">Synchronising</string>
-    <string name="send_dialog_msg">Sending all unsent updates...</string>
+    <string name="send_dialog_title">Publishing</string>
+    <string name="send_dialog_msg">Sending update to server...</string>
     
     <string name="errmsg_empty_title">An update must have a title!</string>
     <string name="errmsg_bad_url">Invalid URL!</string>

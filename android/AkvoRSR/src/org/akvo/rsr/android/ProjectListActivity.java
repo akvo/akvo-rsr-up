@@ -18,7 +18,6 @@ package org.akvo.rsr.android;
 
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.service.GetProjectDataService;
-import org.akvo.rsr.android.service.SubmitProjectUpdateService;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.DialogUtil;
 import org.akvo.rsr.android.util.SettingsUtil;
@@ -26,7 +25,6 @@ import org.akvo.rsr.android.view.adapter.ProjectListCursorAdapter;
 
 import android.os.Bundle;
 import android.app.ListActivity;
-import android.app.ProgressDialog;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -52,7 +50,6 @@ public class ProjectListActivity extends ListActivity {
 	private RsrDbAdapter ad;
 	private Cursor dataCursor;
 	private TextView projCountLabel;
-	private ProgressDialog progress;
 	private LinearLayout inProgress;
 	private ProgressBar inProgress1;
 	private ProgressBar inProgress2;
@@ -108,9 +105,6 @@ public class ProjectListActivity extends ListActivity {
         	SettingsUtil.signOut(this);
         	finish();
             return true;
-        case R.id.menu_sendall:
-        	startSendUpdatesService();
-        	return true;
         default:
         	return super.onOptionsItemSelected(item);
 	    }
@@ -181,43 +175,6 @@ public class ProjectListActivity extends ListActivity {
 		Intent i = new Intent(view.getContext(), ProjectDetailActivity.class);
 		i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(R.id.project_id_tag)).toString());
 		startActivity(i);
-	}
-
-	/**
-	 * starts service to send all pending updates
-	 */
-	private void startSendUpdatesService() {
-		//register a listener for a completion intent
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                new ResponseReceiver(),
-                new IntentFilter(ConstantUtil.UPDATES_SENT_ACTION));
-		
-		//start upload service
-		Intent i = new Intent(this, SubmitProjectUpdateService.class);
-		getApplicationContext().startService(i);
-		
-		//start a "progress" animation
-		//TODO: a real filling progress bar?
-		progress = new ProgressDialog(this);
-		progress.setTitle("Synchronizing");
-		progress.setMessage("Sending all unsent updates...");
-		progress.show();
-		//Now we wait...
-	}
-
-	private void onSendFinished(Intent i) {
-		// Dismiss any in-progress dialog
-		if (progress != null) {
-			progress.dismiss();
-		}
-		String err = i.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
-		if (err == null) {
-			Toast.makeText(getApplicationContext(), "Updates sent", Toast.LENGTH_SHORT).show();
-		} else {
-			Toast.makeText(getApplicationContext(), err, Toast.LENGTH_SHORT).show();
-		}
-		//Refresh the list
-		getData();
 	}
 
 	/*
@@ -293,9 +250,6 @@ public class ProjectListActivity extends ListActivity {
 		
 		// Called when the BroadcastReceiver gets an Intent it's registered to receive
 		public void onReceive(Context context, Intent intent) {
-			if (intent.getAction() == ConstantUtil.UPDATES_SENT_ACTION)
-				onSendFinished(intent);
-			else
 			if (intent.getAction() == ConstantUtil.PROJECTS_FETCHED_ACTION)
 				onFetchFinished(intent);
 			else if (intent.getAction() == ConstantUtil.PROJECTS_PROGRESS_ACTION)

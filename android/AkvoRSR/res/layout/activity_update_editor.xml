@@ -3,20 +3,20 @@
   		android:layout_width="fill_parent"
   		android:layout_height="fill_parent"
         android:orientation="vertical"
-        android:background="@color/lt_gray"
 		>
 
 	<!-- The project title -->	
+
  	<TextView
-        android:id="@+id/projupd_edit_proj_title"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="left"
-		android:textColor="@color/dk_gray"
-        android:padding="5dip"
-        android:typeface="sans"
-      	android:text="Project title goes here"
-      	/>
+ 	    android:id="@+id/projupd_edit_proj_title"
+ 	    android:layout_width="fill_parent"
+ 	    android:layout_height="wrap_content"
+ 	    android:layout_gravity="left"
+ 	    android:background="@color/lt_gray"
+ 	    android:padding="5dip"
+ 	    android:text="Project title goes here"
+ 	    android:textColor="@color/rsr_purple"
+ 	    android:typeface="sans" />
  	
 	<!-- The scrollview should fill all the space beween the project title and the bottom -->	
  	<ScrollView
@@ -34,15 +34,15 @@
 			>
 			 	
 			<!-- The update title entry -->	
+
 	        <TextView
-		        android:layout_width="fill_parent"
-		       	android:layout_height="wrap_content"
-		        android:layout_gravity="left"
+	            android:layout_width="fill_parent"
+	            android:layout_height="wrap_content"
+	            android:layout_gravity="left"
 	            android:text="@string/label_update_title"
-		        android:textColor="@color/dk_gray"
-		        android:textSize="18sp"
-		        android:textStyle="italic"
-		        android:typeface="sans" />
+	            android:textColor="@color/dk_gray"
+	            android:textSize="18sp"
+	            android:typeface="sans" />
 	
 	        <EditText
 	            android:id="@+id/edit_projupd_title"
@@ -56,16 +56,6 @@
 	            android:singleLine="true" />
 	  
 			<!-- The update text entry -->	
-	        <TextView
-		        android:layout_width="fill_parent"
-		        android:layout_height="wrap_content"
-		        android:layout_gravity="left"
-	            android:hint="@string/label_update_description"
-		        android:textColor="@color/dk_gray"
-		        android:textSize="18sp"
-		        android:textStyle="italic"
-		        android:typeface="sans" />
-	
 	        <EditText
 	            android:id="@+id/edit_projupd_description"
 	            android:layout_width="fill_parent"
@@ -77,27 +67,19 @@
 	            android:minHeight="30dp"
 	            android:minLines="3"
 	            android:inputType="textMultiLine"
-	            android:padding="5dip" />
+	            android:padding="5dip"
+	             />
 	        
 			<!-- The photo -->	
-	        <TextView
-		        android:layout_width="fill_parent"
-		        android:layout_height="wrap_content"
-		        android:layout_gravity="left"
-		        android:text="Photo:"
-		        android:textColor="@color/dk_gray"
-		        android:textSize="18sp"
-		        android:textStyle="italic"
-		        android:typeface="sans" />
-	
 			<ImageView
 	        	android:id="@+id/image_update_detail"
 	            android:layout_width="wrap_content"
 	            android:layout_height="wrap_content"
-	            android:maxWidth="60dip"
-	            android:maxHeight="60dip"
+	            android:maxWidth="40dip"
+	            android:maxHeight="40dip"
 	            android:minHeight="30dip"
-		        android:layout_gravity="center_horizontal"
+		        android:layout_gravity="left"
+	            android:layout_margin="5dip"
 	            android:contentDescription="@string/app_name"
 	            android:scaleType="centerInside"
 		        />
@@ -106,12 +88,30 @@
 		        android:id="@+id/btn_take_photo"
 		        android:layout_width="wrap_content"
 		        android:layout_height="50dip"
+		        android:layout_gravity="center_horizontal"
+		        android:layout_margin="15dp"
+		        android:background="@android:color/black"
+		        android:drawableLeft="@drawable/ic_menu_camera"
+		        android:padding="15dp"
+		        android:text="@string/btncaption_photo"
+		        android:textColor="@android:color/white"
+		        android:textSize="18sp" />
+
+		    <Button
+		        android:id="@+id/btn_delete_photo"
+		        android:layout_width="wrap_content"
+		        android:layout_height="50dip"
 	            android:layout_margin="5dip"
 		        android:layout_gravity="center_horizontal"
 		        android:drawableLeft="@drawable/ic_menu_camera"
-		        android:text="@string/btncaption_photo"
-		        android:background="@color/rsr_blue"
-		        android:textColor="@color/rsr_purple" />
+		        android:text="@string/btncaption_dephoto"
+		        android:textColor="@color/red" 
+		        android:background="@android:color/white"
+	            android:padding="15dip"
+	            android:textSize="18sp"
+	            android:visibility="gone"
+		        />
+		    
 		    <!-- The two save buttons -->	
 		    <LinearLayout
 		        android:layout_width="fill_parent"

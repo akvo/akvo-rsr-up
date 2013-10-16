@@ -5,11 +5,6 @@
         android:icon="@drawable/ic_menu_add"        
          />
     
-    <item android:id="@+id/menu_sendall"
-        android:title="@string/menu_sendall"
-        android:icon="@drawable/ic_menu_share"        
-        />
-    
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:icon="@drawable/ic_menu_settings_holo_light"        

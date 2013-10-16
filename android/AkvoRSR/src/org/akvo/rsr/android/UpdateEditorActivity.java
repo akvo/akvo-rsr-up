@@ -34,7 +34,6 @@ import org.akvo.rsr.android.util.SettingsUtil;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.view.Menu;
@@ -295,15 +294,16 @@ public class UpdateEditorActivity extends Activity {
 		}
 		dba.saveUpdate(update, true);
 		//Tell user what happened
+		//TODO: use a confirm dialog instead
 		Context context = getApplicationContext();
-		CharSequence text = "Update saved as draft";
+		CharSequence text = "Draft saved successfully"; //TODO string resource
 		Toast toast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
 		toast.show();
 		finish();
 	}
 
 	/**
-	 * closes current update and seds all unsent ones
+	 * closes current update and sends it
 	 */
 	private void sendUpdate() {
 		if (untitled()) {
@@ -335,7 +335,7 @@ public class UpdateEditorActivity extends Activity {
 		
 	}
 
-	// if update has no title it must not be sent or saved
+	// if update has no title it must not be sent OR saved
 	private boolean untitled() {
 		if (projupdTitleText.getText().toString().trim().length() == 0) {
 			//Tell user what happened
@@ -381,9 +381,17 @@ public class UpdateEditorActivity extends Activity {
 		finish();
 		String err = i.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
 		if (err == null) {
-			Toast.makeText(getApplicationContext(), "Updates sent", Toast.LENGTH_SHORT).show();
+			//TODO display dialog instead
+			Toast.makeText(getApplicationContext(), "Update sent successfully", Toast.LENGTH_SHORT).show(); //TODO string resource
 		} else {
-			Toast.makeText(getApplicationContext(), err, Toast.LENGTH_SHORT).show();
+			//save as draft
+			if (update != null) {
+				update.setUnsent(false);
+				update.setDraft(true);
+			}
+			//TODO display confirm-dialog instead
+			Toast.makeText(getApplicationContext(), "No network connection. Update was saved as draft.", Toast.LENGTH_SHORT).show();
+//			Toast.makeText(getApplicationContext(), err, Toast.LENGTH_SHORT).show();
 		}
 	}
 
