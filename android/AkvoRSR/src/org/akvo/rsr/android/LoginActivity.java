@@ -16,6 +16,8 @@
 
 package org.akvo.rsr.android;
 
+import java.io.File;
+
 import org.akvo.rsr.android.service.SignInService;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.DialogUtil;
@@ -55,7 +57,22 @@ public class LoginActivity extends Activity {
 
 		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 			Log.i(TAG, "External storage: mounted ");
-			Log.i(TAG, "External cache folder: " + FileUtil.getExternalFilesDir(this));
+			File f = FileUtil.getExternalCacheDir(this);
+			Log.i(TAG, "External cache folder: " + f.getAbsolutePath());
+			if (!f.isDirectory()) {
+				Log.w(TAG, " must create it");
+				if (!f.mkdirs()) {
+					Log.e(TAG, "Failed to create cache folder");
+				}	
+			}
+			f = FileUtil.getExternalPhotoDir(this);
+			Log.i(TAG, "External photo folder: " + f.getAbsolutePath());
+			if (!f.isDirectory()) {
+				Log.w(TAG, " must create it");
+				if (!f.mkdirs()) {
+					Log.e(TAG, "Failed to create photo folder");
+				}	
+			}
 
 /*
 			File f = new File (Environment.getExternalStorageDirectory().getPath() + ConstantUtil.PHOTO_DIR);

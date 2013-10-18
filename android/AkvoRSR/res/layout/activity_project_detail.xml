@@ -3,7 +3,7 @@
   	android:layout_width="fill_parent"
   	android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:background="@color/lt_gray"
+    android:background="@android:color/white"
 	>
 
     <TextView
@@ -11,7 +11,7 @@
    	    android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="left"
-		android:background="@color/lt_gray"
+		android:background="@color/pale_gray"
         android:textColor="@color/rsr_purple"
         android:padding="5dip"
         android:typeface="sans"
@@ -35,7 +35,6 @@
 		        android:layout_width="fill_parent"
 		        android:layout_height="wrap_content"
 		        android:orientation="horizontal"
-	            android:background="@layout/gray_gradient"
 		        >
 		        
 			    <!-- Project image  -->

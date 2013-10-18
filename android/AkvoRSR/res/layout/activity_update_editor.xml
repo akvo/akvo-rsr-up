@@ -96,7 +96,7 @@
 			        android:layout_width="wrap_content"
 			        android:layout_height="50dip"
 		            android:layout_margin="5dip"
-			        android:layout_gravity="center_horizontal"
+			        android:layout_gravity="center"
 			        android:drawableLeft="@drawable/ic_menu_close_clear_cancel"
 			        android:text="@string/btncaption_dephoto"
 			        android:textColor="@color/red" 
@@ -105,8 +105,7 @@
 		            android:textSize="18sp"
 			        />
 			</LinearLayout>
-<!-- 		            android:visibility="gone"
- -->		    				        
+
 		    <Button
 		        android:id="@+id/btn_take_photo"
 		        android:layout_width="wrap_content"

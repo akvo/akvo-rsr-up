@@ -69,7 +69,7 @@ public class GetProjectDataService extends IntentService {
 		try {
 			dl.fetchNewThumbnails(this,
 					SettingsUtil.host(this),
-					FileUtil.getExternalFilesDir(this).toString(),
+					FileUtil.getExternalCacheDir(this).toString(),
 					new Downloader.ProgressReporter() {
 						public void sendUpdate(int sofar, int total) {
 							Intent intent = new Intent(ConstantUtil.PROJECTS_PROGRESS_ACTION);

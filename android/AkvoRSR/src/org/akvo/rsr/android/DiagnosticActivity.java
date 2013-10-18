@@ -72,7 +72,7 @@ public class DiagnosticActivity extends Activity {
 	 * TODO: move to FileUtil?
 	 */
 	private void clearCache(Context context ) {
-		File f = FileUtil.getExternalFilesDir(this);
+		File f = FileUtil.getExternalCacheDir(this);
 		File [] files = f.listFiles();
 		if (files != null) { //dir might not exist
 			for (int i = 0; i < files.length; i++) { 
