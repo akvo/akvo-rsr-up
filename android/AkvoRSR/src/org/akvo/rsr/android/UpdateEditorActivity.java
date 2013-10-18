@@ -71,7 +71,9 @@ public class UpdateEditorActivity extends Activity {
 	private ImageView projupdImage;
 	private Button btnSubmit;
 	private Button btnDraft;
-	private Button btnPhoto;
+	private Button btnTakePhoto;
+	private Button btnDelPhoto;
+	private View photoAndDeleteGroup;
 	//Database
 	private RsrDbAdapter dba;
 	ProgressDialog progress;
@@ -106,7 +108,9 @@ public class UpdateEditorActivity extends Activity {
 		projupdTitleText = (EditText) findViewById(R.id.edit_projupd_title);
 		projupdDescriptionText = (EditText) findViewById(R.id.edit_projupd_description);
 		projupdImage = (ImageView) findViewById(R.id.image_update_detail);
+		photoAndDeleteGroup = findViewById(R.id.image_with_delete);
 
+		
 		//Activate buttons
 		btnSubmit = (Button) findViewById(R.id.btn_send_update);
 		btnSubmit.setOnClickListener( new View.OnClickListener() {
@@ -122,14 +126,26 @@ public class UpdateEditorActivity extends Activity {
 			}
 		});
 		
-		btnPhoto = (Button) findViewById(R.id.btn_take_photo);
-		btnPhoto.setOnClickListener( new View.OnClickListener() {
+		btnTakePhoto = (Button) findViewById(R.id.btn_take_photo);
+		btnTakePhoto.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {
 			    Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 			    // generate unique filename
 			    captureFilename = FileUtil.getExternalFilesDir(UpdateEditorActivity.this) + File.separator + "capture" + System.nanoTime() + ".jpg";
 			    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(captureFilename)));
 			    startActivityForResult(takePictureIntent, photoRequest);
+			}
+		});
+		
+		btnDelPhoto = (Button) findViewById(R.id.btn_delete_photo);
+		btnDelPhoto.setOnClickListener( new View.OnClickListener() {
+			public void onClick(View view) {
+				//Forget image
+				update.setThumbnailFilename(null);
+				//TODO: delete image file
+				//Hide them
+				photoAndDeleteGroup.setVisibility(View.GONE);
+				btnTakePhoto.setVisibility(View.VISIBLE);
 			}
 		});
 		
@@ -154,8 +170,10 @@ public class UpdateEditorActivity extends Activity {
 				
 				//show preexisting image
 				if (update.getThumbnailFilename() != null) {
-					btnPhoto.setText(R.string.btncaption_rephoto);
+					//btnTakePhoto.setText(R.string.btncaption_rephoto);
 					setPhotoFile(update.getThumbnailFilename());
+					photoAndDeleteGroup.setVisibility(View.VISIBLE);
+					btnTakePhoto.setVisibility(View.GONE);
 				}
 
 			}
@@ -177,10 +195,10 @@ public class UpdateEditorActivity extends Activity {
 		projupdDescriptionText.setEnabled(editable);
 		btnDraft.setEnabled(editable);
 		btnSubmit.setEnabled(editable);
-		btnPhoto.setEnabled(editable);
+		btnTakePhoto.setEnabled(editable);
 		btnDraft.setVisibility(editable?View.VISIBLE:View.GONE);
 		btnSubmit.setVisibility(editable?View.VISIBLE:View.GONE);
-		btnPhoto.setVisibility(editable?View.VISIBLE:View.GONE);
+//		btnTakePhoto.setVisibility(editable?View.VISIBLE:View.GONE);
 		
 		// Show the Up button in the action bar.
 		//		setupActionBar();
@@ -203,7 +221,7 @@ public class UpdateEditorActivity extends Activity {
 			update.setThumbnailFilename(fn);
 			//DialogUtil.infoAlert(this, "Photo returned", "Got a photo");
 			
-			btnPhoto.setText(R.string.btncaption_rephoto);
+//			btnTakePhoto.setText(R.string.btncaption_rephoto);
 			//make thumbnail and show it on page
 			//shrink to save memory
 			BitmapFactory.Options o = new BitmapFactory.Options();
@@ -239,7 +257,7 @@ public class UpdateEditorActivity extends Activity {
 	
 	/*
 	 * (non-Javadoc)
-	 * Get notification of photo taken
+	 * Get notification of photo taken or picked
 	 */
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -250,6 +268,9 @@ public class UpdateEditorActivity extends Activity {
 				return;
 			}
 			setPhotoFile(captureFilename);
+			//show result
+			photoAndDeleteGroup.setVisibility(View.VISIBLE);
+			btnTakePhoto.setVisibility(View.GONE);
 		}
 		if (requestCode == photoPick) {
 			if (resultCode == RESULT_CANCELED) {
@@ -270,6 +291,8 @@ public class UpdateEditorActivity extends Activity {
 			}
 
 			setPhotoFile(captureFilename);
+			photoAndDeleteGroup.setVisibility(View.VISIBLE);
+			btnTakePhoto.setVisibility(View.GONE);
 		}
 	}
 
