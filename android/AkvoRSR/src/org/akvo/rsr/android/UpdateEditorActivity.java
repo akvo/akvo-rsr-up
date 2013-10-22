@@ -32,6 +32,8 @@ import org.akvo.rsr.android.util.DialogUtil;
 import org.akvo.rsr.android.util.FileUtil;
 import org.akvo.rsr.android.util.SettingsUtil;
 
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
@@ -215,6 +217,13 @@ public class UpdateEditorActivity extends Activity {
 	}  
 	
 	
+	//Show a thumbnail from a filename 
+	//TODO show different  fallback images depending on problem
+	// 1 No image set
+	// 2 Image not loaded (setting)
+	// 3 Image load failed
+	// 4 Image loaded, but unreadable
+	// 5 Image loaded, but cleared from cache
 	private void setPhotoFile(String fn) {
 		//Handle taken photo
 		if (fn != null && new File(fn).exists()) {
@@ -296,6 +305,36 @@ public class UpdateEditorActivity extends Activity {
 		}
 	}
 
+	
+	//check connectivity
+	//TODO move to util class
+	private boolean haveNetworkConnection(Context context, boolean wifiOnly) {
+        ConnectivityManager connMgr = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connMgr != null) {
+            NetworkInfo[] infoArr = connMgr.getAllNetworkInfo();
+            if (infoArr != null) {
+                for (int i = 0; i < infoArr.length; i++) {
+                    if (!wifiOnly) {
+                        // if we don't care what KIND of
+                        // connection we have, just that there is one
+                        if (NetworkInfo.State.CONNECTED == infoArr[i].getState()) {
+                            return true;
+                        }
+                    } else {
+                        // if we only want to use wifi, we need to check the
+                        // type
+                        if (infoArr[i].getType() == ConnectivityManager.TYPE_WIFI
+                                && NetworkInfo.State.CONNECTED == infoArr[i].getState()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+	}
+	
 	/*
 	 * Save current update
 	 */
@@ -332,6 +371,13 @@ public class UpdateEditorActivity extends Activity {
 		if (untitled()) {
 			return;
 		}
+		if (!haveNetworkConnection(this, false)) {
+			//TODO helpful error message, and return
+			//Toast.makeText(getApplicationContext(), "No network connection!", Toast.LENGTH_SHORT).show();
+
+			//return
+		}
+		
 		update.setUnsent(true);
 		update.setDraft(false);
 		update.setTitle(projupdTitleText.getText().toString());
@@ -400,8 +446,6 @@ public class UpdateEditorActivity extends Activity {
 		// Dismiss any in-progress dialog
 		if (progress != null)
 			progress.dismiss();
-		//Return to project
-		finish();
 		String err = i.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
 		if (err == null) {
 			//TODO display dialog instead
@@ -411,11 +455,15 @@ public class UpdateEditorActivity extends Activity {
 			if (update != null) {
 				update.setUnsent(false);
 				update.setDraft(true);
+				dba.saveUpdate(update, true);
+				//TODO display confirm-dialog instead
+				Toast.makeText(getApplicationContext(), "Network connection problem. Update was saved as draft. "+err, Toast.LENGTH_SHORT).show();
+			} else {
+				Toast.makeText(getApplicationContext(), err, Toast.LENGTH_SHORT).show();
 			}
-			//TODO display confirm-dialog instead
-			Toast.makeText(getApplicationContext(), "No network connection. Update was saved as draft.", Toast.LENGTH_SHORT).show();
-//			Toast.makeText(getApplicationContext(), err, Toast.LENGTH_SHORT).show();
 		}
+		//Return to project or update list
+		finish();
 	}
 
 	//Broadcast receiver for receiving status updates from the IntentService
