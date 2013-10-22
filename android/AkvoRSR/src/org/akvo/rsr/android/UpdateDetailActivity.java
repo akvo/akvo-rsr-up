@@ -22,6 +22,8 @@ import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.domain.Update;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.DialogUtil;
+import org.akvo.rsr.android.util.FileUtil;
+
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
@@ -85,6 +87,7 @@ public class UpdateDetailActivity extends Activity {
 				i.putExtra(ConstantUtil.PROJECT_ID_KEY, projectId);
 				i.putExtra(ConstantUtil.UPDATE_ID_KEY, updateId);
 				startActivity(i);
+				finishThisActivity();//close this, as ID will change if update is published
 			}
 		});
 
@@ -106,7 +109,7 @@ public class UpdateDetailActivity extends Activity {
 			
 			//show preexisting image
 			if (update.getThumbnailFilename() != null) {
-				setPhotoFile(update.getThumbnailFilename());
+				FileUtil.setPhotoFile(projupdImage,update.getThumbnailFilename());
 			}
 
 		}
@@ -173,45 +176,8 @@ public class UpdateDetailActivity extends Activity {
 
 	}
 	
-	private void setPhotoFile(String fn) {
-		//Handle taken photo
-		if (fn != null && new File(fn).exists()) {
-			update.setThumbnailFilename(fn);
-			//DialogUtil.infoAlert(this, "Photo returned", "Got a photo");
-			
-			//make thumbnail and show it on page
-			//shrink to save memory
-			BitmapFactory.Options o = new BitmapFactory.Options();
-	        o.inJustDecodeBounds = true;
-	        BitmapFactory.decodeFile(fn, o);
-	        // The new size we want to scale to
-	        final int REQUIRED_SIZE = 140;
-
-	        // Find the correct scale value. It should be a power of 2.
-	        int width_tmp = o.outWidth, height_tmp = o.outHeight;
-	        int scale = 1;
-	        while (true) {
-	            if (width_tmp / 2 < REQUIRED_SIZE
-	               || height_tmp / 2 < REQUIRED_SIZE) {
-	                break;
-	            }
-	            width_tmp /= 2;
-	            height_tmp /= 2;
-	            scale *= 2;
-	        }
-
-	        // Decode with inSampleSize
-	        BitmapFactory.Options o2 = new BitmapFactory.Options();
-	        o2.inSampleSize = scale;			
-			
-			Bitmap bm = BitmapFactory.decodeFile(fn,o2);
-			if (bm != null) {
-				projupdImage.setImageBitmap(bm);
-			}
-		}
-
+	public void finishThisActivity() {
+		finish();
 	}
-	
-
 
 }
