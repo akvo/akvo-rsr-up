@@ -5,8 +5,11 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Environment;
+import android.widget.ImageView;
 
 public class FileUtil {
 
@@ -104,4 +107,51 @@ public class FileUtil {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
     }
 */
+
+	//Show a thumbnail from a filename 
+	//TODO show different fallback images depending on problem
+    // 0 Image!
+	// 1 No image set
+	// 2 Image not loaded (setting)
+	// 3 Image load failed
+	// 4 Image loaded, but unreadable
+	// 5 Image loaded, but cleared from cache
+	public static void setPhotoFile(ImageView imgView, String fn) {
+		//Handle taken photo
+		if (fn != null && new File(fn).exists()) {
+			//DialogUtil.infoAlert(this, "Photo returned", "Got a photo");			
+			//make thumbnail and show it on page
+			//shrink to save memory
+			BitmapFactory.Options o = new BitmapFactory.Options();
+	        o.inJustDecodeBounds = true;
+	        BitmapFactory.decodeFile(fn, o);
+	        // The new size we want to scale to
+	        final int REQUIRED_SIZE = 140;
+
+	        // Find the correct scale value. It should be a power of 2.
+	        int width_tmp = o.outWidth, height_tmp = o.outHeight;
+	        int scale = 1;
+	        while (true) {
+	            if (width_tmp / 2 < REQUIRED_SIZE
+	               || height_tmp / 2 < REQUIRED_SIZE) {
+	                break;
+	            }
+	            width_tmp /= 2;
+	            height_tmp /= 2;
+	            scale *= 2;
+	        }
+
+	        // Decode with inSampleSize
+	        BitmapFactory.Options o2 = new BitmapFactory.Options();
+	        o2.inSampleSize = scale;			
+			
+			Bitmap bm = BitmapFactory.decodeFile(fn,o2);
+			if (bm != null) {
+				imgView.setImageBitmap(bm);
+			}
+		}
+
+	}
+	
+
 }

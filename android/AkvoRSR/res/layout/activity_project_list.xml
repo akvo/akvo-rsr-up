@@ -94,8 +94,7 @@
 
 		</LinearLayout>
 		
-        <!-- list of projects -->
-
+        <!-- list of projects. if it is empty, the TextView will be shown instead -->
 	    <ListView
 	        android:id="@android:id/list"
 	        android:layout_width="fill_parent"
@@ -103,6 +102,14 @@
 	        android:layout_weight="1"
 	        android:background="#ffffff"
 	        android:drawSelectorOnTop="false" />
+	    <TextView
+		    android:id="@android:id/empty"
+		    android:text="@string/label_empty_proj_list"
+		    android:layout_width="fill_parent"
+	        android:layout_height="0dp"
+	        android:layout_weight="1"
+		    android:gravity="center"
+    		/>
 
         <!-- Refresh button -->
 	    <Button

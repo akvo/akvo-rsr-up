@@ -166,14 +166,14 @@ public class UpdateEditorActivity extends Activity {
 				DialogUtil.errorAlert(this, "Update missing", "Cannot open for review, update " + updateId);
 			} else {
 				//populate fields
-				editable = update.getDraft();
+				editable = update.getDraft();//This will always be true with the current UI flow
 				projupdTitleText.setText(update.getTitle());	
 				projupdDescriptionText.setText(update.getText());
 				
 				//show preexisting image
 				if (update.getThumbnailFilename() != null) {
 					//btnTakePhoto.setText(R.string.btncaption_rephoto);
-					setPhotoFile(update.getThumbnailFilename());
+					FileUtil.setPhotoFile(projupdImage, update.getThumbnailFilename());
 					photoAndDeleteGroup.setVisibility(View.VISIBLE);
 					btnTakePhoto.setVisibility(View.GONE);
 				}
@@ -217,53 +217,7 @@ public class UpdateEditorActivity extends Activity {
 	}  
 	
 	
-	//Show a thumbnail from a filename 
-	//TODO show different  fallback images depending on problem
-	// 1 No image set
-	// 2 Image not loaded (setting)
-	// 3 Image load failed
-	// 4 Image loaded, but unreadable
-	// 5 Image loaded, but cleared from cache
-	private void setPhotoFile(String fn) {
-		//Handle taken photo
-		if (fn != null && new File(fn).exists()) {
-			update.setThumbnailFilename(fn);
-			//DialogUtil.infoAlert(this, "Photo returned", "Got a photo");
-			
-//			btnTakePhoto.setText(R.string.btncaption_rephoto);
-			//make thumbnail and show it on page
-			//shrink to save memory
-			BitmapFactory.Options o = new BitmapFactory.Options();
-	        o.inJustDecodeBounds = true;
-	        BitmapFactory.decodeFile(fn, o);
-	        // The new size we want to scale to
-	        final int REQUIRED_SIZE = 140;
 
-	        // Find the correct scale value. It should be a power of 2.
-	        int width_tmp = o.outWidth, height_tmp = o.outHeight;
-	        int scale = 1;
-	        while (true) {
-	            if (width_tmp / 2 < REQUIRED_SIZE
-	               || height_tmp / 2 < REQUIRED_SIZE) {
-	                break;
-	            }
-	            width_tmp /= 2;
-	            height_tmp /= 2;
-	            scale *= 2;
-	        }
-
-	        // Decode with inSampleSize
-	        BitmapFactory.Options o2 = new BitmapFactory.Options();
-	        o2.inSampleSize = scale;			
-			
-			Bitmap bm = BitmapFactory.decodeFile(fn,o2);
-			if (bm != null) {
-				projupdImage.setImageBitmap(bm);
-			}
-		}
-
-	}
-	
 	/*
 	 * (non-Javadoc)
 	 * Get notification of photo taken or picked
@@ -276,7 +230,8 @@ public class UpdateEditorActivity extends Activity {
 			if (resultCode == RESULT_CANCELED) {
 				return;
 			}
-			setPhotoFile(captureFilename);
+			update.setThumbnailFilename(captureFilename);
+			FileUtil.setPhotoFile(projupdImage, captureFilename);
 			//show result
 			photoAndDeleteGroup.setVisibility(View.VISIBLE);
 			btnTakePhoto.setVisibility(View.GONE);
@@ -293,15 +248,18 @@ public class UpdateEditorActivity extends Activity {
 			    captureFilename = FileUtil.getExternalPhotoDir(this) + File.separator + "capture" + System.nanoTime() + ".jpg";
 			    OutputStream os = new FileOutputStream(captureFilename);
 			    copyStream(imageStream,os);
+			    //since that worked, store it and show it
+				update.setThumbnailFilename(captureFilename);
+				FileUtil.setPhotoFile(projupdImage, captureFilename);
+				photoAndDeleteGroup.setVisibility(View.VISIBLE);
+				btnTakePhoto.setVisibility(View.GONE);
 			} catch (FileNotFoundException e) {
+				//TODO show an error
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 
-			setPhotoFile(captureFilename);
-			photoAndDeleteGroup.setVisibility(View.VISIBLE);
-			btnTakePhoto.setVisibility(View.GONE);
 		}
 	}
 
@@ -448,7 +406,8 @@ public class UpdateEditorActivity extends Activity {
 			progress.dismiss();
 		String err = i.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
 		if (err == null) {
-			//TODO display dialog instead
+			//display dialog instead
+			DialogUtil.infoAlert(this,"Update published","Update successfully sent to server");
 			Toast.makeText(getApplicationContext(), "Update sent successfully", Toast.LENGTH_SHORT).show(); //TODO string resource
 		} else {
 			//save as draft

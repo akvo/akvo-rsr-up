@@ -14,10 +14,17 @@
     <CheckBoxPreference
        android:key="setting_send_images"
        android:title="Send images"
-       android:summary="Embeds images in uploads as base-64"
+       android:summary="Embeds images in uploads"
        android:defaultValue="true"
        />
-    
+    <!--
+    <CheckBoxPreference
+       android:key="setting_prefetch_images"
+       android:title="Fetch images early"
+       android:summary="Fetches all thumbnails dring a refresh. This may take a long time, but they are then available when offline."
+       android:defaultValue="true"
+       />
+    -->
     <Preference
        android:key="data_host"
 	   android:title="Data server"
