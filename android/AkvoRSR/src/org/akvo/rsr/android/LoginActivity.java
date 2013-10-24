@@ -74,18 +74,6 @@ public class LoginActivity extends Activity {
 				}	
 			}
 
-/*
-			File f = new File (Environment.getExternalStorageDirectory().getPath() + ConstantUtil.PHOTO_DIR);
-			if (f.mkdirs() || f.isDirectory() ) {
-				Log.i(TAG, "Found/created photo dir " + f.getAbsolutePath());
-			} else
-				Log.e("LoginActivity", "could not find/create photo dir");
-			f = new File (Environment.getExternalStorageDirectory().getPath() + ConstantUtil.IMAGECACHE_DIR);
-			if (f.mkdirs() || f.isDirectory()) {
-				Log.i(TAG, "Found/created image cache dir " + f.getAbsolutePath());
-			} else
-				Log.e("LoginActivity", "could not find/create image cache dir");
-				*/
 		} else {
 			DialogUtil.errorAlert(this, "No storage available", "Akvo RSR requires a mounted, writable storage card for image files. Mount card and restart app.");
 			

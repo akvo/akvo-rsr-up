@@ -48,6 +48,12 @@ public class RsrDbAdapter {
 	public static final String DRAFT_COL = "draft";
 	public static final String UNSENT_COL = "unsent"; //currently unused
 
+	public static final String LAT_COL = "latitude";
+	public static final String LON_COL = "longitude";
+	public static final String COUNTRY_COL = "country";
+	public static final String STATE_COL = "state";
+	public static final String CITY_COL = "city";
+
 	private static final String TAG = "RsrDbAdapter";
 	private DatabaseHelper databaseHelper;
 	private SQLiteDatabase database;
@@ -58,7 +64,8 @@ public class RsrDbAdapter {
 	private static final String PROJECT_TABLE_CREATE =
 			"create table project (_id integer primary key, "+
 			"title text not null, subtitle text, summary text, funds real, "+
-			"thumbnail_url text, thumbnail_fn text);";
+			"thumbnail_url text, thumbnail_fn text," +
+			"longitude text, latitude text, country text, state text, city text);";
 	private static final String UPDATE_TABLE_CREATE =
 			"create table _update (_id integer primary key, project integer not null, "+
 			"title text not null, _text text, location text, "+
@@ -74,7 +81,8 @@ public class RsrDbAdapter {
 	private static final String PROJECT_TABLE = "project";
 	private static final String UPDATE_TABLE = "_update";
 
-	private static final int DATABASE_VERSION = 5;
+//	private static final int DATABASE_VERSION = 5;
+	private static final int DATABASE_VERSION = 6; //added long, lat, country, state, city
 
 	private final Context context;
 
@@ -114,7 +122,7 @@ public class RsrDbAdapter {
 					+ newVersion);
 
 			
-			if (oldVersion < DATABASE_VERSION) { //start over fresh
+			if (oldVersion < DATABASE_VERSION) { //start over fresh, consider everything to be a cache
 				db.execSQL("DROP TABLE IF EXISTS " + PROJECT_TABLE);
 				db.execSQL("DROP TABLE IF EXISTS " + UPDATE_TABLE);
 				onCreate(db);
@@ -319,6 +327,11 @@ public class RsrDbAdapter {
 		updatedValues.put(THUMBNAIL_URL_COL, project.getThumbnailUrl());
 		//not done here to preserve a cache connection
 //		updatedValues.put(THUMBNAIL_FILENAME_COL, project.getThumbnailFilename());
+		updatedValues.put(COUNTRY_COL, project.getCountry());
+		updatedValues.put(STATE_COL, project.getState());
+		updatedValues.put(CITY_COL, project.getCity());
+		updatedValues.put(LAT_COL, project.getLatitude());
+		updatedValues.put(LON_COL, project.getLongitude());
 		
 		Cursor cursor = database.query(PROJECT_TABLE,
 		new String[] { PK_ID_COL },
@@ -351,7 +364,7 @@ public class RsrDbAdapter {
 
 	
 	/**
-	 * updates an update in the db
+	 * saves or updates an Update in the db
 	 * 
 	 * @param survey
 	 * @return
@@ -389,9 +402,10 @@ public class RsrDbAdapter {
 	}
 
 	/**
-	 * updates an update in the db
+	 * updates an update in the db, after the real ID is returned from the server
 	 * 
-	 * @param survey
+	 * @param update
+	 * @param old_id
 	 * @return
 	 */
 	public void updateUpdateIdSent(Update update, String old_id) {
@@ -406,11 +420,11 @@ public class RsrDbAdapter {
 				null, null, null);
 
 		if (cursor != null && cursor.getCount() > 0) {
-			// if we found an item, it's an update, otherwise, it's an insert
+			// if we found an item, it's an update, otherwise, it's an error
 			database.update(UPDATE_TABLE, updatedValues, PK_ID_COL + " = ?",
 					new String[] { old_id });
 		} else {
-			Log.e(TAG, "Tried to update id/sent sts of nonexistent update "+old_id);
+			Log.e(TAG, "Tried to update id/sent sts of nonexistent update " + old_id);
 		}
 
 		if (cursor != null) {
@@ -532,9 +546,9 @@ public class RsrDbAdapter {
 	public Project findProject(String _id) {
 		Project project = null;
 		Cursor cursor = database.query(PROJECT_TABLE,
-										new String[] { PK_ID_COL, TITLE_COL, SUBTITLE_COL, SUMMARY_COL, FUNDS_COL, THUMBNAIL_URL_COL, THUMBNAIL_FILENAME_COL },
-										PK_ID_COL + " = ?",
-										new String[] { _id }, null, null, null);
+									   null,
+									   PK_ID_COL + " = ?",
+									   new String[] { _id }, null, null, null);
 		if (cursor != null) {
 			if (cursor.getCount() > 0) {
 				cursor.moveToFirst();
@@ -546,7 +560,11 @@ public class RsrDbAdapter {
 				project.setThumbnailUrl(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_URL_COL)));
 				project.setThumbnail(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_FILENAME_COL)));
 				//TODO funds
-				//TODO location
+				project.setCountry(cursor.getString(cursor.getColumnIndexOrThrow(COUNTRY_COL)));
+				project.setState(cursor.getString(cursor.getColumnIndexOrThrow(STATE_COL)));
+				project.setCity(cursor.getString(cursor.getColumnIndexOrThrow(CITY_COL)));
+				project.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(LAT_COL)));
+				project.setLongitude(cursor.getString(cursor.getColumnIndexOrThrow(LON_COL)));
 				}
 			cursor.close();
 			}

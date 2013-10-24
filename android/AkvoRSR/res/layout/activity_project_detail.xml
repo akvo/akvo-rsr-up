@@ -1,28 +1,26 @@
-<LinearLayout
-	xmlns:android="http://schemas.android.com/apk/res/android"
-  	android:layout_width="fill_parent"
-  	android:layout_height="fill_parent"
-    android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
     android:background="@android:color/white"
-	>
+    android:orientation="vertical" >
 
     <TextView
-    	android:id="@+id/text_proj_detail_title"
-   	    android:layout_width="fill_parent"
+        android:id="@+id/text_proj_detail_title"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="left"
-		android:background="@color/pale_gray"
-        android:textColor="@color/rsr_purple"
+        android:background="@color/pale_gray"
         android:padding="5dip"
-        android:typeface="sans"
         android:text="Project title here"
-         />
+        android:textColor="@color/rsr_purple"
+        android:textSize="20sp"
+        android:typeface="sans" />
 
   	<ScrollView
-		android:layout_width="fill_parent"
-		android:layout_height="0dp"
-		android:layout_weight="1"
-		>
+  	    android:layout_width="fill_parent"
+  	    android:layout_height="0dp"
+  	    android:layout_weight="1"
+  	    android:padding="10dp" >
 
   	    <LinearLayout
   		android:layout_width="fill_parent"
@@ -31,26 +29,28 @@
 	    android:orientation="vertical"
         >
       	    
-		    <LinearLayout
-		        android:layout_width="fill_parent"
-		        android:layout_height="wrap_content"
-		        android:orientation="horizontal"
-		        >
-		        
-			    <!-- Project image  -->
-
-	            <ImageView
-		            android:id="@+id/image_proj_detail"
-	                android:layout_width="wrap_content"
-	                android:layout_height="wrap_content"
-	                android:layout_gravity="left"
-	                android:contentDescription="@string/app_name"
-	                android:src="@drawable/ic_launcher"
-			        />
 	    <LinearLayout
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
-	        android:orientation="vertical" >
+	        android:orientation="horizontal"
+	        >
+	        
+		    <!-- Project image  -->
+
+            <ImageView
+	            android:id="@+id/image_proj_detail"
+                android:layout_gravity="left"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/ic_launcher"
+                android:layout_width="100dip"
+		        android:layout_height="80dip"
+		        android:layout_margin="10dp"
+		        />
+
+            <LinearLayout
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:orientation="vertical" >
 
         	<TextView
 	        	android:id="@+id/text_proj_detail_published_count"
@@ -93,14 +93,21 @@
     	</LinearLayout>
 
            </LinearLayout>	        
-<!-- location TODO
-		   <TextView
+
+	      	<TextView
+			    style="?android:attr/listSeparatorTextViewStyle"
+			    android:paddingTop="5dip"
+			    android:gravity="center_horizontal"
+			    android:layout_width="match_parent"
+			    android:layout_height="1dp" />
+		    
+	      	<TextView
 		       android:layout_width="fill_parent"
 		       android:layout_height="wrap_content"
 		       android:layout_gravity="left"
 		       android:text="Location:"
 		       android:textColor="@color/rsr_purple"
-		       android:textSize="18sp"
+		       android:textSize="20sp"
 		       android:typeface="sans" />
 
 	      	<TextView
@@ -112,14 +119,22 @@
 			   android:textSize="14sp"
 			   android:typeface="sans"
 			   />
-			    -->
-		   <TextView
+
+	      	<TextView
+			    style="?android:attr/listSeparatorTextViewStyle"
+			    android:paddingTop="5dip"
+			    android:gravity="center_horizontal"
+			    android:layout_width="match_parent"
+			    android:layout_height="1dp" />
+
+	      	
+	      	<TextView
 		       android:layout_width="fill_parent"
 		       android:layout_height="wrap_content"
 		       android:layout_gravity="left"
 		       android:text="Summary:"
 		       android:textColor="@color/rsr_purple"
-		       android:textSize="18sp"
+		       android:textSize="20sp"
 		       android:typeface="sans" />
 
 	      	<TextView
@@ -134,11 +149,14 @@
 	   	</LinearLayout>
 	</ScrollView>
 	<!-- the bottom buttons -->      		      		
+
 		    <LinearLayout
 		        android:layout_width="fill_parent"
 		        android:layout_height="wrap_content"
-			   android:layout_gravity="bottom"
-		        android:orientation="horizontal" >
+		        android:layout_gravity="bottom"
+		        android:background="@color/btn_border"
+		        android:orientation="horizontal"
+		        android:padding="10dp" >
 	
 			    <Button
 		            android:id="@+id/btn_view_updates"
@@ -148,6 +166,10 @@
 			        android:drawableTop="@drawable/ic_menu_view"
 			        android:text="@string/btncaption_viewupdates"
 				    android:textColor="@color/rsr_purple"
+				    android:background="@color/btn_face"
+			        android:padding="5dip"
+			        android:textSize="18sp"
+			        android:typeface="sans"				    
 		            />
 
    			    <!-- Add update button -->
@@ -159,6 +181,11 @@
 			        android:drawableTop="@drawable/ic_menu_add"
 			        android:text="@string/btncaption_add_update"
 				    android:textColor="@color/rsr_purple"
+				    android:background="@color/btn_face"
+			        android:padding="5dip"
+			        android:layout_marginLeft="5dip"
+			        android:textSize="18sp"
+			        android:typeface="sans"				    
 		            />
 		    	    	
    			</LinearLayout>

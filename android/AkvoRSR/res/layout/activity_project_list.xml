@@ -100,7 +100,7 @@
 	        android:layout_width="fill_parent"
 	        android:layout_height="0dp"
 	        android:layout_weight="1"
-	        android:background="#ffffff"
+	        android:background="@android:color/white"
 	        android:drawSelectorOnTop="false" />
 	    <TextView
 		    android:id="@android:id/empty"
@@ -111,17 +111,28 @@
 		    android:gravity="center"
     		/>
 
-        <!-- Refresh button -->
-	    <Button
-	        android:id="@+id/button_refresh_projects"
+        <!-- Refresh button  -->
+	
+	    <RelativeLayout
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
-	        android:drawableTop="@drawable/ic_menu_refresh"
-	        android:text="@string/btncaption_refresh" />
-	    	
-	    
-		
-      		
+	        android:background="@color/btn_border"
+		    android:padding="5dip"
+		    >
+
+		    <Button
+		        android:id="@+id/button_refresh_projects"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:background="@color/btn_face"
+		        android:drawableTop="@drawable/ic_menu_refresh"
+		        android:padding="5dip"
+		        android:text="@string/btncaption_refresh"
+		        android:textColor="@color/rsr_purple"
+		        android:textSize="18sp"
+		        android:typeface="sans" />
+
+	    </RelativeLayout>
 </LinearLayout>
-	
+	    	
 	

@@ -20,7 +20,7 @@
       	android:text="Project title goes here"
       	/>
  	
-	<!-- The scrollview should fill all the space beween the project title and the bottom -->	
+	<!-- The scrollview should fill all the space beween the project title and the button -->	
  	<ScrollView
 		android:layout_width="fill_parent"
 		android:layout_height="0dp"
@@ -34,6 +34,7 @@
 	  		android:layout_height="wrap_content"
 			android:background="@android:color/white"
 		    android:orientation="vertical"
+	   	    android:padding="5dip"	    
 			>
 			 	
 			<!-- The photo -->	
@@ -42,9 +43,18 @@
 		        android:layout_width="100dip"
 		        android:layout_height="80dip"
 		        android:layout_gravity="left"
-	            android:contentDescription="@string/app_name"
+		        android:src="@drawable/ic_launcher"
+		        android:contentDescription="@string/app_name"
 	            android:scaleType="centerInside"
 		        />
+			
+			<!-- separator -->
+			<TextView
+			    style="?android:attr/listSeparatorTextViewStyle"
+			    android:paddingTop="5dip"
+			    android:gravity="center_horizontal"
+			    android:layout_width="match_parent"
+			    android:layout_height="1dp" />
 
 			<!-- The update title entry -->	
 	        <TextView
@@ -52,10 +62,13 @@
 		        android:layout_width="fill_parent"
 		       	android:layout_height="wrap_content"
 		        android:layout_gravity="left"
-	            android:text="@string/label_update_title"
+	            android:text="Update title here"
 		        android:textColor="@color/rsr_purple"
 		        android:textSize="18sp"
-		        android:typeface="sans" />
+		        android:typeface="sans"
+				android:paddingTop="10dip"
+				android:paddingBottom="10dip"
+		        />
 	
 			<!-- The update description -->	
 	        <TextView
@@ -65,6 +78,7 @@
 		        android:layout_gravity="left"
 		        android:textColor="@android:color/black"
 		        android:textSize="12sp"
+	            android:text="Update description goes here, and can be be any length. Update will scroll but button will stay at bottom of screen."
 			    />
 	        
 	        <!-- fudge to fill the viewport if necessary -->
@@ -73,15 +87,27 @@
         		android:layout_height="0dp"
         		android:layout_weight="1"/>
 	        
-		    <!-- The edit button -->	
-
-		    <Button
-		        android:id="@+id/btn_edit_update"
-		        android:layout_width="fill_parent"
-		        android:layout_height="wrap_content"
-		        android:drawableTop="@drawable/ic_menu_edit"
-		        android:text="@string/btncaption_edit_update" />
 		    	    	
 		</LinearLayout>
 	</ScrollView>	    
+    <!-- The edit button -->	
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/btn_border"
+	    android:padding="5dip"
+	    >
+	    <Button
+	        android:id="@+id/btn_edit_update"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+			android:background="@color/btn_face"
+			android:padding="5dip"
+	        android:drawableTop="@drawable/ic_menu_edit"
+			android:textColor="@color/rsr_purple"
+	        android:text="@string/btncaption_edit_update"
+	        android:textSize="18sp"
+			android:typeface="sans"
+	        />
+	    </RelativeLayout>
 </LinearLayout>

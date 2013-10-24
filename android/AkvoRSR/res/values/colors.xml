@@ -10,5 +10,8 @@
 	<color name="green"     >#009900</color>
 	<color name="pink"      >#FBF0E2</color>
 	<color name="orange"    >#FAA31D</color>
-							
+	<color name="draft_text">#FAA31D</color>
+	<color name="btn_face"  >#DBDBE0</color>
+	<color name="btn_border">#E7E8E9</color>
+									
 </resources>

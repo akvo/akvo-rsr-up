@@ -87,7 +87,7 @@ public class UpdateDetailActivity extends Activity {
 				i.putExtra(ConstantUtil.PROJECT_ID_KEY, projectId);
 				i.putExtra(ConstantUtil.UPDATE_ID_KEY, updateId);
 				startActivity(i);
-				finishThisActivity();//close this, as ID will change if update is published
+				finishThisActivity();//close this, as ID will change if update is published -- WINDOW LEAK!
 			}
 		});
 
@@ -160,7 +160,7 @@ public class UpdateDetailActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		//getMenuInflater().inflate(R.menu.update_details, menu);
-		return false; //no menu yet
+		return false; //no menu here
 	}
 
 	@Override

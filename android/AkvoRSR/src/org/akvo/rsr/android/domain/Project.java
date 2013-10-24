@@ -29,6 +29,11 @@ public class Project {
 //	private Date endDate;
 	private double funds;
 	private String summary;
+	private String longitude; //fractional degrees with decimal point
+	private String latitude;  //ditto
+	private String country;
+	private String state;
+	private String city;
 
 	public String getId() {
 		return id;
@@ -86,6 +91,22 @@ public class Project {
 		this.funds = funds;
 	}
 
+	public String getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(String lon) {
+		this.longitude = lon;
+	}
+
+	public String getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(String lat) {
+		this.latitude = lat;
+	}
+
 	public String getSummary() {
 		return summary;
 	}
@@ -94,5 +115,38 @@ public class Project {
 		this.summary = summary;
 	}
 
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	/*
+	public String get() {
+		return ;
+	}
+
+	public void set(String ) {
+		this. = ;
+	}
+*/
 
 }
