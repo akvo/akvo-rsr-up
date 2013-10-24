@@ -39,7 +39,7 @@ public class SignInService extends IntentService {
 				SettingsUtil.signIn(this,user);
 				
 				//TODO get project list from API and set other projects invisible
-				dl.enableAuthorizedProjects(this, new URL(SettingsUtil.host(this) + String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN, SettingsUtil.Read(this, "authorized_orgid"))));
+				//dl.enableAuthorizedProjects(this, new URL(SettingsUtil.host(this) + String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN, SettingsUtil.Read(this, "authorized_orgid"))));
 
 			}
 			else {
