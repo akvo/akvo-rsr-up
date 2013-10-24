@@ -87,7 +87,39 @@ public class Downloader {
 		Log.i(TAG, "Fetched " + myProjectListHandler.getCount() + " projects");
 	}
 
+	
+	/**
+	 * populates the projects table in the db from a server URL
+	 * @param ctx
+	 * @param url
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 */
+	public void enableAuthorizedProjects(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
 
+		Log.i(TAG, "Fetching project list from " + url);
+
+		/* Get a SAXParser from the SAXPArserFactory. */
+		SAXParserFactory spf = SAXParserFactory.newInstance();
+		SAXParser sp = spf.newSAXParser();
+
+		/* Get the XMLReader of the SAXParser we created. */
+		XMLReader xr = sp.getXMLReader();
+		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
+		ProjectListHandler myProjectListHandler = new ProjectListHandler(new RsrDbAdapter(ctx));
+		xr.setContentHandler(myProjectListHandler);
+		/* Parse the xml-data from our URL. */
+		//TODO THIS MIGHT HANG, no timeout defined...
+		xr.parse(new InputSource(url.openStream()));
+		/* Parsing has finished. */
+
+		/* Check if anything went wrong. */
+		err = myProjectListHandler.getError();
+
+		Log.i(TAG, "Fetched " + myProjectListHandler.getCount() + " projects");
+	}
+	
 	/**
 	 * populates the updates table in the db from a server URL
 	 * Typically the url will specify updates for a single project.

@@ -47,6 +47,7 @@ public class RsrDbAdapter {
 	public static final String TEXT_COL = "_text";
 	public static final String DRAFT_COL = "draft";
 	public static final String UNSENT_COL = "unsent"; //currently unused
+	public static final String HIDDEN_COL = "hidden";
 
 	public static final String LAT_COL = "latitude";
 	public static final String LON_COL = "longitude";
@@ -65,7 +66,7 @@ public class RsrDbAdapter {
 			"create table project (_id integer primary key, "+
 			"title text not null, subtitle text, summary text, funds real, "+
 			"thumbnail_url text, thumbnail_fn text," +
-			"longitude text, latitude text, country text, state text, city text);";
+			"longitude text, latitude text, country text, state text, city text, hidden integer);";
 	private static final String UPDATE_TABLE_CREATE =
 			"create table _update (_id integer primary key, project integer not null, "+
 			"title text not null, _text text, location text, "+
@@ -82,7 +83,8 @@ public class RsrDbAdapter {
 	private static final String UPDATE_TABLE = "_update";
 
 //	private static final int DATABASE_VERSION = 5;
-	private static final int DATABASE_VERSION = 6; //added long, lat, country, state, city
+//	private static final int DATABASE_VERSION = 6; //added long, lat, country, state, city
+	private static final int DATABASE_VERSION = 7; //added project.hidden
 
 	private final Context context;
 
@@ -332,6 +334,7 @@ public class RsrDbAdapter {
 		updatedValues.put(CITY_COL, project.getCity());
 		updatedValues.put(LAT_COL, project.getLatitude());
 		updatedValues.put(LON_COL, project.getLongitude());
+		updatedValues.put(HIDDEN_COL, project.getHidden()?"1":"0");
 		
 		Cursor cursor = database.query(PROJECT_TABLE,
 		new String[] { PK_ID_COL },
@@ -565,6 +568,7 @@ public class RsrDbAdapter {
 				project.setCity(cursor.getString(cursor.getColumnIndexOrThrow(CITY_COL)));
 				project.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(LAT_COL)));
 				project.setLongitude(cursor.getString(cursor.getColumnIndexOrThrow(LON_COL)));
+				project.setHidden(0 != cursor.getInt(cursor.getColumnIndexOrThrow(HIDDEN_COL)));
 				}
 			cursor.close();
 			}

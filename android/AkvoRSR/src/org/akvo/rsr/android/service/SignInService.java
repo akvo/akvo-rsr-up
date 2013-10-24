@@ -37,6 +37,10 @@ public class SignInService extends IntentService {
 							user)) {
 				//Yes!
 				SettingsUtil.signIn(this,user);
+				
+				//TODO get project list from API and set other projects invisible
+				dl.enableAuthorizedProjects(this, new URL(SettingsUtil.host(this) + String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN, SettingsUtil.Read(this, "authorized_orgid"))));
+
 			}
 			else {
 				i2.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, "Wrong password and/or username");

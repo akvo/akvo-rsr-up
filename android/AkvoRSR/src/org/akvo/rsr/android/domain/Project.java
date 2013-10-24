@@ -34,6 +34,7 @@ public class Project {
 	private String country;
 	private String state;
 	private String city;
+	private boolean hidden;
 
 	public String getId() {
 		return id;
@@ -138,6 +139,15 @@ public class Project {
 	public void setCity(String city) {
 		this.city = city;
 	}
+
+	public boolean getHidden() {
+		return hidden;
+	}
+
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
+	}
+
 
 	/*
 	public String get() {
