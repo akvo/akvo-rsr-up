@@ -49,7 +49,7 @@
     <string name="btncaption_add_update">Add update</string>
     <string name="btncaption_edit_update">Edit this update</string>
     <string name="btncaption_refresh">Refresh project list</string> 
-    <string name="btncaption_viewupdates">Vew all updates</string>   
+    <string name="btncaption_viewupdates">View all updates</string>   
     <string name="btncaption_clear_data">Clear all data</string>
     <string name="btncaption_send_update">Send update</string>
     <string name="btncaption_save_draft">Save draft</string>
