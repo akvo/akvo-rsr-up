@@ -102,6 +102,9 @@ public class ProjectListHandler extends DefaultHandler {
 	private boolean in_thumbnail_url = false;
 
 	private boolean in_location = false;
+	private boolean in_country = false;
+	private boolean in_state = false;
+	private boolean in_city = false;
 	private boolean in_long = false;
 	private boolean in_lat = false;
 
@@ -184,6 +187,16 @@ public class ProjectListHandler extends DefaultHandler {
 				this.in_summary = true;
 			} else if (localName.equals("current_image") && depth==3) {
 				this.in_current_image = true;
+			} else if (localName.equals("country") && in_location) {
+				this.in_country = true;
+			} else if (localName.equals("state") && in_location) {
+				this.in_state = true;
+			} else if (localName.equals("city") && in_location) {
+				this.in_city = true;
+			} else if (localName.equals("latitude") && in_location) {
+				this.in_lat = true;
+			} else if (localName.equals("longitude") && in_location) {
+				this.in_long = true;
 			} else if (localName.equals("thumbnails") && in_current_image) {
 				this.in_thumbnails = true;
 			} else if (localName.equals("map_thumb") && in_thumbnails) {
@@ -220,6 +233,16 @@ public class ProjectListHandler extends DefaultHandler {
 			this.in_summary = false;
 		} else if (localName.equals("current_image") && depth==3) {
 			this.in_current_image = false;
+		} else if (localName.equals("country") && in_location) {
+			this.in_country = false;
+		} else if (localName.equals("state") && in_location) {
+			this.in_state = false;
+		} else if (localName.equals("city") && in_location) {
+			this.in_city = false;
+		} else if (localName.equals("latitude") && in_location) {
+			this.in_lat = false;
+		} else if (localName.equals("longitude") && in_location) {
+			this.in_long = false;
 		} else if (localName.equals("thumbnails") && in_current_image) {
 			this.in_thumbnails = false;
 		} else if (localName.equals("map_thumb") && in_thumbnails) {
@@ -242,6 +265,16 @@ public class ProjectListHandler extends DefaultHandler {
 				currentProj.setSummary(currentProj.getSummary() + new String(ch, start, length));
 			} else if(this.in_thumbnail_url) {
 				currentProj.setThumbnailUrl(new String(ch, start, length));
+			} else if(this.in_country) {
+	    		currentProj.setCountry(new String(ch, start, length));
+			} else if(this.in_state) {
+	    		currentProj.setState(new String(ch, start, length));
+			} else if(this.in_city) {
+	    		currentProj.setCity(new String(ch, start, length));
+			} else if(this.in_lat) {
+	    		currentProj.setLatitude(new String(ch, start, length));
+			} else if(this.in_long) {
+	    		currentProj.setLongitude(new String(ch, start, length));				
 			} else if(this.in_funds) {
 				try {
 					currentProj.setFunds(Double.parseDouble(new String(ch, start, length)));

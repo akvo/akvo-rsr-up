@@ -96,7 +96,8 @@
 
 	      	<TextView
 			    style="?android:attr/listSeparatorTextViewStyle"
-			    android:paddingTop="5dip"
+	      	    android:layout_marginTop="10dp"
+	      	    android:layout_marginBottom="10dip"
 			    android:gravity="center_horizontal"
 			    android:layout_width="match_parent"
 			    android:layout_height="1dp" />
@@ -111,22 +112,22 @@
 		       android:typeface="sans" />
 
 	      	<TextView
-			   android:id="@+id/text_proj_location"
-			   android:layout_width="fill_parent"
-			   android:layout_height="wrap_content"
-			   android:layout_gravity="left"
-			   android:textColor="@color/dk_gray"
-			   android:textSize="14sp"
-			   android:typeface="sans"
-			   />
+	      	    android:id="@+id/text_proj_location"
+	      	    android:layout_width="fill_parent"
+	      	    android:layout_height="wrap_content"
+	      	    android:layout_gravity="left"
+	      	    android:textColor="@color/dk_gray"
+	      	    android:textSize="14sp"
+	      	    android:typeface="sans" />
 
 	      	<TextView
-			    style="?android:attr/listSeparatorTextViewStyle"
-			    android:paddingTop="5dip"
-			    android:gravity="center_horizontal"
-			    android:layout_width="match_parent"
-			    android:layout_height="1dp" />
-
+	      	    style="?android:attr/listSeparatorTextViewStyle"
+	      	    android:layout_width="match_parent"
+	      	    android:layout_height="1dp"
+	      	    android:layout_marginTop="10dp"
+	      	    android:layout_marginBottom="10dip"
+	      	    android:gravity="center_horizontal"
+	      	    />
 	      	
 	      	<TextView
 		       android:layout_width="fill_parent"
@@ -145,6 +146,7 @@
 			   android:textColor="@color/dk_gray"
 			   android:textSize="14sp"
 			   android:typeface="sans"
+		       android:text="@string/lorem_ipsum"
 			   />
 	   	</LinearLayout>
 	</ScrollView>

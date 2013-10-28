@@ -408,8 +408,8 @@ public class Downloader {
 	 */
 	public void postXmlUpdateStreaming(String urlTemplate, Update update, boolean sendImage, User user) throws Exception {
 		final String contentType = "application/xml";
-		final String bodyTemplate1  =	"<object><update_method>S</update_method><project>%s</project>" + //SMS update method
-//		final String bodyTemplate1  =	"<object><update_method>M</update_method><project>%s</project>" + //New! Mobile update method
+//		final String bodyTemplate1  =	"<object><update_method>S</update_method><project>%s</project>" + //SMS update method
+		final String bodyTemplate1  =	"<object><update_method>M</update_method><project>%s</project>" + //New! Mobile update method
 				"<photo_location>E</photo_location><user>%s</user><title>%s</title>" +
 				"<text>%s</text>";
 		final String bodyTemplate2  = "</object>";

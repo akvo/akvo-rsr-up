@@ -41,6 +41,7 @@ public class ProjectDetailActivity extends Activity {
 	private String projId = null;
 	private TextView projTitleLabel;
 	private TextView projSummaryText;
+	private TextView projLocationText;
 	private TextView publishedCountView;
 	private TextView draftCountView;
 	private ImageView projImage;
@@ -69,7 +70,7 @@ public class ProjectDetailActivity extends Activity {
 		setContentView(R.layout.activity_project_detail);
 		//find the fields
 		projTitleLabel		= (TextView) findViewById(R.id.text_proj_detail_title);
-//		projLocationText 	= (TextView) findViewById(R.id.text_proj_location);
+		projLocationText 	= (TextView) findViewById(R.id.text_proj_location);
 		projSummaryText		= (TextView) findViewById(R.id.text_proj_summary);
 		projImage 			= (ImageView) findViewById(R.id.image_proj_detail);
 		publishedCountView 	= (TextView) findViewById(R.id.text_proj_detail_published_count);
@@ -112,7 +113,21 @@ public class ProjectDetailActivity extends Activity {
 		} else {
 			projTitleLabel.setText(project.getTitle());
 		}
-//		projLocationText.setText(project.getLocation()); //not sure what this is supposed to match in XML
+		String loc = "";
+		if (project.getCity() != null) {
+			loc += project.getCity() + ", ";
+		}
+		if (project.getState() != null) {
+			loc += project.getState() + ", ";			
+		}
+		if (project.getCountry() != null) {
+			loc += project.getCountry() + ", ";			
+		}
+		if (loc.length() > 1) {
+			loc = loc.substring(loc.length()-2);
+		}
+			
+		projLocationText.setText(loc);
 		projSummaryText.setText(project.getSummary());
 		
 		dba.open();
