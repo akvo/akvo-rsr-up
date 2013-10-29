@@ -38,14 +38,12 @@
 		    <!-- Project image  -->
 
             <ImageView
-	            android:id="@+id/image_proj_detail"
+                android:id="@+id/image_proj_detail"
+                android:layout_width="100dip"
+                android:layout_height="80dip"
                 android:layout_gravity="left"
                 android:contentDescription="@string/app_name"
-                android:src="@drawable/ic_launcher"
-                android:layout_width="100dip"
-		        android:layout_height="80dip"
-		        android:layout_margin="10dp"
-		        />
+                android:src="@drawable/thumbnail_noimage" />
 
             <LinearLayout
 		        android:layout_width="fill_parent"
@@ -53,17 +51,17 @@
 		        android:orientation="vertical" >
 
         	<TextView
-	        	android:id="@+id/text_proj_detail_published_count"
+        	    android:id="@+id/text_proj_detail_published_count"
         	    android:layout_width="wrap_content"
         	    android:layout_height="wrap_content"
         	    android:layout_gravity="left"
-        	    android:paddingRight="5dp"
         	    android:paddingLeft="5dp"
+        	    android:paddingRight="5dp"
         	    android:text="@string/published"
-        	    android:textSize="12sp"
         	    android:textColor="@color/blue"
+        	    android:textSize="12sp"
         	    android:typeface="sans"
-        	    />
+        	    android:visibility="invisible" />
 
         	<!-- TextView
 	     		android:id="@+id/text_proj_detail_unsynchronized_count"
@@ -79,37 +77,39 @@
         	    /-->
 
         	<TextView
-	        	android:id="@+id/text_proj_detail_draft_count"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-	            android:layout_gravity="left"
-        	    android:paddingRight="5dp"
+        	    android:id="@+id/text_proj_detail_draft_count"
+        	    android:layout_width="wrap_content"
+        	    android:layout_height="wrap_content"
+        	    android:layout_gravity="left"
         	    android:paddingLeft="5dp"
-	            android:text="@string/drafts"
-		        android:textSize="12sp"
-		        android:textColor="@color/red"
-		        android:typeface="sans"
-		        />
+        	    android:paddingRight="5dp"
+        	    android:text="@string/drafts"
+        	    android:textColor="@color/red"
+        	    android:textSize="12sp"
+        	    android:typeface="sans"
+        	    android:visibility="invisible" />
+
     	</LinearLayout>
 
            </LinearLayout>	        
 
 	      	<TextView
-			    style="?android:attr/listSeparatorTextViewStyle"
-	      	    android:layout_marginTop="10dp"
+	      	    style="?android:attr/listSeparatorTextViewStyle"
+	      	    android:layout_width="match_parent"
+	      	    android:layout_height="1dp"
 	      	    android:layout_marginBottom="10dip"
-			    android:gravity="center_horizontal"
-			    android:layout_width="match_parent"
-			    android:layout_height="1dp" />
+	      	    android:layout_marginTop="5dp"
+	      	    android:gravity="center_horizontal" />
 		    
 	      	<TextView
-		       android:layout_width="fill_parent"
-		       android:layout_height="wrap_content"
-		       android:layout_gravity="left"
-		       android:text="Location:"
-		       android:textColor="@color/rsr_purple"
-		       android:textSize="20sp"
-		       android:typeface="sans" />
+	      	    android:layout_width="fill_parent"
+	      	    android:layout_height="wrap_content"
+	      	    android:layout_gravity="left"
+	      	    android:layout_marginBottom="5dp"
+	      	    android:text="Location:"
+	      	    android:textColor="@color/rsr_purple"
+	      	    android:textSize="20sp"
+	      	    android:typeface="sans" />
 
 	      	<TextView
 	      	    android:id="@+id/text_proj_location"
@@ -130,13 +130,14 @@
 	      	    />
 	      	
 	      	<TextView
-		       android:layout_width="fill_parent"
-		       android:layout_height="wrap_content"
-		       android:layout_gravity="left"
-		       android:text="Summary:"
-		       android:textColor="@color/rsr_purple"
-		       android:textSize="20sp"
-		       android:typeface="sans" />
+	      	    android:layout_width="fill_parent"
+	      	    android:layout_height="wrap_content"
+	      	    android:layout_gravity="left"
+	      	    android:layout_marginBottom="5dp"
+	      	    android:text="Summary:"
+	      	    android:textColor="@color/rsr_purple"
+	      	    android:textSize="20sp"
+	      	    android:typeface="sans" />
 
 	      	<TextView
 			   android:id="@+id/text_proj_summary"

@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import org.akvo.rsr.android.R;
+
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -41,7 +44,8 @@ public class FileUtil {
 	* @param context The context to use
 	* @return The external cache dir
 	*/
-    public static File getExternalCacheDir(Context context) {
+    @TargetApi(Build.VERSION_CODES.FROYO)
+	public static File getExternalCacheDir(Context context) {
         if (hasExternalCacheDir()) {
             File cacheDir = context.getExternalCacheDir();
             if (cacheDir != null) {
@@ -61,7 +65,8 @@ public class FileUtil {
 	* @param context The context to use
 	* @return The external cache dir
 	*/
-    public static File getExternalPhotoDir(Context context) {
+    @TargetApi(Build.VERSION_CODES.FROYO)
+	public static File getExternalPhotoDir(Context context) {
         if (hasExternalCacheDir()) {
             File cacheDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
             if (cacheDir != null) {
@@ -108,7 +113,7 @@ public class FileUtil {
     }
 */
 
-	//Show a thumbnail from a filename 
+	//Show a thumbnail from a URL and filename 
 	//TODO show different fallback images depending on problem
     // 0 Image!
 	// 1 No image set
@@ -116,9 +121,17 @@ public class FileUtil {
 	// 3 Image load failed
 	// 4 Image loaded, but unreadable
 	// 5 Image loaded, but cleared from cache
-	public static void setPhotoFile(ImageView imgView, String fn) {
+	public static void setPhotoFile(ImageView imgView, String url, String fn) {
 		//Handle taken photo
-		if (fn != null && new File(fn).exists()) {
+		if (url == null) {
+			imgView.setImageResource(R.drawable.thumbnail_noimage);			
+		} else
+		if (fn == null) {
+			imgView.setImageResource(R.drawable.thumbnail_load);			
+		} else 
+		if (! new File(fn).exists()) {
+			imgView.setImageResource(R.drawable.thumbnail_error);			
+		} else {
 			//DialogUtil.infoAlert(this, "Photo returned", "Got a photo");			
 			//make thumbnail and show it on page
 			//shrink to save memory
@@ -152,6 +165,8 @@ public class FileUtil {
 		}
 
 	}
+}
+
 	
 
-}
+

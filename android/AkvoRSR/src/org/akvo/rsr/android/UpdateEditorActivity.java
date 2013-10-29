@@ -173,7 +173,7 @@ public class UpdateEditorActivity extends Activity {
 				//show preexisting image
 				if (update.getThumbnailFilename() != null) {
 					//btnTakePhoto.setText(R.string.btncaption_rephoto);
-					FileUtil.setPhotoFile(projupdImage, update.getThumbnailFilename());
+					FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), update.getThumbnailFilename());
 					photoAndDeleteGroup.setVisibility(View.VISIBLE);
 					btnTakePhoto.setVisibility(View.GONE);
 				}
@@ -231,7 +231,8 @@ public class UpdateEditorActivity extends Activity {
 				return;
 			}
 			update.setThumbnailFilename(captureFilename);
-			FileUtil.setPhotoFile(projupdImage, captureFilename);
+			update.setThumbnailUrl("dummyUrl"); //absence will be interpreted as unset thumbnail
+			FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename);
 			//show result
 			photoAndDeleteGroup.setVisibility(View.VISIBLE);
 			btnTakePhoto.setVisibility(View.GONE);
@@ -250,11 +251,12 @@ public class UpdateEditorActivity extends Activity {
 			    copyStream(imageStream,os);
 			    //since that worked, store it and show it
 				update.setThumbnailFilename(captureFilename);
-				FileUtil.setPhotoFile(projupdImage, captureFilename);
+				update.setThumbnailUrl("dummyUrl");
+				FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename);
 				photoAndDeleteGroup.setVisibility(View.VISIBLE);
 				btnTakePhoto.setVisibility(View.GONE);
 			} catch (FileNotFoundException e) {
-				//TODO show an error
+				projupdImage.setImageResource(R.drawable.thumbnail_error);
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();

@@ -21,6 +21,7 @@ import java.io.File;
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.util.ConstantUtil;
+import org.akvo.rsr.android.util.FileUtil;
 import org.akvo.rsr.android.util.SettingsUtil;
 
 import android.os.Bundle;
@@ -124,7 +125,7 @@ public class ProjectDetailActivity extends Activity {
 			loc += project.getCountry() + ", ";			
 		}
 		if (loc.length() > 1) {
-			loc = loc.substring(loc.length()-2);
+			loc = loc.substring(0, loc.length()-2);
 		}
 			
 		projLocationText.setText(loc);
@@ -141,19 +142,7 @@ public class ProjectDetailActivity extends Activity {
 		publishedCountView.setText(Integer.toString(stateCounts[2]) + res.getString(R.string.count_published));
 		draftCountView.setText(Integer.toString(stateCounts[0]) + res.getString(R.string.count_draft));
 
-		
-		//Find file containing thumbnail
-		String fn = project.getThumbnailFilename();
-		File f;
-		if (fn != null && (f = new File(fn)) != null && f.exists()) {
-			Bitmap bm = BitmapFactory.decodeFile(f.getAbsolutePath());
-			if (bm != null) {
-				projImage.setImageBitmap(bm);
-			}
-		} else {
-			//Fall back to generic logo
-			projImage.setImageResource(R.drawable.ic_launcher);
-		}
+		FileUtil.setPhotoFile(projImage,project.getThumbnailUrl(), project.getThumbnailFilename());
 
 	}
 	

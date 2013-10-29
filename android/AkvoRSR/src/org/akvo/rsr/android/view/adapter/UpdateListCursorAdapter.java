@@ -20,6 +20,7 @@ import java.io.File;
 
 import org.akvo.rsr.android.R;
 import org.akvo.rsr.android.dao.RsrDbAdapter;
+import org.akvo.rsr.android.util.FileUtil;
 import org.akvo.rsr.android.util.SettingsUtil;
 
 import android.content.Context;
@@ -81,22 +82,9 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 		ImageView thumbnail = (ImageView) view.findViewById(R.id.ulist_item_thumbnail);
 		//Find file containing thumbnail
 		String fn = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
-		if (fn != null && new File(fn).exists()) {
-			//need to subsample if large to prevent filling memory
-			Options option = new Options();
-			option.inJustDecodeBounds = true;
-			BitmapFactory.decodeFile(fn,option);//fetch dimensions
-			option.inJustDecodeBounds = false;
-			option.inSampleSize = Math.max(option.outHeight, option.outWidth) / 120; //only need 120 pixels for a thumbnail
-			Bitmap bm = BitmapFactory.decodeFile(fn, option);
-			if (bm != null)
-				thumbnail.setImageBitmap(bm);
-		} else {
-			//Fall back to generic logo
-			//TODO different for null and broken ref?
-			thumbnail.setImageResource(R.drawable.ic_launcher);
-		}
-		
+		String url = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
+		FileUtil.setPhotoFile(thumbnail, url, fn);
+
 		//set tags so we will know what got clicked
 		view.setTag(R.id.project_id_tag, cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PROJECT_COL)));
 		view.setTag(R.id.update_id_tag, cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL)));

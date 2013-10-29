@@ -20,6 +20,7 @@ import java.io.File;
 
 import org.akvo.rsr.android.R;
 import org.akvo.rsr.android.dao.RsrDbAdapter;
+import org.akvo.rsr.android.util.FileUtil;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -83,23 +84,9 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 				
 		//Image
 		ImageView thumbnail = (ImageView) view.findViewById(R.id.list_item_thumbnail);
-		//Find file containing thumbnail
-		String fna = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
-		if (fna != null) {
-			File f = new File(fna);
-			if (f.exists()) {
-				Bitmap bm = BitmapFactory.decodeFile(f.getAbsolutePath());
-				if (bm != null)
-					thumbnail.setImageBitmap(bm);
-			} else {
-				//Broken ref, fall back to generic logo
-				//TODO could show error img
-				thumbnail.setImageResource(R.drawable.ic_launcher);
-			}
-		} else {
-			//Not set, fall back to generic logo
-			thumbnail.setImageResource(R.drawable.ic_launcher);
-		}
+		String fn = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
+		String url = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
+		FileUtil.setPhotoFile(thumbnail, url, fn);
 		
 		//set tag so we will know what got clicked
 		view.setTag(R.id.project_id_tag, cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL)));
