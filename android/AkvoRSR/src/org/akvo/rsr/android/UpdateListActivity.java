@@ -29,6 +29,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -82,7 +83,8 @@ public class UpdateListActivity extends ListActivity {
 		listFooter.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.ic_menu_add,0,0);
 		//this worked somewhat, but button text was not shown
 		 */
-		listFooter.setOnClickListener( new View.OnClickListener() {
+		Button addButton = (Button) listFooter.findViewById(R.id.btn_add_update2);
+		addButton.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {
 				startEditorNew();
 			}
@@ -175,7 +177,7 @@ public class UpdateListActivity extends ListActivity {
 		Project p = ad.findProject(projId);
 		projectTitleLabel.setText(p.getTitle());
 		//fetch data
-		dataCursor = ad.listAllUpdatesFor(projId);
+		dataCursor = ad.listAllUpdatesNewestFirstFor(projId);
 		//Show count
 		updateCountLabel.setText(Integer.valueOf(dataCursor.getCount()).toString());
 		//Populate list view
