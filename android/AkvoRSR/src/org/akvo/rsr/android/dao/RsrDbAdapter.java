@@ -16,6 +16,7 @@
 
 package org.akvo.rsr.android.dao;
 
+import org.akvo.rsr.android.domain.Country;
 import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.domain.Update;
 
@@ -51,27 +52,37 @@ public class RsrDbAdapter {
 
 	public static final String LAT_COL = "latitude";
 	public static final String LON_COL = "longitude";
-	public static final String COUNTRY_COL = "country";
+	public static final String COUNTRY_COL = "country_id";
 	public static final String STATE_COL = "state";
 	public static final String CITY_COL = "city";
 
+	public static final String NAME_COL = "name";
+	public static final String CONTINENT_COL = "continent";
+	public static final String ISO_CODE_COL = "iso_code";
+	
 	private static final String TAG = "RsrDbAdapter";
 	private DatabaseHelper databaseHelper;
 	private SQLiteDatabase database;
+	
+	private static final String PROJECT_JOIN = "project LEFT OUTER JOIN country ON (project.country_id = country._id)";
 
 	/**
-	 * Database creation sql statement
+	 * Database creation sql statements
 	 */
 	private static final String PROJECT_TABLE_CREATE =
 			"create table project (_id integer primary key, "+
 			"title text not null, subtitle text, summary text, funds real, "+
 			"thumbnail_url text, thumbnail_fn text," +
-			"longitude text, latitude text, country text, state text, city text, hidden integer);";
+			"longitude text, latitude text, country_id integer, state text, city text, hidden integer);";
 	private static final String UPDATE_TABLE_CREATE =
 			"create table _update (_id integer primary key, project integer not null, "+
 			"title text not null, _text text, location text, "+
 			"thumbnail_url text, thumbnail_fn text," +
 			"draft integer, unsent integer);";
+	private static final String COUNTRY_TABLE_CREATE =
+			"create table country (_id integer primary key, "+
+			"name text not null, continent text, "+
+			"iso_code text);";
 
 	private static final String[] DEFAULT_INSERTS = new String[] {
 //		"insert into project values(1,'Sample Proj1', 'Sample proj 1 subtitle', 'sum1', 4711.00, 'url1', 'fn1')",
@@ -81,10 +92,12 @@ public class RsrDbAdapter {
 	private static final String DATABASE_NAME = "rsrdata";
 	private static final String PROJECT_TABLE = "project";
 	private static final String UPDATE_TABLE = "_update";
+	private static final String COUNTRY_TABLE = "country";
 
 //	private static final int DATABASE_VERSION = 5;
 //	private static final int DATABASE_VERSION = 6; //added long, lat, country, state, city
-	private static final int DATABASE_VERSION = 7; //added project.hidden
+//	private static final int DATABASE_VERSION = 7; //added project.hidden
+	private static final int DATABASE_VERSION = 8; //added country table
 
 	private final Context context;
 
@@ -113,6 +126,7 @@ public class RsrDbAdapter {
 		public void onCreate(SQLiteDatabase db) {
 			db.execSQL(PROJECT_TABLE_CREATE);
 			db.execSQL(UPDATE_TABLE_CREATE);
+			db.execSQL(COUNTRY_TABLE_CREATE);
 			for (int i = 0; i < DEFAULT_INSERTS.length; i++) {
 				db.execSQL(DEFAULT_INSERTS[i]);
 			}			
@@ -127,6 +141,7 @@ public class RsrDbAdapter {
 			if (oldVersion < DATABASE_VERSION) { //start over fresh, consider everything to be a cache
 				db.execSQL("DROP TABLE IF EXISTS " + PROJECT_TABLE);
 				db.execSQL("DROP TABLE IF EXISTS " + UPDATE_TABLE);
+				db.execSQL("DROP TABLE IF EXISTS " + COUNTRY_TABLE);
 				onCreate(db);
 			}			
 			
@@ -220,7 +235,7 @@ public class RsrDbAdapter {
 		}
 
 		
-		// executes a sql statement and swallows errors
+		// executes an SQL statement and swallows errors
 		private void runSQL(String ddl, SQLiteDatabase db) {
 			try {
 				db.execSQL(ddl);
@@ -469,6 +484,21 @@ public class RsrDbAdapter {
 
 
 	/**
+	 * Gets all projects, all columns and country data
+	 */
+	public Cursor listAllProjectsWithCountry() {
+		Cursor cursor = database.query(PROJECT_JOIN,
+										null,
+										null,
+										null,
+										null,
+										null,
+										null);
+		return cursor;
+	}
+
+
+	/**
 	 * Gets all updates, all columns
 	 */
 	public Cursor listAllUpdates() {
@@ -494,6 +524,21 @@ public class RsrDbAdapter {
 										null,
 										null,
 										null);
+
+		return cursor;
+	}
+
+	/**
+	 * Gets updates for a specific project, all columns
+	 */
+	public Cursor listAllUpdatesNewestFirstFor(String _id) {
+		Cursor cursor = database.query(UPDATE_TABLE,
+										null,
+										PROJECT_COL + " = ?",
+										new String[] { _id },
+										null,
+										null,
+										PK_ID_COL + " DESC");
 
 		return cursor;
 	}
@@ -548,22 +593,22 @@ public class RsrDbAdapter {
 	 */
 	public Project findProject(String _id) {
 		Project project = null;
-		Cursor cursor = database.query(PROJECT_TABLE,
+		Cursor cursor = database.query(PROJECT_JOIN,
 									   null,
-									   PK_ID_COL + " = ?",
+									   "project._id = ?",
 									   new String[] { _id }, null, null, null);
 		if (cursor != null) {
 			if (cursor.getCount() > 0) {
 				cursor.moveToFirst();
 				project = new Project();
-				project.setId(_id);
+				project.setId(_id); //no confusion with country id
 				project.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(TITLE_COL)));
 				project.setSubtitle(cursor.getString(cursor.getColumnIndexOrThrow(SUBTITLE_COL)));
 				project.setSummary(cursor.getString(cursor.getColumnIndexOrThrow(SUMMARY_COL)));
 				project.setThumbnailUrl(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_URL_COL)));
 				project.setThumbnail(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_FILENAME_COL)));
-				//TODO funds
-				project.setCountry(cursor.getString(cursor.getColumnIndexOrThrow(COUNTRY_COL)));
+				//TODO funds?
+				project.setCountry(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
 				project.setState(cursor.getString(cursor.getColumnIndexOrThrow(STATE_COL)));
 				project.setCity(cursor.getString(cursor.getColumnIndexOrThrow(CITY_COL)));
 				project.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(LAT_COL)));
@@ -692,6 +737,50 @@ public class RsrDbAdapter {
 		executeSql("delete from _update");
 //		executeSql("update preferences set value = '' where key = 'user.lastuser.id'");
 	}
+
+	public Cursor listAllCountries() {
+		Cursor cursor = database.query(COUNTRY_TABLE,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null);
+		return cursor;
+	}
+
+	/**
+	 * saves or updates a Country in the db
+	 * 
+	 * @param country
+	 * @return
+	 */
+	public void saveCountry(Country country) {
+		ContentValues updatedValues = new ContentValues();
+		updatedValues.put(PK_ID_COL, country.getId());
+		updatedValues.put(NAME_COL, country.getName());
+		updatedValues.put(CONTINENT_COL, country.getContinent());
+		updatedValues.put(ISO_CODE_COL, country.getIsoCode());
+
+		Cursor cursor = database.query(COUNTRY_TABLE,
+				new String[] { PK_ID_COL },
+				PK_ID_COL + " = ?",
+				new String[] { country.getId(), },
+				null, null, null);
+
+		if (cursor != null && cursor.getCount() > 0) {
+			// if we found an item, it's an update, otherwise, it's an insert
+			database.update(COUNTRY_TABLE, updatedValues, PK_ID_COL + " = ?",
+					new String[] { country.getId() });
+		} else {
+			database.insert(COUNTRY_TABLE, null, updatedValues);
+		}
+
+		if (cursor != null) {
+			cursor.close();
+		}
+	}
+
 
 
 }

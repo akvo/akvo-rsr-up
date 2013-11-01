@@ -152,6 +152,36 @@ public class Downloader {
 
 
 	/**
+	 * populates the country table in the db from a server URL
+	 * 
+	 * @param ctx
+	 * @param url
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 */
+	public void fetchCountryList(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
+
+		/* Get a SAXParser from the SAXPArserFactory. */
+		SAXParserFactory spf = SAXParserFactory.newInstance();
+		SAXParser sp = spf.newSAXParser();
+
+		/* Get the XMLReader of the SAXParser we created. */
+		XMLReader xr = sp.getXMLReader();
+		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
+		CountryListHandler myCountryListHandler = new CountryListHandler(new RsrDbAdapter(ctx));
+		xr.setContentHandler(myCountryListHandler);
+		/* Parse the xml-data from our URL. */
+		xr.parse(new InputSource(url.openStream()));
+		/* Parsing has finished. */
+
+		/* Check if anything went wrong. */
+		err = myCountryListHandler.getError();
+		Log.i(TAG, "Fetched " + myCountryListHandler.getCount() + " countries");
+	}
+
+
+	/**
 	 * fetches one file from a URL
 	 * @param url
 	 * @param file

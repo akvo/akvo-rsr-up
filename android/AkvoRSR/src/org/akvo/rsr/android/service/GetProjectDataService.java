@@ -36,6 +36,8 @@ public class GetProjectDataService extends IntentService {
 		try {
 			dl.fetchProjectList(this, new URL(SettingsUtil.host(this) +
 					                          String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN, SettingsUtil.Read(this, "authorized_orgid"))));
+			dl.fetchCountryList(this, new URL(SettingsUtil.host(this) +
+                    String.format(ConstantUtil.FETCH_COUNTRIES_URL)));
 			broadcastProgress(0, 100, 100);//For this phase, only whole operation
 			
 			//We only get published projects from that URL, so we need to iterate on them and get corresponding updates

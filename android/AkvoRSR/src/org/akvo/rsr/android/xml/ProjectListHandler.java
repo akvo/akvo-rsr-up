@@ -113,6 +113,7 @@ public class ProjectListHandler extends DefaultHandler {
 	private int depth = 0;
 	private int projectCount = 0;
 	private boolean syntaxError = false;
+	private String buffer; //used to accumulate a tag ocntent
 
 	//where to store results
 	private RsrDbAdapter dba;
@@ -164,10 +165,10 @@ public class ProjectListHandler extends DefaultHandler {
 		if (localName.equals("object") && depth == 2) { //ignore root tag completely
 			this.in_project = true;
 			currentProj = new Project();
-			currentProj.setSummary("");
 		} else if (in_project)
 			if (localName.equals("id") && depth == 3) {
 				this.in_id = true;
+				buffer = "";
 			} else if (localName.equals("title") && depth == 3) {
 				this.in_title = true;
 			} else if (localName.equals("subtitle") && depth == 3) {
@@ -185,6 +186,7 @@ public class ProjectListHandler extends DefaultHandler {
 				*/
 			} else if (localName.equals("project_plan_summary") && depth==3) {
 				this.in_summary = true;
+				buffer = "";
 			} else if (localName.equals("current_image") && depth==3) {
 				this.in_current_image = true;
 			} else if (localName.equals("country") && in_location) {
@@ -199,8 +201,10 @@ public class ProjectListHandler extends DefaultHandler {
 				this.in_long = true;
 			} else if (localName.equals("thumbnails") && in_current_image) {
 				this.in_thumbnails = true;
+				buffer = "";
 			} else if (localName.equals("map_thumb") && in_thumbnails) {
 				this.in_thumbnail_url = true;
+				buffer = "";
 			}
 		depth++;
 	}
@@ -214,6 +218,7 @@ public class ProjectListHandler extends DefaultHandler {
 		depth--;
 		if (localName.equals("id") && depth==3) {
 			this.in_id= false;
+    		currentProj.setId(buffer);
 		} else if (localName.equals("title") && depth==3) {
 				this.in_title = false;
 		} else if (localName.equals("subtitle") && depth==3) {
@@ -231,6 +236,7 @@ public class ProjectListHandler extends DefaultHandler {
 			}
 		} else if (localName.equals("project_plan_summary") && depth==3) {
 			this.in_summary = false;
+			currentProj.setSummary(buffer);
 		} else if (localName.equals("current_image") && depth==3) {
 			this.in_current_image = false;
 		} else if (localName.equals("country") && in_location) {
@@ -247,6 +253,7 @@ public class ProjectListHandler extends DefaultHandler {
 			this.in_thumbnails = false;
 		} else if (localName.equals("map_thumb") && in_thumbnails) {
 			this.in_thumbnail_url = false;
+			currentProj.setThumbnailUrl(buffer);
 		}
 	}
 	
@@ -256,17 +263,17 @@ public class ProjectListHandler extends DefaultHandler {
     public void characters(char ch[], int start, int length) {
 		if (currentProj != null) {
 			if(this.in_id) {
-	    		currentProj.setId(new String(ch, start, length));
+				buffer += new String(ch, start, length); //TODO do this for all tag values!
 			} else if(this.in_title) {
 		    		currentProj.setTitle(new String(ch, start, length));
 			} else if(this.in_subtitle) {
 				currentProj.setTitle(new String(ch, start, length));
 			} else if(this.in_summary) {
-				currentProj.setSummary(currentProj.getSummary() + new String(ch, start, length));
+				buffer += new String(ch, start, length); //TODO do this for all tag values!
 			} else if(this.in_thumbnail_url) {
-				currentProj.setThumbnailUrl(new String(ch, start, length));
-			} else if(this.in_country) {
-	    		currentProj.setCountry(new String(ch, start, length));
+				buffer += new String(ch, start, length); //TODO do this for all tag values!
+			} else if(this.in_country) { //       /api/v1/country/17/
+	    		currentProj.setCountry(idFromUrl(new String(ch, start, length)));
 			} else if(this.in_state) {
 	    		currentProj.setState(new String(ch, start, length));
 			} else if(this.in_city) {
@@ -286,5 +293,16 @@ public class ProjectListHandler extends DefaultHandler {
 		} else
 			syntaxError = true; //set error flag
     }
+
+	// extract id from things like /api/v1/project/574/
+	private String idFromUrl(String s) {
+		if (s.endsWith("/")) {
+			int i = s.lastIndexOf('/',s.length()-2);
+			if (i>=0) {
+				return s.substring(i+1, s.length()-1);
+			} else syntaxError = true;
+		} else syntaxError = true;
+		return null;
+	}
 
 }
