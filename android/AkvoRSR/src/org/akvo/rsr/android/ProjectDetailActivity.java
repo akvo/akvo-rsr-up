@@ -114,6 +114,7 @@ public class ProjectDetailActivity extends Activity {
 		} else {
 			projTitleLabel.setText(project.getTitle());
 		}
+
 		String loc = "";
 		if (project.getCity() != null) {
 			loc += project.getCity() + ", ";
@@ -127,7 +128,14 @@ public class ProjectDetailActivity extends Activity {
 		if (loc.length() > 1) {
 			loc = loc.substring(0, loc.length()-2);
 		}
-			
+
+		//TODO check against 0,0 too?
+		if (project.getLatitude() != null &&
+			project.getLongitude() != null ) {
+			loc += "\nLatitude " + project.getLatitude() +
+			" Longitude " + project.getLongitude();
+		}
+
 		projLocationText.setText(loc);
 		projSummaryText.setText(project.getSummary());
 		

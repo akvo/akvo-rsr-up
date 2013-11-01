@@ -16,11 +16,17 @@
 
 package org.akvo.rsr.android.xml;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+import java.util.TimeZone;
+
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Update;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+
 
 /*
  * Example input:
@@ -64,11 +70,14 @@ public class UpdateListHandler extends DefaultHandler {
 	private boolean in_project_id = false;
 	private boolean in_photo = false;
 	private boolean in_text = false;
+	private boolean in_time = false;
 
 	private Update currentUpd;
 	private int updateCount;
 	private boolean syntaxError = false;
 	private int depth = 0;
+	private SimpleDateFormat df1;
+	private String idBuffer, dateBuffer, buffer;
 	
 	//where to store results
 	private RsrDbAdapter dba;
@@ -79,6 +88,8 @@ public class UpdateListHandler extends DefaultHandler {
 	UpdateListHandler(RsrDbAdapter aDba){
 		super();
 		dba = aDba;
+		df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
+		df1.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
 	// ===========================================================
 	// Getter & Setter
@@ -114,22 +125,29 @@ public class UpdateListHandler extends DefaultHandler {
 	@Override
 	public void startElement(String namespaceURI, String localName,
 			String qName, Attributes atts) throws SAXException {
+		buffer = "";
 		if (localName.equals("object")) {
 			this.in_update = true;
 			currentUpd = new Update();
 			currentUpd.setText("");//for appending
-		} else if (in_update)
+		} else if (in_update) {
 			if (localName.equals("id")) {
 				this.in_id = true;
+				idBuffer = "";
 			} else if (localName.equals("title")) {
 				this.in_title = true;
 			} else if (localName.equals("text")) {
 				this.in_text = true;
+			} else if (localName.equals("time")) {
+				this.in_time = true;
+				dateBuffer = "";
 			} else if (localName.equals("project")) {
 				this.in_project_id = true;
 			} else if (localName.equals("photo")) {
 				this.in_photo = true;
 			}
+		}
+		
 		depth++;
 	}
 	
@@ -142,10 +160,18 @@ public class UpdateListHandler extends DefaultHandler {
 
 		if (localName.equals("id")) {
 			this.in_id = false;
+			currentUpd.setId(idBuffer);
 		} else if (localName.equals("title")) {
-				this.in_title = false;
+			this.in_title = false;
 		} else if (localName.equals("text")) {
 			this.in_text = false;
+		} else if (localName.equals("time")) {
+			this.in_time = false;
+			try {
+				currentUpd.setDate(df1.parse(dateBuffer));
+			} catch (ParseException e1) {
+				syntaxError = true;
+			}
 		} else if (localName.equals("project")) {
 			this.in_project_id = false;
 		} else if (localName.equals("object")) {
@@ -157,34 +183,43 @@ public class UpdateListHandler extends DefaultHandler {
 			} else syntaxError=true;
 		} else if (localName.equals("photo")) {
 			this.in_photo = false;
+			currentUpd.setThumbnailUrl(buffer);
 		}
 	}
 	
 	/** Gets called on the following structure: 
 	 * <tag>characters</tag> */
+	// May be called multiple times for portions of the same tag contents!
 	@Override
     public void characters(char ch[], int start, int length) {
 		if (currentUpd != null) {
 			if(this.in_id) {
-				currentUpd.setId(new String(ch, start, length));
+				idBuffer += new String(ch, start, length);
 			} else if(this.in_title) {
 				currentUpd.setTitle(new String(ch, start, length));
+			} else if(this.in_time) {
+				dateBuffer += new String(ch, start, length);
 			} else if(this.in_project_id) { // <project>/api/v1/project/574/</project>
-				String s = new String(ch, start, length);
-				if (s.endsWith("/")) {
-					int i = s.lastIndexOf('/',s.length()-2);
-					if (i>=0) {
-						s = s.substring(i+1, s.length()-1);
-						currentUpd.setProjectId(s);
-					} else syntaxError = true;
-				} else syntaxError = true;
+				currentUpd.setProjectId(idFromUrl(new String(ch, start, length)));
 			} else if(this.in_photo) {
-				currentUpd.setThumbnailUrl(new String(ch, start, length));
+				buffer += new String(ch, start, length);
 			} else if(this.in_text) {
 				currentUpd.setText(currentUpd.getText() + new String(ch, start, length)); //append
 			}
 		} else
 			syntaxError = true; //set error flag
     }
+	
+	
+	// extract id from things like /api/v1/project/574/
+	private String idFromUrl(String s) {
+		if (s.endsWith("/")) {
+			int i = s.lastIndexOf('/',s.length()-2);
+			if (i>=0) {
+				return s.substring(i+1, s.length()-1);
+			} else syntaxError = true;
+		} else syntaxError = true;
+		return null;
+	}
 
 }

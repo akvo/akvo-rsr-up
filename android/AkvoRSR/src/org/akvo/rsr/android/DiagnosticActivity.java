@@ -117,6 +117,11 @@ public class DiagnosticActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		dba.open();
+		Cursor a = dba.listAllCountries();
+		txt.append("\nCountries in db: " + String.valueOf(a.getCount())+"\n");
+		while (a.moveToNext())
+			txt.append("\n["+a.getString(a.getColumnIndex(RsrDbAdapter.PK_ID_COL))+"] "+a.getString(a.getColumnIndex(RsrDbAdapter.NAME_COL))+" ");
+		a.close();
 		Cursor c = dba.listAllUpdates();
 		txt.append("\nUpdates in db: " + String.valueOf(c.getCount())+"\n");
 		while (c.moveToNext())
