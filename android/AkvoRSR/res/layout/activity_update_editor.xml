@@ -74,7 +74,42 @@
 	            android:padding="5dip"
 	             />
 	        
-			<!-- The photo -->	
+			<!-- The photo -->
+
+	        <LinearLayout
+	            android:id="@+id/photo_buttons"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:orientation="horizontal" >
+
+	            <Button
+	                android:id="@+id/btn_take_photo"
+	                android:layout_width="0dp"
+	                android:layout_height="wrap_content"
+	                android:layout_margin="5dp"
+	                android:layout_weight="1"
+	                android:background="@android:color/black"
+	                android:drawableTop="@drawable/ic_menu_camera"
+	                android:padding="15dp"
+	                android:text="@string/btncaption_take_photo"
+	                android:textColor="@android:color/white"
+	                android:textSize="18sp" />
+
+	            <Button
+	                android:id="@+id/btn_attach_photo"
+	                android:layout_width="0dp"
+	                android:layout_height="wrap_content"
+	                android:layout_margin="5dp"
+	                android:layout_weight="1"
+	                android:background="@android:color/black"
+	                android:drawableTop="@drawable/ic_menu_camera"
+	                android:padding="15dp"
+	                android:text="@string/btncaption_attach_photo"
+	                android:textColor="@android:color/white"
+	                android:textSize="18sp" />
+
+	        </LinearLayout>
+	
 		    <LinearLayout
 	        	android:id="@+id/image_with_delete"
 		        android:layout_width="fill_parent"
@@ -106,21 +141,9 @@
 			        />
 			</LinearLayout>
 
-		    <Button
-		        android:id="@+id/btn_take_photo"
-		        android:layout_width="wrap_content"
-		        android:layout_height="50dip"
-		        android:layout_gravity="center_horizontal"
-		        android:layout_margin="15dp"
-		        android:background="@android:color/black"
-		        android:drawableLeft="@drawable/ic_menu_camera"
-		        android:padding="15dp"
-		        android:text="@string/btncaption_photo"
-		        android:textColor="@android:color/white"
-		        android:textSize="18sp" />
-
 		    
 		    <!-- some fudge to fill the viewport if necessary -->
+
 		    <View
 		        android:layout_width="fill_parent"
         		android:layout_height="0dp"

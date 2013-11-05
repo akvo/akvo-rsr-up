@@ -43,7 +43,8 @@
     <string name="password">Password</string>
     <string name="forgot_password_">Forgot Password?</string>
     <string name="btncaption_sign_in">SIGN IN</string>
-    <string name="btncaption_photo">Add a photo</string>
+    <string name="btncaption_take_photo">Take photo</string>
+    <string name="btncaption_attach_photo">Attach photo</string>
     <string name="btncaption_rephoto">Replace photo</string>
     <string name="btncaption_dephoto">Delete photo</string>
     <string name="btncaption_add_update">Add update</string>

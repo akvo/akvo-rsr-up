@@ -75,8 +75,10 @@ public class UpdateEditorActivity extends Activity {
 	private Button btnSubmit;
 	private Button btnDraft;
 	private Button btnTakePhoto;
+	private Button btnAttachPhoto;
 	private Button btnDelPhoto;
 	private View photoAndDeleteGroup;
+	private View photoAddGroup;
 	//Database
 	private RsrDbAdapter dba;
 	ProgressDialog progress;
@@ -112,6 +114,7 @@ public class UpdateEditorActivity extends Activity {
 		projupdDescriptionText = (EditText) findViewById(R.id.edit_projupd_description);
 		projupdImage = (ImageView) findViewById(R.id.image_update_detail);
 		photoAndDeleteGroup = findViewById(R.id.image_with_delete);
+		photoAddGroup = findViewById(R.id.photo_buttons);
 
 		
 		//Activate buttons
@@ -140,15 +143,24 @@ public class UpdateEditorActivity extends Activity {
 			}
 		});
 		
+		btnAttachPhoto = (Button) findViewById(R.id.btn_attach_photo);
+		btnAttachPhoto.setOnClickListener( new View.OnClickListener() {
+			public void onClick(View view) {
+	        	Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+	        	photoPickerIntent.setType("image/*");
+	        	startActivityForResult(photoPickerIntent, photoPick);    
+			}
+		});
+		
 		btnDelPhoto = (Button) findViewById(R.id.btn_delete_photo);
 		btnDelPhoto.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {
 				//Forget image
 				update.setThumbnailFilename(null);
-				//TODO: delete image file
+				//TODO: delete image file if in 
 				//Hide them
 				photoAndDeleteGroup.setVisibility(View.GONE);
-				btnTakePhoto.setVisibility(View.VISIBLE);
+				photoAddGroup.setVisibility(View.VISIBLE);
 			}
 		});
 		
@@ -176,7 +188,7 @@ public class UpdateEditorActivity extends Activity {
 					//btnTakePhoto.setText(R.string.btncaption_rephoto);
 					FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), update.getThumbnailFilename());
 					photoAndDeleteGroup.setVisibility(View.VISIBLE);
-					btnTakePhoto.setVisibility(View.GONE);
+					photoAddGroup.setVisibility(View.GONE);
 				}
 
 			}
@@ -236,7 +248,7 @@ public class UpdateEditorActivity extends Activity {
 			FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename);
 			//show result
 			photoAndDeleteGroup.setVisibility(View.VISIBLE);
-			btnTakePhoto.setVisibility(View.GONE);
+			photoAddGroup.setVisibility(View.GONE);
 		}
 		if (requestCode == photoPick) {
 			if (resultCode == RESULT_CANCELED) {
@@ -255,7 +267,7 @@ public class UpdateEditorActivity extends Activity {
 				update.setThumbnailUrl("dummyUrl");
 				FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename);
 				photoAndDeleteGroup.setVisibility(View.VISIBLE);
-				btnTakePhoto.setVisibility(View.GONE);
+				photoAddGroup.setVisibility(View.GONE);
 			} catch (FileNotFoundException e) {
 				projupdImage.setImageResource(R.drawable.thumbnail_error);
 				e.printStackTrace();
@@ -495,11 +507,13 @@ public class UpdateEditorActivity extends Activity {
 			Intent intent = new Intent(this, SettingsActivity.class);
 			startActivity(intent);
             return true;
+/*            
         case R.id.action_attach_photo:
         	Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
         	photoPickerIntent.setType("image/*");
         	startActivityForResult(photoPickerIntent, photoPick);    
         	return true;
+        	*/
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }
