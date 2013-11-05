@@ -16,6 +16,8 @@
 
 package org.akvo.rsr.android.dao;
 
+import java.util.Date;
+
 import org.akvo.rsr.android.domain.Country;
 import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.domain.Update;
@@ -49,6 +51,7 @@ public class RsrDbAdapter {
 	public static final String DRAFT_COL = "draft";
 	public static final String UNSENT_COL = "unsent"; //currently unused
 	public static final String HIDDEN_COL = "hidden";
+	public static final String CREATED_COL = "creation_date";
 
 	public static final String LAT_COL = "latitude";
 	public static final String LON_COL = "longitude";
@@ -78,7 +81,9 @@ public class RsrDbAdapter {
 			"create table _update (_id integer primary key, project integer not null, "+
 			"title text not null, _text text, location text, "+
 			"thumbnail_url text, thumbnail_fn text," +
-			"draft integer, unsent integer);";
+			"draft integer, unsent integer," +
+			CREATED_COL + " INTEGER NOT NULL DEFAULT (strftime('%s','now'))" +
+			");";
 	private static final String COUNTRY_TABLE_CREATE =
 			"create table country (_id integer primary key, "+
 			"name text not null, continent text, "+
@@ -97,7 +102,8 @@ public class RsrDbAdapter {
 //	private static final int DATABASE_VERSION = 5;
 //	private static final int DATABASE_VERSION = 6; //added long, lat, country, state, city
 //	private static final int DATABASE_VERSION = 7; //added project.hidden
-	private static final int DATABASE_VERSION = 8; //added country table
+//	private static final int DATABASE_VERSION = 8; //added country table
+	private static final int DATABASE_VERSION = 9; //added update.creation_date
 
 	private final Context context;
 
@@ -399,6 +405,7 @@ public class RsrDbAdapter {
 			updatedValues.put(THUMBNAIL_FILENAME_COL, update.getThumbnailFilename());
 		updatedValues.put(DRAFT_COL, update.getDraft()?"1":"0");
 		updatedValues.put(UNSENT_COL, update.getUnsent()?"1":"0");
+		updatedValues.put(CREATED_COL, update.getDate().getTime()/1000); //1-second precision only
 
 		Cursor cursor = database.query(UPDATE_TABLE,
 				new String[] { PK_ID_COL },
@@ -538,7 +545,7 @@ public class RsrDbAdapter {
 										new String[] { _id },
 										null,
 										null,
-										PK_ID_COL + " DESC");
+										CREATED_COL + " DESC");
 
 		return cursor;
 	}
@@ -643,6 +650,7 @@ public class RsrDbAdapter {
 				update.setThumbnailFilename(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_FILENAME_COL)));
 				update.setDraft(0 != cursor.getInt(cursor.getColumnIndexOrThrow(DRAFT_COL)));
 				update.setUnsent(0 != cursor.getInt(cursor.getColumnIndexOrThrow(UNSENT_COL)));
+				update.setDate(new Date(1000 * cursor.getLong(cursor.getColumnIndexOrThrow(CREATED_COL))));
 				}
 			cursor.close();
 		}

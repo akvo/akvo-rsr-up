@@ -32,7 +32,7 @@
 		        style="?android:attr/progressBarStyleHorizontal"
 		        android:layout_width="fill_parent"
 		        android:layout_height="wrap_content"
-		        android:indeterminate="true" />
+		        android:indeterminate="false" />
 
 	        <TextView
 	            android:layout_width="fill_parent"

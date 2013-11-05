@@ -24,11 +24,13 @@ import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.FileUtil;
 import org.akvo.rsr.android.util.SettingsUtil;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -40,6 +42,7 @@ import android.graphics.BitmapFactory;
 public class ProjectDetailActivity extends Activity {
 
 	private String projId = null;
+	private Project project = null;
 	private TextView projTitleLabel;
 	private TextView projSummaryText;
 	private TextView projLocationText;
@@ -107,7 +110,7 @@ public class ProjectDetailActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		dba.open();
-		Project project = dba.findProject(projId);
+		project = dba.findProject(projId);
 		
 		if (debug) {
 			projTitleLabel.setText("["+ projId+"] "+project.getTitle());
@@ -134,6 +137,15 @@ public class ProjectDetailActivity extends Activity {
 			project.getLongitude() != null ) {
 			loc += "\nLatitude " + project.getLatitude() +
 			" Longitude " + project.getLongitude();
+			projLocationText.setOnClickListener(
+				new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						launchLatLonIntent();
+					}
+				});
+		} else {
+			projLocationText.setOnClickListener(null);
 		}
 
 		projLocationText.setText(loc);
@@ -198,6 +210,19 @@ public class ProjectDetailActivity extends Activity {
 		        return super.onOptionsItemSelected(item);
 	    }
 
+	}
+	
+	private void launchLatLonIntent() {
+		if (project != null &&
+		    project.getLatitude() != null &&
+			project.getLongitude() != null ) {
+			Uri uri = Uri.parse("geo:" + project.getLatitude() +
+			"," + project.getLongitude()); //Possibly add "?zoom=z"
+			Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+			startActivity(intent);
+			
+		}
+		
 	}
 
 }

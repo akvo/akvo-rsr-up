@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Date;
 
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Project;
@@ -306,6 +307,7 @@ public class UpdateEditorActivity extends Activity {
 		update.setUnsent(false);
 		update.setTitle(projupdTitleText.getText().toString());
 		update.setText(projupdDescriptionText.getText().toString());
+		update.setDate(new Date());
 		if (update.getId() == null) {//new
 			//MUST have project and a local update id
 			update.setProjectId(projectId);
@@ -343,6 +345,7 @@ public class UpdateEditorActivity extends Activity {
 		update.setTitle(projupdTitleText.getText().toString());
 		update.setText(projupdDescriptionText.getText().toString());
 		update.setProjectId(projectId);
+		update.setDate(new Date());		
 		if (update.getId() == null) {//new
 		    update.setId(Integer.toString(nextLocalId));
 			nextLocalId--;

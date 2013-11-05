@@ -56,10 +56,13 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 
+		int idcol = cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL);
 		//Text data
 		TextView titleView = (TextView) view.findViewById(R.id.ulist_item_title);
 		if (debug) {
-			titleView.setText("["+ cursor.getString(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL))+"] "+cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
+			titleView.setText("["+ cursor.getString(idcol)+" t "+
+					cursor.getString(cursor.getColumnIndex(RsrDbAdapter.CREATED_COL)) + "] "+
+					cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
 		} else {
 			titleView.setText(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
 		}
@@ -87,7 +90,7 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 
 		//set tags so we will know what got clicked
 		view.setTag(R.id.project_id_tag, cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PROJECT_COL)));
-		view.setTag(R.id.update_id_tag, cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL)));
+		view.setTag(R.id.update_id_tag, cursor.getLong(idcol));
 
 	}
 

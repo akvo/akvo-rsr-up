@@ -33,12 +33,16 @@ public class GetProjectDataService extends IntentService {
 		RsrDbAdapter ad = new RsrDbAdapter(this);
 		Downloader dl = new Downloader();
 		String errMsg = null;
+		boolean noimages = SettingsUtil.ReadBoolean(this, "setting_delay_image_fetch", false);
+
+
 		try {
 			dl.fetchProjectList(this, new URL(SettingsUtil.host(this) +
 					                          String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN, SettingsUtil.Read(this, "authorized_orgid"))));
+			broadcastProgress(0, 50, 100);
 			dl.fetchCountryList(this, new URL(SettingsUtil.host(this) +
                     String.format(ConstantUtil.FETCH_COUNTRIES_URL)));
-			broadcastProgress(0, 100, 100);//For this phase, only whole operation
+			broadcastProgress(0, 100, 100);
 			
 			//We only get published projects from that URL, so we need to iterate on them and get corresponding updates
 			ad.open();
@@ -68,23 +72,25 @@ public class GetProjectDataService extends IntentService {
 		}
 //		progressBroadcast(1, 0, 0);
 		
-		try {
-			dl.fetchNewThumbnails(this,
-					SettingsUtil.host(this),
-					FileUtil.getExternalCacheDir(this).toString(),
-					new Downloader.ProgressReporter() {
-						public void sendUpdate(int sofar, int total) {
-							Intent intent = new Intent(ConstantUtil.PROJECTS_PROGRESS_ACTION);
-							intent.putExtra(ConstantUtil.PHASE_KEY, 2);
-							intent.putExtra(ConstantUtil.SOFAR_KEY, sofar);
-							intent.putExtra(ConstantUtil.TOTAL_KEY, total);
-						    LocalBroadcastManager.getInstance(myself).sendBroadcast(intent);							
+		if (!noimages) {
+			try {
+				dl.fetchNewThumbnails(this,
+						SettingsUtil.host(this),
+						FileUtil.getExternalCacheDir(this).toString(),
+						new Downloader.ProgressReporter() {
+							public void sendUpdate(int sofar, int total) {
+								Intent intent = new Intent(ConstantUtil.PROJECTS_PROGRESS_ACTION);
+								intent.putExtra(ConstantUtil.PHASE_KEY, 2);
+								intent.putExtra(ConstantUtil.SOFAR_KEY, sofar);
+								intent.putExtra(ConstantUtil.TOTAL_KEY, total);
+							    LocalBroadcastManager.getInstance(myself).sendBroadcast(intent);							
+							}
 						}
-					}
-					);
-		} catch (MalformedURLException e) {
-			Log.e(TAG,"Bad thumbnail URL:",e);
-			errMsg = "Thumbnail url problem: "+ e;
+						);
+			} catch (MalformedURLException e) {
+				Log.e(TAG,"Bad thumbnail URL:",e);
+				errMsg = "Thumbnail url problem: "+ e;
+			}
 		}
 
 		//broadcast completion

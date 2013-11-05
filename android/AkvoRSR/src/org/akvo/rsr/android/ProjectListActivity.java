@@ -190,7 +190,8 @@ public class ProjectListActivity extends ListActivity {
 		
 		//start progress animation
 		inProgress.setVisibility(View.VISIBLE);
-		inProgress1.setIndeterminate(true);//no prediction of projects
+//		inProgress1.setIndeterminate(true);//no prediction of projects
+		inProgress1.setProgress(0);
 		inProgress2.setProgress(0);
 		inProgress3.setProgress(0);
 	}

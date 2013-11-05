@@ -21,6 +21,7 @@ import java.io.File;
 import org.akvo.rsr.android.R;
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.util.FileUtil;
+import org.akvo.rsr.android.util.SettingsUtil;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -43,11 +44,13 @@ public class ProjectListCursorAdapter extends CursorAdapter{
  * 
  */
 	private RsrDbAdapter dba;
+	private boolean debug;
 	
 	public ProjectListCursorAdapter(Context context, Cursor c) {
 		super(context, c);
 		dba = new RsrDbAdapter(context);
 		dba.open();
+		debug = SettingsUtil.ReadBoolean(context, "setting_debug", false);
 	}
 
 	
@@ -57,8 +60,12 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 
 		//Text data
 		TextView titleView = (TextView) view.findViewById(R.id.list_item_title);
-		titleView.setText(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
-
+		if (debug) {
+			titleView.setText("["+ cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL)) +"] "+
+					cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
+		} else {
+			titleView.setText(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
+		}
 		String projId = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL));
 		dba.open();
 		int [] stateCounts = {0,0,0};
