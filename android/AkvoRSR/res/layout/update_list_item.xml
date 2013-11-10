@@ -24,23 +24,33 @@
 		>
 
        	<TextView
-	        android:id="@+id/ulist_item_title"
+       	    android:id="@+id/ulist_item_title"
        	    android:layout_width="fill_parent"
        	    android:layout_height="wrap_content"
+       	    android:layout_marginTop="10dp"
        	    android:gravity="fill_horizontal"
        	    android:paddingBottom="5dip"
-       	    android:textColor="@color/dk_gray"
-       	    android:typeface="sans"
        	    android:text="Title goes here"
-       	     />
+       	    android:textColor="@color/dk_gray"
+       	    android:textSize="14sp"
+       	    android:typeface="sans" />
 
        	<TextView
-	        android:id="@+id/ulist_item_state"
+       	    android:id="@+id/ulist_item_date"
+       	    android:layout_width="fill_parent"
+       	    android:layout_height="wrap_content"
+       	    android:layout_marginTop="5dp"
+       	    android:text="Sometime"
+       	    android:textSize="12sp" />
+
+       	<TextView
+       	    android:id="@+id/ulist_item_state"
        	    android:layout_width="wrap_content"
        	    android:layout_height="wrap_content"
        	    android:layout_gravity="left"
-       	    android:textSize="12sp"
+       	    android:layout_marginTop="5dp"
        	    android:text="@string/state_published"
-       	    />
+       	    android:textSize="12sp" />
+
    	</LinearLayout>
 </LinearLayout>

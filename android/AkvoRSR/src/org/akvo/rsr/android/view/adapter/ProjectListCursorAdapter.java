@@ -93,7 +93,7 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 		ImageView thumbnail = (ImageView) view.findViewById(R.id.list_item_thumbnail);
 		String fn = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
 		String url = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
-		FileUtil.setPhotoFile(thumbnail, url, fn);
+		FileUtil.setPhotoFile(thumbnail, url, fn, projId, null);
 		
 		//set tag so we will know what got clicked
 		view.setTag(R.id.project_id_tag, cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL)));

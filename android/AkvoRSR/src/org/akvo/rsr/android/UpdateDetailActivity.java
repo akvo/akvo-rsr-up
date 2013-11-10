@@ -109,7 +109,7 @@ public class UpdateDetailActivity extends Activity {
 			
 			//show preexisting image
 			if (update.getThumbnailFilename() != null) {
-				FileUtil.setPhotoFile(projupdImage,update.getThumbnailUrl(),update.getThumbnailFilename());
+				FileUtil.setPhotoFile(projupdImage,update.getThumbnailUrl(),update.getThumbnailFilename(), null, updateId);
 			}
 
 		}

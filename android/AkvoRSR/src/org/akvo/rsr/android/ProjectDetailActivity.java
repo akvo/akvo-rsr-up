@@ -113,7 +113,7 @@ public class ProjectDetailActivity extends Activity {
 		project = dba.findProject(projId);
 		
 		if (debug) {
-			projTitleLabel.setText("["+ projId+"] "+project.getTitle());
+			projTitleLabel.setText("["+ projId + "] "+project.getTitle());
 		} else {
 			projTitleLabel.setText(project.getTitle());
 		}
@@ -162,7 +162,7 @@ public class ProjectDetailActivity extends Activity {
 		publishedCountView.setText(Integer.toString(stateCounts[2]) + res.getString(R.string.count_published));
 		draftCountView.setText(Integer.toString(stateCounts[0]) + res.getString(R.string.count_draft));
 
-		FileUtil.setPhotoFile(projImage,project.getThumbnailUrl(), project.getThumbnailFilename());
+		FileUtil.setPhotoFile(projImage,project.getThumbnailUrl(), project.getThumbnailFilename(), projId, null);
 
 	}
 	

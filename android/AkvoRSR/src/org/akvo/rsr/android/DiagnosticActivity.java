@@ -72,13 +72,20 @@ public class DiagnosticActivity extends Activity {
 	 * TODO: move to FileUtil?
 	 */
 	private void clearCache(Context context ) {
+		RsrDbAdapter dba = new RsrDbAdapter(context);
+		dba.open();
+		dba.clearProjectThumbnailFiles();
+		dba.clearUpdateThumbnailFiles();
+		dba.close();
 		File f = FileUtil.getExternalCacheDir(this);
 		File [] files = f.listFiles();
 		if (files != null) { //dir might not exist
-			for (int i = 0; i < files.length; i++) { 
+			long sizeSum = 0;
+			for (int i = 0; i < files.length; i++) {
+				sizeSum += files[i].length();
 				files[i].delete();
 			}
-			DialogUtil.infoAlert(context, "Cache cleared", files.length + " files deleted");
+			DialogUtil.infoAlert(context, "Cache cleared", files.length + " files deleted (" + sizeSum/(1024*1024) + " MB)");
 		}
 		clearOldCache();
 	}

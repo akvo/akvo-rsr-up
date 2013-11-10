@@ -17,6 +17,7 @@
 package org.akvo.rsr.android.view.adapter;
 
 import java.io.File;
+import java.util.Date;
 
 import org.akvo.rsr.android.R;
 import org.akvo.rsr.android.dao.RsrDbAdapter;
@@ -29,6 +30,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
 import android.graphics.Color;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,26 +48,34 @@ public class UpdateListCursorAdapter extends CursorAdapter{
  */
 	
 	private boolean debug = false;
+	private java.text.DateFormat dfmt;
+	private int idcol, titleCol;
 	
-	public UpdateListCursorAdapter(Context context, Cursor c) {
-		super(context, c);
+	public UpdateListCursorAdapter(Context context, Cursor cursor) {
+		super(context, cursor);
 		debug = SettingsUtil.ReadBoolean(context, "setting_debug", false);
+		dfmt = DateFormat.getDateFormat(context);
+		idcol = cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL);
+		titleCol = cursor.getColumnIndex(RsrDbAdapter.TITLE_COL);
 	}
 
 	
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 
-		int idcol = cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL);
 		//Text data
 		TextView titleView = (TextView) view.findViewById(R.id.ulist_item_title);
 		if (debug) {
-			titleView.setText("["+ cursor.getString(idcol)+" t "+
-					cursor.getString(cursor.getColumnIndex(RsrDbAdapter.CREATED_COL)) + "] "+
-					cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
+			titleView.setText("["+ cursor.getString(idcol) + "] "+
+					cursor.getString(titleCol));
 		} else {
-			titleView.setText(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
+			titleView.setText(cursor.getString(titleCol));
 		}
+
+		TextView dateView = (TextView) view.findViewById(R.id.ulist_item_date);
+		long s = cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.CREATED_COL));
+		Date d = new Date(1000 * s);
+		dateView.setText(dfmt.format(d));
 
 		TextView stateView = (TextView) view.findViewById(R.id.ulist_item_state);
 		if (0 != cursor.getInt(cursor.getColumnIndex(RsrDbAdapter.DRAFT_COL))) {
@@ -86,7 +96,7 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 		//Find file containing thumbnail
 		String fn = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
 		String url = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
-		FileUtil.setPhotoFile(thumbnail, url, fn);
+		FileUtil.setPhotoFile(thumbnail, url, fn, null, cursor.getString(idcol));
 
 		//set tags so we will know what got clicked
 		view.setTag(R.id.project_id_tag, cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PROJECT_COL)));

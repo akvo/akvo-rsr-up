@@ -186,7 +186,7 @@ public class Downloader {
 	 * @param url
 	 * @param file
 	 */
-	public void httpGetToFile(URL url, File file) {
+	public static void httpGetToFile(URL url, File file) {
 		HttpRequest.get(url).receive(file);		
 	}
 
@@ -198,7 +198,7 @@ public class Downloader {
 	 * @param prefix
 	 * @return
 	 */
-	public String httpGetToNewFile(URL url, String directory, String prefix) {
+	public static String httpGetToNewFile(URL url, String directory, String prefix) {
 		String extension = null;
 		int i = url.getFile().lastIndexOf('.');
 		if (i >= 0) {

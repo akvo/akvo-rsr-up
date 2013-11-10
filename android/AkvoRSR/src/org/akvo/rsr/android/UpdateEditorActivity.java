@@ -186,7 +186,7 @@ public class UpdateEditorActivity extends Activity {
 				//show preexisting image
 				if (update.getThumbnailFilename() != null) {
 					//btnTakePhoto.setText(R.string.btncaption_rephoto);
-					FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), update.getThumbnailFilename());
+					FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), update.getThumbnailFilename(), updateId, null);
 					photoAndDeleteGroup.setVisibility(View.VISIBLE);
 					photoAddGroup.setVisibility(View.GONE);
 				}
@@ -245,7 +245,7 @@ public class UpdateEditorActivity extends Activity {
 			}
 			update.setThumbnailFilename(captureFilename);
 			update.setThumbnailUrl("dummyUrl"); //absence will be interpreted as unset thumbnail
-			FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename);
+			FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename, null, null);
 			//show result
 			photoAndDeleteGroup.setVisibility(View.VISIBLE);
 			photoAddGroup.setVisibility(View.GONE);
@@ -265,7 +265,7 @@ public class UpdateEditorActivity extends Activity {
 			    //since that worked, store it and show it
 				update.setThumbnailFilename(captureFilename);
 				update.setThumbnailUrl("dummyUrl");
-				FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename);
+				FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename, null, null);
 				photoAndDeleteGroup.setVisibility(View.VISIBLE);
 				photoAddGroup.setVisibility(View.GONE);
 			} catch (FileNotFoundException e) {

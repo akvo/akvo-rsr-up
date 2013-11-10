@@ -3,8 +3,11 @@ package org.akvo.rsr.android.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.net.URL;
 
 import org.akvo.rsr.android.R;
+import org.akvo.rsr.android.dao.RsrDbAdapter;
+import org.akvo.rsr.android.xml.Downloader;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -12,9 +15,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Environment;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.ImageView;
 
 public class FileUtil {
+	
+	public static String TAG = "FileUtil";
 
 	public static byte[] readFile(String file) throws IOException {
 	        return readFile(new File(file));
@@ -114,25 +122,41 @@ public class FileUtil {
 */
 
 	//Show a thumbnail from a URL and filename 
-	//TODO show different fallback images depending on problem
-    // 0 Image!
+	//show different fallback images depending on case:
+    // 0 Image good and shown
 	// 1 No image set
 	// 2 Image not loaded (setting)
-	// 3 Image load failed
+	// 3 Image load failed (currently treated as 2, would need to remember fetch sts)
 	// 4 Image loaded, but unreadable
-	// 5 Image loaded, but cleared from cache
-	public static void setPhotoFile(ImageView imgView, String url, String fn) {
-		//Handle taken photo
-		if (url == null) {
+	// 5 Image loaded, but cleared from cache (should be treated as 2)
+	public static void setPhotoFile(ImageView imgView, String url, String fn, String projectId, String updateId) {
+
+		if (url == null) { //not set
 			imgView.setImageResource(R.drawable.thumbnail_noimage);			
 		} else
-		if (fn == null) {
-			imgView.setImageResource(R.drawable.thumbnail_load);			
-		} else {
+		if (fn == null) { //Not fetched
+			imgView.setImageResource(R.drawable.thumbnail_load);
+			//set tags so we will know what to load on a click
+			if (projectId != null || updateId != null){
+			imgView.setTag(R.id.thumbnail_url_tag, url);
+			//set one of these, so we can update db:
+			if (projectId != null)
+				imgView.setTag(R.id.project_id_tag, projectId);
+			if (updateId != null)
+				imgView.setTag(R.id.update_id_tag, updateId);
+			//make it clickable
+			imgView.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					DoLateIconLoad((ImageView) v);
+				}
+			}); 
+			}
+		} else { //in cache, try to display it
 			File f=new File(fn); 
-			if (!f.exists()) {
+			if (!f.exists()) { //cache corruption
 				imgView.setImageResource(R.drawable.thumbnail_error);			
-			} else {
+			} else { //have file
 				//DialogUtil.infoAlert(this, "Photo returned", "Got a photo");			
 				//make thumbnail and show it on page
 				//shrink to save memory
@@ -160,13 +184,49 @@ public class FileUtil {
 		        o2.inSampleSize = scale;			
 				
 				Bitmap bm = BitmapFactory.decodeFile(fn,o2);
-				if (bm != null) {
+				if (bm == null) {
+					imgView.setImageResource(R.drawable.thumbnail_error);			
+				} else {
 					imgView.setImageBitmap(bm);
 				}
 			}
 		}
 
 	}
+	
+	static void DoLateIconLoad(ImageView iv) {
+		try {
+			String url = (String) iv.getTag(R.id.thumbnail_url_tag);
+			String pid = (String) iv.getTag(R.id.project_id_tag);
+			String uid = (String) iv.getTag(R.id.update_id_tag);
+			
+			URL curl = new URL(SettingsUtil.host(iv.getContext()));
+			String directory = FileUtil.getExternalCacheDir(iv.getContext()).toString();
+	
+			if (url == null || (pid == null && uid == null)) {
+				Log.w(TAG, "Insufficient data for late load ");
+			} else {
+				RsrDbAdapter dba = new RsrDbAdapter(iv.getContext());
+				dba.open();
+				String fn = null;
+				if (pid != null) {
+					fn = Downloader.httpGetToNewFile(new URL(curl,url), directory, "prj" + pid + "_");
+					dba.updateProjectThumbnailFile(pid,fn);
+				} else if (uid != null) {
+					fn = Downloader.httpGetToNewFile(new URL(curl,url), directory, "upd" + uid + "_");
+					dba.updateUpdateThumbnailFile(uid,fn);
+				} 
+				dba.close();
+				setPhotoFile(iv, url, fn, null, null); //prevent infinite recursion
+				
+			}
+		} catch (Exception e) {
+			//DialogUtil.errorAlert(ctx, "Error fetching proj image from URL " + url, e);
+			Log.e(TAG, "DoLateIconLoad Error", e);
+		}
+		
+	}
+	
 }
 
 	

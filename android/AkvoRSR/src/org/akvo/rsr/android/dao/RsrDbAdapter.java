@@ -387,6 +387,16 @@ public class RsrDbAdapter {
 	}
 
 	
+	/*
+	 *  Clear the local filenames of all projects
+	 */
+	public void clearProjectThumbnailFiles() {
+		ContentValues updatedValues = new ContentValues();
+		updatedValues.putNull(THUMBNAIL_FILENAME_COL);
+		database.update(PROJECT_TABLE, updatedValues, null, null);
+	}
+
+
 	/**
 	 * saves or updates an Update in the db
 	 * 
@@ -464,6 +474,16 @@ public class RsrDbAdapter {
 		ContentValues updatedValues = new ContentValues();
 		updatedValues.put(THUMBNAIL_FILENAME_COL, filename);
 		database.update(UPDATE_TABLE, updatedValues, PK_ID_COL + " = ?", new String[] { id });
+	}
+
+
+	/*
+	 *  Clear the local filenames of all updates
+	 */
+	public void clearUpdateThumbnailFiles() {
+		ContentValues updatedValues = new ContentValues();
+		updatedValues.putNull(THUMBNAIL_FILENAME_COL);
+		database.update(UPDATE_TABLE, updatedValues, null, null);
 	}
 
 
