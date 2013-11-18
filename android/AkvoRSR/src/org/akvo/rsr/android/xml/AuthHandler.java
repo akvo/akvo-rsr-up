@@ -49,6 +49,7 @@ public class AuthHandler extends DefaultHandler {
 	private boolean in_cred = false;
 	private boolean in_apikey = false;
 	private boolean in_userid = false;
+	private boolean in_username = false;
 	private boolean in_orgid = false;
 	private boolean in_projects = false;
 	private boolean in_projid = false;
@@ -76,14 +77,6 @@ public class AuthHandler extends DefaultHandler {
 		return user.getApiKey();
 	}
 	
-	public String getUserId() {
-		return user.getId();
-	}
-
-	public String getOrgId() {
-		return user.getOrgId();
-	}
-
 	public Set<String> getPublishedProjects() {
 		return user.getPublishedProjects();
 	}
@@ -116,6 +109,8 @@ public class AuthHandler extends DefaultHandler {
 			this.in_cred = true;
 		} else if (in_cred && localName.equals("api_key")) {
 			this.in_apikey = true;
+		} else if (in_cred && localName.equals("username")) {
+			this.in_username = true;
 		} else if (in_cred && localName.equals("user_id")) {
 			this.in_userid = true;
 		} else if (in_cred && localName.equals("published_projects")) {
@@ -138,6 +133,9 @@ public class AuthHandler extends DefaultHandler {
 		} else if (localName.equals("api_key")) {
 			this.in_apikey = false;
 			user.setApiKey(val);
+		} else if (localName.equals("username")) {
+			this.in_username = false;
+			user.setUsername(val);
 		} else if (localName.equals("user_id")) {
 			this.in_userid = false;
 			user.setId(val);
@@ -156,13 +154,11 @@ public class AuthHandler extends DefaultHandler {
 	 * <tag>characters</tag> */
 	@Override
     public void characters(char ch[], int start, int length) {
-		if (this.in_apikey) {
-			val += new String(ch, start, length);
-		} else if (this.in_userid) {
-			val += new String(ch, start, length);
-		} else if (this.in_orgid) {
-			val += new String(ch, start, length);
-		} else if (this.in_projid) {
+		if (this.in_apikey
+		|| this.in_username
+		|| this.in_userid
+		|| this.in_orgid
+		|| this.in_projid) {
 			val += new String(ch, start, length);
 		}
     }

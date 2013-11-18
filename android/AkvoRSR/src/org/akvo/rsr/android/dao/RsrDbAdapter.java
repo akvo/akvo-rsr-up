@@ -413,9 +413,9 @@ public class RsrDbAdapter {
 	    Iterator<String> itr = ids.iterator();
 	    if (itr.hasNext()) {
 	    	String whereList = "";
-	    	whereList += HIDDEN_COL + "=" + itr.next();
+	    	whereList += PK_ID_COL + "=" + itr.next();
 	    	while(itr.hasNext()) {
-	    		whereList += " OR " + HIDDEN_COL + "=" + itr.next();
+	    		whereList += " OR " + PK_ID_COL + "=" + itr.next();
 	    	}
 	    	database.update(PROJECT_TABLE, updatedValues, whereList, null);
 	    }

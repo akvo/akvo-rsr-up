@@ -39,6 +39,7 @@ public class SignInService extends IntentService {
 				
 				//use project list to set projects visible
 				RsrDbAdapter dba = new RsrDbAdapter(this);
+				dba.open();
 				dba.setVisibleProjects(user.getPublishedProjects());
 				dba.close();
 

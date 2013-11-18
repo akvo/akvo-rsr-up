@@ -580,6 +580,8 @@ public class Downloader {
 
 			return myAuthHandler.getUser();
 		} else {
+			//Vanilla case is 403 forbidden on an auth failure
+			//TODO raise exception if we get a 500
 			Log.e(TAG, "Authorization HTTP error:" + code);
 			String why = h.body();
 			return null;
