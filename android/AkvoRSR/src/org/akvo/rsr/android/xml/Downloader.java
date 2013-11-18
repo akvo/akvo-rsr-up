@@ -550,14 +550,13 @@ public class Downloader {
 	 * @param url
 	 * @param username
 	 * @param password
-	 * @param user
-	 * @return true if success
+	 * @return user if success, null on simple authorization failure
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
 	 * @throws HttpRequestException
 	 * @throws IOException
 	 */
-	public boolean authorize(URL url, String username, String password, User user) throws ParserConfigurationException, SAXException, HttpRequestException, IOException {
+	static public User authorize(URL url, String username, String password) throws ParserConfigurationException, SAXException, HttpRequestException, IOException {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("username", username);
 		data.put("password", password);
@@ -576,17 +575,14 @@ public class Downloader {
 			/* Parse the xml-data from our URL. */
 			xr.parse(new InputSource(h.stream()));
 			/* Parsing has finished. */
-			user.setUsername(username);
-			user.setId(myAuthHandler.getUserId());
-			user.setOrgId(myAuthHandler.getOrgId());
-			user.setApiKey(myAuthHandler.getApiKey());
 
 			Log.i(TAG, "Fetched API key");
 
-			return true;
+			return myAuthHandler.getUser();
 		} else {
 			Log.e(TAG, "Authorization HTTP error:" + code);
-			return false;
+			String why = h.body();
+			return null;
 		}
 	}
 

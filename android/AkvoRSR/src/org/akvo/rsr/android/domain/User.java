@@ -16,13 +16,21 @@
 
 package org.akvo.rsr.android.domain;
 
+import java.util.HashSet;
+import java.util.Set;
+
 
 public class User {
 	private String id;
 	private String username;
 	private String apiKey;
 	private String orgId;
+	private Set<String> publishedProjects;
 
+	public User() {
+		publishedProjects = new HashSet<String>(10);
+	}
+	
 	public String getId() {
 		return id;
 	}
@@ -53,5 +61,17 @@ public class User {
 
 	public void setApiKey(String summary) {
 		this.apiKey = summary;
+	}
+
+	public Set<String> getPublishedProjects() {
+		return publishedProjects;
+	}
+
+	public void addPublishedProject(String id) {
+		this.publishedProjects.add(id);
+	}
+
+	public void clearPublishedProjects() {
+		this.publishedProjects.clear();
 	}
 }

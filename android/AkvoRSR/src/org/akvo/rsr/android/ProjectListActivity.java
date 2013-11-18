@@ -146,7 +146,7 @@ public class ProjectListActivity extends ListActivity {
 
 
 	/**
-	 * shows all the projects in the database
+	 * shows all visible projects in the database
 	 */
 	private void getData() {
 		try {
@@ -156,17 +156,17 @@ public class ProjectListActivity extends ListActivity {
 		} catch(Exception e) {
 			Log.w(TAG, "Could not close old cursor before reloading list",e);
 		}
-		dataCursor = ad.listAllProjects();
+		dataCursor = ad.listAllVisibleProjects();
 		//Show count
 		projCountLabel.setText(Integer.valueOf(dataCursor.getCount()).toString());
 		//Populate list view
 		ProjectListCursorAdapter projects = new ProjectListCursorAdapter(this, dataCursor);
 		setListAdapter(projects);
-
 	}
 
+	
 	/**
-	 *  gets the id of the clicked list item and opens one-project activity.
+	 *  gets the id of the clicked list item and opens the one-project activity.
 	 */
 	@Override
 	protected void onListItemClick(ListView list, View view, int position, long id) {
@@ -225,10 +225,12 @@ public class ProjectListActivity extends ListActivity {
 	private void onFetchProgress(int phase, int done, int total) {
 		if (phase == 0) {
 			inProgress1.setIndeterminate(false);
-			inProgress1.setProgress(100);//Done!
+			inProgress1.setProgress(done);
+			inProgress1.setMax(total);
 			}
 		if (phase == 1) {
 			inProgress1.setProgress(100);//just in case...
+			inProgress1.setMax(100);
 			inProgress2.setProgress(done);
 			inProgress2.setMax(total);
 			}

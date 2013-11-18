@@ -2,6 +2,7 @@ package org.akvo.rsr.android.service;
 
 import java.net.URL;
 
+import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.User;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.SettingsUtil;
@@ -28,18 +29,18 @@ public class SignInService extends IntentService {
 		
 		Intent i2 = new Intent(ConstantUtil.AUTHORIZATION_RESULT_ACTION);
 
-		Downloader dl = new Downloader();
-		User user = new User();
 		try {
-			if (dl.authorize(new URL(SettingsUtil.host(this) + ConstantUtil.AUTH_URL),
-							username,
-							password,
-							user)) {
+			User user = Downloader.authorize(new URL(SettingsUtil.host(this) + ConstantUtil.AUTH_URL),
+									 		 username,
+									 		 password);
+			if (user != null) {
 				//Yes!
-				SettingsUtil.signIn(this,user);
+				SettingsUtil.signIn(this, user);
 				
-				//TODO get project list from API and set other projects invisible
-				//dl.enableAuthorizedProjects(this, new URL(SettingsUtil.host(this) + String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN, SettingsUtil.Read(this, "authorized_orgid"))));
+				//use project list to set projects visible
+				RsrDbAdapter dba = new RsrDbAdapter(this);
+				dba.setVisibleProjects(user.getPublishedProjects());
+				dba.close();
 
 			}
 			else {

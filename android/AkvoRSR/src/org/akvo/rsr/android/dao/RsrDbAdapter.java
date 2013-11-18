@@ -17,6 +17,8 @@
 package org.akvo.rsr.android.dao;
 
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Set;
 
 import org.akvo.rsr.android.domain.Country;
 import org.akvo.rsr.android.domain.Project;
@@ -397,6 +399,30 @@ public class RsrDbAdapter {
 	}
 
 
+	/*
+	 *  Update the local filename of a cached image
+	 */
+	public void setVisibleProjects(Set<String> ids) {
+		//Hide all
+		ContentValues updatedValues = new ContentValues();
+		updatedValues.put(HIDDEN_COL, 1);		
+		database.update(PROJECT_TABLE, updatedValues, null, null);
+		//Show selected
+		updatedValues = new ContentValues();
+		updatedValues.put(HIDDEN_COL, 0);
+	    Iterator<String> itr = ids.iterator();
+	    if (itr.hasNext()) {
+	    	String whereList = "";
+	    	whereList += HIDDEN_COL + "=" + itr.next();
+	    	while(itr.hasNext()) {
+	    		whereList += " OR " + HIDDEN_COL + "=" + itr.next();
+	    	}
+	    	database.update(PROJECT_TABLE, updatedValues, whereList, null);
+	    }
+	}
+
+	
+
 	/**
 	 * saves or updates an Update in the db
 	 * 
@@ -506,6 +532,21 @@ public class RsrDbAdapter {
 										null,
 										null,
 										null);
+		return cursor;
+	}
+
+	/**
+	 * Gets updates for a specific project, all columns
+	 */
+	public Cursor listAllVisibleProjects() {
+		Cursor cursor = database.query(PROJECT_TABLE,
+										null,
+										HIDDEN_COL + " = ?",
+										new String[] { "0" },
+										null,
+										null,
+										null);
+
 		return cursor;
 	}
 

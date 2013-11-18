@@ -16,6 +16,9 @@
 
 package org.akvo.rsr.android.xml;
 
+import java.util.Set;
+
+import org.akvo.rsr.android.domain.User;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -27,6 +30,10 @@ import org.xml.sax.helpers.DefaultHandler;
 	<api_key>asdjklfhlasufhkjasdjfnhalkjdnkjsdhfkjsdnkjfnsdfkjhsdkjfs</api_key>
 	<user_id>666</user_id>
 	<org_id>42</org_id>
+	<published_projects>
+	<id>42</id>
+	<id>4711</id>
+	</published_projects>
 </credentials>
 
  */
@@ -34,7 +41,6 @@ import org.xml.sax.helpers.DefaultHandler;
 
 
 public class AuthHandler extends DefaultHandler {
-
 
 	// ===========================================================
 	// Fields
@@ -44,10 +50,11 @@ public class AuthHandler extends DefaultHandler {
 	private boolean in_apikey = false;
 	private boolean in_userid = false;
 	private boolean in_orgid = false;
+	private boolean in_projects = false;
+	private boolean in_projid = false;
 	private boolean syntaxError = false;
-	private String apiKey = null;
-	private String userId = null;
-	private String orgId = null;
+	private User user = null;
+	private String val;
 	private int level;
 
 	/*
@@ -56,8 +63,9 @@ public class AuthHandler extends DefaultHandler {
 	AuthHandler(){
 		super();
 	}
+	
 	// ===========================================================
-	// Getter & Setter
+	// Getters & Setters
 	// ===========================================================
 
 	public boolean getError() {
@@ -65,15 +73,23 @@ public class AuthHandler extends DefaultHandler {
 	}
 
 	public String getApiKey() {
-		return apiKey;
+		return user.getApiKey();
 	}
 	
 	public String getUserId() {
-		return userId;
+		return user.getId();
 	}
 
 	public String getOrgId() {
-		return orgId;
+		return user.getOrgId();
+	}
+
+	public Set<String> getPublishedProjects() {
+		return user.getPublishedProjects();
+	}
+	
+	public User getUser() {
+		return user;
 	}
 
 	// ===========================================================
@@ -82,6 +98,7 @@ public class AuthHandler extends DefaultHandler {
 	@Override
 	public void startDocument() throws SAXException {
 		level = 0;
+		user = new User();
 	}
 
 	@Override
@@ -94,12 +111,17 @@ public class AuthHandler extends DefaultHandler {
 	 * <tag attribute="attributeValue">*/
 	@Override
 	public void startElement(String namespaceURI, String localName,	String qName, Attributes atts) throws SAXException {
+		val = "";
 		if (localName.equals("credentials") && level == 0) {
 			this.in_cred = true;
 		} else if (in_cred && localName.equals("api_key")) {
 			this.in_apikey = true;
 		} else if (in_cred && localName.equals("user_id")) {
 			this.in_userid = true;
+		} else if (in_cred && localName.equals("published_projects")) {
+			this.in_projects = true;
+		} else if (in_projects && localName.equals("id")) {
+			this.in_projid = true;
 		} else if (in_cred && localName.equals("org_id")) {
 			this.in_orgid = true;
 		}
@@ -115,10 +137,18 @@ public class AuthHandler extends DefaultHandler {
 			this.in_cred = false;
 		} else if (localName.equals("api_key")) {
 			this.in_apikey = false;
+			user.setApiKey(val);
 		} else if (localName.equals("user_id")) {
 			this.in_userid = false;
+			user.setId(val);
+		} else if (localName.equals("published_projects")) {
+			this.in_projects = false;
+		} else if (in_projid && localName.equals("id")) {
+			this.in_projid = false;
+			user.addPublishedProject(val);
 		} else if (localName.equals("org_id")) {
 			this.in_orgid = false;
+			user.setOrgId(val);
 		}
 	}
 	
@@ -127,11 +157,13 @@ public class AuthHandler extends DefaultHandler {
 	@Override
     public void characters(char ch[], int start, int length) {
 		if (this.in_apikey) {
-			apiKey = new String(ch, start, length);
+			val += new String(ch, start, length);
 		} else if (this.in_userid) {
-			userId = new String(ch, start, length);
+			val += new String(ch, start, length);
 		} else if (this.in_orgid) {
-			orgId = new String(ch, start, length);
+			val += new String(ch, start, length);
+		} else if (this.in_projid) {
+			val += new String(ch, start, length);
 		}
     }
 
