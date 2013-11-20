@@ -194,11 +194,15 @@ public class FileUtil {
 
 	}
 	
-	static void DoLateIconLoad(ImageView iv) {
+	static void DoLateIconLoad(final ImageView iv) {
+		//fetch must happen in another thread than main on Android API 11 and later
+		new Thread(new Runnable() {
+			public void run() {
+
 		try {
-			String url = (String) iv.getTag(R.id.thumbnail_url_tag);
-			String pid = (String) iv.getTag(R.id.project_id_tag);
-			String uid = (String) iv.getTag(R.id.update_id_tag);
+			final String url = (String) iv.getTag(R.id.thumbnail_url_tag);
+			final String pid = (String) iv.getTag(R.id.project_id_tag);
+			final String uid = (String) iv.getTag(R.id.update_id_tag);
 			
 			URL curl = new URL(SettingsUtil.host(iv.getContext()));
 			String directory = FileUtil.getExternalCacheDir(iv.getContext()).toString();
@@ -208,22 +212,37 @@ public class FileUtil {
 			} else {
 				RsrDbAdapter dba = new RsrDbAdapter(iv.getContext());
 				dba.open();
-				String fn = null;
+				final String fn;
 				if (pid != null) {
 					fn = Downloader.httpGetToNewFile(new URL(curl,url), directory, "prj" + pid + "_");
 					dba.updateProjectThumbnailFile(pid,fn);
 				} else if (uid != null) {
 					fn = Downloader.httpGetToNewFile(new URL(curl,url), directory, "upd" + uid + "_");
 					dba.updateUpdateThumbnailFile(uid,fn);
-				} 
+				} else {
+					fn = null;
+				}
 				dba.close();
-				setPhotoFile(iv, url, fn, null, null); //prevent infinite recursion
+			
+				//post UI work back to main thread
+		        iv.post(new Runnable() {
+			        public void run() {
+						setPhotoFile(iv, url, fn, null, null); //prevent infinite recursion
+			        }
+			    });
 				
 			}
 		} catch (Exception e) {
+	        iv.post(new Runnable() {
+		        public void run() {
+					iv.setImageResource(R.drawable.thumbnail_error); //boo!			
+		        }
+		    });
 			//DialogUtil.errorAlert(ctx, "Error fetching proj image from URL " + url, e);
 			Log.e(TAG, "DoLateIconLoad Error", e);
 		}
+			}
+		}).start();
 		
 	}
 	
