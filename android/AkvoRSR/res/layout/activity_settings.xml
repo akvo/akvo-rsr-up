@@ -28,10 +28,23 @@
     <Preference
        android:key="data_host"
 	   android:title="Data server"
-    	/>
-    
+    	/>    
   </PreferenceCategory>
 
+  <PreferenceCategory
+     android:title="Testing">
+	  <Preference
+	    android:title="Provide Feedback"
+	    android:summary="Open a web feedback forn where you can tell us what you think of this app">
+	
+	    <intent
+	      android:action="android.intent.action.VIEW"
+	      android:data="https://akvodev.webform.com/form/10072" />
+	
+	  </Preference>
+  </PreferenceCategory>
+  
+  
 <!--       
   <PreferenceCategory
      android:title="Selection">
