@@ -193,6 +193,7 @@ public class FileUtil {
 		}
 
 	}
+
 	
 	static void DoLateIconLoad(final ImageView iv) {
 		//fetch must happen in another thread than main on Android API 11 and later
@@ -245,6 +246,43 @@ public class FileUtil {
 		}).start();
 		
 	}
+	
+	/**
+	 * counts size of all files in the image cache
+	 */
+	public static long countCacheMB(Context context) {
+		File f = getExternalCacheDir(context);
+		File [] files = f.listFiles();
+		long sizeSum = 0;
+		if (files != null) { //dir might not exist
+			for (int i = 0; i < files.length; i++) {
+				sizeSum += files[i].length();
+			}
+		}
+		return sizeSum / (1024*1024);
+	}
+
+	/**
+	 * remove all files in the image cache
+	 */
+	public static void clearCache(Context context) {
+		RsrDbAdapter dba = new RsrDbAdapter(context);
+		dba.open();
+		dba.clearProjectThumbnailFiles();
+		dba.clearUpdateThumbnailFiles();
+		dba.close();
+		File f = getExternalCacheDir(context);
+		File [] files = f.listFiles();
+		if (files != null) { //dir might not exist
+			long sizeSum = 0;
+			for (int i = 0; i < files.length; i++) {
+				sizeSum += files[i].length();
+				files[i].delete();
+			}
+			DialogUtil.infoAlert(context, "Cache cleared", files.length + " files deleted (" + sizeSum/(1024*1024) + " MB)");
+		}
+	}
+
 	
 }
 

@@ -5,6 +5,7 @@ import java.net.URL;
 
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.DialogUtil;
+import org.akvo.rsr.android.util.FileUtil;
 import org.akvo.rsr.android.util.SettingsUtil;
 
 import android.content.DialogInterface;
@@ -14,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.content.Intent;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
@@ -86,6 +88,28 @@ public class SettingsActivity extends PreferenceActivity {
 				return true;
 			}
 		});
+        //Insure ppl remember version for the feedback form
+		String version = "0.0";
+		try {
+		    version = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+		} catch (NameNotFoundException e) {
+		}
+
+        
+        Preference feedbackPref = (Preference) findPreference("feedback_form");
+		feedbackPref.setPersistent(false); //TODO need we say don't save this
+		feedbackPref.setTitle("Give Feedback on ver " + version);
+
+		final Preference ccPref = (Preference) findPreference("clear_cache");
+        ccPref.setPersistent(false);
+        ccPref.setSummary("Frees " + FileUtil.countCacheMB(SettingsActivity.this) + " MB");
+        ccPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+        @Override
+        	public boolean onPreferenceClick(Preference preference) {
+        		FileUtil.clearCache(SettingsActivity.this);
+        		return true;
+        	}	
+        });
 	}
 
 	

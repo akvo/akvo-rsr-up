@@ -5,47 +5,52 @@
     android:title="Settings" >
 
   <PreferenceCategory
-     android:title="Options">
+      android:title="General">
 
+    <CheckBoxPreference
+       android:key="setting_delay_image_fetch"
+       android:title="Delay fetching of pictures"
+       android:summary="Do not fetch pictures until they are clicked. Refresh is fast, but pictures are unavailable when offline."
+       android:defaultValue="false"
+       />
+    <Preference
+       android:key="clear_cache"
+	   android:title="Delete Picture Cache"
+       />    
+    <Preference
+       android:key="data_host"
+	   android:title="Data server"
+       />    
+    </PreferenceCategory>
+
+  <PreferenceCategory android:title="Testing">
+      
+	<Preference
+	  android:key="feedback_form"
+	  android:title="Provide Feedback"
+	  android:summary="Open a web feedback form where you can tell us what you think of this app">
+	
+	  <intent
+	    android:action="android.intent.action.VIEW"
+	    android:data="https://akvodev.webform.com/form/10072" />
+	</Preference>
+    <CheckBoxPreference
+      android:key="setting_debug"
+      android:title="Debug"
+      android:summary="Show project and update ids and other debug info"
+      android:defaultValue="false"
+      />
+	</PreferenceCategory>
+  
+  
+<!--       
     <CheckBoxPreference
        android:key="setting_send_images"
        android:title="Send images"
        android:summary="Embeds images in uploads"
        android:defaultValue="true"
        />
-    <CheckBoxPreference
-       android:key="setting_delay_image_fetch"
-       android:title="Delay fetching of images"
-       android:summary="Do not fetch thumbnails during a refresh. This will speed it up, but they will be unavailable when offline."
-       android:defaultValue="false"
-       />
-     <CheckBoxPreference
-       android:key="setting_debug"
-       android:title="Debug"
-       android:summary="Show extra debug info"
-       android:defaultValue="false"
-       />
-    <Preference
-       android:key="data_host"
-	   android:title="Data server"
-    	/>    
-  </PreferenceCategory>
 
-  <PreferenceCategory
-     android:title="Testing">
-	  <Preference
-	    android:title="Provide Feedback"
-	    android:summary="Open a web feedback forn where you can tell us what you think of this app">
-	
-	    <intent
-	      android:action="android.intent.action.VIEW"
-	      android:data="https://akvodev.webform.com/form/10072" />
-	
-	  </Preference>
-  </PreferenceCategory>
-  
-  
-<!--       
   <PreferenceCategory
      android:title="Selection">
     <ListPreference
