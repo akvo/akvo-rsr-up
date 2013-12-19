@@ -9,13 +9,13 @@
 
     <CheckBoxPreference
        android:key="setting_delay_image_fetch"
-       android:title="Delay fetching of pictures"
+       android:title="Delay fetching pictures"
        android:summary="Do not fetch pictures until they are clicked. Refresh is fast, but pictures are unavailable when offline."
        android:defaultValue="false"
        />
     <Preference
        android:key="clear_cache"
-	   android:title="Delete Picture Cache"
+	   android:title="Delete cached pictures"
        />    
     <Preference
        android:key="data_host"
@@ -27,7 +27,7 @@
       
 	<Preference
 	  android:key="feedback_form"
-	  android:title="Provide Feedback"
+	  android:title="Give feedback"
 	  android:summary="Open a web feedback form where you can tell us what you think of this app">
 	
 	  <intent

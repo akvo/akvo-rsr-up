@@ -102,11 +102,12 @@ public class SettingsActivity extends PreferenceActivity {
 
 		final Preference ccPref = (Preference) findPreference("clear_cache");
         ccPref.setPersistent(false);
-        ccPref.setSummary("Frees " + FileUtil.countCacheMB(SettingsActivity.this) + " MB");
+        ccPref.setSummary("Frees " + FileUtil.countCacheMB(SettingsActivity.this) + " MB. Pictures by you are kept.");
         ccPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
         @Override
         	public boolean onPreferenceClick(Preference preference) {
         		FileUtil.clearCache(SettingsActivity.this);
+                ccPref.setSummary("Frees " + FileUtil.countCacheMB(SettingsActivity.this) + " MB. Pictures by you are kept.");
         		return true;
         	}	
         });
