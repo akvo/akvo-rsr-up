@@ -128,7 +128,7 @@ public class UpdateEditorActivity extends Activity {
 		btnDraft = (Button) findViewById(R.id.btn_save_draft);
 		btnDraft.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {
-				saveAsDraft();
+				saveAsDraft(true);
 			}
 		});
 		
@@ -157,7 +157,7 @@ public class UpdateEditorActivity extends Activity {
 			public void onClick(View view) {
 				//Forget image
 				update.setThumbnailFilename(null);
-				//TODO: delete image file if in 
+				//TODO: delete image file if it was take through this app?
 				//Hide them
 				photoAndDeleteGroup.setVisibility(View.GONE);
 				photoAddGroup.setVisibility(View.VISIBLE);
@@ -176,10 +176,10 @@ public class UpdateEditorActivity extends Activity {
 		} else {
 			update = dba.findUpdate(updateId);
 			if (update == null) {
-				DialogUtil.errorAlert(this, "Update missing", "Cannot open for review, update " + updateId);
+				DialogUtil.errorAlert(this, "Update missing", "Cannot open update " + updateId);
 			} else {
 				//populate fields
-				editable = update.getDraft();//This will always be true with the current UI flow
+				editable = update.getDraft(); //This should always be true with the current UI flow - we go to UpdateDetailActivity if it is sent
 				projupdTitleText.setText(update.getTitle());	
 				projupdDescriptionText.setText(update.getText());
 				
@@ -311,7 +311,7 @@ public class UpdateEditorActivity extends Activity {
 	/*
 	 * Save current update
 	 */
-	private void saveAsDraft() {
+	private void saveAsDraft(boolean andEnd) {
 		if (untitled()) {
 			return;
 		}
@@ -329,13 +329,15 @@ public class UpdateEditorActivity extends Activity {
 
 		}
 		dba.saveUpdate(update, true);
-		//Tell user what happened
-		//TODO: use a confirm dialog instead
-		Context context = getApplicationContext();
-		CharSequence text = "Draft saved successfully"; //TODO string resource
-		Toast toast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
-		toast.show();
-		finish();
+		if (andEnd) {
+			//Tell user what happened
+			//TODO: use a confirm dialog instead
+			Context context = getApplicationContext();
+			CharSequence text = "Draft saved successfully"; //TODO string resource
+			Toast toast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
+			toast.show();
+			finish();
+		}
 	}
 
 	/**
@@ -396,22 +398,12 @@ public class UpdateEditorActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		dba.open();
+		/*		
 		if (projectId != null) {
 			Project project = dba.findProject(projectId);
 			projTitleLabel.setText(project.getTitle());
 		} else {
 			projTitleLabel.setText("<NO PROJECT ID>");
-		}
-/*		
-		//Find file containing thumbnail		
-		File f = new File(project.getThumbnailFilename());
-		if (f.exists()) {
-			Bitmap bm = BitmapFactory.decodeFile(f.getAbsolutePath());
-			if (bm != null)
-				projImage.setImageBitmap(bm);
-		} else {
-			//Fall back to generic logo
-			projImage.setImageResource(R.drawable.ic_launcher);
 		}
 		*/
 
@@ -462,6 +454,15 @@ public class UpdateEditorActivity extends Activity {
 	}
 	
 
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		//pick up the saved draft if we get restarted?
+		saveAsDraft(false);
+		//in case this created the update in the DB
+		outState.putString(ConstantUtil.UPDATE_ID_KEY, update.getId());
+		super.onSaveInstanceState(outState);
+	}
+	
 	@Override
 	protected void onDestroy() {
 		if (dba != null) {
