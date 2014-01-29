@@ -79,9 +79,9 @@ public class LoginActivity extends Activity {
 			
 		}
 		
-		//temporary hack for testing - released app should set up for LIVE_HOST
+		//temporary hack for testing used TEST_HOST
 		if (SettingsUtil.host(this).length() == 0) {//isEmpty() is too modern
-			SettingsUtil.Write(this, ConstantUtil.HOST_SETTING_KEY, ConstantUtil.TEST_HOST);
+			SettingsUtil.Write(this, ConstantUtil.HOST_SETTING_KEY, ConstantUtil.LIVE_HOST);
 		}
 		
 		setContentView(R.layout.activity_login);
