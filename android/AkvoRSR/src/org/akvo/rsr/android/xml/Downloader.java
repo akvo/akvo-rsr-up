@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -471,18 +471,18 @@ public class Downloader {
 					h.send(imagePreamble);
 					//base64-convert the photo in chunks and stream them to server
 					//use origin buffer size divisible by 3 so no padding is inserted in the middle
-					final int bufSiz = 6 * 1024;
-					final long fsize = raf.length();
-					final int wholeChunks = (int) (fsize / bufSiz);
-					byte[] rawBuf = new byte[bufSiz];
-					try {
-						for (int i = 0; i < wholeChunks; i++) {
+					final int bufferSize = 6 * 1024;
+					final long fileSize = raf.length();
+					final long wholeChunks = fileSize / bufferSize;
+					byte[] rawBuf = new byte[bufferSize];
+					try { //If we run out of memory, it will be here
+						for (long i = 0; i < wholeChunks; i++) {
 							raf.readFully(rawBuf);
-							byte[] b64buf = Base64.encodeBytesToBytes(rawBuf,0,bufSiz);
+							byte[] b64buf = Base64.encodeBytesToBytes(rawBuf, 0, bufferSize);
 							h.send(b64buf);
 						}
 						int n = raf.read(rawBuf); //read last piece
-						byte[] b64buf = Base64.encodeBytesToBytes(rawBuf,0,n);
+						byte[] b64buf = Base64.encodeBytesToBytes(rawBuf, 0, n);
 						h.send(b64buf);
 					} catch (IOException e) {
 						Log.e(TAG, "Image encoding problem", e);
@@ -494,10 +494,10 @@ public class Downloader {
 		
 		h.send(bodyTemplate2);
 		
-		int code = h.code();//closes output
+		int code = h.code(); //closes output
 		String msg = h.message();
-		String b = h.body(); //On success, XML representation of created object
-		if (code == 201) {//Created
+		String bod = h.body(); //On success, XML representation of created object
+		if (code == 201) { //Created
 			update.setUnsent(false);
 			String idPath = h.header(HttpRequest.HEADER_LOCATION);//Path-ified ID
 			int penSlash = idPath.lastIndexOf('/', idPath.length() - 2);
@@ -506,7 +506,7 @@ public class Downloader {
 		} else {
 			String e = "Unable to post update, code " + code + " " +  msg;
 			Log.e(TAG, e);
-			Log.e(TAG, b);
+			Log.e(TAG, bod);
 			throw new Exception(e);
 		}
 	}

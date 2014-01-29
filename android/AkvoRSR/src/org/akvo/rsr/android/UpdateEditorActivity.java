@@ -239,8 +239,15 @@ public class UpdateEditorActivity extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		
+		//Handle taken photo
 		if (requestCode == photoRequest) {
 			if (resultCode == RESULT_CANCELED) {
+				return;
+			}
+			//check if file too large - if so, show error dialog and return
+			File sizeTest = new File(captureFilename);
+			if (sizeTest.length() > ConstantUtil.MAX_IMAGE_UPLOAD_SIZE) {
+				DialogUtil.errorAlert(this, "Photo file too big", "Set your camera to a lower resolution or turn on automatic shrinking");
 				return;
 			}
 			update.setThumbnailFilename(captureFilename);
@@ -250,11 +257,12 @@ public class UpdateEditorActivity extends Activity {
 			photoAndDeleteGroup.setVisibility(View.VISIBLE);
 			photoAddGroup.setVisibility(View.GONE);
 		}
+
+		//Handle picked photo
 		if (requestCode == photoPick) {
 			if (resultCode == RESULT_CANCELED) {
 				return;
 			}
-			//Handle taken photo
 			//data.getData is a content: URI. Need to copy the content to a file.
 			InputStream imageStream;
 			try {
@@ -262,7 +270,14 @@ public class UpdateEditorActivity extends Activity {
 			    captureFilename = FileUtil.getExternalPhotoDir(this) + File.separator + "capture" + System.nanoTime() + ".jpg";
 			    OutputStream os = new FileOutputStream(captureFilename);
 			    copyStream(imageStream,os);
-			    //since that worked, store it and show it
+				//check if file too large - if so, show error dialog and return
+				File sizeTest = new File(captureFilename);
+				if (sizeTest.length() > ConstantUtil.MAX_IMAGE_UPLOAD_SIZE) {
+					sizeTest.delete(); //save the space
+					DialogUtil.errorAlert(this, "Photo file too big", "Pick a smaller photo or turn on automatic shrinking");
+					return;
+				}
+			    //store it and show it
 				update.setThumbnailFilename(captureFilename);
 				update.setThumbnailUrl("dummyUrl");
 				FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename, null, null);
