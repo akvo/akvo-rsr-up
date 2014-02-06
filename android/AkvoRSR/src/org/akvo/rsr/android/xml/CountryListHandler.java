@@ -53,6 +53,7 @@ public class CountryListHandler extends DefaultHandler {
 	private int countryCount;
 	private boolean syntaxError = false;
 	private int depth = 0;
+	private String buffer;
 	
 	//where to store results
 	private RsrDbAdapter dba;
@@ -98,6 +99,7 @@ public class CountryListHandler extends DefaultHandler {
 	@Override
 	public void startElement(String namespaceURI, String localName,
 			String qName, Attributes atts) throws SAXException {
+		buffer = "";
 		if (localName.equals("object")) {
 			this.in_country = true;
 			currentCountry = new Country();
@@ -123,12 +125,16 @@ public class CountryListHandler extends DefaultHandler {
 
 		if (localName.equals("id")) {
 			this.in_id = false;
+			currentCountry.setId(buffer);
 		} else if (localName.equals("name")) {
-				this.in_name = false;
+			this.in_name = false;
+			currentCountry.setName(buffer);
 		} else if (localName.equals("iso_code")) {
 			this.in_iso_code = false;
+			currentCountry.setIsoCode(buffer);
 		} else if (localName.equals("continent")) {
 			this.in_continent = false;
+			currentCountry.setContinent(buffer);
 		} else if (localName.equals("object")) {
 			this.in_country = false;
 			if (currentCountry != null) {
@@ -138,21 +144,18 @@ public class CountryListHandler extends DefaultHandler {
 			} else syntaxError=true;
 		}
 	}
+
 	
 	/** Gets called on the following structure: 
 	 * <tag>characters</tag> */
 	@Override
     public void characters(char ch[], int start, int length) {
 		if (currentCountry != null) {
-			if(this.in_id) {
-				currentCountry.setId(new String(ch, start, length));
-			} else if(this.in_name) {
-				currentCountry.setName(new String(ch, start, length));
-			} else if(this.in_continent) { // <project>/api/v1/project/574/</project>
-				currentCountry.setContinent(new String(ch, start, length));
-			} else if(this.in_iso_code) {
-				currentCountry.setIsoCode(new String(ch, start, length)); //append
-			}
+			if (this.in_id ||
+				this.in_continent ||
+				this.in_iso_code) { //append content
+				buffer += new String(ch, start, length);
+			}	
 		} else
 			syntaxError = true; //set error flag
     }

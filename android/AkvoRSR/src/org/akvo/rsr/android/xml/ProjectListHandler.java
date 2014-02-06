@@ -162,13 +162,13 @@ public class ProjectListHandler extends DefaultHandler {
 	@Override
 	public void startElement(String namespaceURI, String localName,
 			String qName, Attributes atts) throws SAXException {
+		buffer = "";
 		if (localName.equals("object") && depth == 2) { //ignore root tag completely
 			this.in_project = true;
 			currentProj = new Project();
 		} else if (in_project)
 			if (localName.equals("id") && depth == 3) {
 				this.in_id = true;
-				buffer = "";
 			} else if (localName.equals("title") && depth == 3) {
 				this.in_title = true;
 			} else if (localName.equals("subtitle") && depth == 3) {
@@ -186,7 +186,6 @@ public class ProjectListHandler extends DefaultHandler {
 				*/
 			} else if (localName.equals("project_plan_summary") && depth==3) {
 				this.in_summary = true;
-				buffer = "";
 			} else if (localName.equals("current_image") && depth==3) {
 				this.in_current_image = true;
 			} else if (localName.equals("country") && in_location) {
@@ -201,10 +200,8 @@ public class ProjectListHandler extends DefaultHandler {
 				this.in_long = true;
 			} else if (localName.equals("thumbnails") && in_current_image) {
 				this.in_thumbnails = true;
-				buffer = "";
 			} else if (localName.equals("map_thumb") && in_thumbnails) {
 				this.in_thumbnail_url = true;
-				buffer = "";
 			}
 		depth++;
 	}
@@ -220,11 +217,18 @@ public class ProjectListHandler extends DefaultHandler {
 			this.in_id= false;
     		currentProj.setId(buffer);
 		} else if (localName.equals("title") && depth==3) {
-				this.in_title = false;
+			this.in_title = false;
+			currentProj.setTitle(buffer);
 		} else if (localName.equals("subtitle") && depth==3) {
 			this.in_subtitle = false;
+			currentProj.setSubtitle(buffer);
 		} else if (localName.equals("funds")) {
 			this.in_funds = false;
+			try {
+				currentProj.setFunds(Double.parseDouble(buffer));
+			} catch (NumberFormatException e) {
+				syntaxError = true;
+			}
 		} else if (localName.equals("primary_location")) {
 			this.in_location = false;
 		} else if (localName.equals("object") && depth==2) {
@@ -241,14 +245,19 @@ public class ProjectListHandler extends DefaultHandler {
 			this.in_current_image = false;
 		} else if (localName.equals("country") && in_location) {
 			this.in_country = false;
+			currentProj.setCountry(buffer);
 		} else if (localName.equals("state") && in_location) {
 			this.in_state = false;
+			currentProj.setState(buffer);
 		} else if (localName.equals("city") && in_location) {
 			this.in_city = false;
+			currentProj.setCity(buffer);
 		} else if (localName.equals("latitude") && in_location) {
 			this.in_lat = false;
+			currentProj.setLatitude(buffer);
 		} else if (localName.equals("longitude") && in_location) {
 			this.in_long = false;
+			currentProj.setLongitude(buffer);
 		} else if (localName.equals("thumbnails") && in_current_image) {
 			this.in_thumbnails = false;
 		} else if (localName.equals("map_thumb") && in_thumbnails) {
@@ -256,39 +265,26 @@ public class ProjectListHandler extends DefaultHandler {
 			currentProj.setThumbnailUrl(buffer);
 		}
 	}
+
 	
 	/** Gets called on the following structure: 
 	 * <tag>characters</tag> */
 	@Override
     public void characters(char ch[], int start, int length) {
 		if (currentProj != null) {
-			if(this.in_id) {
-				buffer += new String(ch, start, length); //TODO do this for all tag values!
-			} else if(this.in_title) {
-		    		currentProj.setTitle(new String(ch, start, length));
-			} else if(this.in_subtitle) {
-				currentProj.setTitle(new String(ch, start, length));
-			} else if(this.in_summary) {
-				buffer += new String(ch, start, length); //TODO do this for all tag values!
-			} else if(this.in_thumbnail_url) {
-				buffer += new String(ch, start, length); //TODO do this for all tag values!
-			} else if(this.in_country) { //       /api/v1/country/17/
-	    		currentProj.setCountry(idFromUrl(new String(ch, start, length)));
-			} else if(this.in_state) {
-	    		currentProj.setState(new String(ch, start, length));
-			} else if(this.in_city) {
-	    		currentProj.setCity(new String(ch, start, length));
-			} else if(this.in_lat) {
-	    		currentProj.setLatitude(new String(ch, start, length));
-			} else if(this.in_long) {
-	    		currentProj.setLongitude(new String(ch, start, length));				
-			} else if(this.in_funds) {
-				try {
-					currentProj.setFunds(Double.parseDouble(new String(ch, start, length)));
-				} catch (NumberFormatException e) {
-					syntaxError = true;
-				}
-				
+			if (this.in_id ||
+				this.in_summary ||
+				this.in_thumbnail_url ||
+				this.in_title ||
+				this.in_subtitle ||
+				this.in_country ||
+				this.in_state ||
+				this.in_city ||
+				this.in_funds ||
+				this.in_long ||
+				this.in_lat
+				) {
+				buffer += new String(ch, start, length);
 	    	}
 		} else
 			syntaxError = true; //set error flag

@@ -52,6 +52,7 @@ public class ProjectCountHandler extends DefaultHandler {
 	private boolean in_meta = false;
 	private boolean in_count = false;
 	private int depth = 0;
+	private String buffer;
 	private int projectCount = 0;
 	private boolean syntaxError = false;
 
@@ -96,6 +97,7 @@ public class ProjectCountHandler extends DefaultHandler {
 	 * <tag attribute="attributeValue">*/
 	@Override
 	public void startElement(String namespaceURI, String localName,	String qName, Attributes atts) throws SAXException {
+		buffer="";
 		if (localName.equals("meta") && depth == 1) {
 			this.in_meta = true;
 		} else if (in_meta && localName.equals("total_count")) {
@@ -114,6 +116,11 @@ public class ProjectCountHandler extends DefaultHandler {
 			this.in_meta = false;
 		} else if (in_count && localName.equals("total_count")) {
 			this.in_count = false;
+			try {
+				projectCount = Integer.parseInt(buffer);
+			} catch (NumberFormatException e) {
+				syntaxError = true;
+			}
 		}
 	}
 		
@@ -122,12 +129,7 @@ public class ProjectCountHandler extends DefaultHandler {
 	@Override
     public void characters(char ch[], int start, int length) {
 			if(this.in_count) {
-				try {
-					projectCount = Integer.parseInt(new String(ch, start, length));
-				} catch (NumberFormatException e) {
-					syntaxError = true;
-				}
-				
+				buffer += new String(ch, start, length);				
 	    	}
     }
 

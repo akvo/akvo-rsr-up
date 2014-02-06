@@ -68,6 +68,7 @@ public class UpdateListHandler extends DefaultHandler {
 	private boolean in_id = false;
 	private boolean in_title = false;
 	private boolean in_project_id = false;
+	private boolean in_user_id = false;
 	private boolean in_photo = false;
 	private boolean in_text = false;
 	private boolean in_time = false;
@@ -77,7 +78,7 @@ public class UpdateListHandler extends DefaultHandler {
 	private boolean syntaxError = false;
 	private int depth = 0;
 	private SimpleDateFormat df1;
-	private String idBuffer, dateBuffer, buffer;
+	private String buffer;
 	
 	//where to store results
 	private RsrDbAdapter dba;
@@ -133,16 +134,16 @@ public class UpdateListHandler extends DefaultHandler {
 		} else if (in_update) {
 			if (localName.equals("id")) {
 				this.in_id = true;
-				idBuffer = "";
 			} else if (localName.equals("title")) {
 				this.in_title = true;
 			} else if (localName.equals("text")) {
 				this.in_text = true;
 			} else if (localName.equals("time")) {
 				this.in_time = true;
-				dateBuffer = "";
 			} else if (localName.equals("project")) {
 				this.in_project_id = true;
+			} else if (localName.equals("user")) {
+				this.in_user_id = true;
 			} else if (localName.equals("photo")) {
 				this.in_photo = true;
 			}
@@ -160,20 +161,26 @@ public class UpdateListHandler extends DefaultHandler {
 
 		if (localName.equals("id")) {
 			this.in_id = false;
-			currentUpd.setId(idBuffer);
+			currentUpd.setId(buffer);
 		} else if (localName.equals("title")) {
 			this.in_title = false;
+			currentUpd.setTitle(buffer);
 		} else if (localName.equals("text")) {
 			this.in_text = false;
+			currentUpd.setText(buffer);
 		} else if (localName.equals("time")) {
 			this.in_time = false;
 			try {
-				currentUpd.setDate(df1.parse(dateBuffer));
+				currentUpd.setDate(df1.parse(buffer));
 			} catch (ParseException e1) {
 				syntaxError = true;
 			}
 		} else if (localName.equals("project")) {
 			this.in_project_id = false;
+			currentUpd.setProjectId(idFromUrl(buffer));
+		} else if (localName.equals("user")) {
+			this.in_user_id = false;
+			currentUpd.setUserId(idFromUrl(buffer));
 		} else if (localName.equals("object")) {
 			this.in_update = false;
 			if (currentUpd != null) {
@@ -189,26 +196,24 @@ public class UpdateListHandler extends DefaultHandler {
 	
 	/** Gets called on the following structure: 
 	 * <tag>characters</tag> */
-	// May be called multiple times for portions of the same tag contents!
+	// May be called multiple times for pieces of the same tag contents!
 	@Override
     public void characters(char ch[], int start, int length) {
 		if (currentUpd != null) {
-			if(this.in_id) {
-				idBuffer += new String(ch, start, length);
-			} else if(this.in_title) {
-				currentUpd.setTitle(new String(ch, start, length));
-			} else if(this.in_time) {
-				dateBuffer += new String(ch, start, length);
-			} else if(this.in_project_id) { // <project>/api/v1/project/574/</project>
-				currentUpd.setProjectId(idFromUrl(new String(ch, start, length)));
-			} else if(this.in_photo) {
+			if (this.in_id
+			 || this.in_title
+			 || this.in_user_id
+			 || this.in_project_id
+			 || this.in_photo
+			 || this.in_text
+			 || this.in_time
+			 ) { //remember content
 				buffer += new String(ch, start, length);
-			} else if(this.in_text) {
-				currentUpd.setText(currentUpd.getText() + new String(ch, start, length)); //append
 			}
-		} else
+		} else {
 			syntaxError = true; //set error flag
-    }
+		}
+	}
 	
 	
 	// extract id from things like /api/v1/project/574/

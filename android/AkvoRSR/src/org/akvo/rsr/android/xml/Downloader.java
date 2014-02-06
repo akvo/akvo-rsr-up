@@ -18,7 +18,6 @@ package org.akvo.rsr.android.xml;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -178,6 +177,36 @@ public class Downloader {
 		/* Check if anything went wrong. */
 		err = myCountryListHandler.getError();
 		Log.i(TAG, "Fetched " + myCountryListHandler.getCount() + " countries");
+	}
+
+
+	/**
+	 * populates the user table in the db from a server URL
+	 * 
+	 * @param ctx
+	 * @param url
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 */
+	public void fetchUser(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
+
+		/* Get a SAXParser from the SAXPArserFactory. */
+		SAXParserFactory spf = SAXParserFactory.newInstance();
+		SAXParser sp = spf.newSAXParser();
+
+		/* Get the XMLReader of the SAXParser we created. */
+		XMLReader xr = sp.getXMLReader();
+		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
+		UserListHandler myUserListHandler = new UserListHandler(new RsrDbAdapter(ctx));
+		xr.setContentHandler(myUserListHandler);
+		/* Parse the xml-data from our URL. */
+		xr.parse(new InputSource(url.openStream()));
+		/* Parsing has finished. */
+
+		/* Check if anything went wrong. */
+		err = myUserListHandler.getError();
+		Log.i(TAG, "Fetched " + myUserListHandler.getCount() + " users");
 	}
 
 
