@@ -3,9 +3,11 @@ package org.akvo.rsr.android.service;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Locale;
 
 import org.akvo.rsr.android.UpdateEditorActivity;
 import org.akvo.rsr.android.dao.RsrDbAdapter;
+import org.akvo.rsr.android.domain.User;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.FileUtil;
 import org.akvo.rsr.android.util.SettingsUtil;
@@ -57,12 +59,39 @@ public class GetProjectDataService extends IntentService {
 										c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL)))
 										);
 					broadcastProgress(1, i, c.getCount());					
+					}
 				}
-			}
 			finally {
 				if (c != null)
 					c.close();
 			}
+/*			
+			//Fetch user data for the authors of the updates.
+			//TODO: may need to change the API 
+			//This API currently requires authorization as an admin
+			User user = SettingsUtil.getAuthUser(this);
+			Cursor c = ad.listUserlessUpdates();
+			try {
+				int i = 0;
+				while (c.moveToNext()) {
+					i++;
+					dl.fetchUser(this,
+								 new URL(SettingsUtil.host(this) +
+										 String.format(Locale.US, ConstantUtil.FETCH_USER_URL_PATTERN, c.getString(c.getColumnIndex(RsrDbAdapter.USER_COL))) +
+										 String.format(Locale.US, ConstantUtil.API_KEY_PATTERN, user.getApiKey(),user.getUsername()))
+							);
+					broadcastProgress(1, i, c.getCount());					
+					}
+				}
+			finally {
+				if (c != null)
+					c.close();
+			}
+*/			
+			
+			
+			
+			
 		} catch (FileNotFoundException e) {
 			Log.e(TAG,"Cannot find:",e);
 			errMsg = "Cannot find: "+ e.getMessage();

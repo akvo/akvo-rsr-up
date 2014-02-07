@@ -80,4 +80,14 @@ public class SettingsUtil {
 			&& k != null && !k.equals("");
     }
 
+    public static User getAuthUser(Context c) {
+		User user = new User();
+		user.setUsername(SettingsUtil.Read(c, "authorized_username"));
+		user.setId(SettingsUtil.Read(c, "authorized_userid"));
+		user.setOrgId(SettingsUtil.Read(c, "authorized_orgid"));
+		user.setApiKey(SettingsUtil.Read(c, "authorized_apikey"));
+		return user;
+    }
+
+
 }

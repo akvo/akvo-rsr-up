@@ -24,6 +24,7 @@ import java.util.Date;
 public class Update {
 	private String id;
 	private String projectId;
+	private String userId;
 	private String title;
 	private boolean draft;
 	private boolean unsent;
@@ -55,6 +56,14 @@ public class Update {
 
 	public void setProjectId(String id) {
 		this.projectId = id;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String id) {
+		this.userId = id;
 	}
 
 	public String getTitle() {

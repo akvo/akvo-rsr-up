@@ -22,11 +22,7 @@ public class SubmitProjectUpdateService extends IntentService {
 	protected void onHandleIntent(Intent intent) {
 		boolean sendImg = SettingsUtil.ReadBoolean(this, "setting_send_images", true);
 		
-		User user = new User();
-		user.setUsername(SettingsUtil.Read(this, "authorized_username"));
-		user.setId(SettingsUtil.Read(this, "authorized_userid"));
-		user.setOrgId(SettingsUtil.Read(this, "authorized_orgid"));
-		user.setApiKey(SettingsUtil.Read(this, "authorized_apikey"));
+		User user = SettingsUtil.getAuthUser(this);
 		
 		Intent i = new Intent(ConstantUtil.UPDATES_SENT_ACTION);
 

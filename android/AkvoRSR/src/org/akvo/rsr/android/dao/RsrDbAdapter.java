@@ -23,6 +23,7 @@ import java.util.Set;
 import org.akvo.rsr.android.domain.Country;
 import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.domain.Update;
+import org.akvo.rsr.android.domain.User;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
@@ -49,6 +50,7 @@ public class RsrDbAdapter {
 	public static final String THUMBNAIL_URL_COL = "thumbnail_url";
 	public static final String THUMBNAIL_FILENAME_COL = "thumbnail_fn";
 	public static final String PROJECT_COL = "project";
+	public static final String USER_COL = "user";
 	public static final String TEXT_COL = "_text";
 	public static final String DRAFT_COL = "draft";
 	public static final String UNSENT_COL = "unsent"; //currently unused
@@ -65,6 +67,12 @@ public class RsrDbAdapter {
 	public static final String CONTINENT_COL = "continent";
 	public static final String ISO_CODE_COL = "iso_code";
 	
+	public static final String USERNAME_COL = "username";
+	public static final String FIRST_NAME_COL = "first_name";
+	public static final String LAST_NAME_COL = "last_name";
+	public static final String EMAIL_COL = "email";
+	public static final String ORGANISATION_COL = "organisation";
+
 	private static final String TAG = "RsrDbAdapter";
 	private DatabaseHelper databaseHelper;
 	private SQLiteDatabase database;
@@ -80,7 +88,7 @@ public class RsrDbAdapter {
 			"thumbnail_url text, thumbnail_fn text," +
 			"longitude text, latitude text, country_id integer, state text, city text, hidden integer);";
 	private static final String UPDATE_TABLE_CREATE =
-			"create table _update (_id integer primary key, project integer not null, "+
+			"create table _update (_id integer primary key, project integer not null, user integer not null, "+
 			"title text not null, _text text, location text, "+
 			"thumbnail_url text, thumbnail_fn text," +
 			"draft integer, unsent integer," +
@@ -90,22 +98,28 @@ public class RsrDbAdapter {
 			"create table country (_id integer primary key, "+
 			"name text not null, continent text, "+
 			"iso_code text);";
+	private static final String USER_TABLE_CREATE =
+			"create table user (_id integer primary key, "+
+			"username text not null, organisation integer not null, "+
+			"first_name text, last_name text, email text);";
 
-	private static final String[] DEFAULT_INSERTS = new String[] {
+	private static final String[] DEFAULT_PROJECT_INSERTS = new String[] {
 //		"insert into project values(1,'Sample Proj1', 'Sample proj 1 subtitle', 'sum1', 4711.00, 'url1', 'fn1')",
 //		"insert into project values(2,'Sample Proj2', 'Sample proj 2 subtitle', 'sum2', 4712.00, 'url2', 'fn2')"
 		};
 
 	private static final String DATABASE_NAME = "rsrdata";
 	private static final String PROJECT_TABLE = "project";
-	private static final String UPDATE_TABLE = "_update";
+	private static final String UPDATE_TABLE  = "_update";
 	private static final String COUNTRY_TABLE = "country";
+	private static final String USER_TABLE    = "user";
 
 //	private static final int DATABASE_VERSION = 5;
-//	private static final int DATABASE_VERSION = 6; //added long, lat, country, state, city
+//	private static final int DATABASE_VERSION = 6; //added project columns:long, lat, country, state, city
 //	private static final int DATABASE_VERSION = 7; //added project.hidden
 //	private static final int DATABASE_VERSION = 8; //added country table
-	private static final int DATABASE_VERSION = 9; //added update.creation_date
+//	private static final int DATABASE_VERSION = 9; //added update.creation_date
+	private static final int DATABASE_VERSION = 10; //added update.user and user table
 
 	private final Context context;
 
@@ -135,8 +149,9 @@ public class RsrDbAdapter {
 			db.execSQL(PROJECT_TABLE_CREATE);
 			db.execSQL(UPDATE_TABLE_CREATE);
 			db.execSQL(COUNTRY_TABLE_CREATE);
-			for (int i = 0; i < DEFAULT_INSERTS.length; i++) {
-				db.execSQL(DEFAULT_INSERTS[i]);
+			db.execSQL(USER_TABLE_CREATE);
+			for (int i = 0; i < DEFAULT_PROJECT_INSERTS.length; i++) {
+				db.execSQL(DEFAULT_PROJECT_INSERTS[i]);
 			}			
 		}
 
@@ -150,6 +165,7 @@ public class RsrDbAdapter {
 				db.execSQL("DROP TABLE IF EXISTS " + PROJECT_TABLE);
 				db.execSQL("DROP TABLE IF EXISTS " + UPDATE_TABLE);
 				db.execSQL("DROP TABLE IF EXISTS " + COUNTRY_TABLE);
+				db.execSQL("DROP TABLE IF EXISTS " + USER_TABLE);
 				onCreate(db);
 			}			
 			
@@ -435,6 +451,7 @@ public class RsrDbAdapter {
 		updatedValues.put(PROJECT_COL, update.getProjectId());
 		updatedValues.put(TITLE_COL, update.getTitle());
 		updatedValues.put(TEXT_COL, update.getText());
+		updatedValues.put(USER_COL, update.getUserId());
 		updatedValues.put(THUMBNAIL_URL_COL, update.getThumbnailUrl());
 		//not always done here to preserve a cache connection
 		if (saveFn)
@@ -707,6 +724,7 @@ public class RsrDbAdapter {
 				update.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(TITLE_COL)));
 				update.setProjectId(cursor.getString(cursor.getColumnIndexOrThrow(PROJECT_COL)));
 				update.setText(cursor.getString(cursor.getColumnIndexOrThrow(TEXT_COL)));
+				update.setUserId(cursor.getString(cursor.getColumnIndexOrThrow(USER_COL)));
 				update.setThumbnailUrl(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_URL_COL)));
 				update.setThumbnailFilename(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_FILENAME_COL)));
 				update.setDraft(0 != cursor.getInt(cursor.getColumnIndexOrThrow(DRAFT_COL)));
@@ -777,6 +795,72 @@ public class RsrDbAdapter {
 		database.delete(UPDATE_TABLE, null, null);
 	}
 
+	
+	/**
+	 * Gets a single user from the db using its primary key
+	 */
+	public User findUser(String _id) {
+		User user = null;
+		Cursor cursor = database.query(USER_TABLE,
+									   null,
+									   "_id = ?",
+									   new String[] { _id }, null, null, null);
+		if (cursor != null) {
+			if (cursor.getCount() > 0) {
+				cursor.moveToFirst();
+				user = new User();
+				user.setId(_id); //no confusion with country id
+				user.setUsername(cursor.getString(cursor.getColumnIndexOrThrow(USERNAME_COL)));
+				user.setFirstname(cursor.getString(cursor.getColumnIndexOrThrow(FIRST_NAME_COL)));
+				user.setLastname(cursor.getString(cursor.getColumnIndexOrThrow(LAST_NAME_COL)));
+				user.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(EMAIL_COL)));
+				user.setOrgId(cursor.getString(cursor.getColumnIndexOrThrow(ORGANISATION_COL)));
+				}
+			cursor.close();
+			}
+
+		return user;
+	}
+
+
+	/**
+	* creates or updates a user in the db
+	*
+	* @param user
+	* @return
+	*/
+	public void saveUser(User user) {
+		ContentValues updatedValues = new ContentValues();
+		updatedValues.put(PK_ID_COL, user.getId());
+		updatedValues.put(USERNAME_COL, user.getUsername());
+		updatedValues.put(FIRST_NAME_COL, user.getFirstname());
+		updatedValues.put(LAST_NAME_COL, user.getLastname());
+		updatedValues.put(EMAIL_COL, user.getEmail());
+		updatedValues.put(ORGANISATION_COL, user.getOrgId());
+		
+		Cursor cursor = database.query(USER_TABLE,
+		new String[] { PK_ID_COL },
+		PK_ID_COL + " = ?",
+		new String[] { user.getId(), },
+		null, null, null);
+		
+		if (cursor != null && cursor.getCount() > 0) {
+			// if we found an item, it's an update, otherwise, it's an insert
+			database.update(USER_TABLE, updatedValues, PK_ID_COL + " = ?",
+					new String[] { user.getId() });
+		} else {
+			database.insert(USER_TABLE, null, updatedValues);
+		}
+		
+		if (cursor != null) {
+			cursor.close();
+		}
+	}
+
+	
+
+	
+	
 
 
 	/**

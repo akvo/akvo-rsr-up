@@ -23,6 +23,9 @@ import java.util.Set;
 public class User {
 	private String id;
 	private String username;
+	private String firstname;
+	private String lastname;
+	private String email;
 	private String apiKey;
 	private String orgId;
 	private Set<String> publishedProjects;
@@ -51,8 +54,32 @@ public class User {
 		return username;
 	}
 
-	public void setUsername(String title) {
-		this.username = title;
+	public void setUsername(String name) {
+		this.username = name;
+	}
+
+	public String getFirstname() {
+		return firstname;
+	}
+
+	public void setFirstname(String name) {
+		this.firstname = name;
+	}
+
+	public String getLastname() {
+		return lastname;
+	}
+
+	public void setLastname(String name) {
+		this.lastname = name;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public String getApiKey() {
