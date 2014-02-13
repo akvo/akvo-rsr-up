@@ -109,19 +109,24 @@ public class DiagnosticActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		dba.open();
+		Cursor u = dba.listMissingUsers();
+		txt.append("\nMissing users in db: " + String.valueOf(u.getCount())+"\n");
+		while (u.moveToNext())
+			txt.append("\n["+u.getString(u.getColumnIndex(RsrDbAdapter.USER_COL))+"] ");
+		u.close();
 		Cursor a = dba.listAllCountries();
 		txt.append("\nCountries in db: " + String.valueOf(a.getCount())+"\n");
 		while (a.moveToNext())
 			txt.append("\n["+a.getString(a.getColumnIndex(RsrDbAdapter.PK_ID_COL))+"] "+a.getString(a.getColumnIndex(RsrDbAdapter.NAME_COL))+" ");
 		a.close();
-		Cursor c = dba.listAllUpdates();
-		txt.append("\nUpdates in db: " + String.valueOf(c.getCount())+"\n");
-		while (c.moveToNext())
-			txt.append("'"+c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL))+"' for '"+c.getString(c.getColumnIndex(RsrDbAdapter.PROJECT_COL))+"' ");
-		c.close();
-		Cursor d = dba.listAllUpdatesFor("609");
-		txt.append("\nUpdates in db for 609: " + String.valueOf(d.getCount())+"\n");
-		d.close();
+//		Cursor c = dba.listAllUpdates();
+//		txt.append("\nUpdates in db: " + String.valueOf(c.getCount())+"\n");
+//		while (c.moveToNext())
+//			txt.append("'"+c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL))+"' for '"+c.getString(c.getColumnIndex(RsrDbAdapter.PROJECT_COL))+"' ");
+//		c.close();
+//		Cursor d = dba.listAllUpdatesFor("609");
+//		txt.append("\nUpdates in db for 609: " + String.valueOf(d.getCount())+"\n");
+//		d.close();
 		
 		StatFs stat = new StatFs(Environment.getExternalStorageDirectory().getPath());
 		double sdAvailSize = (double)stat.getAvailableBlocks()

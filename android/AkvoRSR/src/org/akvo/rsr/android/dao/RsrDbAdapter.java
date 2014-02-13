@@ -50,7 +50,7 @@ public class RsrDbAdapter {
 	public static final String THUMBNAIL_URL_COL = "thumbnail_url";
 	public static final String THUMBNAIL_FILENAME_COL = "thumbnail_fn";
 	public static final String PROJECT_COL = "project";
-	public static final String USER_COL = "user";
+	public static final String USER_COL = "userid";
 	public static final String TEXT_COL = "_text";
 	public static final String DRAFT_COL = "draft";
 	public static final String UNSENT_COL = "unsent"; //currently unused
@@ -88,7 +88,7 @@ public class RsrDbAdapter {
 			"thumbnail_url text, thumbnail_fn text," +
 			"longitude text, latitude text, country_id integer, state text, city text, hidden integer);";
 	private static final String UPDATE_TABLE_CREATE =
-			"create table _update (_id integer primary key, project integer not null, user integer not null, "+
+			"create table _update (_id integer primary key, project integer not null, userid integer not null, "+
 			"title text not null, _text text, location text, "+
 			"thumbnail_url text, thumbnail_fn text," +
 			"draft integer, unsent integer," +
@@ -100,7 +100,7 @@ public class RsrDbAdapter {
 			"iso_code text);";
 	private static final String USER_TABLE_CREATE =
 			"create table user (_id integer primary key, "+
-			"username text not null, organisation integer not null, "+
+			"username text, organisation integer, "+
 			"first_name text, last_name text, email text);";
 
 	private static final String[] DEFAULT_PROJECT_INSERTS = new String[] {
@@ -119,7 +119,8 @@ public class RsrDbAdapter {
 //	private static final int DATABASE_VERSION = 7; //added project.hidden
 //	private static final int DATABASE_VERSION = 8; //added country table
 //	private static final int DATABASE_VERSION = 9; //added update.creation_date
-	private static final int DATABASE_VERSION = 10; //added update.user and user table
+//	private static final int DATABASE_VERSION = 10; //added update.user and user table
+	private static final int DATABASE_VERSION = 11; //user columns attribute change
 
 	private final Context context;
 
@@ -674,6 +675,26 @@ public class RsrDbAdapter {
 
 
 	/**
+	 * Gets users that are referenced by updates but not loaded
+	 */
+	public Cursor listMissingUsers() {
+		Cursor cursor = database.query(true, //distinct
+										"_update LEFT JOIN user ON (userid = user._id)",
+										new String[] {"userid", "user._id"},
+//										null,//selection
+										"user._id IS NULL",
+										null,//selection vals
+//										new String[] { },
+										"userid",
+										null,
+										null,
+										null);
+
+		return cursor;
+	}
+
+
+	/**
 	 * Gets a single project from the db using its primary key
 	 */
 	public Project findProject(String _id) {
@@ -839,10 +860,10 @@ public class RsrDbAdapter {
 		updatedValues.put(ORGANISATION_COL, user.getOrgId());
 		
 		Cursor cursor = database.query(USER_TABLE,
-		new String[] { PK_ID_COL },
-		PK_ID_COL + " = ?",
-		new String[] { user.getId(), },
-		null, null, null);
+										new String[] { PK_ID_COL },
+										PK_ID_COL + " = ?",
+										new String[] { user.getId(), },
+										null, null, null);
 		
 		if (cursor != null && cursor.getCount() > 0) {
 			// if we found an item, it's an update, otherwise, it's an insert

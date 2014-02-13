@@ -68,6 +68,7 @@ public class UserListHandler extends DefaultHandler {
 	private boolean syntaxError = false;
 	private int depth = 0;
 	private String buffer;
+	private String defaultUserId;
 	
 	//where to store results
 	private RsrDbAdapter dba;
@@ -75,9 +76,10 @@ public class UserListHandler extends DefaultHandler {
 	/*
 	 * constructor
 	 */
-	UserListHandler(RsrDbAdapter aDba){
+	UserListHandler(RsrDbAdapter aDba, String defaultId){
 		super();
 		dba = aDba;
+		defaultUserId = defaultId;
 	}
 	// ===========================================================
 	// Getter & Setter
@@ -117,6 +119,7 @@ public class UserListHandler extends DefaultHandler {
 		if (localName.equals("object")) {
 			this.in_user = true;
 			currentUser = new User();
+			currentUser.setId(defaultUserId);
 		} else if (in_user) {
 			if (!in_profile && localName.equals("resource_uri")) {
 				this.in_id = true;
@@ -166,7 +169,7 @@ public class UserListHandler extends DefaultHandler {
 		} else if (in_org_id && localName.equals("organisation")) {
 			this.in_org_id = false;
 			currentUser.setOrgId(idFromUrl(buffer));
-		} else if (localName.equals("user")) {
+		} else if (localName.equals("object")) {
 			this.in_user = false;
 			if (currentUser != null) {
 				dba.saveUser(currentUser);

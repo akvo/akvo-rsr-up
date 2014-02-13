@@ -81,7 +81,19 @@
 	            android:text="Update description goes here, and can be be any length. Update will scroll but button will stay at bottom of screen."
 			    />
 	        
-	        <!-- fudge to fill the viewport if necessary -->
+			<!-- The update author -->	
+	        <TextView
+		        android:id="@+id/projupd_detail_user"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="left"
+		        android:gravity="right"
+		        android:textColor="@color/rsr_purple"
+		        android:textSize="12sp"
+	            android:text="Author name"
+			    />
+	        
+   	        <!-- fudge to fill the viewport if necessary -->
 		    <View
 		        android:layout_width="fill_parent"
         		android:layout_height="0dp"

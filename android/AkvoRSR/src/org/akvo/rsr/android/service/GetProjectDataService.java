@@ -36,6 +36,7 @@ public class GetProjectDataService extends IntentService {
 		Downloader dl = new Downloader();
 		String errMsg = null;
 		boolean noimages = SettingsUtil.ReadBoolean(this, "setting_delay_image_fetch", false);
+		String host = SettingsUtil.host(this);
 
 
 		try {
@@ -54,7 +55,7 @@ public class GetProjectDataService extends IntentService {
 				while (c.moveToNext()) {
 					i++;
 					dl.fetchUpdateList(	this,
-									   	new URL(SettingsUtil.host(this) +
+									   	new URL(host +
 										"/api/v1/project_update/?format=xml&limit=0&project=" + //TODO move to constants
 										c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL)))
 										);
@@ -65,32 +66,6 @@ public class GetProjectDataService extends IntentService {
 				if (c != null)
 					c.close();
 			}
-/*			
-			//Fetch user data for the authors of the updates.
-			//TODO: may need to change the API 
-			//This API currently requires authorization as an admin
-			User user = SettingsUtil.getAuthUser(this);
-			Cursor c = ad.listUserlessUpdates();
-			try {
-				int i = 0;
-				while (c.moveToNext()) {
-					i++;
-					dl.fetchUser(this,
-								 new URL(SettingsUtil.host(this) +
-										 String.format(Locale.US, ConstantUtil.FETCH_USER_URL_PATTERN, c.getString(c.getColumnIndex(RsrDbAdapter.USER_COL))) +
-										 String.format(Locale.US, ConstantUtil.API_KEY_PATTERN, user.getApiKey(),user.getUsername()))
-							);
-					broadcastProgress(1, i, c.getCount());					
-					}
-				}
-			finally {
-				if (c != null)
-					c.close();
-			}
-*/			
-			
-			
-			
 			
 		} catch (FileNotFoundException e) {
 			Log.e(TAG,"Cannot find:",e);
@@ -99,12 +74,46 @@ public class GetProjectDataService extends IntentService {
 			Log.e(TAG,"Bad fetch:",e);
 			errMsg = "Fetch failed: "+ e;
 		}
-//		progressBroadcast(1, 0, 0);
-		
+
+		if (true) {
+				//Fetch user data for the authors of the updates.
+				//This API requires authorization
+				User user = SettingsUtil.getAuthUser(this);
+				Cursor cursor = ad.listMissingUsers();
+				int j = 0;
+				int col = cursor.getColumnIndex(RsrDbAdapter.USER_COL);
+				String key = String.format(Locale.US, ConstantUtil.API_KEY_PATTERN, user.getApiKey(), user.getUsername());
+				while (cursor.moveToNext()) {
+					try { 
+						dl.fetchUser(this,
+									 new URL(host +
+											 String.format(Locale.US, ConstantUtil.FETCH_USER_URL_PATTERN, cursor.getString(col)) +
+											 key),
+									 cursor.getString(col)
+									);
+						j++;
+						}
+					catch (FileNotFoundException e) { //possibly because user is no longer active
+						Log.w(TAG,"Cannot find:" + cursor.getString(col));
+	//					errMsg = "Cannot find: "+ e.getMessage(); //not serious
+					} catch (Exception e) { //probably network reasons
+						Log.e(TAG,"Bad fetch:",e);
+						errMsg = "Fetch failed: "+ e;
+					}
+				}
+				if (cursor != null)
+					cursor.close();
+				Log.i(TAG,"Fetched users: " + j);
+
+			}
+			
+		broadcastProgress(1, 100, 100);					
+			
+					
 		if (!noimages) {
 			try {
 				dl.fetchNewThumbnails(this,
-						SettingsUtil.host(this),
+						host,
 						FileUtil.getExternalCacheDir(this).toString(),
 						new Downloader.ProgressReporter() {
 							public void sendUpdate(int sofar, int total) {

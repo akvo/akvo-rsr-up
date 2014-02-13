@@ -20,9 +20,11 @@ import java.io.File;
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.domain.Update;
+import org.akvo.rsr.android.domain.User;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.DialogUtil;
 import org.akvo.rsr.android.util.FileUtil;
+import org.akvo.rsr.android.util.SettingsUtil;
 
 import android.os.Bundle;
 import android.app.Activity;
@@ -45,10 +47,12 @@ public class UpdateDetailActivity extends Activity {
 	private String updateId = null;
 	private Update update = null;
 	private boolean editable;
+	private boolean debug;
 	//UI
 	private TextView projTitleLabel;
 	private TextView projupdTitleText;
 	private TextView projupdDescriptionText;
+	private TextView projupdUser;
 	private ImageView projupdImage;
 	private Button btnEdit;
 	//Database
@@ -58,6 +62,8 @@ public class UpdateDetailActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		debug = SettingsUtil.ReadBoolean(this, "setting_debug", false);
 
 		//find which update we are showing
 		Bundle extras = getIntent().getExtras();
@@ -77,6 +83,7 @@ public class UpdateDetailActivity extends Activity {
 		projupdTitleText = (TextView) findViewById(R.id.projupd_detail_title);
 		projupdDescriptionText = (TextView) findViewById(R.id.projupd_detail_descr);
 		projupdImage = (ImageView) findViewById(R.id.image_update_detail);
+		projupdUser = (TextView) findViewById(R.id.projupd_detail_user);
 
 		//Activate buttons
 				
@@ -106,7 +113,16 @@ public class UpdateDetailActivity extends Activity {
 			editable = update.getDraft();
 			projupdTitleText.setText(update.getTitle());	
 			projupdDescriptionText.setText(update.getText());
-			
+			User author = dba.findUser(update.getUserId());
+			if (author != null) {
+				if (debug) {
+					projupdUser.setText(author.getFirstname() + " " + author.getLastname() + "[" + update.getUserId() + "]");
+				} else {
+					projupdUser.setText(author.getFirstname() + " " + author.getLastname());
+				}				
+			} else {
+				projupdUser.setText("[" + update.getUserId() + "]");
+			}
 			//show preexisting image
 			if (update.getThumbnailFilename() != null) {
 				FileUtil.setPhotoFile(projupdImage,update.getThumbnailUrl(),update.getThumbnailFilename(), null, updateId);

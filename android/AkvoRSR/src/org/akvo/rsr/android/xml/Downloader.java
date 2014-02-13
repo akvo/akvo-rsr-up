@@ -189,7 +189,7 @@ public class Downloader {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public void fetchUser(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
+	public void fetchUser(Context ctx, URL url, String defaultId) throws ParserConfigurationException, SAXException, IOException {
 
 		/* Get a SAXParser from the SAXPArserFactory. */
 		SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -198,7 +198,7 @@ public class Downloader {
 		/* Get the XMLReader of the SAXParser we created. */
 		XMLReader xr = sp.getXMLReader();
 		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
-		UserListHandler myUserListHandler = new UserListHandler(new RsrDbAdapter(ctx));
+		UserListHandler myUserListHandler = new UserListHandler(new RsrDbAdapter(ctx), defaultId);
 		xr.setContentHandler(myUserListHandler);
 		/* Parse the xml-data from our URL. */
 		xr.parse(new InputSource(url.openStream()));
@@ -206,7 +206,6 @@ public class Downloader {
 
 		/* Check if anything went wrong. */
 		err = myUserListHandler.getError();
-		Log.i(TAG, "Fetched " + myUserListHandler.getCount() + " users");
 	}
 
 
