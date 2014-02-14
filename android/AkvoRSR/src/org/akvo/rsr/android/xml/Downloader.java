@@ -227,10 +227,10 @@ public class Downloader {
 	 * @return
 	 */
 	public static String httpGetToNewFile(URL url, String directory, String prefix) {
-		String extension = null;
+		String extension = "";
 		int i = url.getFile().lastIndexOf('.');
 		if (i >= 0) {
-			extension = url.getFile().substring((url.getFile().lastIndexOf('.')));
+			extension = url.getFile().substring((i));
 		}
 		File output = new File(directory + File.separator + prefix + System.nanoTime() + extension);
 		httpGetToFile(url,output.getAbsoluteFile());
@@ -300,7 +300,7 @@ public class Downloader {
 					if (url == null) {
 						Log.i(TAG, "Null image URL for update: " + id);
 					} else try {
-						fn = httpGetToNewFile(new URL(curl,url), directory, "upd"+id+"_");
+						fn = httpGetToNewFile(new URL(curl,url), directory, "upd" + id + "_");
 						dba.updateUpdateThumbnailFile(id,fn);						
 						fetchCount++;
 					} catch (Exception e) {

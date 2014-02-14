@@ -1,6 +1,7 @@
 package org.akvo.rsr.android.util;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.URL;
@@ -195,6 +196,98 @@ public class FileUtil {
 	}
 
 	
+	
+	//shrink an image file (to save upload bandwidth)
+	//the quick way, by a power-of-2 integer factor
+	//This will lose any EXIF information
+	public static boolean shrinkImageFileQuickly(String filename, int maxSize) {
+		BitmapFactory.Options o = new BitmapFactory.Options();
+	    o.inJustDecodeBounds = true;
+	    BitmapFactory.decodeFile(filename, o);
+	    int width_tmp = o.outWidth, height_tmp = o.outHeight;
+	    if (width_tmp < 0 || height_tmp < 0 )
+	    	return false;
+	    if (width_tmp <= maxSize && height_tmp <= maxSize)
+	    	return true;
+
+	    // Find the correct scale value. It should be a power of 2.
+	    int scale = 1;
+	    while (true) {
+	        if (width_tmp <= maxSize &&
+	            height_tmp <= maxSize) {
+	            break;
+	        }
+	        width_tmp /= 2;
+	        height_tmp /= 2;
+	        scale *= 2;
+	    }
+	
+	    // Decode with inSampleSize
+	    BitmapFactory.Options o2 = new BitmapFactory.Options();
+	    o2.inSampleSize = scale;			
+		
+		Bitmap bm = BitmapFactory.decodeFile(filename,o2);
+		if (bm == null) {
+			return false;
+		} else {
+			//save it back
+			try {
+				FileOutputStream stream = new FileOutputStream(filename);
+				if (bm.compress(Bitmap.CompressFormat.JPEG, 90, stream)) {
+					stream.close();
+					Log.i(TAG,"Shrunk image by a factor of " + scale);
+					return true;
+				}
+				return false;
+			}
+			catch (IOException e) {
+				Log.e(TAG,"Could not write resized image: ",e);
+				return false;
+			}
+		}
+	}
+	
+
+	//shrink image file so long edge becomes exactly maxSize pixels
+	//if already smaller, do nothing
+	//This will lose any EXIF information, although rotation should be normalized
+	public static boolean shrinkImageFileExactly(String filename, int maxSize) { 
+		BitmapFactory.Options o = new BitmapFactory.Options();
+	    Bitmap bm = BitmapFactory.decodeFile(filename, o);
+	    float width = o.outWidth, height = o.outHeight;
+	    if (bm == null || width < 0 || height < 0 )
+	    	return false;
+	    if (width <= maxSize && height <= maxSize)
+	    	return true;
+	    
+	    float xFactor;
+	    if (width > height) {
+	    	xFactor = maxSize/width;
+		} else {
+			xFactor = maxSize/height;
+		}
+	
+		int Nheight = (int) (xFactor * height);//preserve aspect ratio
+		int NWidth  = (int) (xFactor * width) ; 
+		Log.v("Nheight", String.valueOf(NWidth));
+		Log.v("Nwidht",  String.valueOf(Nheight));
+	
+		Bitmap bm2 = Bitmap.createScaledBitmap(bm, NWidth, Nheight, true);
+		File file = new File(filename);
+		try {
+			FileOutputStream ostream = new FileOutputStream(file);
+			bm2.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
+			ostream.close(); 
+		}
+		catch (Exception e) {
+			Log.e(TAG,"Could not write resized image: ",e);
+			return false;
+		}
+		return true;
+	}	
+
+	
+	//called when a delayed-load icon is clicked
 	static void DoLateIconLoad(final ImageView iv) {
 		//fetch must happen in another thread than main on Android API 11 and later
 		new Thread(new Runnable() {

@@ -27,6 +27,7 @@ import java.util.Date;
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.domain.Update;
+import org.akvo.rsr.android.domain.User;
 import org.akvo.rsr.android.service.SubmitProjectUpdateService;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.DialogUtil;
@@ -52,8 +53,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.provider.MediaStore;
 
 public class UpdateEditorActivity extends Activity {
@@ -61,8 +60,12 @@ public class UpdateEditorActivity extends Activity {
 	private final int photoRequest = 777;
 	private final int photoPick = 888;
 	private  String captureFilename = null;
+	private boolean warnAboutBigImage = false;
+	private boolean shrinkBigImage = true;
+	private final int shrinkSize = 1024;
+	private User user;
 	
-	private int nextLocalId = -1; //TODO load from /save to variable store
+	private int nextLocalId; //load from / save to variable store
 	private String projectId = null;
 	private String updateId = null;
 	private Update update = null;
@@ -88,6 +91,7 @@ public class UpdateEditorActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		user = SettingsUtil.getAuthUser(this);
 		nextLocalId = SettingsUtil.ReadInt(this, ConstantUtil.LOCAL_ID_KEY, -1);
 		
 		//find which update we are editing
@@ -172,6 +176,8 @@ public class UpdateEditorActivity extends Activity {
 
 		if (updateId == null) { //create new
 			update = new Update();
+			update.setUserId(user.getId());
+			update.setDate(new Date());
 			editable = true;
 		} else {
 			update = dba.findUpdate(updateId);
@@ -239,16 +245,24 @@ public class UpdateEditorActivity extends Activity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		
-		//Handle taken photo
+		//Handle photo taken by camera app
 		if (requestCode == photoRequest) {
 			if (resultCode == RESULT_CANCELED) {
 				return;
 			}
-			//check if file too large - if so, show error dialog and return
-			File sizeTest = new File(captureFilename);
-			if (sizeTest.length() > ConstantUtil.MAX_IMAGE_UPLOAD_SIZE) {
-				DialogUtil.errorAlert(this, "Photo file too big", "Set your camera to a lower resolution or turn on automatic shrinking");
-				return;
+			if (warnAboutBigImage) {
+				//check if file too large - if so, show error dialog and return
+				File sizeTest = new File(captureFilename);
+				if (sizeTest.length() > ConstantUtil.MAX_IMAGE_UPLOAD_SIZE) {
+					DialogUtil.errorAlert(this, "Photo file too big", "Set your camera to a lower resolution");
+					return;
+				}
+			}
+			if (shrinkBigImage) {
+				//make long edge 1024 px or smaller
+				if (!FileUtil.shrinkImageFileExactly(captureFilename, shrinkSize)) {
+					DialogUtil.errorAlert(this, "Could not shrink photo", "Original was too big to send.");
+				}
 			}
 			update.setThumbnailFilename(captureFilename);
 			update.setThumbnailUrl("dummyUrl"); //absence will be interpreted as unset thumbnail
@@ -267,15 +281,25 @@ public class UpdateEditorActivity extends Activity {
 			InputStream imageStream;
 			try {
 				imageStream = getContentResolver().openInputStream(data.getData());
-			    captureFilename = FileUtil.getExternalPhotoDir(this) + File.separator + "capture" + System.nanoTime() + ".jpg";
+			    captureFilename = FileUtil.getExternalPhotoDir(this) + File.separator + "pick" + System.nanoTime() + ".jpg";
 			    OutputStream os = new FileOutputStream(captureFilename);
 			    copyStream(imageStream,os);
-				//check if file too large - if so, show error dialog and return
-				File sizeTest = new File(captureFilename);
-				if (sizeTest.length() > ConstantUtil.MAX_IMAGE_UPLOAD_SIZE) {
-					sizeTest.delete(); //save the space
-					DialogUtil.errorAlert(this, "Photo file too big", "Pick a smaller photo or turn on automatic shrinking");
-					return;
+			    os.close();
+				if (warnAboutBigImage) {
+					//check if file too large - if so, show error dialog and return
+					File sizeTest = new File(captureFilename);
+					if (sizeTest.length() > ConstantUtil.MAX_IMAGE_UPLOAD_SIZE) {
+						sizeTest.delete(); //save the space
+						DialogUtil.errorAlert(this, "Photo file too big", "Pick a smaller photo");
+						return;
+					}
+				}
+				if (shrinkBigImage) {
+					//make long edge 1024 px or smaller
+					//since this is a copy we can resize it in place
+					if (!FileUtil.shrinkImageFileExactly(captureFilename, shrinkSize)) {
+						DialogUtil.errorAlert(this, "Could not shrink photo", "Original was too big to send.");
+					}
 				}
 			    //store it and show it
 				update.setThumbnailFilename(captureFilename);
@@ -326,15 +350,23 @@ public class UpdateEditorActivity extends Activity {
 	/*
 	 * Save current update
 	 */
-	private void saveAsDraft(boolean andEnd) {
+	private void saveAsDraft(boolean interactive) {
 		if (untitled()) {
-			return;
+			if (interactive) {
+				//Tell user why not
+				Context context = getApplicationContext();
+				Toast toast = Toast.makeText(context, R.string.errmsg_empty_title, Toast.LENGTH_SHORT);
+				toast.show();
+				return;
+			} else {
+				projupdTitleText.setText("?"); //must have something
+			}
 		}
 		update.setDraft(true);
 		update.setUnsent(false);
 		update.setTitle(projupdTitleText.getText().toString());
 		update.setText(projupdDescriptionText.getText().toString());
-		update.setDate(new Date());
+//		update.setDate(new Date()); //should have date from when it was created
 		if (update.getId() == null) {//new
 			//MUST have project and a local update id
 			update.setProjectId(projectId);
@@ -344,7 +376,7 @@ public class UpdateEditorActivity extends Activity {
 
 		}
 		dba.saveUpdate(update, true);
-		if (andEnd) {
+		if (interactive) {
 			//Tell user what happened
 			//TODO: use a confirm dialog instead
 			Context context = getApplicationContext();
@@ -374,7 +406,7 @@ public class UpdateEditorActivity extends Activity {
 		update.setTitle(projupdTitleText.getText().toString());
 		update.setText(projupdDescriptionText.getText().toString());
 		update.setProjectId(projectId);
-		update.setDate(new Date());		
+//		update.setDate(new Date()); //should have date from when it was created
 		if (update.getId() == null) {//new
 		    update.setId(Integer.toString(nextLocalId));
 			nextLocalId--;
@@ -396,16 +428,9 @@ public class UpdateEditorActivity extends Activity {
 		
 	}
 
-	// if update has no title it must not be sent OR saved
+
 	private boolean untitled() {
-		if (projupdTitleText.getText().toString().trim().length() == 0) {
-			//Tell user what happened
-			Context context = getApplicationContext();
-			Toast toast = Toast.makeText(context, R.string.errmsg_empty_title, Toast.LENGTH_SHORT);
-			toast.show();
-			return true;
-		} else
-			return false;
+		return (projupdTitleText.getText().toString().trim().length() == 0);
 	}
 	
 	
@@ -430,7 +455,7 @@ public class UpdateEditorActivity extends Activity {
 			progress.dismiss();
 		String err = i.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
 		if (err == null) {
-			//display dialog instead
+			//display success dialog
 			DialogUtil.infoAlert(this,"Update published","Update successfully sent to server");
 			Toast.makeText(getApplicationContext(), "Update sent successfully", Toast.LENGTH_SHORT).show(); //TODO string resource
 		} else {
@@ -439,8 +464,8 @@ public class UpdateEditorActivity extends Activity {
 				update.setUnsent(false);
 				update.setDraft(true);
 				dba.saveUpdate(update, true);
-				//TODO display confirm-dialog instead
-				Toast.makeText(getApplicationContext(), "Network connection problem. Update was saved as draft. "+err, Toast.LENGTH_SHORT).show();
+				//TODO display confirm-dialog instead, maybe with a "details" button to see the full error message
+				Toast.makeText(getApplicationContext(), "Network connection problem. Update was saved as draft. " + err, Toast.LENGTH_SHORT).show();
 			} else {
 				Toast.makeText(getApplicationContext(), err, Toast.LENGTH_SHORT).show();
 			}
@@ -471,7 +496,7 @@ public class UpdateEditorActivity extends Activity {
 
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
-		//pick up the saved draft if we get restarted?
+		//pick up the saved draft if we get restarted
 		saveAsDraft(false);
 		//in case this created the update in the DB
 		outState.putString(ConstantUtil.UPDATE_ID_KEY, update.getId());
