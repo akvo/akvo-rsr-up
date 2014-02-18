@@ -14,11 +14,12 @@
  	    android:layout_gravity="left"
  	    android:background="@color/pale_gray"
  	    android:padding="5dip"
- 	    android:text="Project title goes here"
+ 	    android:text="@string/dummy_project_title"
  	    android:textColor="@color/rsr_purple"
         android:textSize="20sp"
 		android:layout_weight="0"
- 	    android:typeface="sans" />
+ 	    android:typeface="sans"
+	    />
  	
 	<!-- The scrollview should fill all the space beween the project title and the bottom -->	
  	<ScrollView
@@ -46,7 +47,8 @@
 	            android:textColor="@color/dk_gray"
 	            android:textSize="20sp"
 	            android:padding="10dip"
-	            android:typeface="sans" />
+	            android:typeface="sans"
+	            />
 	
 	        <EditText
 	            android:id="@+id/edit_projupd_title"
@@ -55,11 +57,13 @@
 	            android:layout_margin="5dip"
 	            android:background="@drawable/box"
 	            android:hint="@string/hint_update_title"
+	            android:inputType="textCapSentences"
 	            android:maxLength="50"
 	            android:padding="5dip"
 	            android:singleLine="true" />
 	  
 			<!-- The update text entry -->	
+
 	        <EditText
 	            android:id="@+id/edit_projupd_description"
 	            android:layout_width="fill_parent"
@@ -68,11 +72,10 @@
 	            android:background="@drawable/box"
 	            android:gravity="top|left"
 	            android:hint="@string/hint_update_description"
+	            android:inputType="textCapSentences|textMultiLine"
 	            android:minHeight="30dp"
 	            android:minLines="3"
-	            android:inputType="textMultiLine"
-	            android:padding="5dip"
-	             />
+	            android:padding="5dip" />
 	        
 			<!-- The photo -->
 

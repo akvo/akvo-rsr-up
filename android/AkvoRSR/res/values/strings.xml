@@ -72,6 +72,7 @@
     <string name="authfailed">Authorization failed</string>
     <string name="invalidpassword">Invalid password</string>
     
+    <string name="dummy_project_title">Project title here</string>
     
     
     <string-array name="types">
