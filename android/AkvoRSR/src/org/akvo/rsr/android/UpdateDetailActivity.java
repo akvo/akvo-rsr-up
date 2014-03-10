@@ -47,12 +47,14 @@ public class UpdateDetailActivity extends Activity {
 	private String updateId = null;
 	private Update update = null;
 	private boolean editable;
+	private boolean synching;
 	private boolean debug;
 	//UI
 	private TextView projTitleLabel;
 	private TextView projupdTitleText;
 	private TextView projupdDescriptionText;
 	private TextView projupdUser;
+	private TextView synchFlag;
 	private ImageView projupdImage;
 	private Button btnEdit;
 	//Database
@@ -66,6 +68,7 @@ public class UpdateDetailActivity extends Activity {
 		debug = SettingsUtil.ReadBoolean(this, "setting_debug", false);
 
 		//find which update we are showing
+		//TODO, use uuid as update id?
 		Bundle extras = getIntent().getExtras();
 		projectId = extras != null ? extras.getString(ConstantUtil.PROJECT_ID_KEY)
 				: null;
@@ -84,6 +87,7 @@ public class UpdateDetailActivity extends Activity {
 		projupdDescriptionText = (TextView) findViewById(R.id.projupd_detail_descr);
 		projupdImage = (ImageView) findViewById(R.id.image_update_detail);
 		projupdUser = (TextView) findViewById(R.id.projupd_detail_user);
+		synchFlag= (TextView) findViewById(R.id.projupd_detail_synchronising);
 
 		//Activate buttons
 				
@@ -110,7 +114,8 @@ public class UpdateDetailActivity extends Activity {
 			DialogUtil.errorAlert(this, "Update missing", "Cannot open for review, update " + updateId);
 		} else {
 			//populate fields
-			editable = update.getDraft();
+			synching = update.getUnsent();
+			editable = update.getDraft() && !synching;
 			projupdTitleText.setText(update.getTitle());	
 			projupdDescriptionText.setText(update.getText());
 			User author = dba.findUser(update.getUserId());
@@ -132,6 +137,7 @@ public class UpdateDetailActivity extends Activity {
 
 		btnEdit.setEnabled(editable);
 		btnEdit.setVisibility(editable?View.VISIBLE:View.GONE);
+		synchFlag.setVisibility(synching?View.VISIBLE:View.GONE);
 		
 		// Show the Up button in the action bar.
 		//		setupActionBar();

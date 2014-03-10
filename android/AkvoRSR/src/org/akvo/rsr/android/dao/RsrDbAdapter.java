@@ -56,6 +56,7 @@ public class RsrDbAdapter {
 	public static final String UNSENT_COL = "unsent"; //currently unused
 	public static final String HIDDEN_COL = "hidden";
 	public static final String CREATED_COL = "creation_date";
+	public static final String UUID_COL = "uuid";
 
 	public static final String LAT_COL = "latitude";
 	public static final String LON_COL = "longitude";
@@ -89,7 +90,7 @@ public class RsrDbAdapter {
 			"longitude text, latitude text, country_id integer, state text, city text, hidden integer);";
 	private static final String UPDATE_TABLE_CREATE =
 			"create table _update (_id integer primary key, project integer not null, userid integer not null, "+
-			"title text not null, _text text, location text, "+
+			"title text not null, _text text, location text, uuid text,"+
 			"thumbnail_url text, thumbnail_fn text," +
 			"draft integer, unsent integer," +
 			CREATED_COL + " INTEGER NOT NULL DEFAULT (strftime('%s','now'))" +
@@ -120,7 +121,8 @@ public class RsrDbAdapter {
 //	private static final int DATABASE_VERSION = 8; //added country table
 //	private static final int DATABASE_VERSION = 9; //added update.creation_date
 //	private static final int DATABASE_VERSION = 10; //added update.user and user table
-	private static final int DATABASE_VERSION = 11; //user columns attribute change
+//	private static final int DATABASE_VERSION = 11; //user columns attribute change
+	private static final int DATABASE_VERSION = 12; //uuid for updates
 
 	private final Context context;
 
@@ -453,6 +455,7 @@ public class RsrDbAdapter {
 		updatedValues.put(TITLE_COL, update.getTitle());
 		updatedValues.put(TEXT_COL, update.getText());
 		updatedValues.put(USER_COL, update.getUserId());
+		updatedValues.put(UUID_COL, update.getUuid());
 		updatedValues.put(THUMBNAIL_URL_COL, update.getThumbnailUrl());
 		//not always done here to preserve a cache connection
 		if (saveFn)
@@ -491,6 +494,7 @@ public class RsrDbAdapter {
 		ContentValues updatedValues = new ContentValues();
 		updatedValues.put(PK_ID_COL, update.getId());
 		updatedValues.put(UNSENT_COL, update.getUnsent()?"1":"0");
+		updatedValues.put(DRAFT_COL, update.getUnsent()?"1":"0");
 
 		Cursor cursor = database.query(UPDATE_TABLE,
 				new String[] { PK_ID_COL },
@@ -509,6 +513,33 @@ public class RsrDbAdapter {
 		if (cursor != null) {
 			cursor.close();
 		}
+	}
+
+	
+	/**
+	 * updates an update in the db, after the uuid verified by the server
+	 * 
+	 * @param update
+	 * @return
+	 */
+	public boolean updateUpdateVerifiedByUuid(Update update) {
+		ContentValues updatedValues = new ContentValues();
+		updatedValues.put(PK_ID_COL, update.getId());
+		updatedValues.put(UNSENT_COL, update.getUnsent()?"1":"0");
+		updatedValues.put(DRAFT_COL, update.getUnsent()?"1":"0");
+
+		// if we changed exactly one item, we are done
+		int rowsAffected = database.update(UPDATE_TABLE, updatedValues,
+					UUID_COL + " = ?",
+					new String[] { update.getUuid() }
+					);
+		if (rowsAffected == 1) {
+			return true;
+		} else {
+			Log.e(TAG, "Tried to update id/sent/draft sts of nonexistent update " + update.getUuid());
+			return false;
+		}
+
 	}
 	
 	/*
@@ -745,6 +776,7 @@ public class RsrDbAdapter {
 				update.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(TITLE_COL)));
 				update.setProjectId(cursor.getString(cursor.getColumnIndexOrThrow(PROJECT_COL)));
 				update.setText(cursor.getString(cursor.getColumnIndexOrThrow(TEXT_COL)));
+				update.setUuid(cursor.getString(cursor.getColumnIndexOrThrow(UUID_COL)));
 				update.setUserId(cursor.getString(cursor.getColumnIndexOrThrow(USER_COL)));
 				update.setThumbnailUrl(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_URL_COL)));
 				update.setThumbnailFilename(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_FILENAME_COL)));

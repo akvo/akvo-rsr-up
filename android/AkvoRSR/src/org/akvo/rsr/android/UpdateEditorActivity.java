@@ -23,12 +23,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
+import java.util.UUID;
 
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.domain.Update;
 import org.akvo.rsr.android.domain.User;
 import org.akvo.rsr.android.service.SubmitProjectUpdateService;
+import org.akvo.rsr.android.service.VerifyProjectUpdateService;
 import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.DialogUtil;
 import org.akvo.rsr.android.util.FileUtil;
@@ -176,6 +178,18 @@ public class UpdateEditorActivity extends Activity {
 
 		if (updateId == null) { //create new
 			update = new Update();
+			update.setUuid(UUID.randomUUID().toString()); //should do sth better, especially if MAC address is avaliable
+			/*
+			WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+	        WifiInfo wInfo = wifiManager.getConnectionInfo();
+	        String macAddress = wInfo.getMacAddress();
+	        if (macAddress == null)
+	               txt_View.append( "MAC Address : " + macAddress + "\n" );
+	        else
+	              txt_View.append( "MAC Address : " + macAddress + "\n" );
+	        }
+
+			 */
 			update.setUserId(user.getId());
 			update.setDate(new Date());
 			editable = true;
@@ -454,20 +468,16 @@ public class UpdateEditorActivity extends Activity {
 		if (progress != null)
 			progress.dismiss();
 		String err = i.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
+		boolean unresolved = i.getBooleanExtra(ConstantUtil.SERVICE_UNRESOLVED_KEY, false);
 		if (err == null) {
 			//display success dialog
-			DialogUtil.infoAlert(this,"Update published","Update successfully sent to server");
-			Toast.makeText(getApplicationContext(), "Update sent successfully", Toast.LENGTH_SHORT).show(); //TODO string resource
+			DialogUtil.infoAlert(this,"Update published","Update successfully sent to server"); //TODO string resource
 		} else {
-			//save as draft
-			if (update != null) {
-				update.setUnsent(false);
-				update.setDraft(true);
-				dba.saveUpdate(update, true);
-				//TODO display confirm-dialog instead, maybe with a "details" button to see the full error message
-				Toast.makeText(getApplicationContext(), "Network connection problem. Update was saved as draft. " + err, Toast.LENGTH_SHORT).show();
-			} else {
-				Toast.makeText(getApplicationContext(), err, Toast.LENGTH_SHORT).show();
+			if (unresolved) { //still has unsent flag set, commence retrying
+				getApplicationContext().startService(new Intent(this, VerifyProjectUpdateService.class));
+				DialogUtil.infoAlert(this,"Network connection problem","Update still synchronising..."); //TODO string resource
+			} else { //was saved as draft
+				DialogUtil.infoAlert(this,"Network connection problem","Update was saved as draft"); //TODO string resource
 			}
 		}
 		//Return to project or update list

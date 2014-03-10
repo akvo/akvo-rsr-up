@@ -32,6 +32,7 @@ public class Update {
 	private String location;
 	private String thumbnailUrl;
 	private String thumbnailFilename;	
+	private String uuid;	
 	private Date date;
 
 	public String getId() {
@@ -122,5 +123,13 @@ public class Update {
 		this.unsent = unsent;
 	}
 
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid= uuid;
+	}
 
 }

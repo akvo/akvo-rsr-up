@@ -29,7 +29,9 @@ import org.xml.sax.helpers.DefaultHandler;
 
 
 /*
- * Example input:
+ * Class to handle XML parsing for a project update.
+ * Normally requested as a list, in which case the root tags of the XML will be <response><objects type="list">
+ * Example input for one object:
  * 
 <object>
 <update_method>W</update_method>
@@ -44,6 +46,7 @@ import org.xml.sax.helpers.DefaultHandler;
 <video_credit/>
 <video/>
 <user>/api/v1/user/460/</user>
+<uuid>893274983-3243-23423433242342234</uuid>
 <time>2013-02-04T10:54:12</time>
 <time_last_updated>2013-02-04T10:56:30</time_last_updated>
 <text>After training on audio Visual content development(supported by IICD) ADS-Nyanza is currently using the videos to train farmers on how they can improve their farm productivity.
@@ -72,10 +75,12 @@ public class UpdateListHandler extends DefaultHandler {
 	private boolean in_photo = false;
 	private boolean in_text = false;
 	private boolean in_time = false;
+	private boolean in_uuid = false;
 
 	private Update currentUpd;
 	private int updateCount;
 	private boolean syntaxError = false;
+	private boolean insert;
 	private int depth = 0;
 	private SimpleDateFormat df1;
 	private String buffer;
@@ -86,9 +91,10 @@ public class UpdateListHandler extends DefaultHandler {
 	/*
 	 * constructor
 	 */
-	UpdateListHandler(RsrDbAdapter aDba){
+	UpdateListHandler(RsrDbAdapter aDba, boolean insert) {
 		super();
 		dba = aDba;
+		this.insert = insert;
 		df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
 		df1.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
@@ -102,6 +108,10 @@ public class UpdateListHandler extends DefaultHandler {
 
 	public int getCount() {
 		return updateCount;
+	}
+
+	public Update getLastUpdate() {
+		return currentUpd; //only valid if insert==False
 	}
 
 	// ===========================================================
@@ -130,7 +140,6 @@ public class UpdateListHandler extends DefaultHandler {
 		if (localName.equals("object")) {
 			this.in_update = true;
 			currentUpd = new Update();
-			currentUpd.setText("");//for appending
 		} else if (in_update) {
 			if (localName.equals("id")) {
 				this.in_id = true;
@@ -144,6 +153,8 @@ public class UpdateListHandler extends DefaultHandler {
 				this.in_project_id = true;
 			} else if (localName.equals("user")) {
 				this.in_user_id = true;
+			} else if (localName.equals("uuid")) {
+				this.in_uuid = true;
 			} else if (localName.equals("photo")) {
 				this.in_photo = true;
 			}
@@ -181,12 +192,17 @@ public class UpdateListHandler extends DefaultHandler {
 		} else if (localName.equals("user")) {
 			this.in_user_id = false;
 			currentUpd.setUserId(idFromUrl(buffer));
+		} else if (localName.equals("uuid")) {
+			this.in_uuid = false;
+			currentUpd.setUuid(buffer);
 		} else if (localName.equals("object")) {
 			this.in_update = false;
 			if (currentUpd != null) {
-				dba.saveUpdate(currentUpd, false); //preserve name of any cached image
 				updateCount++;
-				currentUpd = null;
+				if (insert) {
+					dba.saveUpdate(currentUpd, false); //preserve name of any cached image
+					currentUpd = null;
+				}
 			} else syntaxError=true;
 		} else if (localName.equals("photo")) {
 			this.in_photo = false;
@@ -202,6 +218,7 @@ public class UpdateListHandler extends DefaultHandler {
 		if (currentUpd != null) {
 			if (this.in_id
 			 || this.in_title
+			 || this.in_uuid
 			 || this.in_user_id
 			 || this.in_project_id
 			 || this.in_photo

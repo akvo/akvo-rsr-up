@@ -49,7 +49,7 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 	
 	private boolean debug = false;
 	private java.text.DateFormat dfmt;
-	private int idcol, titleCol;
+	private int idcol, titleCol, draftCol, unsentCol;
 	
 	public UpdateListCursorAdapter(Context context, Cursor cursor) {
 		super(context, cursor);
@@ -57,6 +57,8 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 		dfmt = DateFormat.getDateFormat(context);
 		idcol = cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL);
 		titleCol = cursor.getColumnIndex(RsrDbAdapter.TITLE_COL);
+		draftCol = cursor.getColumnIndex(RsrDbAdapter.DRAFT_COL);
+		unsentCol = cursor.getColumnIndex(RsrDbAdapter.UNSENT_COL);
 	}
 
 	
@@ -76,20 +78,26 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 		long s = cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.CREATED_COL));
 		Date d = new Date(1000 * s);
 		dateView.setText(dfmt.format(d));
-
 		TextView stateView = (TextView) view.findViewById(R.id.ulist_item_state);
-		if (0 != cursor.getInt(cursor.getColumnIndex(RsrDbAdapter.DRAFT_COL))) {
-			//Show draft updates as pink with a red label "Draft"
-			view.setBackgroundColor(context.getResources().getColor(R.color.pink));
+
+		if (0 != cursor.getInt(draftCol)) {
+			//Show synchronising updates as red with a "Synchronising" label
+			view.setBackgroundColor(context.getResources().getColor(R.color.red));
 			stateView.setVisibility(View.VISIBLE);
-			stateView.setText(R.string.state_draft);
-			stateView.setTextColor(context.getResources().getColor(R.color.red));
+			stateView.setText(R.string.state_synchronising);
 		} else {
-			//Published updates are on white, no state label
-			view.setBackgroundColor(Color.WHITE);
-			stateView.setVisibility(View.GONE);
-		}
-		
+			if (0 != cursor.getInt(draftCol)) {
+				//Show draft updates as pink with a red label "Draft"
+				view.setBackgroundColor(context.getResources().getColor(R.color.pink));
+				stateView.setVisibility(View.VISIBLE);
+				stateView.setText(R.string.state_draft);
+				stateView.setTextColor(context.getResources().getColor(R.color.red));
+			} else {
+				//Published updates are on white, no state label
+				view.setBackgroundColor(Color.WHITE);
+				stateView.setVisibility(View.GONE);
+			}
+		}		
 			
 		//Image
 		ImageView thumbnail = (ImageView) view.findViewById(R.id.ulist_item_thumbnail);

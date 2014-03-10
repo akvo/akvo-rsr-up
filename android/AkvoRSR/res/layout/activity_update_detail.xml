@@ -56,8 +56,23 @@
 			    android:layout_width="match_parent"
 			    android:layout_height="1dp" />
 
-			<!-- The update title entry -->	
-	        <TextView
+
+			<!-- The synch flag -->
+
+			<TextView
+			    android:id="@+id/projupd_detail_synchronising"
+			    android:layout_width="fill_parent"
+			    android:layout_height="wrap_content"
+			    android:paddingBottom="10dip"
+			    android:paddingTop="10dip"
+			    android:text="@string/state_synchronising"
+			    android:textColor="@color/red"
+			    android:textSize="18sp"
+			    android:typeface="sans"
+			    android:visibility="gone" />
+	
+			<!-- The update title entry -->
+			<TextView
 		        android:id="@+id/projupd_detail_title"
 		        android:layout_width="fill_parent"
 		       	android:layout_height="wrap_content"
@@ -70,7 +85,7 @@
 				android:paddingBottom="10dip"
 		        />
 	
-			<!-- The update description -->	
+	        <!-- The update description -->	
 	        <TextView
 		        android:id="@+id/projupd_detail_descr"
 		        android:layout_width="fill_parent"

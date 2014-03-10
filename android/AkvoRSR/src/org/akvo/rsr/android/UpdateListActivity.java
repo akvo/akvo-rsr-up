@@ -66,7 +66,6 @@ public class UpdateListActivity extends ListActivity {
 					.getString(ConstantUtil.PROJECT_ID_KEY) : null;
 		}
 
-
 		setContentView(R.layout.activity_update_list);
 
 		projectTitleLabel = (TextView) findViewById(R.id.ulisttitlelabel);
@@ -95,10 +94,6 @@ public class UpdateListActivity extends ListActivity {
         //Create db
 
 		ad = new RsrDbAdapter(this);
-		//register a listener for completion broadcasts
-		IntentFilter f = new IntentFilter(ConstantUtil.UPDATES_SENT_ACTION);
-		broadRec = new ResponseReceiver();
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadRec, f);
 	}
 
 	private void startEditorNew() {
@@ -121,9 +116,6 @@ public class UpdateListActivity extends ListActivity {
 			Intent intent = new Intent(this, SettingsActivity.class);
 			startActivity(intent);
             return true;
-//        case R.id.menu_sendall:
-//        	startSendUpdatesService();
-//        	return true;
         case R.id.action_add_update:
         	startEditorNew();
         	return true;
@@ -186,34 +178,10 @@ public class UpdateListActivity extends ListActivity {
 
 	}
 	
-	/**
-	 * starts service to send all pending updates
-	 * TODO for this to work we must first set all draft updates to unsent
-	 */
-	private void startSendUpdatesService(){
-		//register a listener for a completion intent
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                new ResponseReceiver(),
-                new IntentFilter(ConstantUtil.UPDATES_SENT_ACTION));
-		
-		//start upload service
-		Intent i = new Intent(this, SubmitProjectUpdateService.class);
-		getApplicationContext().startService(i);
-		
-		//start a "progress" animation
-		//TODO: a real filling progress bar?
-		progress = new ProgressDialog(this);
-		progress.setTitle("Synchronizing");
-		progress.setMessage("Sending all draft updates...");
-		progress.show();
-		//Now we wait...
-	}
-
-
 
 	/**
 	 * when a list item is clicked, get the id of the selected
-	 * item and open the edit/review update activity.
+	 * item and open the update detail activity.
 	 */
 	@Override
 	protected void onListItemClick(ListView list, View view, int position, long id) {
@@ -225,38 +193,6 @@ public class UpdateListActivity extends ListActivity {
 		startActivity(i);
 	}
 
-	private void onSendFinished(Intent i) {
-		// Dismiss any in-progress dialog
-		if (progress != null)
-			progress.dismiss();
-
-		String err = i.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
-		if (err == null) {
-			Toast.makeText(getApplicationContext(), "Updates sent", Toast.LENGTH_SHORT).show();
-		} else {
-			Toast.makeText(getApplicationContext(), err, Toast.LENGTH_SHORT).show();
-		}
-		//Refresh the list
-		getData();
-	}
-
 	
-	
-	/**
-	 * receives status updates from any IntentService
-	 *
-	 */
-	private class ResponseReceiver extends BroadcastReceiver {
-		// Prevents instantiation
-		private ResponseReceiver() {
-		}
-		
-		// Called when the BroadcastReceiver gets an Intent it's registered to receive
-		public void onReceive(Context context, Intent intent) {
-			if (intent.getAction() == ConstantUtil.UPDATES_SENT_ACTION) {
-				onSendFinished(intent);
-			}
-		}
-	}
 
 }

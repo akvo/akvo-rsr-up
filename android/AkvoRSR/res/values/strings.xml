@@ -25,6 +25,7 @@
     <string name="label_empty_proj_list">Nothing fetched yet. Use the refresh button to see your projects.</string>
     <string name="state_draft">Draft</string>
     <string name="state_published">Published</string>
+    <string name="state_synchronising">Synchronising</string>
     <string name="count_draft">&#160;Draft</string>
     <string name="count_published">&#160;Published</string>
     <string name="count_zero">No updates</string>

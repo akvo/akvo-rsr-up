@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -34,6 +34,7 @@ public class ConstantUtil {
 	public static final String AUTH_URL = "/auth/token/";
 	public static final String API_KEY_PATTERN = "&api_key=%s&username=%s";
 	public static final String POST_UPDATE_URL = "/api/v1/project_update/?format=xml";
+	public static final String VERIFY_UPDATE_PATTERN = "/api/v1/project_update/?format=xml&uuid=%s&limit=2";
 	public static final String FETCH_PROJ_URL_PATTERN = "/api/v1/project/?format=xml&limit=0&partnerships__organisation=%s";
 	public static final String FETCH_COUNTRIES_URL = "/api/v1/country/?format=xml&limit=0";
 	public static final String FETCH_PROJ_COUNT_URL = "/api/v1/project/?format=xml&limit=0&partnerships__organisation=%s";
@@ -82,6 +83,9 @@ public class ConstantUtil {
 	 * settings keys
 	 */
 	public static final String HOST_SETTING_KEY = "data_host";
+	public static final String DEBUG_SETTING_KEY = "setting_debug";
+	public static final String SEND_IMG_SETTING_KEY = "setting_send_images";
+	public static final String DELAY_IMG_SETTING_KEY = "setting_delay_image_fetch";
 	public static final String AUTH_USERNAME_KEY = "authorized_username";
 	public static final String AUTH_APIKEY_KEY = "authorized_apikey";
 	public static final String AUTH_USERID_KEY = "authorized_userid";
@@ -94,6 +98,7 @@ public class ConstantUtil {
     public static final String PROJECTS_FETCHED_ACTION = "org.akvo.rsr.android.PROJECTS_FETCHED";
     public static final String PROJECTS_PROGRESS_ACTION = "org.akvo.rsr.android.PROJECTS_PROGRESS";
     public static final String UPDATES_SENT_ACTION = "org.akvo.rsr.android.UPDATES_SENT";
+    public static final String UPDATES_VERIFIED_ACTION = "org.akvo.rsr.android.UPDATES_VERIFIED";
     public static final String AUTHORIZATION_RESULT_ACTION = "org.akvo.rsr.android.AUTHORIZATION_RESULT";
 
 	public static final String GPS_STATUS_INTENT = "com.eclipsim.gpsstatus.VIEW";
@@ -106,10 +111,18 @@ public class ConstantUtil {
 	public static final String SOFAR_KEY = "SOFAR_KEY";
 	public static final String TOTAL_KEY = "TOTAL_KEY";
 	public static final String SERVICE_ERRMSG_KEY = "org.akvo.rsr.android.ERRMSG";
+	public static final String SERVICE_UNRESOLVED_KEY = "org.akvo.rsr.android.UNRESOLVED";
 	public static final String USERNAME_KEY = "org.akvo.rsr.android.USERNAME";
 	public static final String PASSWORD_KEY = "org.akvo.rsr.android.PASSWORD";
 
-
+	/**
+	 * posting outcomes
+	 */
+	public static final int POST_SUCCESS = 0;
+	public static final int POST_FAILURE = 1;
+	public static final int POST_UNKNOWN = 2;
+	
+	
 	/**
 	 * language codes
 	 */

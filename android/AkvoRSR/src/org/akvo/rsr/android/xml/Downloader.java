@@ -17,6 +17,7 @@
 package org.akvo.rsr.android.xml;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.MalformedURLException;
@@ -36,6 +37,7 @@ import org.akvo.rsr.android.util.ConstantUtil;
 import org.akvo.rsr.android.util.FileUtil;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 
 import com.github.kevinsawicki.http.HttpRequest;
@@ -52,7 +54,24 @@ public class Downloader {
 
 	public boolean err = false;
 	
-	private final int READ_TIMEOUT_MS = 60000;
+	private final static int READ_TIMEOUT_MS = 60000;
+		
+	public static class PostUnresolvedException extends Exception {
+		public PostUnresolvedException(String string) {
+			super(string);
+		}
+
+		private static final long serialVersionUID = -630304430323100535L;
+	}
+
+	public static class PostFailedException extends Exception {
+		public PostFailedException(String string) {
+			super(string);
+		}
+
+		private static final long serialVersionUID = -8091570663513780467L;
+	}
+
 
 	/**
 	 * populates the projects table in the db from a server URL
@@ -138,7 +157,7 @@ public class Downloader {
 		/* Get the XMLReader of the SAXParser we created. */
 		XMLReader xr = sp.getXMLReader();
 		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
-		UpdateListHandler myUpdateListHandler = new UpdateListHandler(new RsrDbAdapter(ctx));
+		UpdateListHandler myUpdateListHandler = new UpdateListHandler(new RsrDbAdapter(ctx), true);
 		xr.setContentHandler(myUpdateListHandler);
 		/* Parse the xml-data from our URL. */
 		xr.parse(new InputSource(url.openStream()));
@@ -150,6 +169,109 @@ public class Downloader {
 	}
 
 
+	/**
+	 * Verify status at server of a single Update
+	 * 
+	 * @param ctx
+	 * @param url
+	 * @throws ParserConfigurationException
+	 */
+	public static int verifyUpdate(Context ctx, URL url, RsrDbAdapter dba, String localId) throws ParserConfigurationException {
+
+		Log.v(TAG, "Verifying update " + localId);
+
+		/* Get a SAXParser from the SAXPArserFactory. */
+		SAXParserFactory spf = SAXParserFactory.newInstance();
+		try {
+		SAXParser sp = spf.newSAXParser();
+
+		/* Get the XMLReader of the SAXParser we created. */
+		XMLReader xr = sp.getXMLReader();
+		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
+		UpdateListHandler myUpdateListHandler = new UpdateListHandler(dba, false);
+		xr.setContentHandler(myUpdateListHandler);
+		/* Parse the xml-data from our URL. */
+		xr.parse(new InputSource(url.openStream()));
+		/* Parsing has finished. */
+
+		/* Check if anything went wrong. */
+		boolean err = myUpdateListHandler.getError();
+		if (err) {
+			Log.e(TAG, "Verification error");
+			return ConstantUtil.POST_UNKNOWN;
+		}
+		int count = myUpdateListHandler.getCount();
+		Log.v(TAG, "Verification count: " + count);
+		 //TODO, check that more than UUID matches?
+		if (count == 1) {  //1 is good, Update present on server, just note that
+			Update u = myUpdateListHandler.getLastUpdate(); //this is the result, db has not been changed
+			u.setUnsent(false); //we are done
+			u.setDraft(false); //published, not draft
+			dba.updateUpdateVerifiedByUuid(u);
+			return ConstantUtil.POST_SUCCESS;
+		} else {
+			if (count == 0) {  //0 is bad, update never made it to server, will need to be re-sent
+				Update u = myUpdateListHandler.getLastUpdate(); //this is the result, db has not been changed
+				u.setUnsent(false); //status is resolved
+				u.setDraft(true); //go back to being draft
+				dba.updateUpdateVerifiedByUuid(u);
+			} else {
+				Log.e(TAG, "more than one match for Update UUID!");
+			}
+			return ConstantUtil.POST_FAILURE;
+		}
+		} 
+		catch (IOException e) {
+			return ConstantUtil.POST_UNKNOWN;
+					
+		}
+		catch (SAXException e) {
+			return ConstantUtil.POST_UNKNOWN;
+			
+		}
+		
+	}
+
+	
+	/**
+	 * try to verify what happened to any unresolved posted Updates
+	 * 
+	 * @param ctx
+	 * @param urlPattern
+	 * @throws ParserConfigurationException
+	 * @throws MalformedURLException 
+	 */
+	public static int verifyUpdates(Context ctx, String urlPattern) throws  MalformedURLException, ParserConfigurationException{
+		RsrDbAdapter dba = new RsrDbAdapter(ctx);
+		dba.open();
+		int count = 0, unresolvedCount = 0;
+		try {
+			Cursor cursor = dba.listAllUpdatesUnsent();
+			while (cursor.moveToNext()) {
+				count++;
+				String localId = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL));
+				String uuid = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.UUID_COL));
+				URL url = new URL(String.format(urlPattern, uuid));
+				switch (verifyUpdate(ctx, url, dba, localId)) {
+					case ConstantUtil.POST_SUCCESS:
+						break;
+					case ConstantUtil.POST_FAILURE:
+						break;
+					case ConstantUtil.POST_UNKNOWN:
+						unresolvedCount++;
+						break;
+				}
+				
+			}
+		}
+		finally {
+			dba.close();
+		}
+		Log.i(TAG, "Updates checked: " + count);
+		return unresolvedCount;
+	}
+			
+					
 	/**
 	 * populates the country table in the db from a server URL
 	 * 
@@ -343,7 +465,7 @@ public class Downloader {
 	}
 	 */
 
-	private final char SPC = '\u0020';
+	private final static char SPC = '\u0020';
 
 	/**
 	 * returns a string without newlines and with a maximum length
@@ -351,7 +473,7 @@ public class Downloader {
 	 * @param maxLength
 	 * @return
 	 */
-	private String oneLine(String s, int maxLength) {
+	private static String oneLine(String s, int maxLength) {
 		String result = "";
 		for (int i = 0; i < Math.min(s.length(), maxLength); i++)
 			if (s.charAt(i) < SPC) {
@@ -363,20 +485,28 @@ public class Downloader {
 	}
 
 
+	
 	/**
-	 *  Publishes an update, returns true if success
+	 *  Publishes an update to the server
+	 *  
 	 * @param urlTemplate
 	 * @param update
 	 * @param sendImage
-	 * @param u
-	 * @throws Exception
-
-	 * What to submit:
+	 * @param user
 	 * 
+	 * @return int
+	 * 
+	 * There are three outcomes:
+	 *   0  Success, we got the server id back
+	 *   1  Failure, we never got to send the whole thing
+	 *   2  Unknown, server may or may not have got it. Verification will be necessary.
+	 *   
+	 * What to submit:
 	<object>
 	<update_method>W</update_method>
 	<project>/api/v1/project/277/</project>
 	<user>/api/v1/project/1/</user>
+	<uuid>nn-nn-nn-nnnnnnn</uuid>
 	<title>The Rain in Spain...</title>
 	<photo_location>E</photo_location>
 	<text>
@@ -394,182 +524,199 @@ public class Downloader {
 	application/xml
 
 	 */
-	public void postXmlUpdate(String urlTemplate, Update update, boolean sendImage, User u) throws Exception {
+	public static int postXmlUpdateStreaming(String urlTemplate, Update update, boolean sendImage, User user) {
 		final String contentType = "application/xml";
-		final String bodyTemplate1 =	"<object><update_method>S</update_method><project>%s</project>" +
-				"<photo_location>E</photo_location><user>%s</user><title>%s</title>" +
-				"<text>%s</text>";
-		final String bodyTemplate2 = "</object>";
-		final String imagePreamble =	 "<photo type=\"hash\"><name>dummy.jpg</name><content_type>image/jpeg</content_type><file>";
-		final String imagePostamble = "</file></photo>";
-		URL url;
-		//		try {
-		url = new URL(String.format(Locale.US, urlTemplate, u.getApiKey(), u.getUsername()));
-		//		} catch (MalformedURLException e1) {
-		//			Log.e(TAG, "Unable to make post URL:",e1);
-		//			return false;
-		//		}
-		String projectPath = "/api/v1/project/" + update.getProjectId() + "/";//TODO move to constantutil
-		String userPath = "/api/v1/user/" + u.getId() + "/";
-
-		String requestBody = String.format(Locale.US, bodyTemplate1,
-				projectPath, userPath,
-				oneLine(update.getTitle(),50), //TODO: WHAT ABOUT XML?
-				update.getText());
-
-		HttpRequest h = HttpRequest.post(url).contentType(contentType);
-		h.readTimeout(READ_TIMEOUT_MS);
-		h.send(requestBody);//OutOfMemory here...
-		if (sendImage) {
-			String fn = update.getThumbnailFilename();
-			if (fn != null) {
-				File f = new File (fn);
-				if (f.exists()) {
-					byte[] barr;
-					try {
-						barr = FileUtil.readFile(f);
-						h.send(imagePreamble);
-						h.send(Base64.encodeBytes(barr));
-						barr = null; //release memory
-						h.send(imagePostamble);
-					} catch (IOException e) {
-						Log.e(TAG, "Image encoding problem", e);
-					}
-				}
-			}
-		}
-		h.send(bodyTemplate2);//terminate object
-		int code = h.code();
-		String msg = h.message();
-		String b = h.body(); //On success, XML representation of created object
-		if (code == 201) {//Created
-			update.setUnsent(false);
-			String idPath = h.header(HttpRequest.HEADER_LOCATION);//Path-ified ID
-			int penSlash = idPath.lastIndexOf('/', idPath.length() - 2);
-			String id = idPath.substring(penSlash + 1, idPath.length() - 1);
-			update.setId(id);
-		} else {
-			String e = "Unable to post update, code " + code + " " +  msg;
-			Log.e(TAG, e);
-			Log.e(TAG, b);
-			throw new Exception(e);
-		}
-	}
-
-	/**
-	 *  Publishes an update, returns true if success
-	 * @param urlTemplate
-	 * @param update
-	 * @param sendImage
-	 * @param user
-	 * @throws Exception
-	 */
-	public void postXmlUpdateStreaming(String urlTemplate, Update update, boolean sendImage, User user) throws Exception {
-		final String contentType = "application/xml";
-//		final String bodyTemplate1  =	"<object><update_method>S</update_method><project>%s</project>" + //SMS update method
-		final String bodyTemplate1  =	"<object><update_method>M</update_method><project>%s</project>" + //New! Mobile update method
-				"<photo_location>E</photo_location><user>%s</user><title>%s</title>" +
+		final String bodyTemplate1  =	"<object><update_method>M</update_method><project>%s</project>" + //Mobile update method
+				"<photo_location>E</photo_location><uuid>%s</uuid><user>%s</user><title>%s</title>" +
 				"<text>%s</text>";
 		final String bodyTemplate2  = "</object>";
 		final String imagePreamble  = "<photo type=\"hash\"><name>dummy.jpg</name><content_type>image/jpeg</content_type><file>";
 		final String imagePostamble = "</file></photo>";
-		URL url;
-		url = new URL(String.format(Locale.US, urlTemplate, user.getApiKey(), user.getUsername()));
-
-		//user and project references have to be in URL form
-		String projectPath = String.format(Locale.US, ConstantUtil.PROJECT_PATH_PATTERN, update.getProjectId());
-		String userPath = String.format(Locale.US, ConstantUtil.USER_PATH_PATTERN, user.getId());
-
-		String requestBody = String.format(Locale.US, bodyTemplate1,
-				projectPath, userPath,
-				oneLine(update.getTitle(),50), //TODO: WHAT ABOUT XML?
-				update.getText());
-
-		HttpRequest h = HttpRequest.post(url).contentType(contentType);//OutOfMemory here...
-		h.readTimeout(READ_TIMEOUT_MS);
-		h.send(requestBody);
-
-		if (sendImage) {
-			String fn = update.getThumbnailFilename();
-			if (fn != null) {
-				File f = new File (fn);
-				if (f.exists()) {
-					
-					RandomAccessFile raf = new RandomAccessFile(f, "r");
-					h.send(imagePreamble);
-					//base64-convert the photo in chunks and stream them to server
-					//use origin buffer size divisible by 3 so no padding is inserted in the middle
-					final int bufferSize = 6 * 1024;
-					final long fileSize = raf.length();
-					final long wholeChunks = fileSize / bufferSize;
-					byte[] rawBuf = new byte[bufferSize];
-					try { //If we run out of memory, it will be here
-						for (long i = 0; i < wholeChunks; i++) {
-							raf.readFully(rawBuf);
-							byte[] b64buf = Base64.encodeBytesToBytes(rawBuf, 0, bufferSize);
+		boolean allSent = false;
+		try {
+			URL url = new URL(String.format(Locale.US, urlTemplate, user.getApiKey(), user.getUsername()));
+	
+			//user and project references have to be in URL form
+			String projectPath = String.format(Locale.US, ConstantUtil.PROJECT_PATH_PATTERN, update.getProjectId());
+			String userPath = String.format(Locale.US, ConstantUtil.USER_PATH_PATTERN, user.getId());
+	
+			String requestBody = String.format(Locale.US, bodyTemplate1,
+					projectPath, update.getUuid(), userPath,
+					oneLine(update.getTitle(),50), //TODO: WHAT ABOUT XML?
+					update.getText());
+	
+			HttpRequest h = HttpRequest.post(url).contentType(contentType);//OutOfMemory here...
+			h.readTimeout(READ_TIMEOUT_MS);
+			h.send(requestBody);
+	
+			if (sendImage) {
+				String fn = update.getThumbnailFilename();
+				if (fn != null) {
+					File f = new File (fn);
+					if (f.exists()) {
+						
+						h.send(imagePreamble);
+						RandomAccessFile raf = new RandomAccessFile(f, "r");
+						try {
+							//base64-convert the photo in chunks and stream them to server
+							//use origin buffer size divisible by 3 so no padding is inserted in the middle
+							final int bufferSize = 6 * 1024;
+							final long fileSize = raf.length();
+							final long wholeChunks = fileSize / bufferSize;
+							byte[] rawBuf = new byte[bufferSize];
+							for (long i = 0; i < wholeChunks; i++) {
+								raf.readFully(rawBuf);
+								byte[] b64buf = Base64.encodeBytesToBytes(rawBuf, 0, bufferSize);
+								h.send(b64buf);
+							}
+							int n = raf.read(rawBuf); //read last piece
+							byte[] b64buf = Base64.encodeBytesToBytes(rawBuf, 0, n);
 							h.send(b64buf);
+						} finally {
+							raf.close();
 						}
-						int n = raf.read(rawBuf); //read last piece
-						byte[] b64buf = Base64.encodeBytesToBytes(rawBuf, 0, n);
-						h.send(b64buf);
-					} catch (IOException e) {
-						Log.e(TAG, "Image encoding problem", e);
+						h.send(imagePostamble);
 					}
-					h.send(imagePostamble);
 				}
 			}
+			
+			h.send(bodyTemplate2);
+			allSent = true;
+			
+			int code = h.code(); //closes output
+			String msg = h.message();
+			String bod = h.body(); //On success, XML representation of created object
+			if (code == 201) { //Created
+				String idPath = h.header(HttpRequest.HEADER_LOCATION);//Path-ified ID
+				int penSlash = idPath.lastIndexOf('/', idPath.length() - 2);
+				String id = idPath.substring(penSlash + 1, idPath.length() - 1);
+				update.setId(id);
+				return ConstantUtil.POST_SUCCESS; //Yes!
+			} else {
+				String e = "Unable to post update, code " + code + " " +  msg;
+				Log.e(TAG, e);
+				Log.e(TAG, bod);
+				return ConstantUtil.POST_FAILURE;
+			}
 		}
-		
-		h.send(bodyTemplate2);
-		
-		int code = h.code(); //closes output
-		String msg = h.message();
-		String bod = h.body(); //On success, XML representation of created object
-		if (code == 201) { //Created
-			update.setUnsent(false);
-			String idPath = h.header(HttpRequest.HEADER_LOCATION);//Path-ified ID
-			int penSlash = idPath.lastIndexOf('/', idPath.length() - 2);
-			String id = idPath.substring(penSlash + 1, idPath.length() - 1);
-			update.setId(id);
-		} else {
-			String e = "Unable to post update, code " + code + " " +  msg;
-			Log.e(TAG, e);
-			Log.e(TAG, bod);
-			throw new Exception(e);
+		catch (HttpRequestException e) { //connection problem
+			if (allSent) {
+				Log.w(TAG, "Unknown-result post", e);
+				return ConstantUtil.POST_UNKNOWN;
+			} else {
+				Log.w(TAG, "Failed post", e);
+				return ConstantUtil.POST_FAILURE;
+			}
+		}
+		catch (MalformedURLException e) { //server string is bad or coding error
+			Log.e(TAG, "Bad URL", e);
+			return ConstantUtil.POST_FAILURE;
+		}
+		catch (FileNotFoundException e) {
+			Log.e(TAG, "Cannot find image file", e);
+			return ConstantUtil.POST_FAILURE;
+		}
+		catch (IOException e) {
+			Log.e(TAG, "Cannot read image file", e);
+			return ConstantUtil.POST_FAILURE;
 		}
 	}
 
 
 	/**
-	 * Sends all unsent updates
+	 * Sends one update, retrying if verification shows post failed.
+	 * @param ctx
+	 * @param urlTemplate
+	 * @param sendImages
+	 * @param user
+	 * @throws PostFailedException 
+	 * @throws PostUnresolvedException 
+	 * @throws MalformedURLException 
+	 * @throws ParserConfigurationException 
+	 * @throws Exception
+	 */
+	static public void sendUpdate(Context ctx, String localId, String urlTemplate, boolean sendImages, User user) throws PostFailedException, PostUnresolvedException, MalformedURLException, ParserConfigurationException  {
+		Log.i(TAG, "Sending update " + localId);
+		RsrDbAdapter dba = new RsrDbAdapter(ctx);
+		dba.open();
+		try {
+			Update upd = dba.findUpdate(localId);
+			
+			int status = postXmlUpdateStreaming(urlTemplate, upd, sendImages, user);
+
+			if (status == ConstantUtil.POST_UNKNOWN) { //try to check on sts immediately
+				URL url = new URL(String.format(urlTemplate, upd.getUuid()));
+				status = verifyUpdate(ctx, url, dba, localId);
+			}	
+
+			switch (status) {
+				case ConstantUtil.POST_SUCCESS:
+					upd.setUnsent(false);
+					upd.setDraft(false);
+					dba.updateUpdateIdSent(upd, localId); //remember new ID and status for this update
+					Log.i(TAG, "Sent update" + localId);
+					return;
+				case ConstantUtil.POST_FAILURE:
+					upd.setUnsent(false);
+					//stays as draft
+					dba.updateUpdateIdSent(upd, localId); //remember new ID and status for this update
+					throw new PostFailedException("Could not post Update");
+				case ConstantUtil.POST_UNKNOWN: //try to check sts immediately
+					URL url = new URL(String.format(urlTemplate, upd.getUuid()));
+					status = verifyUpdate(ctx, url, dba, localId);
+					throw new PostUnresolvedException("Update status unknown, still trying");
+			}
+		} finally {
+			dba.close();
+		}
+	}
+
+	
+	/**
+	 * Sends all unsent updates - currently unused
 	 * @param ctx
 	 * @param urlTemplate
 	 * @param sendImages
 	 * @param user
 	 * @throws Exception
 	 */
-	public void sendUnsentUpdates(Context ctx, String urlTemplate, boolean sendImages, User user) throws Exception {
-		Log.i(TAG, "Sending unsent updates");
+	public void sendAllUnsentUpdates(Context ctx, String urlTemplate, boolean sendImages, User user) throws Exception {
+		Log.i(TAG, "Sending all unsent updates");
 		RsrDbAdapter dba = new RsrDbAdapter(ctx);
 		dba.open();
-		int count = 0;
+		int successCount = 0;
+		int failCount = 0;
+		int unknownCount = 0;
 		try {
 			Cursor cursor2 = dba.listAllUpdatesUnsent();
 			if (cursor2 != null) {
 				while (cursor2.moveToNext()) {
-					String id = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.PK_ID_COL));
-					Update upd = dba.findUpdate(id);
-//					postXmlUpdate(urlTemplate, upd, sendImages, user);
-					postXmlUpdateStreaming(urlTemplate, upd, sendImages, user);
-					dba.updateUpdateIdSent(upd, id); //remember new ID and status for this update
-					count++;
+					String localId = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.PK_ID_COL));
+					Update upd = dba.findUpdate(localId);
+					
+					switch (postXmlUpdateStreaming(urlTemplate, upd, sendImages, user)) {
+					case ConstantUtil.POST_SUCCESS:
+						upd.setUnsent(false);
+						dba.updateUpdateIdSent(upd, localId); //remember new ID and status for this update
+						successCount++;
+						break;
+					case ConstantUtil.POST_FAILURE:
+						upd.setUnsent(false);
+						dba.updateUpdateIdSent(upd, localId); //remember new ID and status for this update
+						failCount++;
+						break;
+					case ConstantUtil.POST_UNKNOWN:
+						//dba.updateUpdateIdSent(upd, localId); //no change in status for this update
+						unknownCount++;
+						break;						
+					}
 				}
 				cursor2.close();
 			}
 		} finally {
 			dba.close();
 		}
-		Log.i(TAG, "Sent " + count + " updates");
+		Log.i(TAG, "Sent " + successCount + " updates");
 	}
 
 
