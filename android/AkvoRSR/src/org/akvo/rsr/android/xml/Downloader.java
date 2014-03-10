@@ -625,7 +625,7 @@ public class Downloader {
 
 
 	/**
-	 * Sends one update, retrying if verification shows post failed.
+	 * Sends one update, verifying if status was indeterminate
 	 * @param ctx
 	 * @param urlTemplate
 	 * @param sendImages
@@ -636,7 +636,10 @@ public class Downloader {
 	 * @throws ParserConfigurationException 
 	 * @throws Exception
 	 */
-	static public void sendUpdate(Context ctx, String localId, String urlTemplate, String verifyUrlTemplate, boolean sendImages, User user) throws PostFailedException, PostUnresolvedException, MalformedURLException, ParserConfigurationException  {
+	static public void sendUpdate(Context ctx, String localId,
+			String urlTemplate, String verifyUrlTemplate,
+			boolean sendImages, User user)
+					throws PostFailedException, PostUnresolvedException, MalformedURLException, ParserConfigurationException  {
 		Log.i(TAG, "Sending update " + localId);
 		RsrDbAdapter dba = new RsrDbAdapter(ctx);
 		dba.open();
@@ -663,7 +666,7 @@ public class Downloader {
 					dba.updateUpdateIdSent(upd, localId); //remember status for this update
 					throw new PostFailedException("Could not post Update");
 				case ConstantUtil.POST_UNKNOWN: //try to check sts immediately
-					throw new PostUnresolvedException("Update status unknown, still trying");
+					throw new PostUnresolvedException("Update status unknown, needs verification");
 			}
 		} finally {
 			dba.close();

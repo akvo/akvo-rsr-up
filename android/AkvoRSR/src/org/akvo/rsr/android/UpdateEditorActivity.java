@@ -53,6 +53,7 @@ import android.widget.Toast;
 import android.support.v4.content.LocalBroadcastManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.provider.MediaStore;
@@ -84,11 +85,13 @@ public class UpdateEditorActivity extends Activity {
 	private Button btnDelPhoto;
 	private View photoAndDeleteGroup;
 	private View photoAddGroup;
+	ProgressDialog progress;
+
 	//Database
 	private RsrDbAdapter dba;
-	ProgressDialog progress;
-	private BroadcastReceiver broadRec;
 	
+	private BroadcastReceiver broadRec;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -332,8 +335,10 @@ public class UpdateEditorActivity extends Activity {
 	}
 
 	
-	//check connectivity
-	//TODO move to util class
+	/**
+	 * checks connectivity.
+	 * TODO move to util class
+	 */
 	private boolean haveNetworkConnection(Context context, boolean wifiOnly) {
         ConnectivityManager connMgr = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -361,8 +366,8 @@ public class UpdateEditorActivity extends Activity {
         return false;
 	}
 	
-	/*
-	 * Save current update
+	/**
+	 * Saves current update as draft, if it has a title and this is done by the user
 	 */
 	private void saveAsDraft(boolean interactive) {
 		if (untitled()) {
@@ -402,7 +407,7 @@ public class UpdateEditorActivity extends Activity {
 	}
 
 	/**
-	 * closes current update and sends it
+	 * sends current update
 	 */
 	private void sendUpdate() {
 		if (untitled()) {
@@ -420,7 +425,7 @@ public class UpdateEditorActivity extends Activity {
 		update.setTitle(projupdTitleText.getText().toString());
 		update.setText(projupdDescriptionText.getText().toString());
 		update.setProjectId(projectId);
-//		update.setDate(new Date()); //should have date from when it was created
+//		update.setDate(new Date()); //keep date from when it was created
 		if (update.getId() == null) {//new
 		    update.setId(Integer.toString(nextLocalId));
 			nextLocalId--;
@@ -443,12 +448,14 @@ public class UpdateEditorActivity extends Activity {
 		
 	}
 
-
+	
+	/** checks if user has set an update title */
 	private boolean untitled() {
 		return (projupdTitleText.getText().toString().trim().length() == 0);
 	}
 	
 	
+	/** opens database when Activity resumes */
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -464,29 +471,47 @@ public class UpdateEditorActivity extends Activity {
 
 	}
 	
+	/** handles result of send attempt */
 	private void onSendFinished(Intent i) {
 		// Dismiss any in-progress dialog
 		if (progress != null)
 			progress.dismiss();
 		String err = i.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
 		boolean unresolved = i.getBooleanExtra(ConstantUtil.SERVICE_UNRESOLVED_KEY, false);
+		int msgTitle, msgText;
 		if (err == null) {
-			//display success dialog -- LEAKS WINDOW!
-			DialogUtil.infoAlert(this,"Update published","Update successfully sent to server"); //TODO string resource
+			msgTitle = R.string.msg_update_published;
+			msgText = R.string.msg_update_success;
 		} else {
-			if (unresolved) { //still has unsent flag set, commence retrying
+			if (unresolved) {
+				//Update still has unsent flag set, start service for background synchronisation
 				getApplicationContext().startService(new Intent(this, VerifyProjectUpdateService.class));
-				DialogUtil.infoAlert(this,"Network connection problem","Update still synchronising..."); //TODO string resource
+				msgTitle = R.string.msg_network_problem;
+				msgText = R.string.msg_synchronising;
 			} else { //was saved as draft
-				DialogUtil.infoAlert(this,"Network connection problem","Update was saved as draft"); //TODO string resource
+				msgTitle = R.string.msg_network_problem;
+				msgText = R.string.msg_update_drafted;
 			}
 		}
-		//Return to project or update list
-		//TODO: this really should be done from info dialog onClick 
-		finish();
+		//display result dialog 
+		DialogUtil.showConfirmDialog(msgTitle,
+									 msgText,
+									 this,
+									 false,
+									 new DialogInterface.OnClickListener() {
+										@Override
+										public void onClick(DialogInterface dialog, int which) {
+											if (dialog != null) {
+												dialog.dismiss();
+												//Return to project or update list
+												finish();
+											}
+										}
+									});
 	}
 
-	//Broadcast receiver for receiving status updates from the IntentService
+	
+	/** receives status updates broadcast from the IntentService */
 	private class ResponseReceiver extends BroadcastReceiver {
 		// Prevents instantiation
 		private ResponseReceiver() {
@@ -499,6 +524,7 @@ public class UpdateEditorActivity extends Activity {
 	}
 
 	
+	/** closes database when activity is paused */
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -506,6 +532,7 @@ public class UpdateEditorActivity extends Activity {
 	}
 	
 
+	/** saves update being worked on before we leave the activity */
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		//pick up the saved draft if we get restarted
@@ -515,6 +542,8 @@ public class UpdateEditorActivity extends Activity {
 		super.onSaveInstanceState(outState);
 	}
 	
+	
+	/** cleans up */
 	@Override
 	protected void onDestroy() {
 		if (dba != null) {
@@ -528,7 +557,7 @@ public class UpdateEditorActivity extends Activity {
 
 	
 	/**
-	 * Set up the {@link android.app.ActionBar}, if the API is available.
+	 * Sets up the {@link android.app.ActionBar}, if the API is available.
 	 *
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	private void setupActionBar() {
@@ -536,7 +565,9 @@ public class UpdateEditorActivity extends Activity {
 			getActionBar().setDisplayHomeAsUpEnabled(true);
 		}
 	}
-*/
+	 */
+	
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -544,6 +575,10 @@ public class UpdateEditorActivity extends Activity {
 		return true;
 	}
 
+	
+	/**
+	 * Handles context menu buttons being pushed
+	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
@@ -553,20 +588,12 @@ public class UpdateEditorActivity extends Activity {
         		dba.deleteUpdate(update.getId());
         		update = null;
         		finish();
-        	}
-        		
+        	}        		
         	return true;
         case R.id.action_settings:
 			Intent intent = new Intent(this, SettingsActivity.class);
 			startActivity(intent);
             return true;
-/*            
-        case R.id.action_attach_photo:
-        	Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-        	photoPickerIntent.setType("image/*");
-        	startActivityForResult(photoPickerIntent, photoPick);    
-        	return true;
-        	*/
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }

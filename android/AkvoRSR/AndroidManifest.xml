@@ -102,6 +102,11 @@
             android:enabled="true"
             android:exported="false" >
         </service>
+        <service
+            android:name="org.akvo.rsr.android.service.VerifyProjectUpdateService"
+            android:enabled="true"
+            android:exported="false" >
+        </service>
         
     </application>
 

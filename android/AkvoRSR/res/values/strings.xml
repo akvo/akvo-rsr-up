@@ -59,6 +59,12 @@
     <string name="send_dialog_title">Publishing</string>
     <string name="send_dialog_msg">Sending update to server...</string>
     
+    <string name="msg_update_published">Update published</string>
+    <string name="msg_update_success">Update successfully sent to server</string>
+    <string name="msg_network_problem">Network connection problem</string>
+    <string name="msg_synchronising">Update still synchronising...</string>
+    <string name="msg_update_drafted">Update was saved as draft</string>
+    
     <string name="errmsg_empty_title">An update must have a title!</string>
     <string name="errmsg_bad_url">Invalid URL!</string>
     
