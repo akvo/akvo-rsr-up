@@ -36,7 +36,12 @@ public class SubmitProjectUpdateService extends IntentService {
 		Intent i = new Intent(ConstantUtil.UPDATES_SENT_ACTION);
 
 		try {
-			Downloader.sendUpdate(this, localUpdateId, SettingsUtil.host(this) + ConstantUtil.POST_UPDATE_URL + ConstantUtil.API_KEY_PATTERN, sendImg, user);
+			Downloader.sendUpdate(this,
+					localUpdateId,
+					SettingsUtil.host(this) + ConstantUtil.POST_UPDATE_URL + ConstantUtil.API_KEY_PATTERN,
+					SettingsUtil.host(this) + ConstantUtil.VERIFY_UPDATE_PATTERN,
+					sendImg,
+					user);
 		} catch (PostFailedException e) {
 			i.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, e.getMessage());
 		}

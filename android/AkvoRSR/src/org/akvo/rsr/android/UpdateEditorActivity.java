@@ -430,6 +430,7 @@ public class UpdateEditorActivity extends Activity {
 		
 		//start upload service
 		Intent i = new Intent(this, SubmitProjectUpdateService.class);
+		i.putExtra(ConstantUtil.UPDATE_ID_KEY, update.getId());
 		getApplicationContext().startService(i);
 		
 		//start a "progress" animation
@@ -470,7 +471,7 @@ public class UpdateEditorActivity extends Activity {
 		String err = i.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
 		boolean unresolved = i.getBooleanExtra(ConstantUtil.SERVICE_UNRESOLVED_KEY, false);
 		if (err == null) {
-			//display success dialog
+			//display success dialog -- LEAKS WINDOW!
 			DialogUtil.infoAlert(this,"Update published","Update successfully sent to server"); //TODO string resource
 		} else {
 			if (unresolved) { //still has unsent flag set, commence retrying
@@ -481,6 +482,7 @@ public class UpdateEditorActivity extends Activity {
 			}
 		}
 		//Return to project or update list
+		//TODO: this really should be done from info dialog onClick 
 		finish();
 	}
 

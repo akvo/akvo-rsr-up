@@ -80,7 +80,7 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 		dateView.setText(dfmt.format(d));
 		TextView stateView = (TextView) view.findViewById(R.id.ulist_item_state);
 
-		if (0 != cursor.getInt(draftCol)) {
+		if (0 != cursor.getInt(unsentCol)) {
 			//Show synchronising updates as red with a "Synchronising" label
 			view.setBackgroundColor(context.getResources().getColor(R.color.red));
 			stateView.setVisibility(View.VISIBLE);

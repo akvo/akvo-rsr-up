@@ -122,6 +122,7 @@ public class UpdateListHandler extends DefaultHandler {
 		dba.open();
 		updateCount = 0;
 		depth = 0;
+		syntaxError = false;
 	}
 
 	@Override
@@ -197,13 +198,13 @@ public class UpdateListHandler extends DefaultHandler {
 			currentUpd.setUuid(buffer);
 		} else if (localName.equals("object")) {
 			this.in_update = false;
-			if (currentUpd != null) {
+			if (currentUpd != null && currentUpd.getId() != null) {
 				updateCount++;
 				if (insert) {
 					dba.saveUpdate(currentUpd, false); //preserve name of any cached image
 					currentUpd = null;
 				}
-			} else syntaxError=true;
+			}
 		} else if (localName.equals("photo")) {
 			this.in_photo = false;
 			currentUpd.setThumbnailUrl(buffer);
@@ -215,7 +216,6 @@ public class UpdateListHandler extends DefaultHandler {
 	// May be called multiple times for pieces of the same tag contents!
 	@Override
     public void characters(char ch[], int start, int length) {
-		if (currentUpd != null) {
 			if (this.in_id
 			 || this.in_title
 			 || this.in_uuid
@@ -227,9 +227,6 @@ public class UpdateListHandler extends DefaultHandler {
 			 ) { //remember content
 				buffer += new String(ch, start, length);
 			}
-		} else {
-			syntaxError = true; //set error flag
-		}
 	}
 	
 	

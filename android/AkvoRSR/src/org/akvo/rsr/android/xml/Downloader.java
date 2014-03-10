@@ -211,7 +211,7 @@ public class Downloader {
 			return ConstantUtil.POST_SUCCESS;
 		} else {
 			if (count == 0) {  //0 is bad, update never made it to server, will need to be re-sent
-				Update u = myUpdateListHandler.getLastUpdate(); //this is the result, db has not been changed
+				Update u = dba.findUpdate(localId);
 				u.setUnsent(false); //status is resolved
 				u.setDraft(true); //go back to being draft
 				dba.updateUpdateVerifiedByUuid(u);
@@ -263,6 +263,7 @@ public class Downloader {
 				}
 				
 			}
+			cursor.close();
 		}
 		finally {
 			dba.close();
@@ -635,7 +636,7 @@ public class Downloader {
 	 * @throws ParserConfigurationException 
 	 * @throws Exception
 	 */
-	static public void sendUpdate(Context ctx, String localId, String urlTemplate, boolean sendImages, User user) throws PostFailedException, PostUnresolvedException, MalformedURLException, ParserConfigurationException  {
+	static public void sendUpdate(Context ctx, String localId, String urlTemplate, String verifyUrlTemplate, boolean sendImages, User user) throws PostFailedException, PostUnresolvedException, MalformedURLException, ParserConfigurationException  {
 		Log.i(TAG, "Sending update " + localId);
 		RsrDbAdapter dba = new RsrDbAdapter(ctx);
 		dba.open();
@@ -645,7 +646,7 @@ public class Downloader {
 			int status = postXmlUpdateStreaming(urlTemplate, upd, sendImages, user);
 
 			if (status == ConstantUtil.POST_UNKNOWN) { //try to check on sts immediately
-				URL url = new URL(String.format(urlTemplate, upd.getUuid()));
+				URL url = new URL(String.format(verifyUrlTemplate, upd.getUuid()));
 				status = verifyUpdate(ctx, url, dba, localId);
 			}	
 
@@ -658,12 +659,10 @@ public class Downloader {
 					return;
 				case ConstantUtil.POST_FAILURE:
 					upd.setUnsent(false);
-					//stays as draft
-					dba.updateUpdateIdSent(upd, localId); //remember new ID and status for this update
+					upd.setDraft(true);
+					dba.updateUpdateIdSent(upd, localId); //remember status for this update
 					throw new PostFailedException("Could not post Update");
 				case ConstantUtil.POST_UNKNOWN: //try to check sts immediately
-					URL url = new URL(String.format(urlTemplate, upd.getUuid()));
-					status = verifyUpdate(ctx, url, dba, localId);
 					throw new PostUnresolvedException("Update status unknown, still trying");
 			}
 		} finally {
@@ -697,11 +696,13 @@ public class Downloader {
 					switch (postXmlUpdateStreaming(urlTemplate, upd, sendImages, user)) {
 					case ConstantUtil.POST_SUCCESS:
 						upd.setUnsent(false);
+						upd.setDraft(false);
 						dba.updateUpdateIdSent(upd, localId); //remember new ID and status for this update
 						successCount++;
 						break;
 					case ConstantUtil.POST_FAILURE:
 						upd.setUnsent(false);
+						upd.setDraft(true);
 						dba.updateUpdateIdSent(upd, localId); //remember new ID and status for this update
 						failCount++;
 						break;
