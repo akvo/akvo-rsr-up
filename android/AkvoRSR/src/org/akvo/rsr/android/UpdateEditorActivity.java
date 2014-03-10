@@ -277,7 +277,7 @@ public class UpdateEditorActivity extends Activity {
             }
             if (shrinkBigImage) {
                 // make long edge 1024 px or smaller
-                if (!FileUtil.shrinkImageFileExactly(captureFilename, shrinkSize)) {
+                if (!FileUtil.shrinkImageFileExactly(captureFilename, shrinkSize, true)) { //ensure no rotation
                     DialogUtil.errorAlert(this, "Could not shrink photo",
                             "Original was too big to send.");
                 }
@@ -320,7 +320,7 @@ public class UpdateEditorActivity extends Activity {
                 if (shrinkBigImage) {
                     // make long edge 1024 px or smaller
                     // since this is a copy we can resize it in place
-                    if (!FileUtil.shrinkImageFileExactly(captureFilename, shrinkSize)) {
+                    if (!FileUtil.shrinkImageFileExactly(captureFilename, shrinkSize, true)) { //ensure no rotation
                         DialogUtil.errorAlert(this, "Could not shrink photo",
                                 "Original was too big to send.");
                     }
