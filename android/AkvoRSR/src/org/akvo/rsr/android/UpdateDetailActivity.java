@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -16,7 +16,6 @@
 
 package org.akvo.rsr.android;
 
-import java.io.File;
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.domain.Update;
@@ -32,14 +31,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.support.v4.content.LocalBroadcastManager;
-import android.content.BroadcastReceiver;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 public class UpdateDetailActivity extends Activity {
 	
@@ -59,7 +53,6 @@ public class UpdateDetailActivity extends Activity {
 	private Button btnEdit;
 	//Database
 	private RsrDbAdapter dba;
-	private BroadcastReceiver broadRec;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,12 +61,9 @@ public class UpdateDetailActivity extends Activity {
 		debug = SettingsUtil.ReadBoolean(this, "setting_debug", false);
 
 		//find which update we are showing
-		//TODO, use uuid as update id?
-		Bundle extras = getIntent().getExtras();
-		projectId = extras != null ? extras.getString(ConstantUtil.PROJECT_ID_KEY)
-				: null;
-		updateId = extras != null ? extras.getString(ConstantUtil.UPDATE_ID_KEY)
-				: null;
+		//TODO, use uuid as update id? Would let us stick around while an update is posted (and changes id)
+        projectId = getIntent().getStringExtra(ConstantUtil.PROJECT_ID_KEY);
+        updateId = getIntent().getStringExtra(ConstantUtil.UPDATE_ID_KEY);
 		if (projectId == null || updateId == null) {
 			DialogUtil.errorAlert(this,"No project/update id", "Caller did not specify a project and update");
 		}
@@ -134,35 +124,14 @@ public class UpdateDetailActivity extends Activity {
 			}
 
 		}
-
+		dba.close();
+		
 		btnEdit.setEnabled(editable);
 		btnEdit.setVisibility(editable?View.VISIBLE:View.GONE);
 		synchFlag.setVisibility(synching?View.VISIBLE:View.GONE);
 		
 		// Show the Up button in the action bar.
 		//		setupActionBar();
-	}
-
-	
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		dba.open();
-		if (projectId != null) {
-			Project project = dba.findProject(projectId);
-			projTitleLabel.setText(project.getTitle());
-		} else {
-			projTitleLabel.setText("<NO PROJECT ID>");
-		}
-
-	}
-	
-	
-	@Override
-	protected void onPause() {
-		super.onPause();
-		dba.close();
 	}
 	
 
@@ -171,9 +140,6 @@ public class UpdateDetailActivity extends Activity {
 		if (dba != null) {
 			dba.close();
 		}
-		if (broadRec != null) {
-			LocalBroadcastManager.getInstance(this).unregisterReceiver(broadRec);
-		}
 		super.onDestroy();
 	}
 
@@ -181,8 +147,8 @@ public class UpdateDetailActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		//getMenuInflater().inflate(R.menu.update_details, menu);
-		return false; //no menu here
+		getMenuInflater().inflate(R.menu.update_detail, menu);
+		return true;
 	}
 
 	@Override
