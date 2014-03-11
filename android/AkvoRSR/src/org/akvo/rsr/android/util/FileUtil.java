@@ -110,26 +110,39 @@ public class FileUtil {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD;
     }
 
-    /*
-     * TODO extend as target version advances public static boolean
-     * hasHoneycomb() { return Build.VERSION.SDK_INT >=
-     * Build.VERSION_CODES.HONEYCOMB; } public static boolean hasHoneycombMR1()
-     * { return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1; }
-     * public static boolean hasICS() { return Build.VERSION.SDK_INT >=
-     * Build.VERSION_CODES.ICE_CREAM_SANDWICH; } public static boolean
-     * hasJellyBean() { return Build.VERSION.SDK_INT >=
-     * Build.VERSION_CODES.JELLY_BEAN; }
-     */
+    /* TODO extend as target version advances
+    public static boolean hasHoneycomb() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB;
+    } 
+    public static boolean hasHoneycombMR1() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1;
+    }
 
-    // Show a thumbnail from a URL and filename
-    // show different fallback images depending on case:
-    // 0 Image good and shown
-    // 1 No image set
-    // 2 Image not loaded (setting)
-    // 3 Image load failed (currently treated as 2, would need to remember fetch
-    // sts)
-    // 4 Image loaded, but unreadable
-    // 5 Image loaded, but cleared from cache (should be treated as 2)
+    public static boolean hasICS() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
+    }
+    public static boolean hasJellyBean() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
+    }
+*/
+    
+
+    /**
+     *  Shows a thumbnail from a URL and a filename
+     *  @param imgView where to show it
+     *  @param url where to fetch it from
+     *  @param fn filename in the image cache
+     *  @param projectId non-null if this is a Project
+     *  @param updateId non/null if this is an Update
+     *  
+     *  show different fallback images depending on case:
+     *   0 Image good and shown
+     *   1 No image set
+     *   2 Image not loaded (setting)
+     *   3 Image load failed (currently treated as 2, would need to remember fetch sts)
+     *   4 Image loaded, but unreadable
+     *   5 Image loaded, but cleared from cache (should be treated as 2)
+     */
     public static void setPhotoFile(ImageView imgView, String url, String fn, String projectId,
             String updateId) {
 
