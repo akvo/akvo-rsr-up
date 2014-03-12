@@ -481,7 +481,7 @@ public class RsrDbAdapter {
 		ContentValues updatedValues = new ContentValues();
 		updatedValues.put(PK_ID_COL, update.getId());
 		updatedValues.put(UNSENT_COL, update.getUnsent()?"1":"0");
-		updatedValues.put(DRAFT_COL, update.getUnsent()?"1":"0");
+		updatedValues.put(DRAFT_COL, update.getDraft()?"1":"0");
 
 		Cursor cursor = database.query(UPDATE_TABLE,
 				new String[] { PK_ID_COL },
@@ -513,7 +513,7 @@ public class RsrDbAdapter {
 		ContentValues updatedValues = new ContentValues();
 		updatedValues.put(PK_ID_COL, update.getId());
 		updatedValues.put(UNSENT_COL, update.getUnsent()?"1":"0");
-		updatedValues.put(DRAFT_COL, update.getUnsent()?"1":"0");
+		updatedValues.put(DRAFT_COL, update.getDraft()?"1":"0");
 
 		// if we changed exactly one item, we are done
 		int rowsAffected = database.update(UPDATE_TABLE, updatedValues,
