@@ -140,11 +140,9 @@ public class RsrDbAdapter {
 		@SuppressLint("UseValueOf")
 		private static volatile Long LOCK_OBJ = new Long(1);
 		private volatile static int instanceCount = 0;
-		private Context context;
 
 		DatabaseHelper(Context context) {
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
-			this.context = context;
 		}
 
 		@Override
@@ -258,20 +256,9 @@ public class RsrDbAdapter {
 			}
 */
 
-			this.context = null;
 		}
 
 		
-		// executes an SQL statement and swallows errors
-		private void runSQL(String ddl, SQLiteDatabase db) {
-			try {
-				db.execSQL(ddl);
-			} catch (Exception e) {
-				// no-op
-			}
-		}
-
-
 		@Override
 		public SQLiteDatabase getWritableDatabase() {
 			synchronized (LOCK_OBJ) {
@@ -744,7 +731,6 @@ public class RsrDbAdapter {
 				project.setSummary(cursor.getString(cursor.getColumnIndexOrThrow(SUMMARY_COL)));
 				project.setThumbnailUrl(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_URL_COL)));
 				project.setThumbnail(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_FILENAME_COL)));
-				//TODO funds?
 				project.setCountry(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
 				project.setState(cursor.getString(cursor.getColumnIndexOrThrow(STATE_COL)));
 				project.setCity(cursor.getString(cursor.getColumnIndexOrThrow(CITY_COL)));
