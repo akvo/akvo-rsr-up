@@ -43,13 +43,20 @@ public class AboutActivity extends Activity {
 		if (tv != null)
 			tv.setText(version);
 		
-		final ImageButton btnUpdates = (ImageButton) findViewById(R.id.btn_akvo_link);
-		btnUpdates.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
+        final ImageButton btnUpdates = (ImageButton) findViewById(R.id.btn_akvo_link);
+        btnUpdates.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
                 Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.akvo.org/"));
-                startActivity(myIntent);                				
-			}
-		});
+                startActivity(myIntent);                                
+            }
+        });
+
+        final TextView licenseLink = (TextView) findViewById(R.id.link_to_license);
+        licenseLink.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startActivity(new Intent(AboutActivity.this, LicenseActivity.class));
+            }
+        });
 	}
 
 

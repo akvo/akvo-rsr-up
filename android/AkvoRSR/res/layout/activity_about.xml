@@ -53,10 +53,10 @@
    	</LinearLayout>
 
     <!-- some fudge to fill the viewport if necessary -->
-		    <View
-		        android:layout_width="fill_parent"
-        		android:layout_height="0dp"
-        		android:layout_weight="1"/>
+    <View
+        android:layout_width="fill_parent"
+ 		android:layout_height="0dp"
+  		android:layout_weight="1"/>
     
     <TextView
         android:layout_width="wrap_content"
@@ -65,6 +65,17 @@
         android:padding="8dp"
         android:text="@string/copyright"
         android:textColor="@android:color/white" />
+
+    <TextView
+        android:id="@+id/link_to_license"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="30dp"
+        android:layout_marginTop="30dip"
+        android:text="@string/license"
+        android:textColor="@color/rsr_blue"
+        android:textSize="20sp" />
 
     <ImageButton
         android:id="@+id/btn_akvo_link"
