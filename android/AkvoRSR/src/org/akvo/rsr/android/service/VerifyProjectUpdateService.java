@@ -22,11 +22,11 @@ public class VerifyProjectUpdateService extends Service {
 
 	private static final String TAG = "VerifyProjectUpdateService";
     private static Timer timer;
-//    private static final long INITIAL_DELAY_MS = 60000; //one minute
-//    private static final long INTERVAL_MS = 300000; //five minutes
+    private static final long INITIAL_DELAY_MS = 60000; //one minute
+    private static final long INTERVAL_MS = 300000; //five minutes
 
-    private static final long INITIAL_DELAY_MS = 6000;
-    private static final long INTERVAL_MS = 30000;
+//    private static final long INITIAL_DELAY_MS = 6000;
+//    private static final long INTERVAL_MS = 30000;
 
 
     /**
