@@ -445,8 +445,9 @@ public class RsrDbAdapter {
 		updatedValues.put(UUID_COL, update.getUuid());
 		updatedValues.put(THUMBNAIL_URL_COL, update.getThumbnailUrl());
 		//not always done here to preserve a cache connection
-		if (saveFn)
+		if (saveFn) {
 			updatedValues.put(THUMBNAIL_FILENAME_COL, update.getThumbnailFilename());
+		}
 		updatedValues.put(DRAFT_COL, update.getDraft()?"1":"0");
 		updatedValues.put(UNSENT_COL, update.getUnsent()?"1":"0");
 		updatedValues.put(CREATED_COL, update.getDate().getTime()/1000); //1-second precision only

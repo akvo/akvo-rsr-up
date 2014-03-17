@@ -85,7 +85,7 @@ public class Downloader {
 	 */
 	public void fetchProjectList(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
 
-		Log.i(TAG, "Fetching project list from " + url);
+		//Log.v(TAG, "Fetching project list from " + url);
 
 		/* Get a SAXParser from the SAXPArserFactory. */
 		SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -398,7 +398,7 @@ public class Downloader {
 				if (fn == null) {
 					//not fetched yet
 					if (url == null) {
-						Log.w(TAG, "Null image URL for update: "+id);
+						//Log.v(TAG, "Null image URL for update: "+id);
 					} else try{
 						fn = httpGetToNewFile(new URL(curl,url), directory, "prj" + id + "_");
 						dba.updateProjectThumbnailFile(id,fn);	
@@ -423,7 +423,7 @@ public class Downloader {
 
 					//not fetched yet, or deleted
 					if (url == null) {
-						Log.i(TAG, "Null image URL for update: " + id);
+						//Log.v(TAG, "Null image URL for update: " + id);
 					} else try {
 						fn = httpGetToNewFile(new URL(curl,url), directory, "upd" + id + "_");
 						dba.updateUpdateThumbnailFile(id,fn);						
@@ -444,29 +444,6 @@ public class Downloader {
 
 	}
 
-
-	/* 
-	 * Publish an update, return true if success
-	 *
-	public boolean unusedPostUpdate(Context ctx, URL url, Update update) {
-		Map<String, String> data = new HashMap<String, String>();
-		data.put("title", update.getTitle());
-		data.put("text", update.getText());
-		String projectPath = "/api/v1/project/" + update.getProjectId() + "/";//todo move to constantutil
-		data.put("project", projectPath);
-
-//		if (HttpRequest.post(url).form(data).created())
-//			System.out.println("User was created");
-		HttpRequest h = HttpRequest.post(url).form(data);
-		int code = h.code();
-		String s = h.body();//TODO: is this XML or just an ID?
-		if (code != 201){
-			DialogUtil.errorAlert(ctx, "Unable to post update", code + h.message());
-			return false;
-		}
-		return true;
-	}
-	 */
 
 	private final static char SPC = '\u0020';
 
@@ -643,7 +620,7 @@ public class Downloader {
 			String urlTemplate, String verifyUrlTemplate,
 			boolean sendImages, User user)
 					throws PostFailedException, PostUnresolvedException, MalformedURLException, ParserConfigurationException  {
-		Log.i(TAG, "Sending update " + localId);
+		//Log.v(TAG, "Sending update " + localId);
 		RsrDbAdapter dba = new RsrDbAdapter(ctx);
 		dba.open();
 		try {

@@ -10,7 +10,6 @@ import org.akvo.rsr.android.util.SettingsUtil;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -43,7 +42,8 @@ public class SettingsActivity extends PreferenceActivity {
 						final EditText inputView = new EditText(SettingsActivity.this);
 						//one line only
 						inputView.setSingleLine();
-						inputView.setText("http://");//seed input field TODO: change to https when we have that?
+						inputView.setText("http://");//seed input field 
+						//TODO: change to https when we have that?
 						inputView.setSelection(7);
 						DialogUtil.showTextInputDialog(
 								SettingsActivity.this,
@@ -88,7 +88,7 @@ public class SettingsActivity extends PreferenceActivity {
 				return true;
 			}
 		});
-        //Insure ppl remember version for the feedback form
+        //Ensure user remember version for the feedback form
 		String version = "0.0";
 		try {
 		    version = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
@@ -102,12 +102,14 @@ public class SettingsActivity extends PreferenceActivity {
 
 		final Preference ccPref = (Preference) findPreference("clear_cache");
         ccPref.setPersistent(false);
-        ccPref.setSummary("Frees " + FileUtil.countCacheMB(SettingsActivity.this) + " MB. Pictures by you are kept.");
+        ccPref.setSummary("Frees " + FileUtil.countCacheMB(SettingsActivity.this) +
+                " MB. Pictures by you are kept.");
         ccPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
         @Override
         	public boolean onPreferenceClick(Preference preference) {
         		FileUtil.clearCache(SettingsActivity.this);
-                ccPref.setSummary("Frees " + FileUtil.countCacheMB(SettingsActivity.this) + " MB. Pictures by you are kept.");
+                ccPref.setSummary("Frees " + FileUtil.countCacheMB(SettingsActivity.this) +
+                        " MB. Pictures by you are kept.");
         		return true;
         	}	
         });

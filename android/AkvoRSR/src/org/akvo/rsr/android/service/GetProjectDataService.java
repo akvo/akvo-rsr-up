@@ -101,9 +101,10 @@ public class GetProjectDataService extends IntentService {
 						errMsg = "Fetch failed: "+ e;
 					}
 				}
-				if (cursor != null)
+				if (cursor != null) {
 					cursor.close();
-				Log.i(TAG,"Fetched users: " + j);
+				}
+				//Log.i(TAG,"Fetched users: " + j);
 
 			}
 			

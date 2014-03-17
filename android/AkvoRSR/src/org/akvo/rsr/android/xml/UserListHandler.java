@@ -17,7 +17,6 @@
 package org.akvo.rsr.android.xml;
 
 import org.akvo.rsr.android.dao.RsrDbAdapter;
-import org.akvo.rsr.android.domain.Country;
 import org.akvo.rsr.android.domain.User;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

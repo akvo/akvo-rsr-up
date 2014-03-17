@@ -16,8 +16,6 @@
 
 package org.akvo.rsr.android;
 
-import java.io.File;
-
 import org.akvo.rsr.android.dao.RsrDbAdapter;
 import org.akvo.rsr.android.domain.Project;
 import org.akvo.rsr.android.util.ConstantUtil;
@@ -36,8 +34,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 public class ProjectDetailActivity extends Activity {
 

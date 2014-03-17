@@ -38,8 +38,9 @@ public class FileUtil {
             // Get and check length
             long longlength = f.length();
             int length = (int) longlength;
-            if (length != longlength)
+            if (length != longlength) {
                 throw new IOException("File size >= 2 GB");
+            }
             // Read file and return data
             byte[] data = new byte[length];
             f.readFully(data);

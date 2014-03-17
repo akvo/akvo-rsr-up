@@ -37,7 +37,7 @@ public class VerifyProjectUpdateService extends Service {
     public int onStartCommand(final Intent intent, int flags, int startid) {
         // Safe to lazy initialize the static field, since this method
         // will always be called in the Main Thread
-		Log.d(TAG, "Starting verification service");
+		//Log.d(TAG, "Starting verification service");
         if (timer == null) {
             timer = new Timer(true);
             timer.scheduleAtFixedRate(new TimerTask() {
@@ -56,7 +56,7 @@ public class VerifyProjectUpdateService extends Service {
 		//Must not do network IO on main thread
 		new Thread(new Runnable() {
 			public void run() {
-				Log.i(TAG, "Starting a verify pass");
+				//Log.v(TAG, "Starting a verify pass");
 				Intent i = new Intent(ConstantUtil.UPDATES_VERIFIED_ACTION);
 
 				try {
@@ -81,9 +81,9 @@ public class VerifyProjectUpdateService extends Service {
 				        }
 				        //stop the service
 				        stopSelf();
-					} else
+					} else {
 						Log.i(TAG, "Still unverified:" + unresolveds);
-
+					}
 
 				} catch (Exception e) {
 					i.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, e.getMessage());
