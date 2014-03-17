@@ -44,7 +44,9 @@ import com.github.kevinsawicki.http.HttpRequest;
 import com.github.kevinsawicki.http.HttpRequest.Base64;
 import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
 
+import android.app.Application;
 import android.content.Context;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.util.Log;
 
@@ -525,11 +527,11 @@ public class Downloader {
 	application/xml
 
 	 */
-	public static int postXmlUpdateStreaming(String urlTemplate, Update update, boolean sendImage, User user) {
+	public static int postXmlUpdateStreaming(String urlTemplate, Update update, boolean sendImage, User user, String agent) {
 		final String contentType = "application/xml";
 		final String bodyTemplate1  =	"<object><update_method>M</update_method><project>%s</project>" + //Mobile update method
 				"<photo_location>E</photo_location><uuid>%s</uuid><user>%s</user><title>%s</title>" +
-				"<text>%s</text>";
+				"<user_agent>%s</user_agent><text>%s</text>";
 		final String bodyTemplate2  = "</object>";
 		final String imagePreamble  = "<photo type=\"hash\"><name>dummy.jpg</name><content_type>image/jpeg</content_type><file>";
 		final String imagePostamble = "</file></photo>";
@@ -540,10 +542,11 @@ public class Downloader {
 			//user and project references have to be in URL form
 			String projectPath = String.format(Locale.US, ConstantUtil.PROJECT_PATH_PATTERN, update.getProjectId());
 			String userPath = String.format(Locale.US, ConstantUtil.USER_PATH_PATTERN, user.getId());
-	
+
 			String requestBody = String.format(Locale.US, bodyTemplate1,
 					projectPath, update.getUuid(), userPath,
 					oneLine(update.getTitle(),50), //TODO: WHAT ABOUT XML?
+					agent,
 					update.getText());
 	
 			HttpRequest h = HttpRequest.post(url).contentType(contentType);//OutOfMemory here...
@@ -645,8 +648,17 @@ public class Downloader {
 		dba.open();
 		try {
 			Update upd = dba.findUpdate(localId);
-			
-			int status = postXmlUpdateStreaming(urlTemplate, upd, sendImages, user);
+			String userAgent;
+			try {
+			    userAgent = "Akvo RSR Up v" + ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0).versionName +
+                        " on Android " + android.os.Build.VERSION.RELEASE +
+                        " device " + android.os.Build.MANUFACTURER + 
+                        " " + android.os.Build.MODEL;			
+            } catch (NameNotFoundException e) {
+                userAgent = "(not found)";
+            }
+
+			int status = postXmlUpdateStreaming(urlTemplate, upd, sendImages, user, userAgent);
 
 			if (status == ConstantUtil.POST_UNKNOWN) { //try to check on sts immediately
 				URL url = new URL(String.format(verifyUrlTemplate, upd.getUuid()));
@@ -696,7 +708,7 @@ public class Downloader {
 					String localId = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.PK_ID_COL));
 					Update upd = dba.findUpdate(localId);
 					
-					switch (postXmlUpdateStreaming(urlTemplate, upd, sendImages, user)) {
+					switch (postXmlUpdateStreaming(urlTemplate, upd, sendImages, user, "")) {
 					case ConstantUtil.POST_SUCCESS:
 						upd.setUnsent(false);
 						upd.setDraft(false);
