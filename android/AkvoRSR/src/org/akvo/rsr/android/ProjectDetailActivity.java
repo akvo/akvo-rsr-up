@@ -115,13 +115,13 @@ public class ProjectDetailActivity extends Activity {
 		}
 
 		String loc = "";
-		if (project.getCity() != null) {
+		if (project.getCity() != null && project.getCity().length() > 0) {
 			loc += project.getCity() + ", ";
 		}
-		if (project.getState() != null) {
+		if (project.getState() != null && project.getState().length() > 0) {
 			loc += project.getState() + ", ";			
 		}
-		if (project.getCountry() != null) {
+		if (project.getCountry() != null && project.getCountry().length() > 0) {
 			loc += project.getCountry() + ", ";			
 		}
 		if (loc.length() > 1) {
@@ -132,7 +132,7 @@ public class ProjectDetailActivity extends Activity {
 		if (project.getLatitude() != null &&
 			project.getLongitude() != null ) {
 			loc += "\nLatitude " + project.getLatitude() +
-			" Longitude " + project.getLongitude();
+			        " Longitude " + project.getLongitude();
 			projLocationText.setOnClickListener(
 				new OnClickListener() {
 					@Override
