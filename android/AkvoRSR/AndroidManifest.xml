@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.akvo.rsr.android"
-    android:versionCode="3"
-    android:versionName="0.91" >
+    package="org.akvo.rsr.up"
+    android:versionCode="4"
+    android:versionName="0.92"
+    android:debuggable="false"
+    >
 
     <uses-sdk
         android:minSdkVersion="7"
@@ -23,7 +25,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="org.akvo.rsr.android.LoginActivity"
+            android:name="org.akvo.rsr.up.LoginActivity"
             android:label="@string/title_activity_login"
             android:theme="@android:style/Theme.Black.NoTitleBar" >
             <intent-filter>
@@ -33,7 +35,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="org.akvo.rsr.android.ProjectListActivity"
+            android:name="org.akvo.rsr.up.ProjectListActivity"
             android:configChanges="keyboardHidden|orientation"
             android:label="@string/title_activity_project_list" >
             <meta-data
@@ -41,35 +43,35 @@
                 android:value="org.akvo.rsr.android.LoginActivity" />
         </activity>
         <activity
-            android:name="org.akvo.rsr.android.UpdateListActivity"
+            android:name="org.akvo.rsr.up.UpdateListActivity"
             android:label="@string/title_activity_update_list" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.akvo.rsr.android.ProjectDetailActivity" />
         </activity>
         <activity
-            android:name="org.akvo.rsr.android.ProjectDetailActivity"
+            android:name="org.akvo.rsr.up.ProjectDetailActivity"
             android:label="@string/title_activity_project_detail" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.akvo.rsr.android.ProjectListActivity" />
         </activity>
         <activity
-            android:name="org.akvo.rsr.android.DiagnosticActivity"
+            android:name="org.akvo.rsr.up.DiagnosticActivity"
             android:label="@string/title_activity_project_detail" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.akvo.rsr.android.ProjectListActivity" />
         </activity>
         <activity
-            android:name="org.akvo.rsr.android.UpdateDetailActivity"
+            android:name="org.akvo.rsr.up.UpdateDetailActivity"
             android:label="@string/title_activity_update_detail" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.akvo.rsr.android.UpdateListActivity" />
         </activity>
         <activity
-            android:name="org.akvo.rsr.android.UpdateEditorActivity"
+            android:name="org.akvo.rsr.up.UpdateEditorActivity"
             android:configChanges="keyboardHidden|orientation"
             android:label="@string/title_activity_update_edit" >
             <meta-data
@@ -77,21 +79,21 @@
                 android:value="org.akvo.rsr.android.UpdateListActivity" />
         </activity>
         <activity
-            android:name="org.akvo.rsr.android.SettingsActivity"
+            android:name="org.akvo.rsr.up.SettingsActivity"
             android:label="@string/title_activity_settings" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.akvo.rsr.android.ProjectListActivity" />
         </activity>
         <activity
-            android:name="org.akvo.rsr.android.AboutActivity"
+            android:name="org.akvo.rsr.up.AboutActivity"
             android:label="@string/title_activity_about" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.akvo.rsr.android.LoginActivity" />
         </activity>
         <activity
-            android:name="org.akvo.rsr.android.LicenseActivity"
+            android:name="org.akvo.rsr.up.LicenseActivity"
             android:label="@string/title_activity_license" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -99,22 +101,22 @@
         </activity>
         
         <service
-            android:name="org.akvo.rsr.android.service.SubmitProjectUpdateService"
+            android:name="org.akvo.rsr.up.service.SubmitProjectUpdateService"
             android:enabled="true"
             android:exported="false" >
         </service>
         <service
-            android:name="org.akvo.rsr.android.service.GetProjectDataService"
+            android:name="org.akvo.rsr.up.service.GetProjectDataService"
             android:enabled="true"
             android:exported="false" >
         </service>
         <service
-            android:name="org.akvo.rsr.android.service.SignInService"
+            android:name="org.akvo.rsr.up.service.SignInService"
             android:enabled="true"
             android:exported="false" >
         </service>
         <service
-            android:name="org.akvo.rsr.android.service.VerifyProjectUpdateService"
+            android:name="org.akvo.rsr.up.service.VerifyProjectUpdateService"
             android:enabled="true"
             android:exported="false" >
         </service>
