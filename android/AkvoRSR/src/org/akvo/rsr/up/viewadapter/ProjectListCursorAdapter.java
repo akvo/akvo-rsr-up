@@ -16,8 +16,6 @@
 
 package org.akvo.rsr.up.viewadapter;
 
-import java.io.File;
-
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.util.FileUtil;
@@ -26,8 +24,7 @@ import org.akvo.rsr.up.util.SettingsUtil;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,13 +40,14 @@ public class ProjectListCursorAdapter extends CursorAdapter{
  * @author Stellan Lagerstroem
  * 
  */
+    private final String TAG = "ProjectListCursorAdapter";
 	private RsrDbAdapter dba;
 	private boolean debug;
 	
 	public ProjectListCursorAdapter(Context context, Cursor c) {
 		super(context, c);
 		dba = new RsrDbAdapter(context);
-		dba.open();
+//		dba.open();
 		debug = SettingsUtil.ReadBoolean(context, "setting_debug", false);
 	}
 
@@ -58,10 +56,16 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 
-		//Text data
+        Long thisId = cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL));
+//        Long oldId = (Long) view.getTag(R.id.project_id_tag);
+//        if (oldId != null && oldId.compareTo(thisId) !=0 ) {
+//            Log.w(TAG,"switch!");
+//        }
+        
+        //Text data
 		TextView titleView = (TextView) view.findViewById(R.id.list_item_title);
 		if (debug) {
-			titleView.setText("["+ cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL)) +"] "+
+			titleView.setText("["+ thisId +"] "+
 					cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
 		} else {
 			titleView.setText(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
@@ -80,7 +84,7 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 		publishedCountView.setText(Integer.toString(stateCounts[2]) + res.getString(R.string.count_published));
 		publishedCountView.setVisibility(stateCounts[2]==0?View.GONE:View.VISIBLE);
 
-//	No unsent any more - just draft and published
+//	unsent not shown any more - just draft and published
 //		TextView unsynchCountView = (TextView) view.findViewById(R.id.list_item_unsynchronized_count);
 // 		unsynchCountView.setText(Integer.toString(stateCounts[1]) + res.getString(R.string.count_unsent));
 //		unsynchCountView.setVisibility(stateCounts[1]==0?View.GONE:View.VISIBLE);
@@ -96,7 +100,7 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 		FileUtil.setPhotoFile(thumbnail, url, fn, projId, null);
 		
 		//set tag so we will know what got clicked
-		view.setTag(R.id.project_id_tag, cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL)));
+		view.setTag(R.id.project_id_tag, thisId);
 
 	}
 

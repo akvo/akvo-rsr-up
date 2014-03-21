@@ -153,11 +153,9 @@ public class FileUtil {
             // set tags so we will know what to load on a click
             if (projectId != null || updateId != null) {
                 imgView.setTag(R.id.thumbnail_url_tag, url);
-                // set one of these, so we can update db:
-                if (projectId != null)
-                    imgView.setTag(R.id.project_id_tag, projectId);
-                if (updateId != null)
-                    imgView.setTag(R.id.update_id_tag, updateId);
+                // remember so we can update db when clicked
+                imgView.setTag(R.id.project_id_tag, projectId);
+                imgView.setTag(R.id.update_id_tag, updateId);
                 // make it clickable
                 imgView.setOnClickListener(new OnClickListener() {
                     @Override
@@ -166,6 +164,7 @@ public class FileUtil {
                     }
                 });
             }
+            
         } else { // in cache, try to display it
             File f = new File(fn);
             if (!f.exists()) { // cache corruption
@@ -204,8 +203,18 @@ public class FileUtil {
                     imgView.setImageBitmap(bm);
                 }
             }
+            //now fetched, (maybe late)
+            //clean out hints from this ImageView
+            imgView.setOnClickListener(null);                
+            imgView.setClickable(false);                
+            imgView.setTag(R.id.thumbnail_url_tag, null);
+            imgView.setTag(R.id.project_id_tag, null);
+            imgView.setTag(R.id.update_id_tag, null);
+            if (projectId != null && updateId != null) { //late
+                //TODO: how to update the list cursor content?
+                //Otherwise we need a URL-filename lookaside list
+            }
         }
-
     }
 
     
@@ -337,6 +346,9 @@ public class FileUtil {
                             fn = null;
                         }
                         dba.close();
+//                        if (fn != null) { //remember fn for use before list cursor updates
+//                        iv.setTag(R.id.thumbnail_fn_tag, fn);
+//                        }
 
                         // post UI work back to main thread
                         iv.post(new Runnable() {
