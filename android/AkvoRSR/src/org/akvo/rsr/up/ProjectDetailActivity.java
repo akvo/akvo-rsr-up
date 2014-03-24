@@ -107,66 +107,67 @@ public class ProjectDetailActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		dba.open();
-		project = dba.findProject(projId);
-		
-		if (debug) {
-			projTitleLabel.setText("["+ projId + "] "+project.getTitle());
-		} else {
-			projTitleLabel.setText(project.getTitle());
-		}
+		try{
+    		project = dba.findProject(projId);
+    		if (project == null) { //DB may have been cleared
+    		    return;
+    		}
+    		if (debug) {
+    			projTitleLabel.setText("["+ projId + "] "+project.getTitle());
+    		} else {
+    			projTitleLabel.setText(project.getTitle());
+    		}
+    
+    		String loc = "";
+    		if (project.getCity() != null && project.getCity().length() > 0) {
+    			loc += project.getCity() + ", ";
+    		}
+    		if (project.getState() != null && project.getState().length() > 0) {
+    			loc += project.getState() + ", ";			
+    		}
+    		if (project.getCountry() != null && project.getCountry().length() > 0) {
+    			loc += project.getCountry() + ", ";			
+    		}
+    		if (loc.length() > 1) {
+    			loc = loc.substring(0, loc.length()-2);
+    		}
+    
+    		//TODO check against 0,0 too?
+    		if (project.getLatitude() != null &&
+    			project.getLongitude() != null ) {
+    			loc += "\nLatitude " + project.getLatitude() +
+    			        " Longitude " + project.getLongitude();
+    			projLocationText.setOnClickListener(
+    				new OnClickListener() {
+    					@Override
+    					public void onClick(View v) {
+    						launchLatLonIntent();
+    					}
+    				});
+    		} else {
+    			projLocationText.setOnClickListener(null);
+    		}
+    
+    		projLocationText.setText(loc);
+    		projSummaryText.setText(project.getSummary());
+    		
+    		int [] stateCounts = {0,0,0};
+    		stateCounts = dba.countAllUpdatesFor(projId);
+    		Resources res = getResources();
+    		publishedCountView.setText(Integer.toString(stateCounts[2]) + res.getString(R.string.count_published));
+    		draftCountView.setText(Integer.toString(stateCounts[0]) + res.getString(R.string.count_draft));
+    
+    		FileUtil.setPhotoFile(projImage,project.getThumbnailUrl(), project.getThumbnailFilename(), projId, null);
 
-		String loc = "";
-		if (project.getCity() != null && project.getCity().length() > 0) {
-			loc += project.getCity() + ", ";
-		}
-		if (project.getState() != null && project.getState().length() > 0) {
-			loc += project.getState() + ", ";			
-		}
-		if (project.getCountry() != null && project.getCountry().length() > 0) {
-			loc += project.getCountry() + ", ";			
-		}
-		if (loc.length() > 1) {
-			loc = loc.substring(0, loc.length()-2);
-		}
-
-		//TODO check against 0,0 too?
-		if (project.getLatitude() != null &&
-			project.getLongitude() != null ) {
-			loc += "\nLatitude " + project.getLatitude() +
-			        " Longitude " + project.getLongitude();
-			projLocationText.setOnClickListener(
-				new OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						launchLatLonIntent();
-					}
-				});
-		} else {
-			projLocationText.setOnClickListener(null);
-		}
-
-		projLocationText.setText(loc);
-		projSummaryText.setText(project.getSummary());
-		
-		dba.open();
-		int [] stateCounts = {0,0,0};
-		try {
-			stateCounts = dba.countAllUpdatesFor(projId);
 		} finally {
-			dba.close();	
-		}
-		Resources res = getResources();
-		publishedCountView.setText(Integer.toString(stateCounts[2]) + res.getString(R.string.count_published));
-		draftCountView.setText(Integer.toString(stateCounts[0]) + res.getString(R.string.count_draft));
-
-		FileUtil.setPhotoFile(projImage,project.getThumbnailUrl(), project.getThumbnailFilename(), projId, null);
+            dba.close();    
+        }
 
 	}
 	
 	@Override
 	protected void onPause() {
 		super.onPause();
-		dba.close();
 	}
 	
 

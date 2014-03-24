@@ -694,22 +694,27 @@ public class RsrDbAdapter {
 
 
 	/**
-	 * Gets users that are referenced by updates but not loaded
+	 * gets users that are referenced by updates but not loaded
+	 * 
+	 * query crashes with NullPointerException if update table is empty
 	 */
 	public Cursor listMissingUsers() {
-		Cursor cursor = database.query(true, //distinct
-										"_update LEFT JOIN user ON (userid = user._id)",
-										new String[] {"userid", "user._id"},
-//										null,//selection
-										"user._id IS NULL",
-										null,//selection vals
-//										new String[] { },
-										"userid",
-										null,
-										null,
-										null);
-
-		return cursor;
+	    try {
+    		Cursor cursor = database.query(true, //distinct
+    										"_update LEFT JOIN user ON (userid = user._id)",
+    										new String[] {"userid", "user._id"},
+    										"user._id IS NULL",
+    										null,//selection vals
+    										"userid",
+    										null,
+    										null,
+    										null);
+    
+    		return cursor;
+	    }
+	    catch (NullPointerException e) {
+	        return null;
+	    }
 	}
 
 
@@ -913,22 +918,16 @@ public class RsrDbAdapter {
 		database.execSQL(sql);
 	}
 
-	/**
-	 * reinserts the test survey into the database. For debugging purposes only.
-	 * The survey xml must exist in the APK
-	 */
-	public void reinstallTestSurvey() {
-//		executeSql("insert into project values(999991,'Sample Survey', 1.0,'Survey','res','testsurvey','english','N','N')");
-	}
 
 	/**
-	 * permanently deletes all projects, updates
+	 * permanently deletes all projects, updates, users and countries
 	 * from the database
 	 */
 	public void clearAllData() {
 		executeSql("delete from project");
-		executeSql("delete from _update");
-//		executeSql("update preferences set value = '' where key = 'user.lastuser.id'");
+        executeSql("delete from _update");
+        executeSql("delete from user");
+        executeSql("delete from country");
 	}
 
 	public Cursor listAllCountries() {

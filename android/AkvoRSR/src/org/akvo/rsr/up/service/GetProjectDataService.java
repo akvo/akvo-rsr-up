@@ -5,7 +5,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Locale;
 
-import org.akvo.rsr.up.UpdateEditorActivity;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.util.ConstantUtil;
@@ -16,14 +15,15 @@ import org.akvo.rsr.up.util.SettingsUtil;
 import android.app.IntentService;
 import android.content.Intent;
 import android.database.Cursor;
-import android.os.Environment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 public class GetProjectDataService extends IntentService {
 	
 	private static final String TAG = "GetProjectDataService";
-	private final GetProjectDataService myself = this;
+    private static final boolean mFetchUsers = true;
+    private static final boolean mFetchCountries = true;
+    private static final boolean mFetchUpdates = true;
 
 	public GetProjectDataService() {
 		super(TAG);
@@ -31,83 +31,91 @@ public class GetProjectDataService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		// TODO get the URL?
-		RsrDbAdapter ad = new RsrDbAdapter(this);
+
+	    RsrDbAdapter ad = new RsrDbAdapter(this);
 		Downloader dl = new Downloader();
 		String errMsg = null;
 		boolean noimages = SettingsUtil.ReadBoolean(this, "setting_delay_image_fetch", false);
 		String host = SettingsUtil.host(this);
 
-
-		try {
-			dl.fetchProjectList(this, new URL(SettingsUtil.host(this) +
-					                          String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN, SettingsUtil.Read(this, "authorized_orgid"))));
+        ad.open();
+        try {
+            try {
+			dl.fetchProjectList(this,
+			        new URL(SettingsUtil.host(this) +
+			                String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN,
+			                        SettingsUtil.Read(this, "authorized_orgid"))));
 			broadcastProgress(0, 50, 100);
-			dl.fetchCountryList(this, new URL(SettingsUtil.host(this) +
-                    String.format(ConstantUtil.FETCH_COUNTRIES_URL)));
+            if (mFetchCountries) {
+			//TODO: rarely changes, so only fetch countries if we never did that
+                dl.fetchCountryList(this, new URL(SettingsUtil.host(this) +
+                        String.format(ConstantUtil.FETCH_COUNTRIES_URL)));
+            }
 			broadcastProgress(0, 100, 100);
 			
-			//We only get published projects from that URL, so we need to iterate on them and get corresponding updates
-			ad.open();
-			Cursor c = ad.listAllProjects();
-			try {
-				int i = 0;
-				while (c.moveToNext()) {
-					i++;
-					dl.fetchUpdateList(	this,
-									   	new URL(host +
-										"/api/v1/project_update/?format=xml&limit=0&project=" + //TODO move to constants
-										c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL)))
-										);
-					broadcastProgress(1, i, c.getCount());					
-					}
-				}
-			finally {
-				if (c != null)
-					c.close();
-			}
-			
+	        if (mFetchUpdates) {
+    			//We only get published projects from that URL,
+    			// so we need to iterate on them and get corresponding updates
+    			Cursor c = ad.listAllProjects();
+    			try {
+    				int i = 0;
+    				while (c.moveToNext()) {
+    					i++;
+    					dl.fetchUpdateList(	this,
+    									   	new URL(host +
+    										"/api/v1/project_update/?format=xml&limit=0&project=" + //TODO move to constants
+    										c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL)))
+    										);
+    					broadcastProgress(1, i, c.getCount());					
+    					}
+    				}
+    			finally {
+    				if (c != null)
+    					c.close();
+    			}
+	        }
+    			
 		} catch (FileNotFoundException e) {
 			Log.e(TAG,"Cannot find:",e);
 			errMsg = "Cannot find: "+ e.getMessage();
 		} catch (Exception e) {
 			Log.e(TAG,"Bad fetch:",e);
-			errMsg = "Fetch failed: "+ e;
+			errMsg = "Update Fetch failed: "+ e;
+		}
+		
+		if (mFetchUsers) {
+			//Fetch user data for the authors of the updates.
+			//This API requires authorization
+			User user = SettingsUtil.getAuthUser(this);
+			Cursor cursor = ad.listMissingUsers();
+            if (cursor != null) {
+    			int j = 0;
+    			int col = cursor.getColumnIndex(RsrDbAdapter.USER_COL);
+    			String key = String.format(Locale.US, ConstantUtil.API_KEY_PATTERN, user.getApiKey(), user.getUsername());
+    			while (cursor.moveToNext()) {
+    				try { 
+    					dl.fetchUser(this,
+    								 new URL(host +
+    										 String.format(Locale.US, ConstantUtil.FETCH_USER_URL_PATTERN, cursor.getString(col)) +
+    										 key),
+    								 cursor.getString(col)
+    								);
+    					j++;
+    					}
+    				catch (FileNotFoundException e) { //possibly because user is no longer active
+    					Log.w(TAG,"Cannot find:" + cursor.getString(col));
+    //					errMsg = "Cannot find: "+ e.getMessage(); //not serious
+    				} catch (Exception e) { //probably network reasons
+    					Log.e(TAG,"Bad fetch:",e);
+    					errMsg = "Fetch failed: "+ e;
+    				}
+    			}
+				cursor.close();
+			}
+			//Log.i(TAG,"Fetched users: " + j);
+
 		}
 
-		if (true) {
-				//Fetch user data for the authors of the updates.
-				//This API requires authorization
-				User user = SettingsUtil.getAuthUser(this);
-				Cursor cursor = ad.listMissingUsers();
-				int j = 0;
-				int col = cursor.getColumnIndex(RsrDbAdapter.USER_COL);
-				String key = String.format(Locale.US, ConstantUtil.API_KEY_PATTERN, user.getApiKey(), user.getUsername());
-				while (cursor.moveToNext()) {
-					try { 
-						dl.fetchUser(this,
-									 new URL(host +
-											 String.format(Locale.US, ConstantUtil.FETCH_USER_URL_PATTERN, cursor.getString(col)) +
-											 key),
-									 cursor.getString(col)
-									);
-						j++;
-						}
-					catch (FileNotFoundException e) { //possibly because user is no longer active
-						Log.w(TAG,"Cannot find:" + cursor.getString(col));
-	//					errMsg = "Cannot find: "+ e.getMessage(); //not serious
-					} catch (Exception e) { //probably network reasons
-						Log.e(TAG,"Bad fetch:",e);
-						errMsg = "Fetch failed: "+ e;
-					}
-				}
-				if (cursor != null) {
-					cursor.close();
-				}
-				//Log.i(TAG,"Fetched users: " + j);
-
-			}
-			
 		broadcastProgress(1, 100, 100);					
 			
 					
@@ -122,7 +130,7 @@ public class GetProjectDataService extends IntentService {
 								intent.putExtra(ConstantUtil.PHASE_KEY, 2);
 								intent.putExtra(ConstantUtil.SOFAR_KEY, sofar);
 								intent.putExtra(ConstantUtil.TOTAL_KEY, total);
-							    LocalBroadcastManager.getInstance(myself).sendBroadcast(intent);							
+							    LocalBroadcastManager.getInstance(GetProjectDataService.this).sendBroadcast(intent);							
 							}
 						}
 						);
@@ -131,6 +139,11 @@ public class GetProjectDataService extends IntentService {
 				errMsg = "Thumbnail url problem: "+ e;
 			}
 		}
+        }
+        finally {
+            if (ad != null)
+                ad.close();
+        }
 
 		//broadcast completion
 		Intent intent2 = new Intent(ConstantUtil.PROJECTS_FETCHED_ACTION);
