@@ -11,6 +11,9 @@
         name="thumbnail_url_tag" />
     <item
         type="id"
+        name="thumbnail_fn_tag" />
+    <item
+        type="id"
         name="object_type_tag" />
 </resources>
 
