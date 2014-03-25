@@ -21,6 +21,35 @@
  	    android:typeface="sans"
 	    />
  	
+	<!-- The sometimes visible progress part -->	
+	<LinearLayout
+	    android:id="@+id/sendprogress_group"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:background="@color/rsr_blue"
+	    android:orientation="vertical"
+	    android:padding="5dip"
+	    android:visibility="gone" >
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/label_send_progress"
+            android:textColor="@color/rsr_purple"
+            android:textSize="18sp"
+            />
+
+        <ProgressBar
+	        android:id="@+id/sendProgressBar"
+	        style="?android:attr/progressBarStyleHorizontal"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:indeterminate="false"
+	        />
+	</LinearLayout>
+	        
+ 	
 	<!-- The scrollview should fill all the space beween the project title and the bottom -->	
  	<ScrollView
 		android:layout_width="fill_parent"

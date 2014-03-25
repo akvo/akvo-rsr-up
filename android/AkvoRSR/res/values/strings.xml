@@ -23,6 +23,7 @@
     <string name="label_update_title">Add a project update:</string>
     <string name="hint_update_title">Title</string>
     <string name="label_update_description">Update Description:</string>
+    <string name="label_send_progress">Publishing update</string>
     <string name="hint_update_description">Description</string>
     <string name="label_empty_proj_list">Nothing fetched yet. Use the refresh button to see your projects.\n\nIf you have a low-bandwidth connection you should turn on delayed picture fetching in settings first.</string>
     <string name="state_draft">Draft</string>

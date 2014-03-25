@@ -34,21 +34,20 @@ import org.akvo.rsr.up.service.SubmitProjectUpdateService;
 import org.akvo.rsr.up.service.VerifyProjectUpdateService;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.DialogUtil;
+import org.akvo.rsr.up.util.Downloader;
 import org.akvo.rsr.up.util.FileUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
 
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v4.content.LocalBroadcastManager;
@@ -90,7 +89,8 @@ public class UpdateEditorActivity extends Activity {
     private Button btnDelPhoto;
     private View photoAndDeleteGroup;
     private View photoAddGroup;
-    ProgressDialog progress;
+    private View progressGroup;
+    private ProgressBar inProgress;
 
     // Database
     private RsrDbAdapter dba;
@@ -122,6 +122,8 @@ public class UpdateEditorActivity extends Activity {
         // get the look
         setContentView(R.layout.activity_update_editor);
         // find the fields
+        progressGroup = findViewById(R.id.sendprogress_group);
+        inProgress = (ProgressBar) findViewById(R.id.sendProgressBar);
         projTitleLabel = (TextView) findViewById(R.id.projupd_edit_proj_title);
         projupdTitleText = (EditText) findViewById(R.id.edit_projupd_title);
         projupdDescriptionText = (EditText) findViewById(R.id.edit_projupd_description);
@@ -226,17 +228,13 @@ public class UpdateEditorActivity extends Activity {
             }
         }
 
-        // register a listener for a completion intent
+        // register a listener for a completion and progress intents
         broadRec = new ResponseReceiver();
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                broadRec,
-                new IntentFilter(ConstantUtil.UPDATES_SENT_ACTION));
+        IntentFilter f = new IntentFilter(ConstantUtil.UPDATES_SENT_ACTION);
+        f.addAction(ConstantUtil.UPDATES_SENDPROGRESS_ACTION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadRec, f);
 
-        projupdTitleText.setEnabled(editable);
-        projupdDescriptionText.setEnabled(editable);
-        btnDraft.setEnabled(editable);
-        btnSubmit.setEnabled(editable);
-        btnTakePhoto.setEnabled(editable);
+        enableChanges(editable);
         btnDraft.setVisibility(editable ? View.VISIBLE : View.GONE);
         btnSubmit.setVisibility(editable ? View.VISIBLE : View.GONE);
         // btnTakePhoto.setVisibility(editable?View.VISIBLE:View.GONE);
@@ -244,7 +242,21 @@ public class UpdateEditorActivity extends Activity {
         // Show the Up button in the action bar.
         // setupActionBar();
     }
-
+    
+    
+    /**
+     * sets and clears enabled for all elements.
+     */
+    private void enableChanges(boolean enabled) {
+        projupdTitleText.setEnabled(enabled);
+        projupdDescriptionText.setEnabled(enabled);
+        btnDraft.setEnabled(enabled);
+        btnSubmit.setEnabled(enabled);
+        btnTakePhoto.setEnabled(enabled);        
+        btnDelPhoto.setEnabled(enabled);                
+    }
+    
+    
     private static final int IO_BUFFER_SIZE = 4 * 1024;
 
     private static void copyStream(InputStream in, OutputStream out) throws IOException {
@@ -343,35 +355,6 @@ public class UpdateEditorActivity extends Activity {
         }
     }
 
-    /**
-     * checks connectivity. TODO: move to util class
-     */
-    private boolean haveNetworkConnection(Context context, boolean wifiOnly) {
-        ConnectivityManager connMgr = (ConnectivityManager) context
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connMgr != null) {
-            NetworkInfo[] infoArr = connMgr.getAllNetworkInfo();
-            if (infoArr != null) {
-                for (int i = 0; i < infoArr.length; i++) {
-                    if (!wifiOnly) {
-                        // if we don't care what KIND of
-                        // connection we have, just that there is one
-                        if (NetworkInfo.State.CONNECTED == infoArr[i].getState()) {
-                            return true;
-                        }
-                    } else {
-                        // if we only want to use wifi, we need to check the
-                        // type
-                        if (infoArr[i].getType() == ConnectivityManager.TYPE_WIFI
-                                && NetworkInfo.State.CONNECTED == infoArr[i].getState()) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
 
     /**
      * Saves current update as draft, if it has a title and this is done by the
@@ -424,7 +407,7 @@ public class UpdateEditorActivity extends Activity {
         if (untitled()) {
             return;
         }
-        if (!haveNetworkConnection(this, false)) {
+        if (!Downloader.haveNetworkConnection(this, false)) {
             // TODO helpful error message, and return
             // Toast.makeText(getApplicationContext(), "No network connection!",
             // Toast.LENGTH_SHORT).show();
@@ -450,12 +433,11 @@ public class UpdateEditorActivity extends Activity {
         i.putExtra(ConstantUtil.UPDATE_ID_KEY, update.getId());
         getApplicationContext().startService(i);
 
-        // start a "progress" animation
-        // TODO: a real filling progress bar?
-        progress = new ProgressDialog(this);
-        progress.setTitle(R.string.send_dialog_title);
-        progress.setMessage(getResources().getString(R.string.send_dialog_msg));
-        progress.show();
+        // Disable UI during send to avoid confusion
+        enableChanges(false);
+        // Show the "progress" animation
+        progressGroup.setVisibility(View.VISIBLE);
+
         // Now we wait...
 
     }
@@ -469,7 +451,6 @@ public class UpdateEditorActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-//        dba.open();
         /*
          * if (projectId != null) { Project project =
          * dba.findProject(projectId);
@@ -481,9 +462,9 @@ public class UpdateEditorActivity extends Activity {
 
     /** handles result of send attempt */
     private void onSendFinished(Intent i) {
-        // Dismiss any in-progress dialog
-        if (progress != null)
-            progress.dismiss();
+        //Hide progressbar
+        progressGroup.setVisibility(View.GONE);
+
         String err = i.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
         boolean unresolved = i.getBooleanExtra(ConstantUtil.SERVICE_UNRESOLVED_KEY, false);
         int msgTitle, msgText;
@@ -520,25 +501,11 @@ public class UpdateEditorActivity extends Activity {
                 });
     }
 
-    /** receives status updates broadcast from the IntentService */
-    private class ResponseReceiver extends BroadcastReceiver {
-        // Prevents instantiation
-        private ResponseReceiver() {
-        }
-
-        // Called when the BroadcastReceiver gets an Intent it's registered to
-        // receive
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction() == ConstantUtil.UPDATES_SENT_ACTION)
-                onSendFinished(intent);
-        }
-    }
 
     /** closes database when activity is paused */
     @Override
     protected void onPause() {
         super.onPause();
-//        dba.close(); //should be open for onSaveInstanceState()
     }
 
     /** saves update being worked on before we leave the activity */
@@ -604,5 +571,39 @@ public class UpdateEditorActivity extends Activity {
         }
 
     }
+    /**
+     * updates the progress bars
+     * @param phase
+     * @param done
+     * @param total
+     */
+    private void onFetchProgress(int phase, int done, int total) {
+        inProgress.setIndeterminate(false);
+        inProgress.setProgress(done);
+        inProgress.setMax(total);
+    }
+
+    /**
+     * receives status updates from an IntentService
+     *
+     */
+    private class ResponseReceiver extends BroadcastReceiver {
+        // Prevents instantiation
+        private ResponseReceiver() {
+        }
+        
+        // Called when the BroadcastReceiver gets an Intent it's registered to receive
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction() == ConstantUtil.UPDATES_SENT_ACTION) {
+                onSendFinished(intent);
+            } else if (intent.getAction() == ConstantUtil.UPDATES_SENDPROGRESS_ACTION) {
+                onFetchProgress(intent.getExtras().getInt(ConstantUtil.PHASE_KEY, 0),
+                                intent.getExtras().getInt(ConstantUtil.SOFAR_KEY, 0),
+                                intent.getExtras().getInt(ConstantUtil.TOTAL_KEY, 100));
+            }
+        }
+    }
+
+
 
 }

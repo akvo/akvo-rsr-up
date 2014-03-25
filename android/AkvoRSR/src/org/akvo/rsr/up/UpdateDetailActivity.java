@@ -55,6 +55,10 @@ public class UpdateDetailActivity extends Activity {
 	//Database
 	private RsrDbAdapter dba;
 	
+	//TODO: may want to have an onResume where we check if an upload is ongoing,
+	// and if so display a progress indicator
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
