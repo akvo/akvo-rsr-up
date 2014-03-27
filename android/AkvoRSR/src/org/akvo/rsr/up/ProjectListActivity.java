@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -104,13 +104,16 @@ public class ProjectListActivity extends ListActivity {
             return true;
         case R.id.menu_logout:
         	SettingsUtil.signOut(this);
+            //Fire up the login screen
+            Intent mainIntent = new Intent(this, LoginActivity.class);
+            startActivity(mainIntent);
         	finish();
             return true;
         default:
         	return super.onOptionsItemSelected(item);
 	    }
-
 	}
+
 	
 	@Override
 	protected void onPause() {
@@ -118,6 +121,9 @@ public class ProjectListActivity extends ListActivity {
 		if (dataCursor != null) {
 			dataCursor.close();
 		}	
+        if (ad != null) {
+            ad.close();
+        }
 	}
 	
 	@Override
@@ -131,23 +137,12 @@ public class ProjectListActivity extends ListActivity {
 	@Override
 	protected void onDestroy() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadRec);
-		if (dataCursor != null) {
-			try {
-				dataCursor.close();
-			} catch (Exception e) {
-
-			}
-		}
-		if (ad != null) {
-			ad.close();
-		}
 		super.onDestroy();
 	}
 
 
-
 	/**
-	 * shows all visible projects in the database
+	 * shows all projects visible to this user
 	 */
 	private void getData() {
 		try {
@@ -155,7 +150,7 @@ public class ProjectListActivity extends ListActivity {
 				dataCursor.close();
 			}
 		} catch(Exception e) {
-			Log.w(TAG, "Could not close old cursor before reloading list",e);
+			Log.w(TAG, "Could not close old cursor before reloading list", e);
 		}
 		dataCursor = ad.listAllVisibleProjects();
 		//Show count
@@ -178,8 +173,9 @@ public class ProjectListActivity extends ListActivity {
 		startActivity(i);
 	}
 
-	/*
-	 * Start the service fetching new project data
+	
+	/**
+	 * starts the service fetching new project data
 	 */
 	private void startGetProjectsService() {
 		//disable refresh button
@@ -191,23 +187,26 @@ public class ProjectListActivity extends ListActivity {
 		
 		//start progress animation
 		inProgress.setVisibility(View.VISIBLE);
-//		inProgress1.setIndeterminate(true);//no prediction of projects
 		inProgress1.setProgress(0);
 		inProgress2.setProgress(0);
 		inProgress3.setProgress(0);
 	}
 
+	
+	/**
+	 * handles result of server login attempt
+	 * @param intent
+	 */
 	private void onFetchFinished(Intent intent) {
 		// Hide in-progress indicators
 		inProgress.setVisibility(View.GONE);
 		
 		String err = intent.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
 		if (err == null) {
-			Toast.makeText(getApplicationContext(), "Fetch complete", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(), R.string.msg_fetch_complete, Toast.LENGTH_SHORT).show();
 		} else {
-			//show a dialog instead?
+			//show a dialog instead
 			DialogUtil.errorAlert(this, "Error", err);
-//			Toast.makeText(getApplicationContext(), err, Toast.LENGTH_SHORT).show();
 		}
 
 		//re-enable the refresh button
