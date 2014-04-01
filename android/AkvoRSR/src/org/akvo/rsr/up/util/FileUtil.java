@@ -218,20 +218,21 @@ public class FileUtil {
     }
 
     
-    /*
-     *  shrinks an image file (to save upload bandwidth)
-     * the quick way, by a power-of-2 integer factor
-     * This will lose any EXIF information
+    /**
+     * reads an image file into a bitmap where long edge is no larger than given size
+     * @param filename
+     * @param maxSize
+     * @return
      */
-    public static boolean shrinkImageFileQuickly(String filename, int maxSize) {
+    public static Bitmap readSubsampledImageFile(String filename, int maxSize) {
         BitmapFactory.Options o = new BitmapFactory.Options();
         o.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(filename, o);
         int width_tmp = o.outWidth, height_tmp = o.outHeight;
         if (width_tmp < 0 || height_tmp < 0)
-            return false;
+            return null;
         if (width_tmp <= maxSize && height_tmp <= maxSize)
-            return true;
+            return null;
 
         // Find the correct scale value. It should be a power of 2.
         int scale = 1;
@@ -248,8 +249,19 @@ public class FileUtil {
         // Decode with inSampleSize
         BitmapFactory.Options o2 = new BitmapFactory.Options();
         o2.inSampleSize = scale;
-
-        Bitmap bm = BitmapFactory.decodeFile(filename, o2);
+        Log.v(TAG, "Shrinking image by a factor of " + scale);
+        return BitmapFactory.decodeFile(filename, o2);
+    }
+    
+    
+    /**
+     * 
+     *  shrinks an image file (to save upload bandwidth)
+     * the quick way, by a power-of-2 integer factor
+     * This will lose any EXIF information
+     */
+    public static boolean shrinkImageFileQuickly(String filename, int maxSize) {
+        Bitmap bm = readSubsampledImageFile(filename, maxSize);
         if (bm == null) {
             return false;
         } else {
@@ -258,7 +270,6 @@ public class FileUtil {
                 FileOutputStream stream = new FileOutputStream(filename);
                 if (bm.compress(Bitmap.CompressFormat.JPEG, 90, stream)) {
                     stream.close();
-                    Log.i(TAG, "Shrunk image by a factor of " + scale);
                     return true;
                 }
                 return false;
@@ -278,9 +289,9 @@ public class FileUtil {
      * Rotation will be normalized (if library is well-written)
      */
     public static boolean shrinkImageFileExactly(String filename, int maxSize, boolean alwaysRewrite) {
-        BitmapFactory.Options o = new BitmapFactory.Options();
-        Bitmap bm = BitmapFactory.decodeFile(filename, o);
-        float width = o.outWidth, height = o.outHeight;
+        Bitmap bm = readSubsampledImageFile(filename, maxSize * 2); //could throw 
+
+        float width = bm.getWidth(), height = bm.getHeight();
         if (bm == null || width < 0 || height < 0)
             return false;
         if (!alwaysRewrite && width <= maxSize && height <= maxSize)
