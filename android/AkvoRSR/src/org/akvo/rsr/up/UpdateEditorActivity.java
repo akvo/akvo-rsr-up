@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -81,13 +81,16 @@ public class UpdateEditorActivity extends Activity {
     private TextView projTitleLabel;
     private EditText projupdTitleText;
     private EditText projupdDescriptionText;
+    private EditText photoDescriptionText;
+    private EditText photoCreditText;
     private ImageView projupdImage;
     private Button btnSubmit;
     private Button btnDraft;
     private Button btnTakePhoto;
     private Button btnAttachPhoto;
     private Button btnDelPhoto;
-    private View photoAndDeleteGroup;
+    private Button btnRotRightPhoto;
+    private View photoAndToolsGroup;
     private View photoAddGroup;
     private View progressGroup;
     private ProgressBar inProgress;
@@ -128,7 +131,7 @@ public class UpdateEditorActivity extends Activity {
         projupdTitleText = (EditText) findViewById(R.id.edit_projupd_title);
         projupdDescriptionText = (EditText) findViewById(R.id.edit_projupd_description);
         projupdImage = (ImageView) findViewById(R.id.image_update_detail);
-        photoAndDeleteGroup = findViewById(R.id.image_with_delete);
+        photoAndToolsGroup = findViewById(R.id.image_with_tools);
         photoAddGroup = findViewById(R.id.photo_buttons);
 
         // Activate buttons
@@ -175,8 +178,15 @@ public class UpdateEditorActivity extends Activity {
                 update.setThumbnailFilename(null);
                 // TODO: delete image file if it was take through this app?
                 // Hide them
-                photoAndDeleteGroup.setVisibility(View.GONE);
-                photoAddGroup.setVisibility(View.VISIBLE);
+                showPhoto(false);
+            }
+        });
+
+        btnRotRightPhoto = (Button) findViewById(R.id.btn_rotate_photo_r);
+        btnRotRightPhoto.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                // Rotate image right
+                rotatePhoto(true);
             }
         });
 
@@ -220,11 +230,9 @@ public class UpdateEditorActivity extends Activity {
                 if (update.getThumbnailFilename() != null) {
                     // btnTakePhoto.setText(R.string.btncaption_rephoto);
                     FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(),
-                            update.getThumbnailFilename(), updateId, null);
-                    photoAndDeleteGroup.setVisibility(View.VISIBLE);
-                    photoAddGroup.setVisibility(View.GONE);
+                            update.getThumbnailFilename(), null, null);
+                    showPhoto(true);
                 }
-
             }
         }
 
@@ -242,7 +250,21 @@ public class UpdateEditorActivity extends Activity {
         // Show the Up button in the action bar.
         // setupActionBar();
     }
-    
+
+    private void showPhoto(boolean show) {
+        if (show) {
+            photoAndToolsGroup.setVisibility(View.VISIBLE);
+            photoAddGroup.setVisibility(View.GONE);
+        } else {
+            photoAndToolsGroup.setVisibility(View.GONE);
+            photoAddGroup.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void rotatePhoto(boolean clockwise) {
+        FileUtil.rotateImageFile(update.getThumbnailFilename(), clockwise);
+        FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), update.getThumbnailFilename(), null, null);
+    }
     
     /**
      * sets and clears enabled for all elements.
@@ -301,8 +323,7 @@ public class UpdateEditorActivity extends Activity {
             FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename, null,
                     null);
             // show result
-            photoAndDeleteGroup.setVisibility(View.VISIBLE);
-            photoAddGroup.setVisibility(View.GONE);
+            showPhoto(true);
         }
 
         // Handle picked photo
@@ -343,8 +364,7 @@ public class UpdateEditorActivity extends Activity {
                 update.setThumbnailUrl("dummyUrl");
                 FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename,
                         null, null);
-                photoAndDeleteGroup.setVisibility(View.VISIBLE);
-                photoAddGroup.setVisibility(View.GONE);
+                showPhoto(true);
             } catch (FileNotFoundException e) {
                 projupdImage.setImageResource(R.drawable.thumbnail_error);
                 e.printStackTrace();

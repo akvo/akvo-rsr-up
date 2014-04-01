@@ -490,16 +490,16 @@ public class RsrDbAdapter {
 				new String[] { old_id, },
 				null, null, null);
 
-		if (cursor != null && cursor.getCount() > 0) {
-			// if we found an item, it's an update, otherwise, it's an error
-			database.update(UPDATE_TABLE, updatedValues, PK_ID_COL + " = ?",
-					new String[] { old_id });
-		} else {
-			Log.e(TAG, "Tried to update id/sent sts of nonexistent update " + old_id);
-		}
-
 		if (cursor != null) {
-			cursor.close();
+		    if (cursor.getCount() > 0) {
+	            cursor.close();
+    			// if we found an item, it's an update, otherwise, it's an error
+    			database.update(UPDATE_TABLE, updatedValues, PK_ID_COL + " = ?",
+    					new String[] { old_id });
+    		} else {
+                cursor.close();
+    			Log.e(TAG, "Tried to update id/sent sts of nonexistent update " + old_id);
+    		}
 		}
 	}
 

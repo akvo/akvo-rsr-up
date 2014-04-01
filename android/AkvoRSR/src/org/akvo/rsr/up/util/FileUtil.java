@@ -14,6 +14,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
@@ -410,6 +411,33 @@ public class FileUtil {
             DialogUtil.infoAlert(context, "Cache cleared", files.length + " files deleted ("
                     + sizeSum / (1024 * 1024) + " MB)");
         }
+    }
+
+    /**
+     * rotates the image in a file 90 degrees
+     * @param filename
+     * @param clockwise
+     * @return
+     */
+    public static boolean rotateImageFile(String filename, boolean clockwise) {
+        //Read image file
+        try {
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            Bitmap bm = BitmapFactory.decodeFile(filename, o);
+            //Rotate it
+            Matrix matrix = new Matrix();
+            matrix.postRotate(clockwise?90:-90);
+            Bitmap rotatedBitmap = Bitmap.createBitmap(bm , 0, 0, bm.getWidth(), bm.getHeight(), matrix, true);
+            //write image file
+            FileOutputStream ostream = new FileOutputStream(filename);
+            rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
+            ostream.close();
+        } catch (Exception e) {
+            Log.e(TAG, "Could not write rotated image: ", e);
+            return false;
+        }
+        return true;
+        
     }
 
 }
