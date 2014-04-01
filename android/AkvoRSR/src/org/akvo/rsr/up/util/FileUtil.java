@@ -2,6 +2,7 @@
 package org.akvo.rsr.up.util;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -418,26 +419,24 @@ public class FileUtil {
      * @param filename
      * @param clockwise
      * @return
+     * @throws IOException 
      */
-    public static boolean rotateImageFile(String filename, boolean clockwise) {
+    public static void rotateImageFile(String filename, boolean clockwise) throws IOException {
         //Read image file
+        BitmapFactory.Options o = new BitmapFactory.Options();
+        Bitmap bm = BitmapFactory.decodeFile(filename, o);
+        //Rotate it
+        Matrix matrix = new Matrix();
+        matrix.postRotate(clockwise ? 90 : -90);
+        Bitmap rotatedBitmap = Bitmap.createBitmap(bm , 0, 0, bm.getWidth(), bm.getHeight(), matrix, true);
+        //write image file
+        FileOutputStream ostream = new FileOutputStream(filename);
         try {
-            BitmapFactory.Options o = new BitmapFactory.Options();
-            Bitmap bm = BitmapFactory.decodeFile(filename, o);
-            //Rotate it
-            Matrix matrix = new Matrix();
-            matrix.postRotate(clockwise?90:-90);
-            Bitmap rotatedBitmap = Bitmap.createBitmap(bm , 0, 0, bm.getWidth(), bm.getHeight(), matrix, true);
-            //write image file
-            FileOutputStream ostream = new FileOutputStream(filename);
             rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
-            ostream.close();
-        } catch (Exception e) {
-            Log.e(TAG, "Could not write rotated image: ", e);
-            return false;
         }
-        return true;
-        
+        finally {
+            ostream.close();
+        }       
     }
 
 }

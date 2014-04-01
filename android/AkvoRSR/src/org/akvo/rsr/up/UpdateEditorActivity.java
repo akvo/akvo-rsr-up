@@ -41,6 +41,7 @@ import org.akvo.rsr.up.util.SettingsUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -261,8 +262,21 @@ public class UpdateEditorActivity extends Activity {
         }
     }
 
+    
     private void rotatePhoto(boolean clockwise) {
-        FileUtil.rotateImageFile(update.getThumbnailFilename(), clockwise);
+        try {
+            FileUtil.rotateImageFile(update.getThumbnailFilename(), clockwise);
+        }
+        catch (IOException e) {
+            DialogUtil.errorAlert(this, "IO Error rotating photo file",
+                    "Try a lower resolution photo");
+            return;
+        }
+        catch (OutOfMemoryError e) {
+            DialogUtil.errorAlert(this, "Photo file too big to rotate",
+                    "Try a lower resolution photo");
+            return;
+        }
         FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), update.getThumbnailFilename(), null, null);
     }
     
@@ -289,32 +303,62 @@ public class UpdateEditorActivity extends Activity {
         }
     }
 
-    /*
-     * (non-Javadoc) Get notification of photo taken or picked
+    
+    /**
+     * gets notification of photo taken or picked
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         // Handle photo taken by camera app
-        if (requestCode == photoRequest) {
+        if (requestCode == photoRequest || requestCode == photoPick) {
             if (resultCode == RESULT_CANCELED) {
                 return;
             }
+            boolean camera = true;
+            
+            // Handle picked photo
+            if (requestCode == photoPick) {
+                camera = false;
+                if (resultCode == RESULT_CANCELED) {
+                    return;
+                }
+                // data.getData is a content: URI. Need to copy the content to a
+                // file, so we can resize and rotate in place
+                InputStream imageStream;
+                try {
+                    imageStream = getContentResolver().openInputStream(data.getData());
+                    captureFilename = FileUtil.getExternalPhotoDir(this) + File.separator + "pick"
+                            + System.nanoTime() + ".jpg";
+                    OutputStream os = new FileOutputStream(captureFilename);
+                    try {
+                        copyStream(imageStream, os);
+                    }
+                    finally {
+                        os.close();
+                    }
+                } catch (FileNotFoundException e) {
+                    projupdImage.setImageResource(R.drawable.thumbnail_error);
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } 
             if (warnAboutBigImage) {
                 // check if file too large - if so, show error dialog and return
                 File sizeTest = new File(captureFilename);
                 if (sizeTest.length() > ConstantUtil.MAX_IMAGE_UPLOAD_SIZE) {
                     DialogUtil.errorAlert(this, "Photo file too big",
-                            "Set your camera to a lower resolution");
+                            camera ? "Set your camera to a lower resolution" :  "Pick a smaller photo");
                     return;
                 }
             }
             if (shrinkBigImage) {
-                // make long edge 1024 px or smaller
-                if (!FileUtil.shrinkImageFileExactly(captureFilename, shrinkSize, true)) { //ensure no rotation
+                // make long edge 1024 px
+                if (!FileUtil.shrinkImageFileExactly(captureFilename, shrinkSize, false)) { 
                     DialogUtil.errorAlert(this, "Could not shrink photo",
-                            "Original was too big to send.");
+                            "Original was too big to process");
                 }
             }
             update.setThumbnailFilename(captureFilename);
@@ -325,56 +369,8 @@ public class UpdateEditorActivity extends Activity {
             // show result
             showPhoto(true);
         }
-
-        // Handle picked photo
-        if (requestCode == photoPick) {
-            if (resultCode == RESULT_CANCELED) {
-                return;
-            }
-            // data.getData is a content: URI. Need to copy the content to a
-            // file.
-            InputStream imageStream;
-            try {
-                imageStream = getContentResolver().openInputStream(data.getData());
-                captureFilename = FileUtil.getExternalPhotoDir(this) + File.separator + "pick"
-                        + System.nanoTime() + ".jpg";
-                OutputStream os = new FileOutputStream(captureFilename);
-                copyStream(imageStream, os);
-                os.close();
-                if (warnAboutBigImage) {
-                    // check if file too large - if so, show error dialog and
-                    // return
-                    File sizeTest = new File(captureFilename);
-                    if (sizeTest.length() > ConstantUtil.MAX_IMAGE_UPLOAD_SIZE) {
-                        sizeTest.delete(); // save the space
-                        DialogUtil.errorAlert(this, "Photo file too big", "Pick a smaller photo");
-                        return;
-                    }
-                }
-                if (shrinkBigImage) {
-                    // make long edge 1024 px or smaller
-                    // since this is a copy we can resize it in place
-                    if (!FileUtil.shrinkImageFileExactly(captureFilename, shrinkSize, true)) { //ensure no rotation
-                        DialogUtil.errorAlert(this, "Could not shrink photo",
-                                "Original was too big to send.");
-                    }
-                }
-                // store it and show it
-                update.setThumbnailFilename(captureFilename);
-                update.setThumbnailUrl("dummyUrl");
-                FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename,
-                        null, null);
-                showPhoto(true);
-            } catch (FileNotFoundException e) {
-                projupdImage.setImageResource(R.drawable.thumbnail_error);
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
     }
-
+    
 
     /**
      * Saves current update as draft, if it has a title and this is done by the
