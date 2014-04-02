@@ -25,20 +25,34 @@ public class DialogUtil {
 	    alert.show();
 	}
 
-	public static void errorAlert(Context ctx, String title, String msg) {
-		/* Display any Error to the GUI. */
-		AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
-	    alert.setTitle(title);
-	    alert.setMessage(msg);
-	    alert.setIcon(android.R.drawable.ic_dialog_alert);
-	    alert.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int whichButton) {
-		    	dialog.cancel();
-		    	}
-		    });
-	    alert.show();
-	}
-	
+    public static void errorAlert(Context ctx, String title, String msg) {
+        /* Display any Error to the GUI. */
+        AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
+        alert.setTitle(title);
+        alert.setMessage(msg);
+        alert.setIcon(android.R.drawable.ic_dialog_alert);
+        alert.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.cancel();
+                }
+            });
+        alert.show();
+    }
+    
+    public static void errorAlert(Context ctx, int title, int msg) {
+        /* Display any Error to the GUI. */
+        AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
+        alert.setTitle(title);
+        alert.setMessage(msg);
+        alert.setIcon(android.R.drawable.ic_dialog_alert);
+        alert.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.cancel();
+                }
+            });
+        alert.show();
+    }
+    
 	public static void infoAlert(Context ctx, String title, String msg) {
 		/* Display an info dialog to the GUI. */
 		AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
