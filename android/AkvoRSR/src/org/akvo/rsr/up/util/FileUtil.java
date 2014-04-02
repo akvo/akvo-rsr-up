@@ -2,6 +2,7 @@
 package org.akvo.rsr.up.util;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -14,6 +15,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
@@ -421,6 +423,31 @@ public class FileUtil {
             DialogUtil.infoAlert(context, "Cache cleared", files.length + " files deleted ("
                     + sizeSum / (1024 * 1024) + " MB)");
         }
+    }
+
+    /**
+     * rotates the image in a file 90 degrees
+     * @param filename
+     * @param clockwise
+     * @return
+     * @throws IOException 
+     */
+    public static void rotateImageFile(String filename, boolean clockwise) throws IOException {
+        //Read image file
+        BitmapFactory.Options o = new BitmapFactory.Options();
+        Bitmap bm = BitmapFactory.decodeFile(filename, o);
+        //Rotate it
+        Matrix matrix = new Matrix();
+        matrix.postRotate(clockwise ? 90 : -90);
+        Bitmap rotatedBitmap = Bitmap.createBitmap(bm , 0, 0, bm.getWidth(), bm.getHeight(), matrix, true);
+        //write image file
+        FileOutputStream ostream = new FileOutputStream(filename);
+        try {
+            rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
+        }
+        finally {
+            ostream.close();
+        }       
     }
 
 }
