@@ -181,22 +181,9 @@ public class FileUtil {
                 // The new size we want to scale to
                 final int REQUIRED_SIZE = 140;
 
-                // Find the correct scale value. It should be a power of 2.
-                int width_tmp = o.outWidth, height_tmp = o.outHeight;
-                int scale = 1;
-                while (true) {
-                    if (width_tmp / 2 < REQUIRED_SIZE
-                            || height_tmp / 2 < REQUIRED_SIZE) {
-                        break;
-                    }
-                    width_tmp /= 2;
-                    height_tmp /= 2;
-                    scale *= 2;
-                }
-
                 // Decode with inSampleSize
                 BitmapFactory.Options o2 = new BitmapFactory.Options();
-                o2.inSampleSize = scale;
+                o2.inSampleSize = subsamplingFactor(o, REQUIRED_SIZE);
 
                 Bitmap bm = BitmapFactory.decodeFile(fn, o2);
                 if (bm == null) {
@@ -221,7 +208,28 @@ public class FileUtil {
 
     
     /**
-     * reads an image file into a bitmap where long edge is no larger than given size
+     * returns a power-of-two subsampling factor
+     * @param o
+     * @param maxSize
+     * @return
+     */
+    public static int subsamplingFactor(BitmapFactory.Options o, int maxSize) {
+        int width_tmp = o.outWidth, height_tmp = o.outHeight;
+        int scale = 1;
+        while (true) {
+            if (width_tmp <= maxSize &&
+                    height_tmp <= maxSize) {
+                break;
+            }
+            width_tmp /= 2;
+            height_tmp /= 2;
+            scale *= 2;
+        }
+        return scale;
+    }
+    
+    /**
+     * always reads an image file into a bitmap where long edge is no larger than given size
      * @param filename
      * @param maxSize
      * @return
@@ -233,32 +241,17 @@ public class FileUtil {
         int width_tmp = o.outWidth, height_tmp = o.outHeight;
         if (width_tmp < 0 || height_tmp < 0)
             return null;
-        if (width_tmp <= maxSize && height_tmp <= maxSize)
-            return null;
-
-        // Find the correct scale value. It should be a power of 2.
-        int scale = 1;
-        while (true) {
-            if (width_tmp <= maxSize &&
-                    height_tmp <= maxSize) {
-                break;
-            }
-            width_tmp /= 2;
-            height_tmp /= 2;
-            scale *= 2;
-        }
 
         // Decode with inSampleSize
         BitmapFactory.Options o2 = new BitmapFactory.Options();
-        o2.inSampleSize = scale;
-        Log.v(TAG, "Shrinking image by a factor of " + scale);
+        o2.inSampleSize = subsamplingFactor(o, maxSize);
+        Log.v(TAG, "Shrinking image by a factor of " + o2.inSampleSize);
         return BitmapFactory.decodeFile(filename, o2);
     }
     
     
     /**
-     * 
-     *  shrinks an image file (to save upload bandwidth)
+     * shrinks an image file (to save upload bandwidth)
      * the quick way, by a power-of-2 integer factor
      * This will lose any EXIF information
      */
@@ -283,22 +276,26 @@ public class FileUtil {
     }
 
     
-    /*
+    /**
      * shrinks an image file so long edge becomes exactly maxSize pixels
      * if already smaller, do nothing unless flag is set
      * 
-     * This will lose any EXIF information
+     * This will lose any EXIF information if it shrinks
      * Rotation will be normalized (if library is well-written)
      */
     public static boolean shrinkImageFileExactly(String filename, int maxSize, boolean alwaysRewrite) {
-        Bitmap bm = readSubsampledImageFile(filename, maxSize * 2); //could throw 
+        BitmapFactory.Options o = new BitmapFactory.Options();
+        o.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(filename, o);
+        int width_tmp = o.outWidth, height_tmp = o.outHeight;
+        if (width_tmp < 0 || height_tmp < 0) return false; //unreadable
+        if (!alwaysRewrite && width_tmp <= maxSize && height_tmp <= maxSize) return true; //already good
+        //Have to read and shrink it
+        //Subsample it first to save memory if it is huge.
+        Bitmap bm = readSubsampledImageFile(filename, maxSize * 2); //could throw OutOfMemory
+        if (bm == null) return false; //unreadable
 
         float width = bm.getWidth(), height = bm.getHeight();
-        if (bm == null || width < 0 || height < 0)
-            return false;
-        if (!alwaysRewrite && width <= maxSize && height <= maxSize)
-            return true;
-
         float xFactor;
         if (width > height) {
             xFactor = maxSize / width;
