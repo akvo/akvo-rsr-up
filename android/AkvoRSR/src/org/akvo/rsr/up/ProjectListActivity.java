@@ -79,6 +79,7 @@ public class ProjectListActivity extends ListActivity {
  
         //Create db
         ad = new RsrDbAdapter(this);
+        ad.open();
 
 		//register a listener for completion broadcasts
 		IntentFilter f = new IntentFilter(ConstantUtil.PROJECTS_FETCHED_ACTION);
@@ -121,15 +122,11 @@ public class ProjectListActivity extends ListActivity {
 		if (dataCursor != null) {
 			dataCursor.close();
 		}	
-        if (ad != null) {
-            ad.close();
-        }
 	}
 	
 	@Override
 	public void onResume() {
 		super.onResume();
-		ad.open();
 		getData();
 	}
 	
@@ -137,12 +134,16 @@ public class ProjectListActivity extends ListActivity {
 	@Override
 	protected void onDestroy() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadRec);
+        if (ad != null) {
+            ad.close();
+        }
 		super.onDestroy();
 	}
 
 
 	/**
-	 * shows all projects visible to this user
+	 * shows all projects visible to this user.
+	 * Assumes DB is open
 	 */
 	private void getData() {
 		try {
