@@ -75,6 +75,8 @@ public class RsrDbAdapter {
 	public static final String ORGANISATION_COL = "organisation";
 
 	private static final String TAG = "RsrDbAdapter";
+	private static final boolean LOG = true;
+
 	private DatabaseHelper databaseHelper;
 	private SQLiteDatabase database;
 	
@@ -311,6 +313,7 @@ public class RsrDbAdapter {
 	 *             if the database could be neither opened or created
 	 */
 	public RsrDbAdapter open() throws SQLException {
+	    if (LOG) Log.d(TAG, "Opening DB");
 		databaseHelper = new DatabaseHelper(context);
 		database = databaseHelper.getWritableDatabase();
 		return this;
@@ -320,6 +323,7 @@ public class RsrDbAdapter {
 	 * close the db
 	 */
 	public void close() {
+        if (LOG) Log.d(TAG, "Closing DB");
 		databaseHelper.close();
 	}
 

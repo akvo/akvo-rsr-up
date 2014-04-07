@@ -173,9 +173,6 @@ public class ProjectDetailActivity extends Activity {
 
 	@Override
 	protected void onDestroy() {
-		if (dba != null) {
-			dba.close();
-		}
 		super.onDestroy();
 	}
 

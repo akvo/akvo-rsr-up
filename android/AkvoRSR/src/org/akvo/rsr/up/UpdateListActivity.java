@@ -90,6 +90,7 @@ public class UpdateListActivity extends ListActivity {
         //Create db
 
 		ad = new RsrDbAdapter(this);
+        ad.open();
 	}
 
 	private void startEditorNew() {
@@ -126,7 +127,6 @@ public class UpdateListActivity extends ListActivity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		ad.open();
 		getData();
 	}
 	

@@ -79,6 +79,7 @@ public class ProjectListActivity extends ListActivity {
  
         //Create db
         ad = new RsrDbAdapter(this);
+        Log.d(TAG, "Opening DB during create");
         ad.open();
 
 		//register a listener for completion broadcasts
@@ -119,9 +120,6 @@ public class ProjectListActivity extends ListActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		if (dataCursor != null) {
-			dataCursor.close();
-		}	
 	}
 	
 	@Override
@@ -134,7 +132,12 @@ public class ProjectListActivity extends ListActivity {
 	@Override
 	protected void onDestroy() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(broadRec);
+        if (dataCursor != null) {
+            Log.d(TAG, "Closing cursor during destroy");
+            dataCursor.close();
+        }   
         if (ad != null) {
+            Log.d(TAG, "Closing DB during destroy");
             ad.close();
         }
 		super.onDestroy();
@@ -148,6 +151,7 @@ public class ProjectListActivity extends ListActivity {
 	private void getData() {
 		try {
 			if (dataCursor != null) {
+	            Log.d(TAG, "Closing cursor");
 				dataCursor.close();
 			}
 		} catch(Exception e) {
@@ -226,20 +230,20 @@ public class ProjectListActivity extends ListActivity {
 	private void onFetchProgress(int phase, int done, int total) {
 		if (phase == 0) {
 			inProgress1.setIndeterminate(false);
+            inProgress1.setMax(total);
 			inProgress1.setProgress(done);
-			inProgress1.setMax(total);
 			}
 		if (phase == 1) {
-			inProgress1.setProgress(100);//just in case...
-			inProgress1.setMax(100);
+            inProgress1.setMax(100);
+			inProgress1.setProgress(100);//make it look good, just in case...
+            inProgress2.setMax(total);
 			inProgress2.setProgress(done);
-			inProgress2.setMax(total);
 			}
 		if (phase == 2) {
-			inProgress2.setProgress(100);//just in case...
-			inProgress2.setMax(100);
+            inProgress2.setMax(100);
+			inProgress2.setProgress(100);//make it look good, just in case...
+            inProgress3.setMax(total);
 			inProgress3.setProgress(done);
-			inProgress3.setMax(total);
 			}
 		}
 

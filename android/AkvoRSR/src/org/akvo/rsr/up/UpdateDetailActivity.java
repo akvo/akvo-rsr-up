@@ -100,36 +100,39 @@ public class UpdateDetailActivity extends Activity {
 		
 		dba = new RsrDbAdapter(this);
 		dba.open();
-
-		Project project = dba.findProject(projectId);
-		projTitleLabel.setText(project.getTitle());
-
-		update = dba.findUpdate(updateId);
-		if (update == null) {
-			DialogUtil.errorAlert(this, "Update missing", "Cannot open for review, update " + updateId);
-		} else {
-			//populate fields
-			synching = update.getUnsent();
-			editable = update.getDraft() && !synching;
-			projupdTitleText.setText(update.getTitle());	
-			projupdDescriptionText.setText(update.getText());
-			User author = dba.findUser(update.getUserId());
-			if (author != null) {
-				if (debug) {
-					projupdUser.setText(author.getFirstname() + " " + author.getLastname() + "[" + update.getUserId() + "]");
-				} else {
-					projupdUser.setText(author.getFirstname() + " " + author.getLastname());
-				}				
-			} else {
-				projupdUser.setText("[" + update.getUserId() + "]");
-			}
-			//show preexisting image
-			if (update.getThumbnailFilename() != null) {
-				FileUtil.setPhotoFile(projupdImage,update.getThumbnailUrl(),update.getThumbnailFilename(), null, updateId);
-			}
-
+		try {
+    		Project project = dba.findProject(projectId);
+    		projTitleLabel.setText(project.getTitle());
+    
+    		update = dba.findUpdate(updateId);
+    		if (update == null) {
+    			DialogUtil.errorAlert(this, "Update missing", "Cannot open for review, update " + updateId);
+    		} else {
+    			//populate fields
+    			synching = update.getUnsent();
+    			editable = update.getDraft() && !synching;
+    			projupdTitleText.setText(update.getTitle());	
+    			projupdDescriptionText.setText(update.getText());
+    			User author = dba.findUser(update.getUserId());
+    			if (author != null) {
+    				if (debug) {
+    					projupdUser.setText(author.getFirstname() + " " + author.getLastname() + "[" + update.getUserId() + "]");
+    				} else {
+    					projupdUser.setText(author.getFirstname() + " " + author.getLastname());
+    				}				
+    			} else {
+    				projupdUser.setText("[" + update.getUserId() + "]");
+    			}
+    			//show preexisting image
+    			if (update.getThumbnailFilename() != null) {
+    				FileUtil.setPhotoFile(projupdImage,update.getThumbnailUrl(),update.getThumbnailFilename(), null, updateId);
+    			}
+    
+    		}
 		}
-		dba.close();
+		finally {
+		    dba.close();
+		}
 		
 		btnEdit.setEnabled(editable);
 		btnEdit.setVisibility(editable?View.VISIBLE:View.GONE);
@@ -142,9 +145,6 @@ public class UpdateDetailActivity extends Activity {
 
 	@Override
 	protected void onDestroy() {
-		if (dba != null) {
-			dba.close();
-		}
 		super.onDestroy();
 	}
 
