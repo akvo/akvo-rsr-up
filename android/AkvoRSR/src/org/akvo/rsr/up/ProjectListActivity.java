@@ -27,14 +27,18 @@ import org.akvo.rsr.up.viewadapter.ProjectListCursorAdapter;
 import android.os.Bundle;
 import android.app.ListActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.support.v4.content.LocalBroadcastManager;
 import android.content.BroadcastReceiver;
@@ -50,32 +54,63 @@ public class ProjectListActivity extends ListActivity {
 
 	private RsrDbAdapter ad;
 	private Cursor dataCursor;
-	private TextView projCountLabel;
+    private TextView projCountLabel;
+    private EditText searchField;
 	private LinearLayout inProgress;
 	private ProgressBar inProgress1;
 	private ProgressBar inProgress2;
 	private ProgressBar inProgress3;
 	private BroadcastReceiver broadRec;
-	private Button refreshButton;
+    private Button searchButton;
+    private Button refreshButton;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_project_list);
 
-		projCountLabel = (TextView) findViewById(R.id.projcountlabel);
+        projCountLabel = (TextView) findViewById(R.id.projcountlabel);
 		inProgress = (LinearLayout) findViewById(R.id.projlistprogress);
 		inProgress1 = (ProgressBar) findViewById(R.id.progressBar1);
 		inProgress2 = (ProgressBar) findViewById(R.id.progressBar2);
 		inProgress3 = (ProgressBar) findViewById(R.id.progressBar3);
 
-		refreshButton = (Button) findViewById(R.id.button_refresh_projects);		
-		refreshButton.setOnClickListener( new View.OnClickListener() {
-			public void onClick(View view) {
-				//fetch new data
-				startGetProjectsService();
-			}
-		});
+        searchButton = (Button) findViewById(R.id.btn_projsearch);        
+        searchButton.setOnClickListener( new View.OnClickListener() {
+            public void onClick(View view) {
+                //toggle visibility. When invisible, clear search string
+                if (searchField.getVisibility() == View.VISIBLE){
+                    searchField.setVisibility(View.GONE);
+                    searchField.setText("");
+                    getData();
+                } else {
+                    searchField.setVisibility(View.VISIBLE);
+                    //TODO set focus
+                    
+                }
+            }
+        });
+ 
+        searchField = (EditText) findViewById(R.id.txt_projsearch);
+        searchField.setOnEditorActionListener(new OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                    hideSoftKeyBoard();
+                    // update list with new search string
+                    getData();
+                    return true;
+                }
+            }
+        );
+
+        
+        refreshButton = (Button) findViewById(R.id.btn_refresh_projects);        
+        refreshButton.setOnClickListener( new View.OnClickListener() {
+            public void onClick(View view) {
+                //fetch new data
+                startGetProjectsService();
+            }
+        });
  
         //Create db
         ad = new RsrDbAdapter(this);
@@ -143,7 +178,14 @@ public class ProjectListActivity extends ListActivity {
 		super.onDestroy();
 	}
 
+	private void hideSoftKeyBoard() {
+	    InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
+	    if(imm.isAcceptingText()) { // verify if the soft keyboard is open                      
+	        imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+	    }
+	}
+	
 	/**
 	 * shows all projects visible to this user.
 	 * Assumes DB is open
@@ -157,9 +199,17 @@ public class ProjectListActivity extends ListActivity {
 		} catch(Exception e) {
 			Log.w(TAG, "Could not close old cursor before reloading list", e);
 		}
-		dataCursor = ad.listAllVisibleProjects();
-		//Show count
-		projCountLabel.setText(Integer.valueOf(dataCursor.getCount()).toString());
+		String searchString = searchField.getText().toString();
+
+		if (searchString == null || searchString.length() == 0) {
+		    dataCursor = ad.listVisibleProjectsWithCountry();
+	        //Show count
+	        projCountLabel.setText(Integer.valueOf(dataCursor.getCount()).toString());
+		} else {
+            dataCursor = ad.listVisibleProjectsWithCountryMatching(searchString);		    
+            //Show count
+            projCountLabel.setText("(" + Integer.valueOf(dataCursor.getCount()).toString() + ")");
+		}
 		//Populate list view
 		ProjectListCursorAdapter projects = new ProjectListCursorAdapter(this, dataCursor);
 		setListAdapter(projects);
