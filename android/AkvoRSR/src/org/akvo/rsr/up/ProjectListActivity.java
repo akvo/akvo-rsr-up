@@ -85,8 +85,7 @@ public class ProjectListActivity extends ListActivity {
                     getData();
                 } else {
                     searchField.setVisibility(View.VISIBLE);
-                    //TODO set focus
-                    
+                    searchField.requestFocus();
                 }
             }
         });
