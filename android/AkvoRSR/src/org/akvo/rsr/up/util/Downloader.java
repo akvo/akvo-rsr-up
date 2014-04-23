@@ -35,6 +35,7 @@ import org.akvo.rsr.up.domain.Update;
 import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.xml.AuthHandler;
 import org.akvo.rsr.up.xml.CountryListHandler;
+import org.akvo.rsr.up.xml.OrganisationHandler;
 import org.akvo.rsr.up.xml.ProjectListHandler;
 import org.akvo.rsr.up.xml.UpdateListHandler;
 import org.akvo.rsr.up.xml.UserListHandler;
@@ -308,33 +309,62 @@ public class Downloader {
 	}
 
 
-	/**
-	 * populates the user table in the db from a server URL
-	 * 
-	 * @param ctx
-	 * @param url
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws IOException
-	 */
-	public void fetchUser(Context ctx, URL url, String defaultId) throws ParserConfigurationException, SAXException, IOException {
+    /**
+     * populates the user table in the db from a server URL
+     * 
+     * @param ctx
+     * @param url
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     */
+    public void fetchUser(Context ctx, URL url, String defaultId) throws ParserConfigurationException, SAXException, IOException {
 
-		/* Get a SAXParser from the SAXPArserFactory. */
-		SAXParserFactory spf = SAXParserFactory.newInstance();
-		SAXParser sp = spf.newSAXParser();
+        /* Get a SAXParser from the SAXPArserFactory. */
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        SAXParser sp = spf.newSAXParser();
 
-		/* Get the XMLReader of the SAXParser we created. */
-		XMLReader xr = sp.getXMLReader();
-		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
-		UserListHandler myUserListHandler = new UserListHandler(new RsrDbAdapter(ctx), defaultId);
-		xr.setContentHandler(myUserListHandler);
-		/* Parse the xml-data from our URL. */
-		xr.parse(new InputSource(url.openStream()));
-		/* Parsing has finished. */
+        /* Get the XMLReader of the SAXParser we created. */
+        XMLReader xr = sp.getXMLReader();
+        /* Create a new ContentHandler and apply it to the XML-Reader*/ 
+        UserListHandler myUserListHandler = new UserListHandler(new RsrDbAdapter(ctx), defaultId);
+        xr.setContentHandler(myUserListHandler);
+        /* Parse the xml-data from our URL. */
+        xr.parse(new InputSource(url.openStream()));
+        /* Parsing has finished. */
 
-		/* Check if anything went wrong. */
-		err = myUserListHandler.getError();
-	}
+        /* Check if anything went wrong. */
+        err = myUserListHandler.getError();
+    }
+
+
+    /**
+     * populates the user table in the db from a server URL
+     * 
+     * @param ctx
+     * @param url
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     */
+    public void fetchOrg(Context ctx, URL url, String defaultId) throws ParserConfigurationException, SAXException, IOException {
+
+        /* Get a SAXParser from the SAXPArserFactory. */
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        SAXParser sp = spf.newSAXParser();
+
+        /* Get the XMLReader of the SAXParser we created. */
+        XMLReader xr = sp.getXMLReader();
+        /* Create a new ContentHandler and apply it to the XML-Reader*/ 
+        OrganisationHandler myOrgHandler = new OrganisationHandler(new RsrDbAdapter(ctx), defaultId);
+        xr.setContentHandler(myOrgHandler);
+        /* Parse the xml-data from our URL. */
+        xr.parse(new InputSource(url.openStream()));
+        /* Parsing has finished. */
+
+        /* Check if anything went wrong. */
+        err = myOrgHandler.getError();
+    }
 
 
 	/**

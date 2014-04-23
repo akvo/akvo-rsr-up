@@ -1,8 +1,24 @@
+/*
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *
+ *  This file is part of Akvo RSR.
+ *
+ *  Akvo RSR is free software: you can redistribute it and modify it under the terms of
+ *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+ *  either version 3 of the License or any later version.
+ *
+ *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Affero General Public License included below for more details.
+ *
+ *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ */
 package org.akvo.rsr.up.service;
 
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.Locale;
 
 import org.akvo.rsr.up.dao.RsrDbAdapter;
@@ -24,6 +40,7 @@ public class GetProjectDataService extends IntentService {
     private static final boolean mFetchUsers = true;
     private static final boolean mFetchCountries = true;
     private static final boolean mFetchUpdates = true;
+    private static final boolean mFetchOrgs = true;
 
 	public GetProjectDataService() {
 		super(TAG);
@@ -76,47 +93,65 @@ public class GetProjectDataService extends IntentService {
 	        }
     			
 		} catch (FileNotFoundException e) {
-			Log.e(TAG,"Cannot find:",e);
+			Log.e(TAG, "Cannot find:", e);
 			errMsg = "Cannot find: "+ e.getMessage();
 		} catch (Exception e) {
-			Log.e(TAG,"Bad fetch:",e);
-			errMsg = "Update Fetch failed: "+ e;
+			Log.e(TAG, "Bad updates fetch:", e);
+			errMsg = "Updates Fetch failed: "+ e;
 		}
 		
-		if (mFetchUsers) {
-			//Fetch user data for the authors of the updates.
-			//This API requires authorization
-			User user = SettingsUtil.getAuthUser(this);
-			Cursor cursor = ad.listMissingUsers();
-            if (cursor != null) {
-    			int j = 0;
-    			int col = cursor.getColumnIndex(RsrDbAdapter.USER_COL);
-    			String key = String.format(Locale.US, ConstantUtil.API_KEY_PATTERN, user.getApiKey(), user.getUsername());
-    			while (cursor.moveToNext()) {
-    				try { 
-    					dl.fetchUser(this,
-    								 new URL(host +
-    										 String.format(Locale.US, ConstantUtil.FETCH_USER_URL_PATTERN, cursor.getString(col)) +
-    										 key),
-    								 cursor.getString(col)
-    								);
-    					j++;
-    					}
-    				catch (FileNotFoundException e) { //possibly because user is no longer active
-    					Log.w(TAG,"Cannot find:" + cursor.getString(col));
-    //					errMsg = "Cannot find: "+ e.getMessage(); //not serious
-    				} catch (Exception e) { //probably network reasons
-    					Log.e(TAG,"Bad fetch:",e);
-    					errMsg = "Fetch failed: "+ e;
-    				}
-    			}
-				cursor.close();
-			}
-			//Log.i(TAG,"Fetched users: " + j);
+        if (mFetchUsers) {
+            //Fetch missing user data for authors of the updates.
+            //This API requires authorization
+            User user = SettingsUtil.getAuthUser(this);
+            String key = String.format(Locale.US, ConstantUtil.API_KEY_PATTERN, user.getApiKey(), user.getUsername());
+            int j = 0;
+            List<String> orgIds = ad.getMissingUsersList();
+            for (String id:orgIds) {
+                try { 
+                    dl.fetchUser(this,
+                                 new URL(host +
+                                         String.format(Locale.US, ConstantUtil.FETCH_USER_URL_PATTERN, id) +
+                                         key),
+                                 id
+                                );
+                    j++;
+                    }
+                catch (FileNotFoundException e) { //possibly because user is no longer active
+                    Log.w(TAG,"Cannot find user:" + id);
+//                  errMsg = "Cannot find: "+ e.getMessage(); //not serious
+                }
+                catch (Exception e) { //probably network reasons
+                    Log.e(TAG,"Bad user fetch:",e);
+                    errMsg = "Fetch failed: "+ e;
+                }
+            }
+            //Log.i(TAG, "Fetched users: " + j);
+        }
 
-		}
-
-		broadcastProgress(1, 100, 100);					
+        if (mFetchOrgs) {
+            //Fetch user data for the organisations of users.
+            User user = SettingsUtil.getAuthUser(this);
+            List<String> orgIds = ad.getMissingOrgsList();
+            int j = 0;
+            for (String id:orgIds)
+                try { 
+                    dl.fetchOrg(this,
+                                new URL(host + String.format(Locale.US, ConstantUtil.FETCH_ORG_URL_PATTERN, id)),
+                                id
+                                );
+                        j++;
+                }
+            catch (FileNotFoundException e) { //possibly because user is no longer active
+                Log.w(TAG,"Cannot find org:" + id);
+            } catch (Exception e) { //probably network reasons
+                Log.e(TAG,"Bad org fetch:",e);
+                errMsg = "Organisation fetch failed: " + e;
+            }
+        Log.i(TAG, "Fetched " + j + " orgs");
+        }
+        
+		broadcastProgress(1, 100, 100);
 			
 					
 		if (!noimages) {

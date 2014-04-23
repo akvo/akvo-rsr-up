@@ -18,6 +18,7 @@ package org.akvo.rsr.up;
 
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
+import org.akvo.rsr.up.domain.Organisation;
 import org.akvo.rsr.up.domain.Project;
 import org.akvo.rsr.up.domain.Update;
 import org.akvo.rsr.up.domain.User;
@@ -114,15 +115,17 @@ public class UpdateDetailActivity extends Activity {
     			projupdTitleText.setText(update.getTitle());	
     			projupdDescriptionText.setText(update.getText());
     			User author = dba.findUser(update.getUserId());
+    			Organisation org = null;
+    			String sig = "";
     			if (author != null) {
-    				if (debug) {
-    					projupdUser.setText(author.getFirstname() + " " + author.getLastname() + "[" + update.getUserId() + "]");
-    				} else {
-    					projupdUser.setText(author.getFirstname() + " " + author.getLastname());
-    				}				
-    			} else {
-    				projupdUser.setText("[" + update.getUserId() + "]");
+    			    sig += author.getFirstname() + " " + author.getLastname();
+                    org = dba.findOrganisation(author.getOrgId());
+    	            if (org != null) sig += ", " + org.getName();
     			}
+    			if (author == null || debug) {
+    				sig += "[" + update.getUserId() + "]";
+    			}
+    		    projupdUser.setText(sig);
     			//show preexisting image
     			if (update.getThumbnailFilename() != null) {
     				FileUtil.setPhotoFile(projupdImage,update.getThumbnailUrl(),update.getThumbnailFilename(), null, updateId);
