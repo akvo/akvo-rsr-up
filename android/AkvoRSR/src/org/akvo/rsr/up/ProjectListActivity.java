@@ -87,6 +87,12 @@ public class ProjectListActivity extends ListActivity {
 		f.addAction(ConstantUtil.PROJECTS_PROGRESS_ACTION);
 		broadRec = new ResponseReceiver();
         LocalBroadcastManager.getInstance(this).registerReceiver(broadRec, f);
+        
+        //in case we came back here during a refresh
+        if (GetProjectDataService.isRunning(this)) {
+            refreshButton.setEnabled(false);
+            inProgress.setVisibility(View.VISIBLE);
+        }
 	}
 
 	

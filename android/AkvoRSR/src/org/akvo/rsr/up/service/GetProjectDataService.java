@@ -12,7 +12,10 @@ import org.akvo.rsr.up.util.Downloader;
 import org.akvo.rsr.up.util.FileUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
 
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v4.content.LocalBroadcastManager;
@@ -21,6 +24,7 @@ import android.util.Log;
 public class GetProjectDataService extends IntentService {
 	
 	private static final String TAG = "GetProjectDataService";
+    private static boolean mRunning = false;
     private static final boolean mFetchUsers = true;
     private static final boolean mFetchCountries = true;
     private static final boolean mFetchUpdates = true;
@@ -28,10 +32,25 @@ public class GetProjectDataService extends IntentService {
 	public GetProjectDataService() {
 		super(TAG);
 	}
-
+	
+	public static boolean isRunning(Context context) {
+	    return mRunning;
+	    /* this solution uses an interface documented as intended for debug use
+	    ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (GetProjectDataService.class.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+        */
+    }
+	
+	
 	@Override
 	protected void onHandleIntent(Intent intent) {
 
+	    mRunning = true;
 	    RsrDbAdapter ad = new RsrDbAdapter(this);
 		Downloader dl = new Downloader();
 		String errMsg = null;
@@ -144,6 +163,8 @@ public class GetProjectDataService extends IntentService {
             if (ad != null)
                 ad.close();
         }
+
+        mRunning = false;
 
 		//broadcast completion
 		Intent intent2 = new Intent(ConstantUtil.PROJECTS_FETCHED_ACTION);
