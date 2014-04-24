@@ -123,11 +123,7 @@ public class UpdateDetailActivity extends Activity {
     			} else {
     				projupdUser.setText("[" + update.getUserId() + "]");
     			}
-    			//show preexisting image
-    			if (update.getThumbnailFilename() != null) {
-    				FileUtil.setPhotoFile(projupdImage,update.getThumbnailUrl(),update.getThumbnailFilename(), null, updateId);
-    			}
-    
+    			FileUtil.setPhotoFile(projupdImage,update.getThumbnailUrl(),update.getThumbnailFilename(), null, updateId);    
     		}
 		}
 		finally {
