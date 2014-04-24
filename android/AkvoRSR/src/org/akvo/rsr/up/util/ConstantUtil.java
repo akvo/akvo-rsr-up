@@ -40,7 +40,8 @@ public class ConstantUtil {
 	public static final String FETCH_PROJ_COUNT_URL = "/api/v1/project/?format=xml&limit=0&partnerships__organisation=%s";
 	public static final String PROJECT_PATH_PATTERN = "/api/v1/project/%s/";
 	public static final String USER_PATH_PATTERN= "/api/v1/user/%s/";
-	public static final String FETCH_USER_URL_PATTERN = "/api/v1/user/%s/?format=xml&depth=1";
+    public static final String FETCH_USER_URL_PATTERN = "/api/v1/user/%s/?format=xml&depth=1";
+    public static final String FETCH_ORG_URL_PATTERN = "/api/v1/organisation/%s/?format=xml&depth=0";
 	public static final int    MAX_IMAGE_UPLOAD_SIZE = 2000000; //Nginx POST limit is 3MB, B64 encoding expands 33% and there may be long text 
 
 	/**

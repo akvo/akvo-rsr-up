@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -21,6 +21,8 @@ import java.util.Date;
 
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
+import org.akvo.rsr.up.domain.Organisation;
+import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.util.FileUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
 
@@ -49,23 +51,26 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 	
 	private boolean debug = false;
 	private java.text.DateFormat dfmt;
-	private int idcol, titleCol, draftCol, unsentCol;
+	private int idcol, titleCol, draftCol, unsentCol, authorIdCol;
+    private RsrDbAdapter dba;
 	
 	public UpdateListCursorAdapter(Context context, Cursor cursor) {
 		super(context, cursor);
+		dba = new RsrDbAdapter(context);
 		debug = SettingsUtil.ReadBoolean(context, "setting_debug", false);
 		dfmt = DateFormat.getDateFormat(context);
 		idcol = cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL);
 		titleCol = cursor.getColumnIndex(RsrDbAdapter.TITLE_COL);
 		draftCol = cursor.getColumnIndex(RsrDbAdapter.DRAFT_COL);
-		unsentCol = cursor.getColumnIndex(RsrDbAdapter.UNSENT_COL);
+        unsentCol = cursor.getColumnIndex(RsrDbAdapter.UNSENT_COL);
+        authorIdCol = cursor.getColumnIndex(RsrDbAdapter.USER_COL);
 	}
 
 	
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 
-		//Text data
+		//Title
 		TextView titleView = (TextView) view.findViewById(R.id.ulist_item_title);
 		if (debug) {
 			titleView.setText("["+ cursor.getString(idcol) + "] "+
@@ -74,12 +79,36 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 			titleView.setText(cursor.getString(titleCol));
 		}
 
+		//Date
 		TextView dateView = (TextView) view.findViewById(R.id.ulist_item_date);
 		long s = cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.CREATED_COL));
 		Date d = new Date(1000 * s);
 		dateView.setText(dfmt.format(d));
-		TextView stateView = (TextView) view.findViewById(R.id.ulist_item_state);
+		
+		//Author
+		User author = null;
+		Organisation org = null;
+		dba.open();
+		try {
+            author = dba.findUser(cursor.getString(authorIdCol));
+            if (author.getOrgId() != null) org = dba.findOrganisation(author.getOrgId());
+        } finally {
+            dba.close();    
+        }
 
+        TextView authorView = (TextView) view.findViewById(R.id.ulist_item_author);
+        String sig = "";
+        if (author != null) {
+            sig += author.getFirstname() + " " + author.getLastname();
+            if (org != null) sig += ", " + org.getName();
+        }
+        if (author == null || debug) {
+            sig += "[" + cursor.getString(authorIdCol) + "]";
+        }
+        authorView.setText(sig);
+
+        //State
+		TextView stateView = (TextView) view.findViewById(R.id.ulist_item_state);
 		if (0 != cursor.getInt(unsentCol)) {
 			//Show synchronising updates as red with a "Synchronising" label
 			view.setBackgroundColor(context.getResources().getColor(R.color.red));

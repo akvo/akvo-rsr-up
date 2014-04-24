@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -17,6 +17,7 @@
 package org.akvo.rsr.up;
 
 import java.io.File;
+import java.util.List;
 
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
@@ -37,11 +38,11 @@ import android.database.Cursor;
 
 public class DiagnosticActivity extends Activity {
 
-	private TextView txt;
-	private Button btnUpdates;
-	private Button btnAddUpdate;
+	private TextView mTextView;
+	private Button mBtnUpdates;
+	private Button mBtnClearDb;
 
-	private RsrDbAdapter dba;
+	private RsrDbAdapter mDb;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,22 +51,22 @@ public class DiagnosticActivity extends Activity {
 		//get the look
 		setContentView(R.layout.activity_diagnostic);
 		//find the fields
-		txt = (TextView) findViewById(R.id.text_field);
+		mTextView = (TextView) findViewById(R.id.text_field);
 		//Activate buttons
-		btnUpdates = (Button) findViewById(R.id.btn_diag_a);
-		btnUpdates.setOnClickListener( new View.OnClickListener() {
+		mBtnUpdates = (Button) findViewById(R.id.btn_diag_a);
+		mBtnUpdates.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {//delete image cache files
 				clearCache(DiagnosticActivity.this);
 			}
 		});
-		btnAddUpdate = (Button) findViewById(R.id.btn_diag_b);
-		btnAddUpdate.setOnClickListener( new View.OnClickListener() {
+		mBtnClearDb = (Button) findViewById(R.id.btn_diag_b);
+		mBtnClearDb.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {
 				clearData();
 			}
 		});
  
-		dba = new RsrDbAdapter(this);
+		mDb = new RsrDbAdapter(this);
 	}
 
 	/**
@@ -102,31 +103,36 @@ public class DiagnosticActivity extends Activity {
 	 * TODO: should we clear login credentials, too?
 	 */
 	private void clearData() {
-		dba.clearAllData();
+		mDb.clearAllData();
 		DialogUtil.infoAlert(this, "Data cleared", "All project and update info deleted");
 	}
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
-		dba.open();
-		Cursor u = dba.listMissingUsers();
-		txt.append("\nMissing users in db: " + String.valueOf(u.getCount())+"\n");
-		while (u.moveToNext())
-			txt.append("\n["+u.getString(u.getColumnIndex(RsrDbAdapter.USER_COL))+"] ");
-		u.close();
-		Cursor a = dba.listAllCountries();
-		txt.append("\nCountries in db: " + String.valueOf(a.getCount())+"\n");
+		mDb.open();
+        List<String>u = mDb.getMissingUsersList();
+        mTextView.append("\nMissing users in db: " + String.valueOf(u.size())+"\n");
+        for (String id:u) {
+            mTextView.append("\n["+id+"] ");
+        }
+        List<String>o = mDb.getMissingOrgsList();
+        mTextView.append("\nMissing orgs in db: " + String.valueOf(u.size())+"\n");
+        for (String id:o) {
+            mTextView.append("\n["+id+"] ");
+        }
+		Cursor a = mDb.listAllCountries();
+		mTextView.append("\nCountries in db: " + String.valueOf(a.getCount())+"\n");
 		while (a.moveToNext())
-			txt.append("\n["+a.getString(a.getColumnIndex(RsrDbAdapter.PK_ID_COL))+"] "+a.getString(a.getColumnIndex(RsrDbAdapter.NAME_COL))+" ");
+			mTextView.append("\n["+a.getString(a.getColumnIndex(RsrDbAdapter.PK_ID_COL))+"] "+a.getString(a.getColumnIndex(RsrDbAdapter.NAME_COL))+" ");
 		a.close();
-//		Cursor c = dba.listAllUpdates();
-//		txt.append("\nUpdates in db: " + String.valueOf(c.getCount())+"\n");
+//		Cursor c = mDb.listAllUpdates();
+//		mTextView.append("\nUpdates in db: " + String.valueOf(c.getCount())+"\n");
 //		while (c.moveToNext())
-//			txt.append("'"+c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL))+"' for '"+c.getString(c.getColumnIndex(RsrDbAdapter.PROJECT_COL))+"' ");
+//			mTextView.append("'"+c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL))+"' for '"+c.getString(c.getColumnIndex(RsrDbAdapter.PROJECT_COL))+"' ");
 //		c.close();
-//		Cursor d = dba.listAllUpdatesFor("609");
-//		txt.append("\nUpdates in db for 609: " + String.valueOf(d.getCount())+"\n");
+//		Cursor d = mDb.listAllUpdatesFor("609");
+//		mTextView.append("\nUpdates in db for 609: " + String.valueOf(d.getCount())+"\n");
 //		d.close();
 		
 		StatFs stat = new StatFs(Environment.getExternalStorageDirectory().getPath());
@@ -134,20 +140,20 @@ public class DiagnosticActivity extends Activity {
 		                   * (double)stat.getBlockSize();
 		//One binary gigabyte equals 1,073,741,824 bytes.
 		double gigaAvailable = sdAvailSize / 1073741824;
-		txt.append(gigaAvailable + " GB free on card\n");
+		mTextView.append(gigaAvailable + " GB free on card\n");
 	}
 	
 	@Override
 	protected void onPause() {
 		super.onPause();
-		dba.close();
+		mDb.close();
 	}
 	
 
 	@Override
 	protected void onDestroy() {
-		if (dba != null) {
-			dba.close();
+		if (mDb != null) {
+			mDb.close();
 		}
 		super.onDestroy();
 	}
