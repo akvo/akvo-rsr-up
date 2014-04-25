@@ -630,8 +630,8 @@ public class RsrDbAdapter {
         //Match caseless, assume country or continent is present in entirety
         Cursor cursor = database.query(PROJECT_JOIN,
                 new String[] { "project._id", "project.title", "project.hidden", "project.thumbnail_url", "project.thumbnail_fn", "country.name", "country.continent" },
-                HIDDEN_COL + " = ? AND ( title LIKE ? OR name LIKE ? OR continent LIKE ?)",
-                new String[] { "0", "%" + search + "%", search, search },
+                HIDDEN_COL + " = ? AND ( title LIKE ? OR name LIKE ? OR continent LIKE ? OR project._id = ?)",
+                new String[] { "0", "%" + search + "%", search, search, search },
                 null,
                 null,
                 null);
