@@ -56,7 +56,7 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 
-        Long thisId = cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL));
+        Long thisId = cursor.getLong(cursor.getColumnIndexOrThrow(RsrDbAdapter.PK_ID_COL));
 //        Long oldId = (Long) view.getTag(R.id.project_id_tag);
 //        if (oldId != null && oldId.compareTo(thisId) !=0 ) {
 //            Log.w(TAG,"switch!");
@@ -66,11 +66,11 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 		TextView titleView = (TextView) view.findViewById(R.id.list_item_title);
 		if (debug) {
 			titleView.setText("["+ thisId +"] "+
-					cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
+					cursor.getString(cursor.getColumnIndexOrThrow(RsrDbAdapter.TITLE_COL)));
 		} else {
-			titleView.setText(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
+			titleView.setText(cursor.getString(cursor.getColumnIndexOrThrow(RsrDbAdapter.TITLE_COL)));
 		}
-		String projId = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL));
+		String projId = cursor.getString(cursor.getColumnIndexOrThrow(RsrDbAdapter.PK_ID_COL));
 		dba.open();
 		int [] stateCounts = {0,0,0};
 		try {
@@ -95,8 +95,8 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 				
 		//Image
 		ImageView thumbnail = (ImageView) view.findViewById(R.id.list_item_thumbnail);
-		String fn = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
-		String url = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
+		String fn = cursor.getString(cursor.getColumnIndexOrThrow(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
+		String url = cursor.getString(cursor.getColumnIndexOrThrow(RsrDbAdapter.THUMBNAIL_URL_COL));
 		FileUtil.setPhotoFile(thumbnail, url, fn, projId, null);
 		
 		//set tag so we will know what got clicked

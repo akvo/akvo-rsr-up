@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -53,7 +53,7 @@ public class RsrDbAdapter {
 	public static final String USER_COL = "userid";
 	public static final String TEXT_COL = "_text";
 	public static final String DRAFT_COL = "draft";
-	public static final String UNSENT_COL = "unsent"; //currently unused
+	public static final String UNSENT_COL = "unsent";
 	public static final String HIDDEN_COL = "hidden";
 	public static final String CREATED_COL = "creation_date";
 	public static final String UUID_COL = "uuid";
@@ -112,10 +112,10 @@ public class RsrDbAdapter {
 		};
 
 	private static final String DATABASE_NAME = "rsrdata";
-	private static final String PROJECT_TABLE = "project";
-	private static final String UPDATE_TABLE  = "_update";
-	private static final String COUNTRY_TABLE = "country";
-	private static final String USER_TABLE    = "user";
+	public static final String PROJECT_TABLE = "project";
+	public static final String UPDATE_TABLE  = "_update";
+	public static final String COUNTRY_TABLE = "country";
+	public static final String USER_TABLE    = "user";
 
 //	private static final int DATABASE_VERSION = 5;
 //	private static final int DATABASE_VERSION = 6; //added project columns:long, lat, country, state, city
@@ -571,7 +571,7 @@ public class RsrDbAdapter {
 	/**
 	 * Gets updates for a specific project, all columns
 	 */
-	public Cursor listAllVisibleProjects() {
+	public Cursor listVisibleProjects() {
 		Cursor cursor = database.query(PROJECT_TABLE,
 										null,
 										HIDDEN_COL + " = ?",
@@ -584,19 +584,59 @@ public class RsrDbAdapter {
 	}
 
 
-	/**
-	 * Gets all projects, all columns and country data
-	 */
-	public Cursor listAllProjectsWithCountry() {
-		Cursor cursor = database.query(PROJECT_JOIN,
-										null,
-										null,
-										null,
-										null,
-										null,
-										null);
-		return cursor;
-	}
+    /**
+     * Gets all projects, all columns and country data
+     */
+    public Cursor listAllProjectsWithCountry() {
+        Cursor cursor = database.query(PROJECT_JOIN,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null);
+        return cursor;
+    }
+
+
+    /**
+     * Gets visible projects, all columns and country data
+     */
+    public Cursor listVisibleProjectsWithCountry() {
+        Cursor cursor = database.query(PROJECT_JOIN,
+                new String[] { "project._id", "project.title", "project.hidden", "project.thumbnail_url", "project.thumbnail_fn", "country.name", "country.continent" },
+                HIDDEN_COL + " = ?",
+                new String[] { "0" },
+                null,
+                null,
+                null);
+        return cursor;
+    }
+
+
+    /**
+     * Gets visible projects, all columns and country data
+     * where project title or country name or continent matches the search string
+     */
+    public Cursor listVisibleProjectsWithCountryMatching(String search) {
+        //Prevent any SQL injection problems
+        /* probably not necessary
+        search = search.replaceAll("\"", " ");
+        search = search.replaceAll("'", " ");
+        search = search.replaceAll("(", " ");
+        search = search.replaceAll(")", " ");
+        search = search.replaceAll(",", " ");
+        */
+        //Match caseless, assume country or continent is present in entirety
+        Cursor cursor = database.query(PROJECT_JOIN,
+                new String[] { "project._id", "project.title", "project.hidden", "project.thumbnail_url", "project.thumbnail_fn", "country.name", "country.continent" },
+                HIDDEN_COL + " = ? AND ( title LIKE ? OR name LIKE ? OR continent LIKE ? OR project._id = ?)",
+                new String[] { "0", "%" + search + "%", search, search, search },
+                null,
+                null,
+                null);
+        return cursor;
+    }
 
 
 	/**
