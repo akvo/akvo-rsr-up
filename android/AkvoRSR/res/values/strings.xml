@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<!-- 
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *
+ *  This file is part of Akvo RSR.
+ *
+ *  Akvo RSR is free software: you can redistribute it and modify it under the terms of
+ *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+ *  either version 3 of the License or any later version.
+ *
+ *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Affero General Public License included below for more details.
+ *
+ *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ -->
+ <resources>
 
     <string name="app_name">Akvo RSR Up</string>
     <string name="app_version">dummyversion</string>
@@ -19,7 +34,6 @@
     <string name="title_activity_license">License information</string>
     <string name="copyright">Copyright &#169; 2012-2014 Stichting Akvo</string>
     <string name="license">License information</string>
-    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent pharetra ultricies ante, imperdiet viverra nisi rutrum a. Integer consequat laoreet malesuada. Nam fermentum risus id aliquet pellentesque. Sed nec nisl in turpis sodales ultricies. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Interdum et malesuada fames ac ante ipsum primis in faucibus.</string>
     <string name="label_update_title">Add a project update:</string>
     <string name="hint_update_title">Title</string>
     <string name="hint_search">Search</string>
@@ -93,6 +107,10 @@
     <string name="invalidpassword">Invalid password</string>
     
     <string name="dummy_project_title">Project title here</string>
+    <string name="dummy_update_title">Update title here</string>
+    <string name="dummy_author">Nomen Nescio, Akvo</string>
+    <string name="dummy_time">2014-04-23 17:18</string>
+    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent pharetra ultricies ante, imperdiet viverra nisi rutrum a. Integer consequat laoreet malesuada. Nam fermentum risus id aliquet pellentesque. Sed nec nisl in turpis sodales ultricies. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Interdum et malesuada fames ac ante ipsum primis in faucibus.</string>
     
     
     <string-array name="types">

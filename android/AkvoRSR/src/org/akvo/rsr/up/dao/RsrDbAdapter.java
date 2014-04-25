@@ -16,11 +16,14 @@
 
 package org.akvo.rsr.up.dao;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.akvo.rsr.up.domain.Country;
+import org.akvo.rsr.up.domain.Organisation;
 import org.akvo.rsr.up.domain.Project;
 import org.akvo.rsr.up.domain.Update;
 import org.akvo.rsr.up.domain.User;
@@ -64,7 +67,7 @@ public class RsrDbAdapter {
 	public static final String STATE_COL = "state";
 	public static final String CITY_COL = "city";
 
-	public static final String NAME_COL = "name";
+    public static final String NAME_COL = "name";
 	public static final String CONTINENT_COL = "continent";
 	public static final String ISO_CODE_COL = "iso_code";
 	
@@ -74,7 +77,10 @@ public class RsrDbAdapter {
 	public static final String EMAIL_COL = "email";
 	public static final String ORGANISATION_COL = "organisation";
 
-	private static final String TAG = "RsrDbAdapter";
+    public static final String LONG_NAME_COL = "long_name";
+    public static final String URL_COL = "url";
+
+    private static final String TAG = "RsrDbAdapter";
 	private static final boolean LOG = true;
 
 	private DatabaseHelper databaseHelper;
@@ -101,10 +107,13 @@ public class RsrDbAdapter {
 			"create table country (_id integer primary key, "+
 			"name text not null, continent text, "+
 			"iso_code text);";
-	private static final String USER_TABLE_CREATE =
-			"create table user (_id integer primary key, "+
-			"username text, organisation integer, "+
-			"first_name text, last_name text, email text);";
+    private static final String USER_TABLE_CREATE =
+            "create table user (_id integer primary key, "+
+            "username text, organisation integer, "+
+            "first_name text, last_name text, email text);";
+    private static final String ORG_TABLE_CREATE =
+            "create table _organisation (_id integer primary key, "+
+            "name text, long_name text, email text, url text)";
 
 	private static final String[] DEFAULT_PROJECT_INSERTS = new String[] {
 //		"insert into project values(1,'Sample Proj1', 'Sample proj 1 subtitle', 'sum1', 4711.00, 'url1', 'fn1')",
@@ -112,10 +121,11 @@ public class RsrDbAdapter {
 		};
 
 	private static final String DATABASE_NAME = "rsrdata";
-	public static final String PROJECT_TABLE = "project";
-	public static final String UPDATE_TABLE  = "_update";
-	public static final String COUNTRY_TABLE = "country";
-	public static final String USER_TABLE    = "user";
+	private static final String PROJECT_TABLE = "project";
+	private static final String UPDATE_TABLE  = "_update";
+	private static final String COUNTRY_TABLE = "country";
+    private static final String USER_TABLE    = "user";
+    private static final String ORG_TABLE     = "_organisation";
 
 //	private static final int DATABASE_VERSION = 5;
 //	private static final int DATABASE_VERSION = 6; //added project columns:long, lat, country, state, city
@@ -124,7 +134,8 @@ public class RsrDbAdapter {
 //	private static final int DATABASE_VERSION = 9; //added update.creation_date
 //	private static final int DATABASE_VERSION = 10; //added update.user and user table
 //	private static final int DATABASE_VERSION = 11; //user columns attribute change
-	private static final int DATABASE_VERSION = 12; //uuid for updates
+//  private static final int DATABASE_VERSION = 12; //uuid for updates
+    private static final int DATABASE_VERSION = 13; //org table
 
 	private final Context context;
 
@@ -152,7 +163,8 @@ public class RsrDbAdapter {
 			db.execSQL(PROJECT_TABLE_CREATE);
 			db.execSQL(UPDATE_TABLE_CREATE);
 			db.execSQL(COUNTRY_TABLE_CREATE);
-			db.execSQL(USER_TABLE_CREATE);
+            db.execSQL(USER_TABLE_CREATE);
+            db.execSQL(ORG_TABLE_CREATE);
 			for (int i = 0; i < DEFAULT_PROJECT_INSERTS.length; i++) {
 				db.execSQL(DEFAULT_PROJECT_INSERTS[i]);
 			}			
@@ -164,14 +176,18 @@ public class RsrDbAdapter {
 					+ newVersion);
 
 			
-			if (oldVersion < DATABASE_VERSION) { //start over fresh, consider everything to be a cache
-				db.execSQL("DROP TABLE IF EXISTS " + PROJECT_TABLE);
-				db.execSQL("DROP TABLE IF EXISTS " + UPDATE_TABLE);
-				db.execSQL("DROP TABLE IF EXISTS " + COUNTRY_TABLE);
-				db.execSQL("DROP TABLE IF EXISTS " + USER_TABLE);
-				onCreate(db);
-			}			
-			
+            if (oldVersion < 12) { //prereleases only, start over fresh, consider everything to be a cache
+                db.execSQL("DROP TABLE IF EXISTS " + PROJECT_TABLE);
+                db.execSQL("DROP TABLE IF EXISTS " + UPDATE_TABLE);
+                db.execSQL("DROP TABLE IF EXISTS " + COUNTRY_TABLE);
+                db.execSQL("DROP TABLE IF EXISTS " + USER_TABLE);
+                db.execSQL("DROP TABLE IF EXISTS " + ORG_TABLE);
+                onCreate(db);
+            } else
+            if (oldVersion < 13) { //need an org table
+                db.execSQL(ORG_TABLE_CREATE);
+            }           
+            
 			/*
 			if (oldVersion < 57) {
 				db.execSQL("DROP TABLE IF EXISTS " + RESPONSE_TABLE);
@@ -729,29 +745,64 @@ public class RsrDbAdapter {
 	}
 
 
-	/**
-	 * gets users that are referenced by updates but not loaded
-	 * 
-	 * query crashes with NullPointerException if update table is empty
-	 */
-	public Cursor listMissingUsers() {
-	    try {
-    		Cursor cursor = database.query(true, //distinct
-    										"_update LEFT JOIN user ON (userid = user._id)",
-    										new String[] {"userid", "user._id"},
-    										"user._id IS NULL",
-    										null,//selection vals
-    										"userid",
-    										null,
-    										null,
-    										null);
-    
-    		return cursor;
-	    }
-	    catch (NullPointerException e) {
-	        return null;
-	    }
-	}
+    /**
+     * gets users that are referenced by updates but not loaded
+     * 
+     * query crashes with NullPointerException if update table is empty
+     * always returns at least an empty list, not null
+     */
+    public List<String> getMissingUsersList() {
+        List<String> idList = new ArrayList<String>();  
+        try {
+            Cursor cursor = database.query(true, //distinct
+                                            "_update LEFT JOIN user ON (userid = user._id)",
+                                            new String[] {"userid", "user._id"},
+                                            "user._id IS NULL",
+                                            null,//selection vals
+                                            "userid",
+                                            null,
+                                            null,
+                                            null);
+            int c = cursor.getColumnIndex("userid");
+            while (cursor.moveToNext()) {
+                idList.add(cursor.getString(c));
+            }
+            cursor.close();
+        }
+        catch (NullPointerException e) {
+        }
+        return idList;
+    }
+
+
+    /**
+     * gets orgs that are referenced by users but not loaded
+     * 
+     * query might crash with NullPointerException if user table is empty
+     * always return at least an empty list, not null
+     */
+    public List<String> getMissingOrgsList() {
+        List<String> idList = new ArrayList<String>();  
+        try {
+            Cursor cursor = database.query(true, //distinct
+                                            "user LEFT JOIN _organisation ON (organisation = _organisation._id)",
+                                            new String[] {"organisation", "_organisation._id"},
+                                            "(organisation NOT NULL) AND (_organisation._id IS NULL)",
+                                            null,//selection vals
+                                            "organisation",
+                                            null,
+                                            null,
+                                            null);
+            int c = cursor.getColumnIndex("organisation");
+            while (cursor.moveToNext()) {
+                idList.add(cursor.getString(c));
+            }
+            cursor.close();
+        }
+        catch (NullPointerException e) {
+        }
+        return idList;
+    }
 
 
 	/**
@@ -877,68 +928,128 @@ public class RsrDbAdapter {
 	}
 
 	
-	/**
-	 * Gets a single user from the db using its primary key
-	 */
-	public User findUser(String _id) {
-		User user = null;
-		Cursor cursor = database.query(USER_TABLE,
-									   null,
-									   "_id = ?",
-									   new String[] { _id }, null, null, null);
-		if (cursor != null) {
-			if (cursor.getCount() > 0) {
-				cursor.moveToFirst();
-				user = new User();
-				user.setId(_id); //no confusion with country id
-				user.setUsername(cursor.getString(cursor.getColumnIndexOrThrow(USERNAME_COL)));
-				user.setFirstname(cursor.getString(cursor.getColumnIndexOrThrow(FIRST_NAME_COL)));
-				user.setLastname(cursor.getString(cursor.getColumnIndexOrThrow(LAST_NAME_COL)));
-				user.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(EMAIL_COL)));
-				user.setOrgId(cursor.getString(cursor.getColumnIndexOrThrow(ORGANISATION_COL)));
-				}
-			cursor.close();
-			}
+    /**
+     * Gets a single user from the db using its primary key
+     */
+    public User findUser(String _id) {
+        User user = null;
+        Cursor cursor = database.query(USER_TABLE,
+                                       null,
+                                       "_id = ?",
+                                       new String[] { _id }, null, null, null);
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                user = new User();
+                user.setId(_id); //no confusion with country id
+                user.setUsername(cursor.getString(cursor.getColumnIndexOrThrow(USERNAME_COL)));
+                user.setFirstname(cursor.getString(cursor.getColumnIndexOrThrow(FIRST_NAME_COL)));
+                user.setLastname(cursor.getString(cursor.getColumnIndexOrThrow(LAST_NAME_COL)));
+                user.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(EMAIL_COL)));
+                user.setOrgId(cursor.getString(cursor.getColumnIndexOrThrow(ORGANISATION_COL)));
+                }
+            cursor.close();
+            }
 
-		return user;
-	}
+        return user;
+    }
 
 
-	/**
-	* creates or updates a user in the db
-	*
-	* @param user
-	* @return
-	*/
-	public void saveUser(User user) {
-		ContentValues updatedValues = new ContentValues();
-		updatedValues.put(PK_ID_COL, user.getId());
-		updatedValues.put(USERNAME_COL, user.getUsername());
-		updatedValues.put(FIRST_NAME_COL, user.getFirstname());
-		updatedValues.put(LAST_NAME_COL, user.getLastname());
-		updatedValues.put(EMAIL_COL, user.getEmail());
-		updatedValues.put(ORGANISATION_COL, user.getOrgId());
-		
-		Cursor cursor = database.query(USER_TABLE,
-										new String[] { PK_ID_COL },
-										PK_ID_COL + " = ?",
-										new String[] { user.getId(), },
-										null, null, null);
-		
-		if (cursor != null && cursor.getCount() > 0) {
-			// if we found an item, it's an update, otherwise, it's an insert
-			database.update(USER_TABLE, updatedValues, PK_ID_COL + " = ?",
-					new String[] { user.getId() });
-		} else {
-			database.insert(USER_TABLE, null, updatedValues);
-		}
-		
-		if (cursor != null) {
-			cursor.close();
-		}
-	}
+    /**
+    * creates or updates a user in the db
+    *
+    * @param user
+    * @return
+    */
+    public void saveUser(User user) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(PK_ID_COL, user.getId());
+        updatedValues.put(USERNAME_COL, user.getUsername());
+        updatedValues.put(FIRST_NAME_COL, user.getFirstname());
+        updatedValues.put(LAST_NAME_COL, user.getLastname());
+        updatedValues.put(EMAIL_COL, user.getEmail());
+        updatedValues.put(ORGANISATION_COL, user.getOrgId());
+        
+        Cursor cursor = database.query(USER_TABLE,
+                                        new String[] { PK_ID_COL },
+                                        PK_ID_COL + " = ?",
+                                        new String[] { user.getId(), },
+                                        null, null, null);
+        
+        if (cursor != null && cursor.getCount() > 0) {
+            // if we found an item, it's an update, otherwise, it's an insert
+            database.update(USER_TABLE, updatedValues, PK_ID_COL + " = ?",
+                    new String[] { user.getId() });
+        } else {
+            database.insert(USER_TABLE, null, updatedValues);
+        }
+        
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
 
-	
+    
+    /**
+     * Gets a single user from the db using its primary key
+     */
+    public Organisation findOrganisation(String _id) {
+        Organisation org = null;
+        Cursor cursor = database.query(ORG_TABLE,
+                                       null,
+                                       "_id = ?",
+                                       new String[] { _id }, null, null, null);
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                org = new Organisation();
+                org.setId(_id);
+                org.setName(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
+                org.setLongName(cursor.getString(cursor.getColumnIndexOrThrow(LONG_NAME_COL)));
+                org.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(EMAIL_COL)));
+                org.setUrl(cursor.getString(cursor.getColumnIndexOrThrow(URL_COL)));
+                }
+            cursor.close();
+            }
+
+        return org;
+    }
+
+
+    /**
+    * creates or updates a user in the db
+    *
+    * @param org
+    * @return
+    */
+    public void saveOrganisation(Organisation org) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(PK_ID_COL, org.getId());
+        updatedValues.put(NAME_COL, org.getName());
+        updatedValues.put(LONG_NAME_COL, org.getLongName());
+        updatedValues.put(EMAIL_COL, org.getEmail());
+        updatedValues.put(URL_COL, org.getUrl());
+        
+        Cursor cursor = database.query(ORG_TABLE,
+                                        new String[] { PK_ID_COL },
+                                        PK_ID_COL + " = ?",
+                                        new String[] { org.getId(), },
+                                        null, null, null);
+        
+        if (cursor != null && cursor.getCount() > 0) {
+            // if we found an item, it's an update, otherwise, it's an insert
+            database.update(ORG_TABLE, updatedValues, PK_ID_COL + " = ?",
+                    new String[] { org.getId() });
+        } else {
+            database.insert(ORG_TABLE, null, updatedValues);
+        }
+        
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
+
+    
 
 	
 	
