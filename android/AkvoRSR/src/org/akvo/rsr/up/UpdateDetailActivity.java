@@ -71,7 +71,7 @@ public class UpdateDetailActivity extends Activity {
         projectId = getIntent().getStringExtra(ConstantUtil.PROJECT_ID_KEY);
         updateId = getIntent().getStringExtra(ConstantUtil.UPDATE_ID_KEY);
 		if (projectId == null || updateId == null) {
-			DialogUtil.errorAlert(this,"No project/update id", "Caller did not specify a project and update");
+			DialogUtil.errorAlert(this,R.string.noid_dialog_title, R.string.noid_dialog_msg);
 		}
 		
 		
@@ -107,7 +107,7 @@ public class UpdateDetailActivity extends Activity {
     
     		update = dba.findUpdate(updateId);
     		if (update == null) {
-    			DialogUtil.errorAlert(this, "Update missing", "Cannot open for review, update " + updateId);
+    			DialogUtil.errorAlert(this, R.string.noupd_dialog_title ,R.string.noupd_dialog_msg);
     		} else {
     			//populate fields
     			synching = update.getUnsent();

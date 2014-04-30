@@ -1,3 +1,19 @@
+/*
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *
+ *  This file is part of Akvo RSR.
+ *
+ *  Akvo RSR is free software: you can redistribute it and modify it under the terms of
+ *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+ *  either version 3 of the License or any later version.
+ *
+ *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Affero General Public License included below for more details.
+ *
+ *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ */
+
 package org.akvo.rsr.up;
 
 import java.net.MalformedURLException;
@@ -49,7 +65,7 @@ public class SettingsActivity extends PreferenceActivity {
 						DialogUtil.showTextInputDialog(
 								SettingsActivity.this,
 								R.string.host_dialog_title,
-								R.string.host_dialog_text,
+								R.string.host_dialog_msg,
 								inputView,
 								new DialogInterface.OnClickListener() {
 									
@@ -62,7 +78,7 @@ public class SettingsActivity extends PreferenceActivity {
 										try {
 											//make into valid "protocol://host[:port]" URL
 											URL u = new URL(s);
-											s = u.getProtocol()+"://"+u.getHost();
+											s = u.getProtocol() + "://" + u.getHost();
 											if (u.getPort() >= 0)
 												s += ":" + u.getPort();
 											customPref.setSummary(s);
@@ -71,7 +87,7 @@ public class SettingsActivity extends PreferenceActivity {
 													s);
 											
 										} catch (MalformedURLException e) {
-											DialogUtil.showConfirmDialog(R.string.error_title,
+											DialogUtil.showConfirmDialog(R.string.error_dialog_title,
 																		 R.string.errmsg_bad_url,
 																		 SettingsActivity.this);
 												if (dialog != null) {
@@ -98,19 +114,19 @@ public class SettingsActivity extends PreferenceActivity {
 
         
         Preference feedbackPref = (Preference) findPreference("feedback_form");
-		feedbackPref.setPersistent(false); //TODO need we say don't save this
-		feedbackPref.setTitle("Give Feedback on ver " + version);
+		feedbackPref.setPersistent(false);
+		feedbackPref.setTitle(getResources().getString(R.string.label_give_feedback,version));
 
 		final Preference ccPref = (Preference) findPreference("clear_cache");
         ccPref.setPersistent(false);
-        ccPref.setSummary("Frees " + FileUtil.countCacheMB(SettingsActivity.this) +
-                " MB. Pictures by you are kept.");
+        ccPref.setSummary(getResources().getString(R.string.label_clearcache_freespace,
+                        FileUtil.countCacheMB(this)));
         ccPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
         @Override
         	public boolean onPreferenceClick(Preference preference) {
         		FileUtil.clearCache(SettingsActivity.this);
-                ccPref.setSummary("Frees " + FileUtil.countCacheMB(SettingsActivity.this) +
-                        " MB. Pictures by you are kept.");
+                ccPref.setSummary(getResources().getString(R.string.label_clearcache_freespace,
+                        FileUtil.countCacheMB(SettingsActivity.this)));
         		return true;
         	}	
         });

@@ -2,6 +2,7 @@ package org.akvo.rsr.up.service;
 
 import java.net.URL;
 
+import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.util.ConstantUtil;
@@ -45,12 +46,12 @@ public class SignInService extends IntentService {
 
 			}
 			else {
-				i2.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, "Wrong password and/or username");
+				i2.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, getResources().getString(R.string.errmsg_signin_denied));
 				SettingsUtil.signOut(this);
 			}
 		}
 		catch (Exception e) {
-			i2.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, "Unable to authorize: " + e.getMessage());
+			i2.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, getResources().getString(R.string.errmsg_signin_failed) + e.getMessage());
 			Log.e(TAG,"SignIn() error:",e);
 		}
 

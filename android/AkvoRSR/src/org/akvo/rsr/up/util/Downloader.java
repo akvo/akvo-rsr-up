@@ -666,6 +666,7 @@ public class Downloader {
 			Update upd = dba.findUpdate(localId);
 			String userAgent;
 			try {
+			    //Not to be localized
 			    userAgent = "Akvo RSR Up v" + ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0).versionName +
                         " on Android " + android.os.Build.VERSION.RELEASE +
                         " device " + android.os.Build.MANUFACTURER + 

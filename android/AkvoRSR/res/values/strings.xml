@@ -43,7 +43,9 @@
     <string name="hint_update_caption">Photo caption</string>
     <string name="hint_update_credit">Photo credit</string>
     <string name="label_empty_proj_list">Nothing fetched yet. Use the refresh button to see your projects.\n\nIf you have a low-bandwidth connection you should turn on delayed picture fetching in settings first.</string>
-    <string name="label_proj_list">Your Projects:</string> 
+    <string name="label_proj_list">Your Projects:</string>
+    <string name="label_give_feedback">Give feedback on ver %s</string>
+    <string name="label_clearcache_freespace">Frees %d MB. Pictures by you are kept.</string>
     <string name="state_draft">Draft</string>
     <string name="state_published">Published</string>
     <string name="state_synchronising">Synchronising</string>
@@ -78,31 +80,69 @@
     <string name="btncaption_send_update">Send update</string>
     <string name="btncaption_save_draft">Save draft</string>
     
-    <string name="send_dialog_title">Publishing</string>
-    <string name="send_dialog_msg">Sending update to server...</string>
+    <string name="host_dialog_title">Enter data host name</string>
+    <string name="host_dialog_msg">Example: rsr.akvo.org or https://rsr.akvotest.org</string>
+    
+    <string name="send_progress_title">Publishing</string>
+    <string name="send_progress_msg">Sending update to server...</string>
 
+    <string name="error_dialog_title">Error</string>
+    
     <string name="nocard_dialog_title">No storage available</string>
     <string name="nocard_dialog_msg">Akvo RSR Up requires a mounted, writable storage card for image files. Mount card and restart app.</string>
 			
+    <string name="noid_dialog_title">No project/update id</string>
+    <string name="noid_dialog_msg">Caller did not specify a project and update</string>
+			
+    <string name="noupd_dialog_title">Update missing</string>
+    <string name="noupd_dialog_msg">Cannot find update for display</string>
+    <string name="noupd2_dialog_msg">Cannot find update for edit</string>
+    			
+    <string name="noproj_dialog_title">No project id</string>
+    <string name="noproj_dialog_msg">Caller did not specify a project</string>
+			
+    <string name="norot_dialog_title">IO Error rotating photo file</string>
+    <string name="norot_dialog_title2">Photo file too big to rotate</string>
+    <string name="norot_dialog_msg">Try a lower resolution photo</string>
+    			
+    <string name="warnbig_dialog_title">Photo file too big</string>
+    <string name="warnbig_dialog_msg1">Set your camera to a lower resolution</string>
+    <string name="warnbig_dialog_msg2">Pick a smaller photo</string>
+    			
+    <string name="shrinkbig_dialog_title">Could not shrink photo</string>
+    <string name="shrinkbig_dialog_msg">Original was too big to process</string>
+    
+    <string name="nonet_dialog_title">No network available</string>
+    <string name="nonet_dialog_msg">You must be connected to the internet</string>
+    
+    <string name="login_progress_title">Signing in</string>
+    <string name="login_progress_msg">Sending login information</string>
+            
+    <string name="cleared_dialog_title">Cache cleared</string>
+    <string name="cleared_dialog_msg">%1$d files deleted (%2$d MB)</string>
+    
     <string name="msg_update_published">Update published</string>
     <string name="msg_update_success">Update successfully sent to server</string>
     <string name="msg_network_problem">Network connection problem</string>
     <string name="msg_synchronising">Update still synchronising...</string>
     <string name="msg_update_drafted">Update was saved as draft</string>
+    <string name="msg_success_drafted">Draft saved successfully</string>
     <string name="msg_logged_in_as_template">Logged in as %s</string>
     <string name="msg_fetch_complete">Fetch complete</string>
     
     <string name="errmsg_empty_title">An update must have a title!</string>
     <string name="errmsg_bad_url">Invalid URL!</string>
+    <string name="errmsg_not_found_on_server">Cannot find: </string>
+    <string name="errmsg_update_fetch_failed">Updates fetch failed: </string>
+    <string name="errmsg_user_fetch_failed">User fetch failed: </string>
+    <string name="errmsg_org_fetch_failed">Organisation fetch failed: </string>
+    <string name="errmsg_signin_denied">Wrong password and/or username</string>
+    <string name="errmsg_signin_failed">Unable to authorize: </string>
     
-    <string name="dialog_ok">OK</string>
-    <string name="error_title">Error</string>
-    <string name="okbutton">OK</string>
-    <string name="cancelbutton">Cancel</string>
+    <string name="btncaption_ok">OK</string>
+    <string name="btncaption_cancel">Cancel</string>
     <string name="authtitle">Authorization required</string>
     <string name="authtext">Please input the admin password</string>
-    <string name="host_dialog_title">Enter data host name</string>
-    <string name="host_dialog_text">Example: www.akvo.org or https://test.akvo.org</string>
     <string name="authfailed">Authorization failed</string>
     <string name="invalidpassword">Invalid password</string>
     
