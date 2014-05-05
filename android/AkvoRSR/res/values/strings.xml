@@ -17,9 +17,15 @@
  <resources>
 
     <string name="app_name">Akvo RSR Up</string>
-    <string name="app_version">dummyversion</string>
     <string name="version">&#160;Version&#160;</string>
     <string name="app_subtitle">Really Simple Reporting</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_diagnostics">Diagnostics</string>
+    <string name="action_about">About</string>
+    <string name="action_add_update">Add Update</string>
+    <string name="action_delete_update">Delete Update</string>
+    <string name="action_attach_photo">Attach Photo</string>
+    <string name="copyright">Copyright &#169; 2012-2014 Stichting Akvo</string>
     <string name="powered_by_akvo">Powered by Akvo</string>
     <string name="menu_logout">Log out</string>
     <string name="menu_sendall">Send all unsent</string>
@@ -32,32 +38,42 @@
     <string name="title_activity_settings">Settings</string>
     <string name="title_activity_about">AboutActivity</string>
     <string name="title_activity_license">License information</string>
-    <string name="copyright">Copyright &#169; 2012-2014 Stichting Akvo</string>
     <string name="license">License information</string>
     <string name="label_update_title">Add a project update:</string>
     <string name="hint_update_title">Title</string>
     <string name="hint_search">Search</string>
     <string name="label_update_description">Update Description:</string>
     <string name="label_send_progress">Publishing update</string>
+    <string name="label_project_location">Location:</string>
+    <string name="label_project_summary">Summary:</string>
     <string name="hint_update_description">Description</string>
     <string name="hint_update_caption">Photo caption</string>
     <string name="hint_update_credit">Photo credit</string>
     <string name="label_empty_proj_list">Nothing fetched yet. Use the refresh button to see your projects.\n\nIf you have a low-bandwidth connection you should turn on delayed picture fetching in settings first.</string>
     <string name="label_proj_list">Your Projects:</string>
-    <string name="label_give_feedback">Give feedback on ver %s</string>
+    <string name="label_update_list">Updates:</string>
+    <string name="label_refresh_progress">Refresh progress</string>
+    <string name="label_progress_projects">Projects</string>
+    <string name="label_progress_updates">Updates</string>
+    <string name="label_progress_pictures">Pictures</string>
     <string name="label_clearcache_freespace">Frees %d MB. Pictures by you are kept.</string>
+    <string name="label_settings_general">General</string>
+    <string name="label_settings_testing">Testing</string>
+    <string name="label_setting_delaypics">Delay fetching pictures</string>    
+    <string name="summary_setting_delaypics">Do not fetch pictures until they are clicked. Refresh is fast, but pictures are unavailable when offline.</string>    
+    <string name="label_setting_clearcache">Delete cached pictures</string>    
+    <string name="label_setting_host">Data server</string>    
+    <string name="label_setting_feedback">Give feedback</string>    
+    <string name="label_setting_feedback_version">Give feedback on ver %s</string>
+    <string name="label_setting_debuginfo">Debug</string>    
+    <string name="summary_setting_feedback">Open a web feedback form where you can tell us what you think of this app.</string>    
+    <string name="summary_setting_debuginfo">Show project and update ids and other debug info</string>    
     <string name="state_draft">Draft</string>
     <string name="state_published">Published</string>
     <string name="state_synchronising">Synchronising</string>
     <string name="count_draft">&#160;Draft</string>
     <string name="count_published">&#160;Published</string>
     <string name="count_zero">No updates</string>
-    <string name="action_settings">Settings</string>
-    <string name="action_diagnostics">Diagnostics</string>
-    <string name="action_about">About</string>
-    <string name="action_add_update">Add Update</string>
-    <string name="action_delete_update">Delete Update</string>
-    <string name="action_attach_photo">Attach Photo</string>
     <string name="updates_txt">UPDATES STATUS</string>
     <string name="published">&#160;Published</string>
     <string name="unsynch">&#160;Unsynchronised</string>
@@ -148,8 +164,12 @@
     
     <string name="dummy_project_title">Project title here</string>
     <string name="dummy_update_title">Update title here</string>
+    <string name="dummy_update_description">Update description goes here, and can be any length. Update will scroll but button will stay at bottom of screen.</string>   
     <string name="dummy_author">Nomen Nescio, Akvo</string>
+    <string name="dummy_count">17</string>
     <string name="dummy_time">2014-04-23 17:18</string>
+    <string name="dummy_version">0.0</string>
+    
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent pharetra ultricies ante, imperdiet viverra nisi rutrum a. Integer consequat laoreet malesuada. Nam fermentum risus id aliquet pellentesque. Sed nec nisl in turpis sodales ultricies. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Interdum et malesuada fames ac ante ipsum primis in faucibus.</string>
     
     

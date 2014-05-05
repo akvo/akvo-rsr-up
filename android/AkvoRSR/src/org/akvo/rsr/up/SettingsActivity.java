@@ -115,7 +115,7 @@ public class SettingsActivity extends PreferenceActivity {
         
         Preference feedbackPref = (Preference) findPreference("feedback_form");
 		feedbackPref.setPersistent(false);
-		feedbackPref.setTitle(getResources().getString(R.string.label_give_feedback,version));
+		feedbackPref.setTitle(getResources().getString(R.string.label_setting_feedback_version,version));
 
 		final Preference ccPref = (Preference) findPreference("clear_cache");
         ccPref.setPersistent(false);
