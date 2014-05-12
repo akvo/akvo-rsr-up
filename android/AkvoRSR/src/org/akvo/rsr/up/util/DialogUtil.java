@@ -17,7 +17,7 @@ public class DialogUtil {
 	    alert.setTitle(title);
 	    alert.setMessage(e.toString());
 	
-	    alert.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+	    alert.setPositiveButton(R.string.btncaption_ok, new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int whichButton) {
 		    	dialog.cancel();
 		    	}
@@ -31,7 +31,7 @@ public class DialogUtil {
         alert.setTitle(title);
         alert.setMessage(msg);
         alert.setIcon(android.R.drawable.ic_dialog_alert);
-        alert.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+        alert.setPositiveButton(R.string.btncaption_ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 dialog.cancel();
                 }
@@ -45,7 +45,7 @@ public class DialogUtil {
         alert.setTitle(title);
         alert.setMessage(msg);
         alert.setIcon(android.R.drawable.ic_dialog_alert);
-        alert.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+        alert.setPositiveButton(R.string.btncaption_ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 dialog.cancel();
                 }
@@ -58,7 +58,7 @@ public class DialogUtil {
 		AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
 	    alert.setTitle(title).setMessage(msg).setIcon(android.R.drawable.ic_dialog_info);
 	
-	    alert.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+	    alert.setPositiveButton(R.string.btncaption_ok, new DialogInterface.OnClickListener() {
 		    public void onClick(DialogInterface dialog, int whichButton) {
 		    	dialog.cancel();
 		    	}
@@ -172,12 +172,12 @@ public class DialogUtil {
 		builder.setTitle(titleId);
 		tipText.setText(textId);
 		builder.setView(tipText);
-		builder.setPositiveButton(R.string.okbutton, positiveListener);
+		builder.setPositiveButton(R.string.btncaption_ok, positiveListener);
 		tipText.setBackgroundColor(parentContext.getResources().getColor(R.color.rsr_blue));
 		tipText.setPadding(10, 10, 10,10);
 
 		if (includeNegative) {
-			builder.setNegativeButton(R.string.cancelbutton, negativeListener);
+			builder.setNegativeButton(R.string.btncaption_cancel, negativeListener);
 			if (negativeListener != null) {
 				builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
 					@Override
@@ -222,9 +222,9 @@ public class DialogUtil {
 		main.addView(tipText);
 		main.addView(inputView);
 		builder.setView(main);
-		builder.setPositiveButton(R.string.okbutton, clickListener);
+		builder.setPositiveButton(R.string.btncaption_ok, clickListener);
 
-		builder.setNegativeButton(R.string.cancelbutton,
+		builder.setNegativeButton(R.string.btncaption_cancel,
 				new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {

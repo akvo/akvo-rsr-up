@@ -1,9 +1,5 @@
 package org.akvo.rsr.up.service;
 
-import java.net.MalformedURLException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.Downloader;

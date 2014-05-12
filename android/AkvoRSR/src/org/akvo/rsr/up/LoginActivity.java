@@ -178,8 +178,8 @@ public class LoginActivity extends Activity {
     public void signIn(View view) {
 		//start a "progress" animation
     	progress = new ProgressDialog(this);
-		progress.setTitle("Signing in");
-		progress.setMessage("Sending login information");
+		progress.setTitle(R.string.login_progress_title);
+		progress.setMessage(getResources().getString(R.string.login_progress_msg));
 		progress.show();
     	
     	//request API key from server		
@@ -188,7 +188,6 @@ public class LoginActivity extends Activity {
 		intent.putExtra(ConstantUtil.PASSWORD_KEY, passwordEdit.getText().toString());
 		getApplicationContext().startService(intent);
 		//now we wait for a broadcast...
-
     }
 
     
@@ -204,8 +203,7 @@ public class LoginActivity extends Activity {
 
 		String err = intent.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
 		if (err == null) {
-		    String msg = String.format(
-		            getResources().getString(R.string.msg_logged_in_as_template),
+		    String msg = getResources().getString(R.string.msg_logged_in_as_template,
 		            SettingsUtil.Read(this, "authorized_username"));
 			Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
 			//Go to main screen

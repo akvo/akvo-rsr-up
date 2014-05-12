@@ -17,7 +17,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:text="Refresh progress"
+            android:text="@string/label_refresh_progress"
             android:textColor="@color/rsr_purple"
             android:textSize="18sp" />
 
@@ -25,7 +25,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:text="Projects" />
+            android:text="@string/label_progress_projects" />
 
         <ProgressBar
             android:id="@+id/progressBar1"
@@ -38,7 +38,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:text="Updates" />
+            android:text="@string/label_progress_updates" />
 
         <ProgressBar
             android:id="@+id/progressBar2"
@@ -51,7 +51,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:text="Images" />
+            android:text="@string/label_progress_pictures" />
 
         <ProgressBar
             android:id="@+id/progressBar3"
@@ -87,7 +87,7 @@
             android:layout_weight="1"
             android:background="@color/pale_gray"
             android:padding="5dip"
-            android:text="03"
+            android:text="@string/dummy_count"
             android:textColor="@color/rsr_purple"
             android:textSize="20sp"
             android:typeface="sans" />

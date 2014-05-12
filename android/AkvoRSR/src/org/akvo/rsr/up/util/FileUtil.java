@@ -13,6 +13,7 @@ import org.akvo.rsr.up.dao.RsrDbAdapter;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -417,8 +418,10 @@ public class FileUtil {
                 sizeSum += files[i].length();
                 files[i].delete();
             }
-            DialogUtil.infoAlert(context, "Cache cleared", files.length + " files deleted ("
-                    + sizeSum / (1024 * 1024) + " MB)");
+            Resources res = context.getResources();
+            DialogUtil.infoAlert(context, res.getString(R.string.cleared_dialog_title),
+                    res.getString(R.string.cleared_dialog_msg,  //use positional notation
+                            files.length, sizeSum / (1024 * 1024)));
         }
     }
 

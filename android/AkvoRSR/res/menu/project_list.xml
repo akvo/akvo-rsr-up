@@ -5,7 +5,7 @@
         android:icon="@drawable/ic_menu_settings_holo_light"        
          />
     <item android:id="@+id/menu_logout"
-        android:title="@string/menu_logout"
+        android:title="@string/action_logout"
         android:icon="@drawable/ic_menu_close_clear_cancel"        
          />
 
