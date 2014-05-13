@@ -119,7 +119,7 @@ public class UpdateDetailActivity extends Activity {
     			String sig = "";
     			if (author != null) {
     			    sig += author.getFirstname() + " " + author.getLastname();
-                    org = dba.findOrganisation(author.getOrgId());
+    			    if (author.getOrgId() != null) org = dba.findOrganisation(author.getOrgId());
     	            if (org != null) sig += ", " + org.getName();
     			}
     			if (author == null || debug) {
