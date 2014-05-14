@@ -180,8 +180,8 @@ public class FileUtil {
                 o.inJustDecodeBounds = true;
                 BitmapFactory.decodeFile(fn, o);
                 // The new size we want to scale to
-                final int REQUIRED_SIZE = 140;
-
+                final int REQUIRED_SIZE = 160; //640/4
+                //TODO, maybe: int portSize = Math.min(imgView.getHeight(), imgView.getWidth());
                 // Decode with inSampleSize
                 BitmapFactory.Options o2 = new BitmapFactory.Options();
                 o2.inSampleSize = subsamplingFactor(o, REQUIRED_SIZE);
