@@ -19,6 +19,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Build;
 import android.os.Environment;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -180,11 +181,14 @@ public class FileUtil {
                 o.inJustDecodeBounds = true;
                 BitmapFactory.decodeFile(fn, o);
                 // The new size we want to scale to
-                final int REQUIRED_SIZE = 160; //640/4
-                //TODO, maybe: int portSize = Math.min(imgView.getHeight(), imgView.getWidth());
+                final int REQUIRED_SIZE = 320; //640/2 
+//                int portSize = imgView.getWidth(); //sometimes returns 0
+//                if (imgView.getHeight() > portSize) portSize = imgView.getHeight();
                 // Decode with inSampleSize
                 BitmapFactory.Options o2 = new BitmapFactory.Options();
                 o2.inSampleSize = subsamplingFactor(o, REQUIRED_SIZE);
+//                o2.inDensity = DisplayMetrics.DENSITY_MEDIUM;
+                o2.inScaled = true;
 
                 Bitmap bm = BitmapFactory.decodeFile(fn, o2);
                 if (bm == null) {

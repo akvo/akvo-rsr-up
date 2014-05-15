@@ -13,7 +13,6 @@
         android:layout_height="80dip"
         android:layout_margin="10dp"
         android:contentDescription="@string/app_name"
-        android:scaleType="centerInside"
         />
        
 	<LinearLayout
