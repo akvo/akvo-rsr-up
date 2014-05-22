@@ -408,7 +408,7 @@ public class FileUtil {
     /**
      * remove all files in the image cache
      */
-    public static void clearCache(Context context) {
+    public static void clearCache(Context context, boolean showSavings) {
         RsrDbAdapter dba = new RsrDbAdapter(context);
         dba.open();
         dba.clearProjectThumbnailFiles();
@@ -422,10 +422,12 @@ public class FileUtil {
                 sizeSum += files[i].length();
                 files[i].delete();
             }
-            Resources res = context.getResources();
-            DialogUtil.infoAlert(context, res.getString(R.string.cleared_dialog_title),
-                    res.getString(R.string.cleared_dialog_msg,  //use positional notation
-                            files.length, sizeSum / (1024 * 1024)));
+            if (showSavings) {
+                Resources res = context.getResources();
+                DialogUtil.infoAlert(context, res.getString(R.string.cleared_dialog_title),
+                        res.getString(R.string.cleared_dialog_msg,  //use positional notation
+                                files.length, sizeSum / (1024 * 1024)));
+            }
         }
     }
 

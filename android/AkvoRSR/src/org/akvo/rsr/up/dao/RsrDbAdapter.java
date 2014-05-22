@@ -1067,14 +1067,15 @@ public class RsrDbAdapter {
 
 
 	/**
-	 * permanently deletes all projects, updates, users and countries
+	 * permanently deletes all records
 	 * from the database
 	 */
 	public void clearAllData() {
-		executeSql("delete from project");
-        executeSql("delete from _update");
-        executeSql("delete from user");
-        executeSql("delete from country");
+	    executeSql("delete from " + UPDATE_TABLE);
+	    executeSql("delete from " + USER_TABLE);
+	    executeSql("delete from " + ORG_TABLE);
+	    executeSql("delete from " + PROJECT_TABLE);
+	    executeSql("delete from " + COUNTRY_TABLE);
 	}
 
 	public Cursor listAllCountries() {

@@ -73,7 +73,7 @@ public class DiagnosticActivity extends Activity {
 	 * removes all files from the image cache
 	 */
 	private void clearCache(Context context ) {
-		FileUtil.clearCache(context);
+		FileUtil.clearCache(context, false);
 		//clearOldCache();
 	}
 
@@ -110,8 +110,8 @@ public class DiagnosticActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		mDb.open();
-        List<String>u = mDb.getMissingUsersList();
+
+		List<String>u = mDb.getMissingUsersList();
         mTextView.append("\nMissing users in db: " + String.valueOf(u.size())+"\n");
         for (String id:u) {
             mTextView.append("\n["+id+"] ");
@@ -142,13 +142,7 @@ public class DiagnosticActivity extends Activity {
 		double gigaAvailable = sdAvailSize / 1073741824;
 		mTextView.append(gigaAvailable + " GB free on card\n");
 	}
-	
-	@Override
-	protected void onPause() {
-		super.onPause();
-		mDb.close();
-	}
-	
+		
 
 	@Override
 	protected void onDestroy() {
@@ -159,22 +153,5 @@ public class DiagnosticActivity extends Activity {
 	}
 
 	
-	/**
-	 * Set up the {@link android.app.ActionBar}, if the API is available.
-	 *
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	private void setupActionBar() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			getActionBar().setDisplayHomeAsUpEnabled(true);
-		}
-	}
-*/
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.project_detail, menu);
-		return true;
-	}
-
 
 }

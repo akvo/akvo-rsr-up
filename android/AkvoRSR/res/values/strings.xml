@@ -94,8 +94,8 @@
     <string name="btncaption_send_update">Send update</string>
     <string name="btncaption_save_draft">Save draft</string>
     
-    <string name="host_dialog_title">Enter data host name</string>
-    <string name="host_dialog_msg">Example: rsr.akvo.org or https://rsr.akvotest.org</string>
+    <string name="host_dialog_title">Enter new data host name.</string>
+    <string name="host_dialog_msg">All local data will be deleted.\nExample: rsr.akvo.org or https://rsr.akvotest.org</string>
     
     <string name="send_progress_title">Publishing</string>
     <string name="send_progress_msg">Sending update to server...</string>

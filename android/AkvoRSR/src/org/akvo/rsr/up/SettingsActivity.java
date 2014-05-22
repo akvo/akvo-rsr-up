@@ -20,6 +20,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.akvo.rsr.up.R;
+import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.DialogUtil;
 import org.akvo.rsr.up.util.FileUtil;
@@ -81,10 +82,23 @@ public class SettingsActivity extends PreferenceActivity {
 											s = u.getProtocol() + "://" + u.getHost();
 											if (u.getPort() >= 0)
 												s += ":" + u.getPort();
+											//save to preferences
 											customPref.setSummary(s);
 											SettingsUtil.Write(SettingsActivity.this,
 													ConstantUtil.HOST_SETTING_KEY,
 													s);
+											//clear local database to prevent db mixups
+											FileUtil.clearCache(SettingsActivity.this, false);
+											RsrDbAdapter mDb = new RsrDbAdapter(SettingsActivity.this);
+											mDb.open();
+									        mDb.clearAllData(); //will confuse open activities
+									        mDb.close();
+									        //Go back to proj list closing all other activities
+									        Intent intent = new Intent(getApplicationContext(), ProjectListActivity.class);
+									        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+									        startActivity(intent);
+//									        DialogUtil.infoAlert(this, "Data cleared", "All project and update info deleted");
+
 											
 										} catch (MalformedURLException e) {
 											DialogUtil.showConfirmDialog(R.string.error_dialog_title,
@@ -124,7 +138,7 @@ public class SettingsActivity extends PreferenceActivity {
         ccPref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
         @Override
         	public boolean onPreferenceClick(Preference preference) {
-        		FileUtil.clearCache(SettingsActivity.this);
+        		FileUtil.clearCache(SettingsActivity.this, true);
                 ccPref.setSummary(getResources().getString(R.string.label_clearcache_freespace,
                         FileUtil.countCacheMB(SettingsActivity.this)));
         		return true;
