@@ -9,7 +9,7 @@
  *
  *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  See the GNU Affero General Public License included with this program for more details.
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
@@ -43,7 +43,7 @@ import android.widget.TextView;
 public class UpdateListCursorAdapter extends CursorAdapter{
 
 /**
- * This adaptor formats Update list items using the update_list_item.xml template
+ * This adapter formats Update list items using the update_list_item.xml template
  * 
  * @author Stellan Lagerstroem
  * 

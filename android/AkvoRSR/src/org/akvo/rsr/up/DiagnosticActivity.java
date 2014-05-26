@@ -9,7 +9,7 @@
  *
  *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  See the GNU Affero General Public License included with this program for more details.
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
@@ -53,6 +53,7 @@ public class DiagnosticActivity extends Activity {
 		//find the fields
 		mTextView = (TextView) findViewById(R.id.text_field);
 		//Activate buttons
+/*
 		mBtnUpdates = (Button) findViewById(R.id.btn_diag_a);
 		mBtnUpdates.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {//delete image cache files
@@ -65,7 +66,7 @@ public class DiagnosticActivity extends Activity {
 				clearData();
 			}
 		});
- 
+ */
 		mDb = new RsrDbAdapter(this);
 	}
 
