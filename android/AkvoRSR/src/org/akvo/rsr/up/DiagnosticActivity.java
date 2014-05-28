@@ -68,6 +68,7 @@ public class DiagnosticActivity extends Activity {
 		});
  */
 		mDb = new RsrDbAdapter(this);
+		mDb.open();
 	}
 
 	/**
@@ -141,7 +142,8 @@ public class DiagnosticActivity extends Activity {
 		                   * (double)stat.getBlockSize();
 		//One binary gigabyte equals 1,073,741,824 bytes.
 		double gigaAvailable = sdAvailSize / 1073741824;
-		mTextView.append(gigaAvailable + " GB free on card\n");
+        mTextView.append("\n\n");
+        mTextView.append(gigaAvailable + " GB free on card\n");
 	}
 		
 
