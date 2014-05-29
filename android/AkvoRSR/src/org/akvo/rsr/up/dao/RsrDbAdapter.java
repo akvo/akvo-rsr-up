@@ -745,6 +745,22 @@ public class RsrDbAdapter {
 	}
 
 
+	/**
+     * Gets all users, all columns
+     */
+    public Cursor listAllUsers() {
+        Cursor cursor = database.query(USER_TABLE,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null);
+        return cursor;
+    }
+
+
+
     /**
      * gets users that are referenced by updates but not loaded
      * 
@@ -772,6 +788,21 @@ public class RsrDbAdapter {
         catch (NullPointerException e) {
         }
         return idList;
+    }
+
+
+    /**
+     * Gets all orgs, all columns
+     */
+    public Cursor listAllOrgs() {
+        Cursor cursor = database.query(ORG_TABLE,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null);
+        return cursor;
     }
 
 

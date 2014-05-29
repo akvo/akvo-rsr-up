@@ -113,26 +113,46 @@ public class DiagnosticActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 
-		List<String>u = mDb.getMissingUsersList();
-        mTextView.append("\nMissing users in db: " + String.valueOf(u.size())+"\n");
+        Cursor users = mDb.listAllUsers();
+        mTextView.append("\n\nUsers in db: " + String.valueOf(users.getCount()));
+        while (users.moveToNext())
+            mTextView.append("\n[" + users.getString(users.getColumnIndex(RsrDbAdapter.PK_ID_COL)) +
+                             "] "  + users.getString(users.getColumnIndex(RsrDbAdapter.FIRST_NAME_COL)) +
+                             " "   + users.getString(users.getColumnIndex(RsrDbAdapter.LAST_NAME_COL)));
+        users.close();
+
+        List<String>u = mDb.getMissingUsersList();
+        mTextView.append("\n\nMissing users in db: " + String.valueOf(u.size()));
         for (String id:u) {
             mTextView.append("\n["+id+"] ");
         }
+
+        Cursor orgs = mDb.listAllOrgs();
+        mTextView.append("\n\nOrgs in db: " + String.valueOf(orgs.getCount()));
+        while (orgs.moveToNext())
+            mTextView.append("\n["+orgs.getString(orgs.getColumnIndex(RsrDbAdapter.PK_ID_COL))+"] "+orgs.getString(orgs.getColumnIndex(RsrDbAdapter.NAME_COL))+" ");
+        orgs.close();
+
         List<String>o = mDb.getMissingOrgsList();
-        mTextView.append("\nMissing orgs in db: " + String.valueOf(u.size())+"\n");
+        mTextView.append("\n\nMissing orgs in db: " + String.valueOf(o.size()));
         for (String id:o) {
             mTextView.append("\n["+id+"] ");
         }
-		Cursor a = mDb.listAllCountries();
-		mTextView.append("\nCountries in db: " + String.valueOf(a.getCount())+"\n");
-		while (a.moveToNext())
-			mTextView.append("\n["+a.getString(a.getColumnIndex(RsrDbAdapter.PK_ID_COL))+"] "+a.getString(a.getColumnIndex(RsrDbAdapter.NAME_COL))+" ");
-		a.close();
-//		Cursor c = mDb.listAllUpdates();
-//		mTextView.append("\nUpdates in db: " + String.valueOf(c.getCount())+"\n");
-//		while (c.moveToNext())
-//			mTextView.append("'"+c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL))+"' for '"+c.getString(c.getColumnIndex(RsrDbAdapter.PROJECT_COL))+"' ");
-//		c.close();
+        Cursor b = mDb.listAllProjects();
+        mTextView.append("\n\nProjects in db: " + String.valueOf(b.getCount()));
+        b.close();
+        Cursor b2 = mDb.listVisibleProjects();
+        mTextView.append("\n\nVisible projects in db: " + String.valueOf(b2.getCount()));
+        b2.close();
+        Cursor c = mDb.listAllUpdates();
+        mTextView.append("\n\nUpdates in db: " + String.valueOf(c.getCount()));
+        c.close();
+        Cursor a = mDb.listAllCountries();
+        mTextView.append("\n\nCountries in db: " + String.valueOf(a.getCount()));
+        while (a.moveToNext())
+            mTextView.append("\n["+a.getString(a.getColumnIndex(RsrDbAdapter.PK_ID_COL))+"] "+a.getString(a.getColumnIndex(RsrDbAdapter.NAME_COL))+" ");
+        a.close();
+
 //		Cursor d = mDb.listAllUpdatesFor("609");
 //		mTextView.append("\nUpdates in db for 609: " + String.valueOf(d.getCount())+"\n");
 //		d.close();
@@ -142,8 +162,7 @@ public class DiagnosticActivity extends Activity {
 		                   * (double)stat.getBlockSize();
 		//One binary gigabyte equals 1,073,741,824 bytes.
 		double gigaAvailable = sdAvailSize / 1073741824;
-        mTextView.append("\n\n");
-        mTextView.append(gigaAvailable + " GB free on card\n");
+        mTextView.append("\n\n"+gigaAvailable + " GiB free on card\n");
 	}
 		
 
