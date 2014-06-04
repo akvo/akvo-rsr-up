@@ -11,7 +11,6 @@
         android:id="@+id/ulist_item_thumbnail"
         android:layout_width="100dip"
         android:layout_height="80dip"
-        android:scaleType="centerInside"
         android:layout_margin="10dp"
         android:contentDescription="@string/app_name"
         />
@@ -30,7 +29,7 @@
        	    android:layout_marginTop="10dp"
        	    android:gravity="fill_horizontal"
        	    android:paddingBottom="5dip"
-       	    android:text="Title goes here"
+       	    android:text="@string/dummy_update_title"
        	    android:textColor="@color/dk_gray"
        	    android:textSize="14sp"
        	    android:typeface="sans" />
@@ -40,17 +39,26 @@
        	    android:layout_width="fill_parent"
        	    android:layout_height="wrap_content"
        	    android:layout_marginTop="5dp"
-       	    android:text="Sometime"
+       	    android:text="@string/dummy_time"
        	    android:textSize="12sp" />
 
        	<TextView
-       	    android:id="@+id/ulist_item_state"
+       	    android:id="@+id/ulist_item_author"
        	    android:layout_width="wrap_content"
        	    android:layout_height="wrap_content"
        	    android:layout_gravity="left"
        	    android:layout_marginTop="5dp"
-       	    android:text="@string/state_published"
+       	    android:text="@string/dummy_author"
        	    android:textSize="12sp" />
-
+        
+        <TextView
+            android:id="@+id/ulist_item_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginTop="5dp"
+            android:text="@string/state_published"
+            android:textSize="12sp" />
+        
    	</LinearLayout>
 </LinearLayout>

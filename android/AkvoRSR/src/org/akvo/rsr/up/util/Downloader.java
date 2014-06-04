@@ -9,7 +9,7 @@
  *
  *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  See the GNU Affero General Public License included with this program for more details.
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
@@ -35,22 +35,23 @@ import org.akvo.rsr.up.domain.Update;
 import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.xml.AuthHandler;
 import org.akvo.rsr.up.xml.CountryListHandler;
+import org.akvo.rsr.up.xml.OrganisationHandler;
 import org.akvo.rsr.up.xml.ProjectListHandler;
 import org.akvo.rsr.up.xml.UpdateListHandler;
 import org.akvo.rsr.up.xml.UserListHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 
 import com.github.kevinsawicki.http.HttpRequest;
 import com.github.kevinsawicki.http.HttpRequest.Base64;
 import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 public class Downloader {
@@ -308,33 +309,62 @@ public class Downloader {
 	}
 
 
-	/**
-	 * populates the user table in the db from a server URL
-	 * 
-	 * @param ctx
-	 * @param url
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws IOException
-	 */
-	public void fetchUser(Context ctx, URL url, String defaultId) throws ParserConfigurationException, SAXException, IOException {
+    /**
+     * populates the user table in the db from a server URL
+     * 
+     * @param ctx
+     * @param url
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     */
+    public void fetchUser(Context ctx, URL url, String defaultId) throws ParserConfigurationException, SAXException, IOException {
 
-		/* Get a SAXParser from the SAXPArserFactory. */
-		SAXParserFactory spf = SAXParserFactory.newInstance();
-		SAXParser sp = spf.newSAXParser();
+        /* Get a SAXParser from the SAXPArserFactory. */
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        SAXParser sp = spf.newSAXParser();
 
-		/* Get the XMLReader of the SAXParser we created. */
-		XMLReader xr = sp.getXMLReader();
-		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
-		UserListHandler myUserListHandler = new UserListHandler(new RsrDbAdapter(ctx), defaultId);
-		xr.setContentHandler(myUserListHandler);
-		/* Parse the xml-data from our URL. */
-		xr.parse(new InputSource(url.openStream()));
-		/* Parsing has finished. */
+        /* Get the XMLReader of the SAXParser we created. */
+        XMLReader xr = sp.getXMLReader();
+        /* Create a new ContentHandler and apply it to the XML-Reader*/ 
+        UserListHandler myUserListHandler = new UserListHandler(new RsrDbAdapter(ctx), defaultId);
+        xr.setContentHandler(myUserListHandler);
+        /* Parse the xml-data from our URL. */
+        xr.parse(new InputSource(url.openStream()));
+        /* Parsing has finished. */
 
-		/* Check if anything went wrong. */
-		err = myUserListHandler.getError();
-	}
+        /* Check if anything went wrong. */
+        err = myUserListHandler.getError();
+    }
+
+
+    /**
+     * populates the user table in the db from a server URL
+     * 
+     * @param ctx
+     * @param url
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     */
+    public void fetchOrg(Context ctx, URL url, String defaultId) throws ParserConfigurationException, SAXException, IOException {
+
+        /* Get a SAXParser from the SAXPArserFactory. */
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        SAXParser sp = spf.newSAXParser();
+
+        /* Get the XMLReader of the SAXParser we created. */
+        XMLReader xr = sp.getXMLReader();
+        /* Create a new ContentHandler and apply it to the XML-Reader*/ 
+        OrganisationHandler myOrgHandler = new OrganisationHandler(new RsrDbAdapter(ctx), defaultId);
+        xr.setContentHandler(myOrgHandler);
+        /* Parse the xml-data from our URL. */
+        xr.parse(new InputSource(url.openStream()));
+        /* Parsing has finished. */
+
+        /* Check if anything went wrong. */
+        err = myOrgHandler.getError();
+    }
 
 
 	/**
@@ -470,12 +500,13 @@ public class Downloader {
 
 	
 	/**
-	 *  Publishes an update to the server
+	 * Publishes an update to the server
 	 *  
 	 * @param urlTemplate
 	 * @param update
 	 * @param sendImage
-	 * @param user
+     * @param user
+     * @param prog
 	 * 
 	 * @return int
 	 * 
@@ -501,13 +532,13 @@ public class Downloader {
 	</object>
 
 	 * To URL:
-	/api/v1/project_update/?format=xml&api_key=62a101a36893397300cbf62fbbf0debaa2818496&username=gabriel
+	/api/v1/project_update/?format=xml&api_key=62nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn96&username=uuuuuuuu
 
 	 * As:  
 	application/xml
 
 	 */
-	public static int postXmlUpdateStreaming(String urlTemplate, Update update, boolean sendImage, User user, String agent) {
+	public static int postXmlUpdateStreaming(String urlTemplate, Update update, boolean sendImage, User user, String agent, ProgressReporter prog) {
 		final String contentType = "application/xml";
 		final String bodyTemplate1  =	"<object><update_method>M</update_method><project>%s</project>" + //Mobile update method
 				"<photo_location>E</photo_location><uuid>%s</uuid><user>%s</user><title>%s</title>" +
@@ -552,6 +583,10 @@ public class Downloader {
 								raf.readFully(rawBuf);
 								byte[] b64buf = Base64.encodeBytesToBytes(rawBuf, 0, bufferSize);
 								h.send(b64buf);
+								//only send progress updates for image, which is almost all the payload
+								if (prog != null) {
+								    prog.sendUpdate((int)i, (int)wholeChunks);
+								}
 							}
 							int n = raf.read(rawBuf); //read last piece
 							byte[] b64buf = Base64.encodeBytesToBytes(rawBuf, 0, n);
@@ -621,7 +656,8 @@ public class Downloader {
 	 */
 	static public void sendUpdate(Context ctx, String localId,
 			String urlTemplate, String verifyUrlTemplate,
-			boolean sendImages, User user)
+			boolean sendImages, User user,
+			ProgressReporter prog)
 					throws PostFailedException, PostUnresolvedException, MalformedURLException, ParserConfigurationException  {
 		//Log.v(TAG, "Sending update " + localId);
 		RsrDbAdapter dba = new RsrDbAdapter(ctx);
@@ -630,6 +666,7 @@ public class Downloader {
 			Update upd = dba.findUpdate(localId);
 			String userAgent;
 			try {
+			    //Not to be localized
 			    userAgent = "Akvo RSR Up v" + ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0).versionName +
                         " on Android " + android.os.Build.VERSION.RELEASE +
                         " device " + android.os.Build.MANUFACTURER + 
@@ -638,7 +675,7 @@ public class Downloader {
                 userAgent = "(not found)";
             }
 
-			int status = postXmlUpdateStreaming(urlTemplate, upd, sendImages, user, userAgent);
+			int status = postXmlUpdateStreaming(urlTemplate, upd, sendImages, user, userAgent, prog);
 
 			if (status == ConstantUtil.POST_UNKNOWN) { //try to check on sts immediately
 				URL url = new URL(String.format(verifyUrlTemplate, upd.getUuid()));
@@ -688,7 +725,7 @@ public class Downloader {
 					String localId = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.PK_ID_COL));
 					Update upd = dba.findUpdate(localId);
 					
-					switch (postXmlUpdateStreaming(urlTemplate, upd, sendImages, user, "")) {
+					switch (postXmlUpdateStreaming(urlTemplate, upd, sendImages, user, "", null)) {
 					case ConstantUtil.POST_SUCCESS:
 						upd.setUnsent(false);
 						upd.setDraft(false);
@@ -759,6 +796,34 @@ public class Downloader {
 		}
 	}
 
-
+    /**
+     * checks connectivity.
+     */
+    public static boolean haveNetworkConnection(Context context, boolean wifiOnly) {
+        ConnectivityManager connMgr = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connMgr != null) {
+            NetworkInfo[] infoArr = connMgr.getAllNetworkInfo();
+            if (infoArr != null) {
+                for (int i = 0; i < infoArr.length; i++) {
+                    if (!wifiOnly) {
+                        // if we don't care what KIND of
+                        // connection we have, just that there is one
+                        if (NetworkInfo.State.CONNECTED == infoArr[i].getState()) {
+                            return true;
+                        }
+                    } else {
+                        // if we only want to use wifi, we need to check the
+                        // type
+                        if (infoArr[i].getType() == ConnectivityManager.TYPE_WIFI
+                                && NetworkInfo.State.CONNECTED == infoArr[i].getState()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
 }

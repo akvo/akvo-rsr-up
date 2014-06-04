@@ -13,7 +13,6 @@
         android:layout_height="80dip"
         android:layout_margin="10dp"
         android:contentDescription="@string/app_name"
-        android:scaleType="centerInside"
         />
        
 	<LinearLayout
@@ -51,7 +50,7 @@
         	    android:layout_height="wrap_content"
         	    android:layout_gravity="left"
         	    android:paddingRight="5dp"
-        	    android:text="@string/published"
+        	    android:text="@string/count_published"
         	    android:textSize="12sp"
         	    android:textColor="@color/blue"
         	    android:typeface="sans"
@@ -63,7 +62,7 @@
         	    android:layout_height="wrap_content"
         	    android:layout_gravity="left"
         	    android:paddingRight="5dp"
-        	    android:text="@string/unsynch"
+        	    android:text="@string/count_unsynch"
         	    android:textColor="@color/red"
         	    android:textSize="12sp"
         	    android:typeface="sans"
@@ -74,7 +73,7 @@
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
 	            android:layout_gravity="left"
-	            android:text="@string/drafts"
+	            android:text="@string/count_draft"
 		        android:textSize="12sp"
 		        android:textColor="@color/red"
 		        android:typeface="sans"

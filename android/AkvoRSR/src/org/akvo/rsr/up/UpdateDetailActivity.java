@@ -9,7 +9,7 @@
  *
  *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  See the GNU Affero General Public License included with this program for more details.
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
@@ -18,6 +18,7 @@ package org.akvo.rsr.up;
 
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
+import org.akvo.rsr.up.domain.Organisation;
 import org.akvo.rsr.up.domain.Project;
 import org.akvo.rsr.up.domain.Update;
 import org.akvo.rsr.up.domain.User;
@@ -55,6 +56,10 @@ public class UpdateDetailActivity extends Activity {
 	//Database
 	private RsrDbAdapter dba;
 	
+	//TODO: may want to have an onResume where we check if an upload is ongoing,
+	// and if so display a progress indicator
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -66,7 +71,7 @@ public class UpdateDetailActivity extends Activity {
         projectId = getIntent().getStringExtra(ConstantUtil.PROJECT_ID_KEY);
         updateId = getIntent().getStringExtra(ConstantUtil.UPDATE_ID_KEY);
 		if (projectId == null || updateId == null) {
-			DialogUtil.errorAlert(this,"No project/update id", "Caller did not specify a project and update");
+			DialogUtil.errorAlert(this,R.string.noid_dialog_title, R.string.noid_dialog_msg);
 		}
 		
 		
@@ -96,36 +101,37 @@ public class UpdateDetailActivity extends Activity {
 		
 		dba = new RsrDbAdapter(this);
 		dba.open();
-
-		Project project = dba.findProject(projectId);
-		projTitleLabel.setText(project.getTitle());
-
-		update = dba.findUpdate(updateId);
-		if (update == null) {
-			DialogUtil.errorAlert(this, "Update missing", "Cannot open for review, update " + updateId);
-		} else {
-			//populate fields
-			synching = update.getUnsent();
-			editable = update.getDraft() && !synching;
-			projupdTitleText.setText(update.getTitle());	
-			projupdDescriptionText.setText(update.getText());
-			User author = dba.findUser(update.getUserId());
-			if (author != null) {
-				if (debug) {
-					projupdUser.setText(author.getFirstname() + " " + author.getLastname() + "[" + update.getUserId() + "]");
-				} else {
-					projupdUser.setText(author.getFirstname() + " " + author.getLastname());
-				}				
-			} else {
-				projupdUser.setText("[" + update.getUserId() + "]");
-			}
-			//show preexisting image
-			if (update.getThumbnailFilename() != null) {
-				FileUtil.setPhotoFile(projupdImage,update.getThumbnailUrl(),update.getThumbnailFilename(), null, updateId);
-			}
-
+		try {
+    		Project project = dba.findProject(projectId);
+    		projTitleLabel.setText(project.getTitle());
+    
+    		update = dba.findUpdate(updateId);
+    		if (update == null) {
+    			DialogUtil.errorAlert(this, R.string.noupd_dialog_title ,R.string.noupd_dialog_msg);
+    		} else {
+    			//populate fields
+    			synching = update.getUnsent();
+    			editable = update.getDraft() && !synching;
+    			projupdTitleText.setText(update.getTitle());	
+    			projupdDescriptionText.setText(update.getText());
+    			User author = dba.findUser(update.getUserId());
+    			Organisation org = null;
+    			String sig = "";
+    			if (author != null) {
+    			    sig += author.getFirstname() + " " + author.getLastname();
+    			    if (author.getOrgId() != null) org = dba.findOrganisation(author.getOrgId());
+    	            if (org != null) sig += ", " + org.getName();
+    			}
+    			if (author == null || debug) {
+    				sig += "[" + update.getUserId() + "]";
+    			}
+    		    projupdUser.setText(sig);
+    		    FileUtil.setPhotoFile(projupdImage,update.getThumbnailUrl(),update.getThumbnailFilename(), null, updateId);
+    		}
 		}
-		dba.close();
+		finally {
+		    dba.close();
+		}
 		
 		btnEdit.setEnabled(editable);
 		btnEdit.setVisibility(editable?View.VISIBLE:View.GONE);
@@ -138,9 +144,6 @@ public class UpdateDetailActivity extends Activity {
 
 	@Override
 	protected void onDestroy() {
-		if (dba != null) {
-			dba.close();
-		}
 		super.onDestroy();
 	}
 
@@ -155,6 +158,15 @@ public class UpdateDetailActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
+        case R.id.action_delete_update:
+            if (update.getUnsent() || update.getDraft()) {
+                dba.open();
+                dba.deleteUpdate(update.getId());
+                dba.close();
+                update = null;
+                finish();
+            }
+            return true;
         case R.id.action_settings:
 			Intent intent = new Intent(this, SettingsActivity.class);
 			startActivity(intent);

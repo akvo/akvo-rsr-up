@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *
+ *  This file is part of Akvo RSR.
+ *
+ *  Akvo RSR is free software: you can redistribute it and modify it under the terms of
+ *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+ *  either version 3 of the License or any later version.
+ *
+ *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Affero General Public License included below for more details.
+ *
+ *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ -->
+ <resources>
+
+    <string name="app_name">Akvo RSR Up</string>
+    <string name="app_subtitle">Really Simple Reporting</string>
+    <string name="app_version">&#160;Version&#160;</string>
+    <string name="action_settings">Inställningar</string>
+    <string name="action_diagnostics">Diagnostik</string>
+    <string name="action_about">Om appen</string>
+    <string name="action_add_update">Skapa uppdatering</string>
+    <string name="action_delete_update">Ta bort uppdatering</string>
+    <string name="action_attach_photo">Bifoga foto</string>
+    <string name="action_logout">Logga ut</string>
+    <string name="action_sendall">Skicka allt oskickat</string>
+    <string name="copyright">Copyright &#169; 2012-2014 Stichting Akvo</string>
+    <string name="powered_by_akvo">Powered by Akvo</string>
+    <string name="title_activity_login">Akvo RSR Up</string>
+    <string name="title_activity_project_list">Akvo RSR Up</string>
+    <string name="title_activity_project_detail">Akvo RSR Up</string>
+    <string name="title_activity_update_list">Akvo RSR Up</string>
+    <string name="title_activity_update_edit">Akvo RSR Up</string>
+    <string name="title_activity_update_detail">Akvo RSR Up</string>
+    <string name="title_activity_settings">Inställningar</string>
+    <string name="title_activity_about">Om-appen-sida</string>
+    <string name="title_activity_license">Licensinformation</string>
+    <string name="license">Licensinformation</string>
+    <string name="label_update_title">Skapa en uppdatering:</string>
+    <string name="hint_update_title">Rubrik</string>
+    <string name="hint_search">Sök</string>
+    <string name="hint_update_description">Beskrivning</string>
+    <string name="hint_update_caption">Fototext</string>
+    <string name="hint_update_credit">Fotograf</string>
+    <string name="label_update_description">Uppdateringsbeskrivning:</string>
+    <string name="label_send_progress">Publicerar uppdatering</string>
+    <string name="label_project_location">Plats:</string>
+    <string name="label_project_summary">Sammanfattning:</string>
+    <string name="label_empty_proj_list">Inget hämtat än. Tryck på uppdateringsknappen för att se dina projekt.\n\nOm du har långsam uppkolling bör du slå på \'Vänta med att hämta bilder\' i inställningarna först.</string>
+    <string name="label_proj_list">Dina Projekt:</string>
+    <string name="label_update_list">Uppdateringar:</string>
+    <string name="label_refresh_progress">Uppdatering pågår</string>
+    <string name="label_progress_projects">Projekt</string>
+    <string name="label_progress_updates">Uppdateringar</string>
+    <string name="label_progress_pictures">Bilder</string>
+    <string name="label_clearcache_freespace">Frigör %d MB. Bilder du tagit behålls.</string>
+    <string name="label_settings_general">Allmänt</string>
+    <string name="label_settings_testing">Test</string>
+    <string name="label_setting_delaypics">Vänta med att hämta foton</string>    
+    <string name="summary_setting_delaypics">Hämta inte bilder tills du klickar på dem. Det går fortare att hämta, men bilderna kan inte ses när du är offline.</string>    
+    <string name="label_setting_clearcache">Rensa hämtade biler</string>    
+    <string name="label_setting_host">Dataserver</string>    
+    <string name="label_setting_feedback">Tyck</string>    
+    <string name="label_setting_feedback_version">Tyck till om ver %s</string>
+    <string name="label_setting_debuginfo">Debuggning</string>    
+    <string name="summary_setting_feedback">Öppnar ett webbformulär där du kan berätta vad du tycker om denna app.</string>    
+    <string name="summary_setting_debuginfo">Visa teknisk info som id-nummer etc.</string>    
+    <string name="state_draft">Utkast</string>
+    <string name="state_published">Publicerat</string>
+    <string name="state_synchronising">Synkroniserar</string>
+    <string name="count_draft">&#160;Utkast</string>
+    <string name="count_published">&#160;Publicerade</string>
+    <string name="count_unsynch">&#160;Osynkroniserade</string>
+    <string name="count_zero">Inga uppdateringar</string>
+    <string name="updates_txt">STATUS PÅ UPPDATERINGAR</string>
+    <string name="username">Användarnamn</string>
+    <string name="email_address">Epostadress</string>
+    <string name="password">Lösenord</string>
+    <string name="forgot_password_">Glömt löseordet?</string>
+    <string name="btncaption_sign_in">LOGGA IN</string>
+    <string name="btncaption_take_photo">Ta bild</string>
+    <string name="btncaption_attach_photo">Bifoga bild</string>
+    <string name="btncaption_rephoto">Byt bild</string>
+    <string name="btncaption_dephoto">Ta bort bild</string>
+    <string name="btncaption_rotphoto">Rotera bild</string>
+    <string name="btncaption_add_update">Addera uppdatering</string>
+    <string name="btncaption_edit_update">Redigera</string>
+    <string name="btncaption_refresh">Förnya projektlista</string> 
+    <string name="btncaption_viewupdates">Lista uppdateringar</string>   
+    <string name="btncaption_clear_data">Töm alla data</string>
+    <string name="btncaption_send_update">Skicka uppdatering</string>
+    <string name="btncaption_save_draft">Spara utkast</string>
+    
+    <string name="host_dialog_title">Mata in server</string>
+    <string name="host_dialog_msg">Exempel: rsr.akvo.org eller https://rsr.akvotest.org</string>
+    
+    <string name="send_progress_title">Publicerar</string>
+    <string name="send_progress_msg">Skicakr uppdateringen to servern...</string>
+
+    <string name="error_dialog_title">Fel</string>
+    
+    <string name="nocard_dialog_title">Inget lagringsmedia</string>
+    <string name="nocard_dialog_msg">Akvo RSR Up behöver ett skrivbart minne för bildfiler. Sätt i kort och starta om.</string>
+			
+    <string name="noid_dialog_title">Inget projekt-/updateringsid</string>
+    <string name="noid_dialog_msg">Anropande kod skickade inget id</string>
+			
+    <string name="noupd_dialog_title">Updateringen saknas</string>
+    <string name="noupd_dialog_msg">Kan inte hitta den uppdatering som ska visas</string>
+    <string name="noupd2_dialog_msg">Kan inte hitta den uppdatering som ska redigeras</string>
+    			
+    <string name="noproj_dialog_title">Inget projektid</string>
+    <string name="noproj_dialog_msg">Anropande kod skickade inget projektid</string>
+			
+    <string name="norot_dialog_title">IO-fel vid bildrotation</string>
+    <string name="norot_dialog_title2">Bildfilen för stor för att roteras</string>
+    <string name="norot_dialog_msg">Försök med en bild med lägr upplösning</string>
+    			
+    <string name="warnbig_dialog_title">Bildfilen för stor</string>
+    <string name="warnbig_dialog_msg1">Ställ in kameran på lägre upplösning</string>
+    <string name="warnbig_dialog_msg2">Välj en minder bild</string>
+    			
+    <string name="shrinkbig_dialog_title">Kunde inte krympa bilden</string>
+    <string name="shrinkbig_dialog_msg">Originalet var för stort för att öppnas</string>
+    
+    <string name="nonet_dialog_title">Nätverk ej tillgängligt</string>
+    <string name="nonet_dialog_msg">Du måste vara ansluten till internet</string>
+    
+    <string name="login_progress_title">Loggar in</string>
+    <string name="login_progress_msg">Skickar uppgifter</string>
+            
+    <string name="cleared_dialog_title">Cachen tömd</string>
+    <string name="cleared_dialog_msg">%1$d filer borttagna (%2$d MB)</string>
+    
+    <string name="msg_update_published">Uppdatering publicerad</string>
+    <string name="msg_update_success">Uppdatering skickad</string>
+    <string name="msg_network_problem">Netvärksproblem</string>
+    <string name="msg_synchronising">Uppdatering synkroniseras fortfarande...</string>
+    <string name="msg_update_drafted">Uppdatering sparad som utkast</string>
+    <string name="msg_success_drafted">Utkast sparat</string>
+    <string name="msg_logged_in_as_template">Inloggad som %s</string>
+    <string name="msg_fetch_complete">Hämtat</string>
+    
+    <string name="errmsg_empty_title">En uppdatering måste ha en rubrik!</string>
+    <string name="errmsg_bad_url">Felaktig URL!</string>
+    <string name="errmsg_not_found_on_server">Kan inte hitta: </string>
+    <string name="errmsg_update_fetch_failed">Uppdatering kunde inte hämtas: </string>
+    <string name="errmsg_user_fetch_failed">Användare kunde inte hämtas: </string>
+    <string name="errmsg_org_fetch_failed">Organisation kunde inte hämtas: </string>
+    <string name="errmsg_signin_denied">Fel lösenord eller anändarnamn</string>
+    <string name="errmsg_signin_failed">Kunde inte identifiera: </string>
+    
+    <string name="btncaption_ok">OK</string>
+    <string name="btncaption_cancel">Avbryt</string>
+    <string name="authtitle">Måste vara inloggad</string>
+    <string name="authtext">Mata in admin-lösenord</string>
+    <string name="authfailed">Inloggning misslyckades</string>
+    <string name="invalidpassword">Fel lösenord</string>
+    
+    <string name="dummy_project_title">Project title here</string>
+    <string name="dummy_update_title">Update title here</string>
+    <string name="dummy_update_description">Update description goes here, and can be any length. Update will scroll but button will stay at bottom of screen.</string>   
+    <string name="dummy_author">Nomen Nescio, Akvo</string>
+    <string name="dummy_count">17</string>
+    <string name="dummy_time">2014-04-23 17:18</string>
+    <string name="dummy_version">0.0</string>
+    
+    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent pharetra ultricies ante, imperdiet viverra nisi rutrum a. Integer consequat laoreet malesuada. Nam fermentum risus id aliquet pellentesque. Sed nec nisl in turpis sodales ultricies. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Interdum et malesuada fames ac ante ipsum primis in faucibus.</string>
+    
+    
+    <string-array name="types">
+        <item>Type 1</item>
+        <item>Type 2</item>
+        <item>Type 3</item>
+    </string-array>
+    <string-array name="types_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+
+</resources>

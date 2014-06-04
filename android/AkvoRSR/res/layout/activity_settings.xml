@@ -1,56 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:title="Settings" >
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:title="@string/title_activity_settings"
+    >
 
-  <PreferenceCategory
-      android:title="General">
+    <PreferenceCategory
+        android:title="@string/label_settings_general">
 
-    <CheckBoxPreference
-       android:key="setting_delay_image_fetch"
-       android:title="Delay fetching pictures"
-       android:summary="Do not fetch pictures until they are clicked. Refresh is fast, but pictures are unavailable when offline."
-       android:defaultValue="false"
-       />
-    <Preference
-       android:key="clear_cache"
-	   android:title="Delete cached pictures"
-       />    
-    <Preference
-       android:key="data_host"
-	   android:title="Data server"
-       />    
+        <CheckBoxPreference
+            android:key="setting_delay_image_fetch"
+            android:title="@string/label_setting_delaypics"
+            android:summary="@string/summary_setting_delaypics"
+            android:defaultValue="false"
+            />
+        <Preference
+            android:key="clear_cache"
+            android:title="@string/label_setting_clearcache"
+            />    
+        <Preference
+            android:key="data_host"
+            android:title="@string/label_setting_host"
+            />    
     </PreferenceCategory>
 
-  <PreferenceCategory android:title="Testing">
+    <PreferenceCategory
+        android:title="@string/label_settings_testing">
       
-	<Preference
-	  android:key="feedback_form"
-	  android:title="Give feedback"
-	  android:summary="Open a web feedback form where you can tell us what you think of this app">
-	
-	  <intent
-	    android:action="android.intent.action.VIEW"
-	    android:data="https://akvodev.webform.com/form/10072" />
-	</Preference>
-    <CheckBoxPreference
-      android:key="setting_debug"
-      android:title="Debug"
-      android:summary="Show project and update ids and other debug info"
-      android:defaultValue="false"
-      />
+    	<Preference
+            android:key="feedback_form"
+            android:title="@string/label_setting_feedback"
+            android:summary="@string/summary_setting_feedback">
+            <intent
+        	    android:action="android.intent.action.VIEW"
+        	    android:data="https://akvodev.webform.com/form/10072" />
+    	</Preference>
+        <CheckBoxPreference
+            android:key="setting_debug"
+            android:title="@string/label_setting_debuginfo"
+            android:summary="@string/summary_setting_debuginfo"
+            android:defaultValue="false"
+            />
 	</PreferenceCategory>
   
   
 <!--       
-    <CheckBoxPreference
-       android:key="setting_send_images"
-       android:title="Send images"
-       android:summary="Embeds images in uploads"
-       android:defaultValue="true"
-       />
-
   <PreferenceCategory
      android:title="Selection">
     <ListPreference
@@ -70,15 +64,6 @@
     />
      
   </PreferenceCategory>
-  <Preference
-    android:title="Intent"
-    android:summary="Open a webpage">
-
-    <intent
-      android:action="android.intent.action.VIEW"
-      android:data="http://android-elements.blogspot.com/" />
-
-  </Preference>
  -->
    
 </PreferenceScreen>

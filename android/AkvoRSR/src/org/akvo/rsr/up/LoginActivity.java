@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -9,7 +9,7 @@
  *
  *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  See the GNU Affero General Public License included with this program for more details.
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
@@ -76,8 +76,7 @@ public class LoginActivity extends Activity {
 			}
 
 		} else {
-			DialogUtil.errorAlert(this, "No storage available", "Akvo RSR requires a mounted, writable storage card for image files. Mount card and restart app.");
-			
+			DialogUtil.errorAlert(this, R.string.nocard_dialog_title, R.string.nocard_dialog_msg);
 		}
 		
 		//temporary hack for testing used TEST_HOST
@@ -100,7 +99,8 @@ public class LoginActivity extends Activity {
         final TextView forgot = (TextView) findViewById(R.id.link_to_forgot);
         forgot.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(SettingsUtil.host(LoginActivity.this) + ConstantUtil.PWD_URL));
+                Intent myIntent = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse(SettingsUtil.host(LoginActivity.this) + ConstantUtil.PWD_URL));
                 startActivity(myIntent);                
             }
         });
@@ -118,6 +118,7 @@ public class LoginActivity extends Activity {
         LocalBroadcastManager.getInstance(this).registerReceiver(rec, f);
 	}
 	
+	
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -125,10 +126,12 @@ public class LoginActivity extends Activity {
 		if (SettingsUtil.haveCredentials(this)) { //skip login
 		    Intent intent = new Intent(this, ProjectListActivity.class);
 		    startActivity(intent);
+            finish();
 		} else {
 			passwordEdit.setText("");
 		}
 	}
+	
 	
 	@Override
 	protected void onDestroy() {
@@ -144,7 +147,7 @@ public class LoginActivity extends Activity {
 		return true;
 	}
 
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
@@ -158,8 +161,8 @@ public class LoginActivity extends Activity {
 	    default:
 	    	return super.onOptionsItemSelected(item);
 	    }
-
 	}
+	
 	
 	/**
 	 *  shows the about activity
@@ -175,8 +178,8 @@ public class LoginActivity extends Activity {
     public void signIn(View view) {
 		//start a "progress" animation
     	progress = new ProgressDialog(this);
-		progress.setTitle("Signing in");
-		progress.setMessage("Sending login information");
+		progress.setTitle(R.string.login_progress_title);
+		progress.setMessage(getResources().getString(R.string.login_progress_msg));
 		progress.show();
     	
     	//request API key from server		
@@ -185,7 +188,6 @@ public class LoginActivity extends Activity {
 		intent.putExtra(ConstantUtil.PASSWORD_KEY, passwordEdit.getText().toString());
 		getApplicationContext().startService(intent);
 		//now we wait for a broadcast...
-
     }
 
     
@@ -201,10 +203,13 @@ public class LoginActivity extends Activity {
 
 		String err = intent.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
 		if (err == null) {
-			Toast.makeText(getApplicationContext(), "Logged in as " + SettingsUtil.Read(this, "authorized_username"), Toast.LENGTH_SHORT).show();
+		    String msg = getResources().getString(R.string.msg_logged_in_as_template,
+		            SettingsUtil.Read(this, "authorized_username"));
+			Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
 			//Go to main screen
 		    Intent mainIntent = new Intent(this, ProjectListActivity.class);
 		    startActivity(mainIntent);
+		    finish();
 		} else {
 			passwordEdit.setText("");
 			//Let user keep username
@@ -214,7 +219,10 @@ public class LoginActivity extends Activity {
 	}
 
 	
-	//Broadcast receiver for receiving status updates from the IntentService
+	/**
+	 * Broadcast receiver for receiving status updates from the auth IntentService
+	 *
+	 */
 	private class ResponseReceiver extends BroadcastReceiver {
 		// Prevents instantiation
 		private ResponseReceiver() {

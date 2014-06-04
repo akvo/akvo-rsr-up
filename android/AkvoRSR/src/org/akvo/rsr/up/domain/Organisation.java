@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -16,14 +16,13 @@
 
 package org.akvo.rsr.up.domain;
 
-/**
- * Holds information about one country
- */
-public class Country {
+
+public class Organisation {
 	private String id;
-	private String isoCode;
 	private String name;
-	private String continent;
+    private String longName;
+    private String email;
+    private String url;
 
 	public String getId() {
 		return id;
@@ -31,14 +30,6 @@ public class Country {
 
 	public void setId(String id) {
 		this.id = id;
-	}
-
-	public String getIsoCode() {
-		return isoCode;
-	}
-
-	public void setIsoCode(String isoCode) {
-		this.isoCode = isoCode;
 	}
 
 	public String getName() {
@@ -49,14 +40,28 @@ public class Country {
 		this.name = name;
 	}
 
-	public String getContinent() {
-		return continent;
+	public String getLongName() {
+		return longName;
 	}
 
-	public void setContinent(String continent) {
-		this.continent = continent;
+	public void setLongName(String name) {
+		this.longName = name;
 	}
 
+    public String getEmail() {
+        return email;
+    }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
 }

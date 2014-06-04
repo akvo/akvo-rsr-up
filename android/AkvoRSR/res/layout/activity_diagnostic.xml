@@ -25,7 +25,7 @@
         android:text="Text starts here"
          />
 	</ScrollView>
-	<!-- the bottom buttons -->      		      		
+	<!-- the bottom buttons       		      		
 		    <LinearLayout
 		        android:layout_width="fill_parent"
 		        android:layout_height="wrap_content"
@@ -39,8 +39,6 @@
 			        android:layout_weight="1"
 			        android:text="Clear image cache"
 		            />
-			    <!-- View updates button -->
-		
 			    <Button
 		            android:id="@+id/btn_diag_b"
 			        android:layout_width="0dp"
@@ -50,4 +48,5 @@
 		            />
 		    	    	
    			</LinearLayout>
+            -->
 </LinearLayout>

@@ -2,6 +2,7 @@
 package org.akvo.rsr.up.util;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -12,10 +13,13 @@ import org.akvo.rsr.up.dao.RsrDbAdapter;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Build;
 import android.os.Environment;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -177,24 +181,14 @@ public class FileUtil {
                 o.inJustDecodeBounds = true;
                 BitmapFactory.decodeFile(fn, o);
                 // The new size we want to scale to
-                final int REQUIRED_SIZE = 140;
-
-                // Find the correct scale value. It should be a power of 2.
-                int width_tmp = o.outWidth, height_tmp = o.outHeight;
-                int scale = 1;
-                while (true) {
-                    if (width_tmp / 2 < REQUIRED_SIZE
-                            || height_tmp / 2 < REQUIRED_SIZE) {
-                        break;
-                    }
-                    width_tmp /= 2;
-                    height_tmp /= 2;
-                    scale *= 2;
-                }
-
+                final int REQUIRED_SIZE = 320; //640/2 
+//                int portSize = imgView.getWidth(); //sometimes returns 0
+//                if (imgView.getHeight() > portSize) portSize = imgView.getHeight();
                 // Decode with inSampleSize
                 BitmapFactory.Options o2 = new BitmapFactory.Options();
-                o2.inSampleSize = scale;
+                o2.inSampleSize = subsamplingFactor(o, REQUIRED_SIZE);
+//                o2.inDensity = DisplayMetrics.DENSITY_MEDIUM;
+                o2.inScaled = true;
 
                 Bitmap bm = BitmapFactory.decodeFile(fn, o2);
                 if (bm == null) {
@@ -218,22 +212,14 @@ public class FileUtil {
     }
 
     
-    /*
-     *  shrinks an image file (to save upload bandwidth)
-     * the quick way, by a power-of-2 integer factor
-     * This will lose any EXIF information
+    /**
+     * returns a power-of-two subsampling factor
+     * @param o
+     * @param maxSize
+     * @return
      */
-    public static boolean shrinkImageFileQuickly(String filename, int maxSize) {
-        BitmapFactory.Options o = new BitmapFactory.Options();
-        o.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(filename, o);
+    public static int subsamplingFactor(BitmapFactory.Options o, int maxSize) {
         int width_tmp = o.outWidth, height_tmp = o.outHeight;
-        if (width_tmp < 0 || height_tmp < 0)
-            return false;
-        if (width_tmp <= maxSize && height_tmp <= maxSize)
-            return true;
-
-        // Find the correct scale value. It should be a power of 2.
         int scale = 1;
         while (true) {
             if (width_tmp <= maxSize &&
@@ -244,12 +230,38 @@ public class FileUtil {
             height_tmp /= 2;
             scale *= 2;
         }
+        return scale;
+    }
+    
+    /**
+     * always reads an image file into a bitmap where long edge is no larger than given size
+     * @param filename
+     * @param maxSize
+     * @return
+     */
+    public static Bitmap readSubsampledImageFile(String filename, int maxSize) {
+        BitmapFactory.Options o = new BitmapFactory.Options();
+        o.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(filename, o);
+        int width_tmp = o.outWidth, height_tmp = o.outHeight;
+        if (width_tmp < 0 || height_tmp < 0)
+            return null;
 
         // Decode with inSampleSize
         BitmapFactory.Options o2 = new BitmapFactory.Options();
-        o2.inSampleSize = scale;
-
-        Bitmap bm = BitmapFactory.decodeFile(filename, o2);
+        o2.inSampleSize = subsamplingFactor(o, maxSize);
+        Log.v(TAG, "Shrinking image by a factor of " + o2.inSampleSize);
+        return BitmapFactory.decodeFile(filename, o2);
+    }
+    
+    
+    /**
+     * shrinks an image file (to save upload bandwidth)
+     * the quick way, by a power-of-2 integer factor
+     * This will lose any EXIF information
+     */
+    public static boolean shrinkImageFileQuickly(String filename, int maxSize) {
+        Bitmap bm = readSubsampledImageFile(filename, maxSize);
         if (bm == null) {
             return false;
         } else {
@@ -258,7 +270,6 @@ public class FileUtil {
                 FileOutputStream stream = new FileOutputStream(filename);
                 if (bm.compress(Bitmap.CompressFormat.JPEG, 90, stream)) {
                     stream.close();
-                    Log.i(TAG, "Shrunk image by a factor of " + scale);
                     return true;
                 }
                 return false;
@@ -270,22 +281,26 @@ public class FileUtil {
     }
 
     
-    /*
+    /**
      * shrinks an image file so long edge becomes exactly maxSize pixels
      * if already smaller, do nothing unless flag is set
      * 
-     * This will lose any EXIF information
+     * This will lose any EXIF information if it shrinks
      * Rotation will be normalized (if library is well-written)
      */
     public static boolean shrinkImageFileExactly(String filename, int maxSize, boolean alwaysRewrite) {
         BitmapFactory.Options o = new BitmapFactory.Options();
-        Bitmap bm = BitmapFactory.decodeFile(filename, o);
-        float width = o.outWidth, height = o.outHeight;
-        if (bm == null || width < 0 || height < 0)
-            return false;
-        if (!alwaysRewrite && width <= maxSize && height <= maxSize)
-            return true;
+        o.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(filename, o);
+        int width_tmp = o.outWidth, height_tmp = o.outHeight;
+        if (width_tmp < 0 || height_tmp < 0) return false; //unreadable
+        if (!alwaysRewrite && width_tmp <= maxSize && height_tmp <= maxSize) return true; //already good
+        //Have to read and shrink it
+        //Subsample it first to save memory if it is huge.
+        Bitmap bm = readSubsampledImageFile(filename, maxSize * 2); //could throw OutOfMemory
+        if (bm == null) return false; //unreadable
 
+        float width = bm.getWidth(), height = bm.getHeight();
         float xFactor;
         if (width > height) {
             xFactor = maxSize / width;
@@ -393,7 +408,7 @@ public class FileUtil {
     /**
      * remove all files in the image cache
      */
-    public static void clearCache(Context context) {
+    public static void clearCache(Context context, boolean showSavings) {
         RsrDbAdapter dba = new RsrDbAdapter(context);
         dba.open();
         dba.clearProjectThumbnailFiles();
@@ -407,9 +422,38 @@ public class FileUtil {
                 sizeSum += files[i].length();
                 files[i].delete();
             }
-            DialogUtil.infoAlert(context, "Cache cleared", files.length + " files deleted ("
-                    + sizeSum / (1024 * 1024) + " MB)");
+            if (showSavings) {
+                Resources res = context.getResources();
+                DialogUtil.infoAlert(context, res.getString(R.string.cleared_dialog_title),
+                        res.getString(R.string.cleared_dialog_msg,  //use positional notation
+                                files.length, sizeSum / (1024 * 1024)));
+            }
         }
+    }
+
+    /**
+     * rotates the image in a file 90 degrees
+     * @param filename
+     * @param clockwise
+     * @return
+     * @throws IOException 
+     */
+    public static void rotateImageFile(String filename, boolean clockwise) throws IOException {
+        //Read image file
+        BitmapFactory.Options o = new BitmapFactory.Options();
+        Bitmap bm = BitmapFactory.decodeFile(filename, o);
+        //Rotate it
+        Matrix matrix = new Matrix();
+        matrix.postRotate(clockwise ? 90 : -90);
+        Bitmap rotatedBitmap = Bitmap.createBitmap(bm , 0, 0, bm.getWidth(), bm.getHeight(), matrix, true);
+        //write image file
+        FileOutputStream ostream = new FileOutputStream(filename);
+        try {
+            rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
+        }
+        finally {
+            ostream.close();
+        }       
     }
 
 }

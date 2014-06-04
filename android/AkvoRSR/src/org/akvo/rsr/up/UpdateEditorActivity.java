@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -9,7 +9,7 @@
  *
  *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  See the GNU Affero General Public License included with this program for more details.
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
@@ -34,21 +34,20 @@ import org.akvo.rsr.up.service.SubmitProjectUpdateService;
 import org.akvo.rsr.up.service.VerifyProjectUpdateService;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.DialogUtil;
+import org.akvo.rsr.up.util.Downloader;
 import org.akvo.rsr.up.util.FileUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
 
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v4.content.LocalBroadcastManager;
@@ -71,7 +70,7 @@ public class UpdateEditorActivity extends Activity {
     private boolean warnAboutBigImage = false;
     private boolean shrinkBigImage = true;
     private final int shrinkSize = 1024;
-    private User user;
+    private User mUser;
 
     private int nextLocalId; // load from / save to variable store
     private String projectId = null;
@@ -82,15 +81,19 @@ public class UpdateEditorActivity extends Activity {
     private TextView projTitleLabel;
     private EditText projupdTitleText;
     private EditText projupdDescriptionText;
+    private EditText photoDescriptionText;
+    private EditText photoCreditText;
     private ImageView projupdImage;
     private Button btnSubmit;
     private Button btnDraft;
     private Button btnTakePhoto;
     private Button btnAttachPhoto;
     private Button btnDelPhoto;
-    private View photoAndDeleteGroup;
+    private Button btnRotRightPhoto;
+    private View photoAndToolsGroup;
     private View photoAddGroup;
-    ProgressDialog progress;
+    private View progressGroup;
+    private ProgressBar inProgress;
 
     // Database
     private RsrDbAdapter dba;
@@ -101,7 +104,7 @@ public class UpdateEditorActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        user = SettingsUtil.getAuthUser(this);
+        mUser = SettingsUtil.getAuthUser(this);
         nextLocalId = SettingsUtil.ReadInt(this, ConstantUtil.LOCAL_ID_KEY, -1);
 
         // find which update we are editing
@@ -110,7 +113,7 @@ public class UpdateEditorActivity extends Activity {
         projectId = extras != null ? extras.getString(ConstantUtil.PROJECT_ID_KEY)
                 : null;
         if (projectId == null) {
-            DialogUtil.errorAlert(this, "No project id", "Caller did not specify a project");
+            DialogUtil.errorAlert(this, R.string.noproj_dialog_title, R.string.noproj_dialog_msg);
         }
         updateId = extras != null ? extras.getString(ConstantUtil.UPDATE_ID_KEY)
                 : null;
@@ -122,11 +125,13 @@ public class UpdateEditorActivity extends Activity {
         // get the look
         setContentView(R.layout.activity_update_editor);
         // find the fields
+        progressGroup = findViewById(R.id.sendprogress_group);
+        inProgress = (ProgressBar) findViewById(R.id.sendProgressBar);
         projTitleLabel = (TextView) findViewById(R.id.projupd_edit_proj_title);
         projupdTitleText = (EditText) findViewById(R.id.edit_projupd_title);
         projupdDescriptionText = (EditText) findViewById(R.id.edit_projupd_description);
         projupdImage = (ImageView) findViewById(R.id.image_update_detail);
-        photoAndDeleteGroup = findViewById(R.id.image_with_delete);
+        photoAndToolsGroup = findViewById(R.id.image_with_tools);
         photoAddGroup = findViewById(R.id.photo_buttons);
 
         // Activate buttons
@@ -171,10 +176,17 @@ public class UpdateEditorActivity extends Activity {
             public void onClick(View view) {
                 // Forget image
                 update.setThumbnailFilename(null);
-                // TODO: delete image file if it was take through this app?
-                // Hide them
-                photoAndDeleteGroup.setVisibility(View.GONE);
-                photoAddGroup.setVisibility(View.VISIBLE);
+                // TODO: delete image file if it was taken through this app?
+                // Hide photo w tools
+                showPhoto(false);
+            }
+        });
+
+        btnRotRightPhoto = (Button) findViewById(R.id.btn_rotate_photo_r);
+        btnRotRightPhoto.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                // Rotate image right
+                rotatePhoto(true);
             }
         });
 
@@ -198,13 +210,13 @@ public class UpdateEditorActivity extends Activity {
              * "MAC Address : " + macAddress + "\n" ); else txt_View.append(
              * "MAC Address : " + macAddress + "\n" ); }
              */
-            update.setUserId(user.getId());
+            update.setUserId(mUser.getId());
             update.setDate(new Date());
             editable = true;
         } else {
             update = dba.findUpdate(updateId);
             if (update == null) {
-                DialogUtil.errorAlert(this, "Update missing", "Cannot open update " + updateId);
+                DialogUtil.errorAlert(this, R.string.noupd_dialog_title, R.string.noupd2_dialog_msg);
             } else {
                 // populate fields
                 editable = update.getDraft(); // This should always be true with
@@ -218,25 +230,19 @@ public class UpdateEditorActivity extends Activity {
                 if (update.getThumbnailFilename() != null) {
                     // btnTakePhoto.setText(R.string.btncaption_rephoto);
                     FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(),
-                            update.getThumbnailFilename(), updateId, null);
-                    photoAndDeleteGroup.setVisibility(View.VISIBLE);
-                    photoAddGroup.setVisibility(View.GONE);
+                            update.getThumbnailFilename(), null, null);
+                    showPhoto(true);
                 }
-
             }
         }
 
-        // register a listener for a completion intent
+        // register a listener for a completion and progress intents
         broadRec = new ResponseReceiver();
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                broadRec,
-                new IntentFilter(ConstantUtil.UPDATES_SENT_ACTION));
+        IntentFilter f = new IntentFilter(ConstantUtil.UPDATES_SENT_ACTION);
+        f.addAction(ConstantUtil.UPDATES_SENDPROGRESS_ACTION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadRec, f);
 
-        projupdTitleText.setEnabled(editable);
-        projupdDescriptionText.setEnabled(editable);
-        btnDraft.setEnabled(editable);
-        btnSubmit.setEnabled(editable);
-        btnTakePhoto.setEnabled(editable);
+        enableChanges(editable);
         btnDraft.setVisibility(editable ? View.VISIBLE : View.GONE);
         btnSubmit.setVisibility(editable ? View.VISIBLE : View.GONE);
         // btnTakePhoto.setVisibility(editable?View.VISIBLE:View.GONE);
@@ -245,6 +251,45 @@ public class UpdateEditorActivity extends Activity {
         // setupActionBar();
     }
 
+    private void showPhoto(boolean show) {
+        if (show) {
+            photoAndToolsGroup.setVisibility(View.VISIBLE);
+            photoAddGroup.setVisibility(View.GONE);
+        } else {
+            photoAndToolsGroup.setVisibility(View.GONE);
+            photoAddGroup.setVisibility(View.VISIBLE);
+        }
+    }
+
+    
+    private void rotatePhoto(boolean clockwise) {
+        try {
+            FileUtil.rotateImageFile(update.getThumbnailFilename(), clockwise);
+        }
+        catch (IOException e) {
+            DialogUtil.errorAlert(this, R.string.norot_dialog_title, R.string.norot_dialog_msg);
+            return;
+        }
+        catch (OutOfMemoryError e) {
+            DialogUtil.errorAlert(this, R.string.norot_dialog_title2, R.string.norot_dialog_msg);
+            return;
+        }
+        FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), update.getThumbnailFilename(), null, null);
+    }
+    
+    /**
+     * sets and clears enabled for all elements.
+     */
+    private void enableChanges(boolean enabled) {
+        projupdTitleText.setEnabled(enabled);
+        projupdDescriptionText.setEnabled(enabled);
+        btnDraft.setEnabled(enabled);
+        btnSubmit.setEnabled(enabled);
+        btnTakePhoto.setEnabled(enabled);        
+        btnDelPhoto.setEnabled(enabled);                
+    }
+    
+    
     private static final int IO_BUFFER_SIZE = 4 * 1024;
 
     private static void copyStream(InputStream in, OutputStream out) throws IOException {
@@ -255,32 +300,62 @@ public class UpdateEditorActivity extends Activity {
         }
     }
 
-    /*
-     * (non-Javadoc) Get notification of photo taken or picked
+    
+    /**
+     * gets notification of photo taken or picked
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         // Handle photo taken by camera app
-        if (requestCode == photoRequest) {
+        if (requestCode == photoRequest || requestCode == photoPick) {
             if (resultCode == RESULT_CANCELED) {
                 return;
             }
+            boolean camera = true;
+            
+            // Handle picked photo
+            if (requestCode == photoPick) {
+                camera = false;
+                if (resultCode == RESULT_CANCELED) {
+                    return;
+                }
+                // data.getData is a content: URI. Need to copy the content to a
+                // file, so we can resize and rotate in place
+                InputStream imageStream;
+                try {
+                    imageStream = getContentResolver().openInputStream(data.getData());
+                    captureFilename = FileUtil.getExternalPhotoDir(this) + File.separator + "pick"
+                            + System.nanoTime() + ".jpg";
+                    OutputStream os = new FileOutputStream(captureFilename);
+                    try {
+                        copyStream(imageStream, os);
+                    }
+                    finally {
+                        os.close();
+                    }
+                } catch (FileNotFoundException e) {
+                    projupdImage.setImageResource(R.drawable.thumbnail_error);
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } 
             if (warnAboutBigImage) {
                 // check if file too large - if so, show error dialog and return
                 File sizeTest = new File(captureFilename);
                 if (sizeTest.length() > ConstantUtil.MAX_IMAGE_UPLOAD_SIZE) {
-                    DialogUtil.errorAlert(this, "Photo file too big",
-                            "Set your camera to a lower resolution");
+                    DialogUtil.errorAlert(this, R.string.warnbig_dialog_title,
+                            camera ? R.string.warnbig_dialog_msg1 : R.string.warnbig_dialog_msg2);
                     return;
                 }
             }
             if (shrinkBigImage) {
-                // make long edge 1024 px or smaller
-                if (!FileUtil.shrinkImageFileExactly(captureFilename, shrinkSize, true)) { //ensure no rotation
-                    DialogUtil.errorAlert(this, "Could not shrink photo",
-                            "Original was too big to send.");
+                // make long edge 1024 px
+                if (!FileUtil.shrinkImageFileExactly(captureFilename, shrinkSize, false)) { 
+                    DialogUtil.errorAlert(this, R.string.shrinkbig_dialog_title,
+                            R.string.shrinkbig_dialog_msg);
                 }
             }
             update.setThumbnailFilename(captureFilename);
@@ -289,89 +364,10 @@ public class UpdateEditorActivity extends Activity {
             FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename, null,
                     null);
             // show result
-            photoAndDeleteGroup.setVisibility(View.VISIBLE);
-            photoAddGroup.setVisibility(View.GONE);
-        }
-
-        // Handle picked photo
-        if (requestCode == photoPick) {
-            if (resultCode == RESULT_CANCELED) {
-                return;
-            }
-            // data.getData is a content: URI. Need to copy the content to a
-            // file.
-            InputStream imageStream;
-            try {
-                imageStream = getContentResolver().openInputStream(data.getData());
-                captureFilename = FileUtil.getExternalPhotoDir(this) + File.separator + "pick"
-                        + System.nanoTime() + ".jpg";
-                OutputStream os = new FileOutputStream(captureFilename);
-                copyStream(imageStream, os);
-                os.close();
-                if (warnAboutBigImage) {
-                    // check if file too large - if so, show error dialog and
-                    // return
-                    File sizeTest = new File(captureFilename);
-                    if (sizeTest.length() > ConstantUtil.MAX_IMAGE_UPLOAD_SIZE) {
-                        sizeTest.delete(); // save the space
-                        DialogUtil.errorAlert(this, "Photo file too big", "Pick a smaller photo");
-                        return;
-                    }
-                }
-                if (shrinkBigImage) {
-                    // make long edge 1024 px or smaller
-                    // since this is a copy we can resize it in place
-                    if (!FileUtil.shrinkImageFileExactly(captureFilename, shrinkSize, true)) { //ensure no rotation
-                        DialogUtil.errorAlert(this, "Could not shrink photo",
-                                "Original was too big to send.");
-                    }
-                }
-                // store it and show it
-                update.setThumbnailFilename(captureFilename);
-                update.setThumbnailUrl("dummyUrl");
-                FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename,
-                        null, null);
-                photoAndDeleteGroup.setVisibility(View.VISIBLE);
-                photoAddGroup.setVisibility(View.GONE);
-            } catch (FileNotFoundException e) {
-                projupdImage.setImageResource(R.drawable.thumbnail_error);
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
+            showPhoto(true);
         }
     }
-
-    /**
-     * checks connectivity. TODO: move to util class
-     */
-    private boolean haveNetworkConnection(Context context, boolean wifiOnly) {
-        ConnectivityManager connMgr = (ConnectivityManager) context
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connMgr != null) {
-            NetworkInfo[] infoArr = connMgr.getAllNetworkInfo();
-            if (infoArr != null) {
-                for (int i = 0; i < infoArr.length; i++) {
-                    if (!wifiOnly) {
-                        // if we don't care what KIND of
-                        // connection we have, just that there is one
-                        if (NetworkInfo.State.CONNECTED == infoArr[i].getState()) {
-                            return true;
-                        }
-                    } else {
-                        // if we only want to use wifi, we need to check the
-                        // type
-                        if (infoArr[i].getType() == ConnectivityManager.TYPE_WIFI
-                                && NetworkInfo.State.CONNECTED == infoArr[i].getState()) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
+    
 
     /**
      * Saves current update as draft, if it has a title and this is done by the
@@ -394,24 +390,20 @@ public class UpdateEditorActivity extends Activity {
         update.setUnsent(false);
         update.setTitle(projupdTitleText.getText().toString());
         update.setText(projupdDescriptionText.getText().toString());
-        // update.setDate(new Date()); //should have date from when it was
-        // created
+        // update.setDate(new Date()); //should have date from when it was created
         if (update.getId() == null) {// new
             // MUST have project and a local update id
             update.setProjectId(projectId);
             update.setId(Integer.toString(nextLocalId));
             nextLocalId--;
             SettingsUtil.WriteInt(this, ConstantUtil.LOCAL_ID_KEY, nextLocalId);
-
         }
         dba.saveUpdate(update, true);
         if (interactive) {
             // Tell user what happened
             // TODO: use a confirm dialog instead
             Context context = getApplicationContext();
-            CharSequence text = "Draft saved successfully"; // TODO string
-                                                            // resource
-            Toast toast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(context, R.string.msg_success_drafted, Toast.LENGTH_SHORT);
             toast.show();
             finish();
         }
@@ -424,12 +416,10 @@ public class UpdateEditorActivity extends Activity {
         if (untitled()) {
             return;
         }
-        if (!haveNetworkConnection(this, false)) {
-            // TODO helpful error message, and return
-            // Toast.makeText(getApplicationContext(), "No network connection!",
-            // Toast.LENGTH_SHORT).show();
-
-            // return
+        if (!Downloader.haveNetworkConnection(this, false)) {
+            // helpful error message, instead of a failure later
+            DialogUtil.errorAlert(this, R.string.nonet_dialog_title, R.string.nonet_dialog_msg);
+            return;
         }
 
         update.setUnsent(true);
@@ -450,12 +440,11 @@ public class UpdateEditorActivity extends Activity {
         i.putExtra(ConstantUtil.UPDATE_ID_KEY, update.getId());
         getApplicationContext().startService(i);
 
-        // start a "progress" animation
-        // TODO: a real filling progress bar?
-        progress = new ProgressDialog(this);
-        progress.setTitle(R.string.send_dialog_title);
-        progress.setMessage(getResources().getString(R.string.send_dialog_msg));
-        progress.show();
+        // Disable UI during send to avoid confusion
+        enableChanges(false);
+        // Show the "progress" animation
+        progressGroup.setVisibility(View.VISIBLE);
+
         // Now we wait...
 
     }
@@ -469,7 +458,6 @@ public class UpdateEditorActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-//        dba.open();
         /*
          * if (projectId != null) { Project project =
          * dba.findProject(projectId);
@@ -481,9 +469,9 @@ public class UpdateEditorActivity extends Activity {
 
     /** handles result of send attempt */
     private void onSendFinished(Intent i) {
-        // Dismiss any in-progress dialog
-        if (progress != null)
-            progress.dismiss();
+        //Hide progressbar
+        progressGroup.setVisibility(View.GONE);
+
         String err = i.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
         boolean unresolved = i.getBooleanExtra(ConstantUtil.SERVICE_UNRESOLVED_KEY, false);
         int msgTitle, msgText;
@@ -520,25 +508,11 @@ public class UpdateEditorActivity extends Activity {
                 });
     }
 
-    /** receives status updates broadcast from the IntentService */
-    private class ResponseReceiver extends BroadcastReceiver {
-        // Prevents instantiation
-        private ResponseReceiver() {
-        }
-
-        // Called when the BroadcastReceiver gets an Intent it's registered to
-        // receive
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction() == ConstantUtil.UPDATES_SENT_ACTION)
-                onSendFinished(intent);
-        }
-    }
 
     /** closes database when activity is paused */
     @Override
     protected void onPause() {
         super.onPause();
-//        dba.close(); //should be open for onSaveInstanceState()
     }
 
     /** saves update being worked on before we leave the activity */
@@ -604,5 +578,39 @@ public class UpdateEditorActivity extends Activity {
         }
 
     }
+    /**
+     * updates the progress bars
+     * @param phase
+     * @param done
+     * @param total
+     */
+    private void onFetchProgress(int phase, int done, int total) {
+        inProgress.setIndeterminate(false);
+        inProgress.setProgress(done);
+        inProgress.setMax(total);
+    }
+
+    /**
+     * receives status updates from an IntentService
+     *
+     */
+    private class ResponseReceiver extends BroadcastReceiver {
+        // Prevents instantiation
+        private ResponseReceiver() {
+        }
+        
+        // Called when the BroadcastReceiver gets an Intent it's registered to receive
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction() == ConstantUtil.UPDATES_SENT_ACTION) {
+                onSendFinished(intent);
+            } else if (intent.getAction() == ConstantUtil.UPDATES_SENDPROGRESS_ACTION) {
+                onFetchProgress(intent.getExtras().getInt(ConstantUtil.PHASE_KEY, 0),
+                                intent.getExtras().getInt(ConstantUtil.SOFAR_KEY, 0),
+                                intent.getExtras().getInt(ConstantUtil.TOTAL_KEY, 100));
+            }
+        }
+    }
+
+
 
 }

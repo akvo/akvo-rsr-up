@@ -1,9 +1,5 @@
 package org.akvo.rsr.up.service;
 
-import java.net.MalformedURLException;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.Downloader;
@@ -41,7 +37,14 @@ public class SubmitProjectUpdateService extends IntentService {
 					SettingsUtil.host(this) + ConstantUtil.POST_UPDATE_URL + ConstantUtil.API_KEY_PATTERN,
 					SettingsUtil.host(this) + ConstantUtil.VERIFY_UPDATE_PATTERN,
 					sendImg,
-					user);
+					user,
+					new Downloader.ProgressReporter() {
+                        
+                        @Override
+                        public void sendUpdate(int sofar, int total) {
+                            broadcastProgress(0, sofar, total);
+                        }
+                    });
 		} catch (PostFailedException e) {
 			i.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, e.getMessage());
 		}
@@ -56,4 +59,20 @@ public class SubmitProjectUpdateService extends IntentService {
 	    LocalBroadcastManager.getInstance(this).sendBroadcast(i);
 
 	}
+
+	/**
+	 * broadcasts interim progress (primarily back to update editor activity)
+	 * @param p Phase, not used here
+	 * @param s Progress so far
+	 * @param t Target for this phase
+	 */
+    private void broadcastProgress(int p, int s, int t){
+        Intent i1 = new Intent(ConstantUtil.UPDATES_SENDPROGRESS_ACTION);
+        i1.putExtra(ConstantUtil.PHASE_KEY, p);
+        i1.putExtra(ConstantUtil.SOFAR_KEY, s);
+        i1.putExtra(ConstantUtil.TOTAL_KEY, t);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(i1);      
+    }
+
+
 }
