@@ -75,7 +75,7 @@
     <string name="count_published">&#160;Published</string>
     <string name="count_zero">No updates</string>
     <string name="updates_txt">UPDATES STATUS</string>
-    <string name="unsynch">&#160;Unsynchronised</string>
+    <string name="count_unsynch">&#160;Unsynchronised</string>
     <string name="username">Username</string>
     <string name="email_address">Email Address</string>
     <string name="password">Password</string>

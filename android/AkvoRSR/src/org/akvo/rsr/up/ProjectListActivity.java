@@ -31,6 +31,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -86,6 +87,7 @@ public class ProjectListActivity extends ListActivity {
                 } else {
                     searchField.setVisibility(View.VISIBLE);
                     searchField.requestFocus();
+                    searchField.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
                 }
             }
         });
