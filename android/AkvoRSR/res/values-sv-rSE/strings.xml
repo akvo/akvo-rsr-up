@@ -49,6 +49,7 @@
     <string name="label_send_progress">Publicerar uppdatering</string>
     <string name="label_project_location">Plats:</string>
     <string name="label_project_summary">Sammanfattning:</string>
+    <string name="label_photo_credit">Foto: %s</string>
     <string name="label_empty_proj_list">Inget hämtat än. Tryck på uppdateringsknappen för att se dina projekt.\n\nOm du har långsam uppkolling bör du slå på \'Vänta med att hämta bilder\' i inställningarna först.</string>
     <string name="label_proj_list">Dina Projekt:</string>
     <string name="label_update_list">Uppdateringar:</string>

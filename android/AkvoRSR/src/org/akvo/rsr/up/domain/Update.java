@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -34,6 +34,10 @@ public class Update {
 	private String thumbnailFilename;	
 	private String uuid;	
 	private Date date;
+    private String photoCredit;
+    private String photoCaption;
+    private String videoUrl;
+    private String videoFilename;
 
 	public String getId() {
 		return id;
@@ -129,7 +133,39 @@ public class Update {
 	}
 
 	public void setUuid(String uuid) {
-		this.uuid= uuid;
+		this.uuid = uuid;
 	}
+
+    public String getPhotoCredit() {
+        return photoCredit;
+    }
+
+    public void setPhotoCredit(String credit) {
+        photoCredit = credit;
+    }
+
+    public String getPhotoCaption() {
+        return photoCaption;
+    }
+
+    public void setPhotoCaption(String caption) {
+        photoCaption = caption;
+    }
+
+    public String getVideoUrl() {
+        return videoUrl;
+    }
+
+    public void setVideoUrl(String url) {
+        videoUrl = url;
+    }
+
+    public String getVideoFilename() {
+        return videoFilename;
+    }
+
+    public void setVideoFilename(String fn) {
+        videoFilename = fn;
+    }
 
 }

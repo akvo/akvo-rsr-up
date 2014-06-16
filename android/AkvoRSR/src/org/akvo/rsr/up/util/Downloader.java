@@ -163,7 +163,7 @@ public class Downloader {
 		/* Get the XMLReader of the SAXParser we created. */
 		XMLReader xr = sp.getXMLReader();
 		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
-		UpdateListHandler myUpdateListHandler = new UpdateListHandler(new RsrDbAdapter(ctx), true);
+		UpdateListHandler myUpdateListHandler = new UpdateListHandler(new RsrDbAdapter(ctx), true, false);
 		xr.setContentHandler(myUpdateListHandler);
 		/* Parse the xml-data from our URL. */
 		xr.parse(new InputSource(url.openStream()));
@@ -194,7 +194,7 @@ public class Downloader {
 		/* Get the XMLReader of the SAXParser we created. */
 		XMLReader xr = sp.getXMLReader();
 		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
-		UpdateListHandler myUpdateListHandler = new UpdateListHandler(dba, false);
+		UpdateListHandler myUpdateListHandler = new UpdateListHandler(dba, false, false);
 		xr.setContentHandler(myUpdateListHandler);
 		/* Parse the xml-data from our URL. */
 		xr.parse(new InputSource(url.openStream()));

@@ -17,8 +17,10 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.os.Build;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -412,7 +414,7 @@ public class FileUtil {
         RsrDbAdapter dba = new RsrDbAdapter(context);
         dba.open();
         dba.clearProjectThumbnailFiles();
-        dba.clearUpdateThumbnailFiles();
+        dba.clearUpdateMediaFiles();
         dba.close();
         File f = getExternalCacheDir(context);
         File[] files = f.listFiles();
@@ -456,4 +458,29 @@ public class FileUtil {
         }       
     }
 
+    
+    /**
+     * propagates the EXIF rotation attribute
+     * @param originalImage
+     * @param resizedImage
+     */
+    public static void propagateOrientation(String originalImage, String resizedImage) {
+        try {
+            ExifInterface exif1 = new ExifInterface(originalImage);
+            ExifInterface exif2 = new ExifInterface(resizedImage);
+ 
+            final String orientation1 = exif1.getAttribute(ExifInterface.TAG_ORIENTATION);
+            final String orientation2 = exif2.getAttribute(ExifInterface.TAG_ORIENTATION);
+ 
+            if (!TextUtils.isEmpty(orientation1) && !orientation1.equals(orientation2)) {
+                Log.d(TAG, "Orientation property in EXIF does not match. Overriding it with original value...");
+                exif2.setAttribute(ExifInterface.TAG_ORIENTATION, orientation1);
+                exif2.saveAttributes();
+            }
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
+ 
+    }
+    
 }

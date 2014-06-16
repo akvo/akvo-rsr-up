@@ -49,7 +49,9 @@ public class UpdateDetailActivity extends Activity {
 	private TextView projTitleLabel;
 	private TextView projupdTitleText;
 	private TextView projupdDescriptionText;
-	private TextView projupdUser;
+    private TextView projupdUser;
+    private TextView projupdPhotoCredit;
+    private TextView projupdPhotoCaption;
 	private TextView synchFlag;
 	private ImageView projupdImage;
 	private Button btnEdit;
@@ -80,7 +82,9 @@ public class UpdateDetailActivity extends Activity {
 		//find the fields
 		projTitleLabel = (TextView) findViewById(R.id.projupd_edit_proj_title);
 		projupdTitleText = (TextView) findViewById(R.id.projupd_detail_title);
-		projupdDescriptionText = (TextView) findViewById(R.id.projupd_detail_descr);
+        projupdDescriptionText = (TextView) findViewById(R.id.projupd_detail_descr);
+        projupdPhotoCaption= (TextView) findViewById(R.id.projupd_detail_photo_caption);
+        projupdPhotoCredit= (TextView) findViewById(R.id.projupd_detail_photo_credit);
 		projupdImage = (ImageView) findViewById(R.id.image_update_detail);
 		projupdUser = (TextView) findViewById(R.id.projupd_detail_user);
 		synchFlag= (TextView) findViewById(R.id.projupd_detail_synchronising);
@@ -114,6 +118,10 @@ public class UpdateDetailActivity extends Activity {
     			editable = update.getDraft() && !synching;
     			projupdTitleText.setText(update.getTitle());	
     			projupdDescriptionText.setText(update.getText());
+                projupdPhotoCaption.setText(update.getPhotoCaption());
+                if (update.getPhotoCredit() != null && update.getPhotoCredit().length() > 0) {
+                    projupdPhotoCredit.setText(getResources().getString(R.string.label_photo_credit, update.getPhotoCredit()));                    
+                }
     			User author = dba.findUser(update.getUserId());
     			Organisation org = null;
     			String sig = "";

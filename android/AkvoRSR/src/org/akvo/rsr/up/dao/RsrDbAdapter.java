@@ -50,8 +50,10 @@ public class RsrDbAdapter {
 	public static final String SUBTITLE_COL = "subtitle";
 	public static final String SUMMARY_COL = "summary";
 	public static final String FUNDS_COL = "funds";
-	public static final String THUMBNAIL_URL_COL = "thumbnail_url";
-	public static final String THUMBNAIL_FILENAME_COL = "thumbnail_fn";
+    public static final String THUMBNAIL_URL_COL = "thumbnail_url";
+    public static final String THUMBNAIL_FILENAME_COL = "thumbnail_fn";
+    public static final String VIDEO_URL_COL = "video_url";
+    public static final String VIDEO_FILENAME_COL = "video_fn";
 	public static final String PROJECT_COL = "project";
 	public static final String USER_COL = "userid";
 	public static final String TEXT_COL = "_text";
@@ -59,7 +61,9 @@ public class RsrDbAdapter {
 	public static final String UNSENT_COL = "unsent";
 	public static final String HIDDEN_COL = "hidden";
 	public static final String CREATED_COL = "creation_date";
-	public static final String UUID_COL = "uuid";
+    public static final String UUID_COL = "uuid";
+    public static final String PHOTO_CREDIT_COL = "photo_credit";
+    public static final String PHOTO_CAPTION_COL = "photo_caption";
 
 	public static final String LAT_COL = "latitude";
 	public static final String LON_COL = "longitude";
@@ -99,7 +103,9 @@ public class RsrDbAdapter {
 	private static final String UPDATE_TABLE_CREATE =
 			"create table _update (_id integer primary key, project integer not null, userid integer not null, "+
 			"title text not null, _text text, location text, uuid text,"+
-			"thumbnail_url text, thumbnail_fn text," +
+            "thumbnail_url text, thumbnail_fn text," +
+            "video_url text, video_fn text," +
+            "photo_caption text, photo_credit text," +
 			"draft integer, unsent integer," +
 			CREATED_COL + " INTEGER NOT NULL DEFAULT (strftime('%s','now'))" +
 			");";
@@ -135,7 +141,8 @@ public class RsrDbAdapter {
 //	private static final int DATABASE_VERSION = 10; //added update.user and user table
 //	private static final int DATABASE_VERSION = 11; //user columns attribute change
 //  private static final int DATABASE_VERSION = 12; //uuid for updates
-    private static final int DATABASE_VERSION = 13; //org table
+//  private static final int DATABASE_VERSION = 13; //org table
+    private static final int DATABASE_VERSION = 14; //update now has photo metadata and video
 
 	private final Context context;
 
@@ -183,11 +190,18 @@ public class RsrDbAdapter {
                 db.execSQL("DROP TABLE IF EXISTS " + USER_TABLE);
                 db.execSQL("DROP TABLE IF EXISTS " + ORG_TABLE);
                 onCreate(db);
-            } else
-            if (oldVersion < 13) { //need an org table
-                db.execSQL(ORG_TABLE_CREATE);
-            }           
-            
+            } else {
+                if (oldVersion < 13) { //need an org table
+                    db.execSQL(ORG_TABLE_CREATE);
+                }           
+
+                if (oldVersion < 14) { //more update columns
+                    db.execSQL("alter table " + UPDATE_TABLE + " add column video_url text");
+                    db.execSQL("alter table " + UPDATE_TABLE + " add column video_fn text");
+                    db.execSQL("alter table " + UPDATE_TABLE + " add column photo_caption text");
+                    db.execSQL("alter table " + UPDATE_TABLE + " add column photo_credit text");
+                }
+            }
 			/*
 			if (oldVersion < 57) {
 				db.execSQL("DROP TABLE IF EXISTS " + RESPONSE_TABLE);
@@ -463,11 +477,16 @@ public class RsrDbAdapter {
 		updatedValues.put(TEXT_COL, update.getText());
 		updatedValues.put(USER_COL, update.getUserId());
 		updatedValues.put(UUID_COL, update.getUuid());
-		updatedValues.put(THUMBNAIL_URL_COL, update.getThumbnailUrl());
+        updatedValues.put(THUMBNAIL_URL_COL, update.getThumbnailUrl());
+        updatedValues.put(VIDEO_URL_COL, update.getVideoUrl());
 		//not always done here to preserve a cache connection
 		if (saveFn) {
-			updatedValues.put(THUMBNAIL_FILENAME_COL, update.getThumbnailFilename());
+            updatedValues.put(THUMBNAIL_FILENAME_COL, update.getThumbnailFilename());
+            updatedValues.put(VIDEO_FILENAME_COL, update.getVideoFilename());
 		}
+        updatedValues.put(PHOTO_CAPTION_COL, update.getPhotoCaption());
+        updatedValues.put(PHOTO_CREDIT_COL, update.getPhotoCredit());
+
 		updatedValues.put(DRAFT_COL, update.getDraft()?"1":"0");
 		updatedValues.put(UNSENT_COL, update.getUnsent()?"1":"0");
 		updatedValues.put(CREATED_COL, update.getDate().getTime()/1000); //1-second precision only
@@ -555,9 +574,10 @@ public class RsrDbAdapter {
 	/*
 	 *  Clear the local filenames of all updates
 	 */
-	public void clearUpdateThumbnailFiles() {
+	public void clearUpdateMediaFiles() {
 		ContentValues updatedValues = new ContentValues();
-		updatedValues.putNull(THUMBNAIL_FILENAME_COL);
+        updatedValues.putNull(THUMBNAIL_FILENAME_COL);
+        updatedValues.putNull(VIDEO_FILENAME_COL);
 		database.update(UPDATE_TABLE, updatedValues, null, null);
 	}
 
@@ -888,8 +908,12 @@ public class RsrDbAdapter {
 				update.setText(cursor.getString(cursor.getColumnIndexOrThrow(TEXT_COL)));
 				update.setUuid(cursor.getString(cursor.getColumnIndexOrThrow(UUID_COL)));
 				update.setUserId(cursor.getString(cursor.getColumnIndexOrThrow(USER_COL)));
-				update.setThumbnailUrl(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_URL_COL)));
-				update.setThumbnailFilename(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_FILENAME_COL)));
+                update.setThumbnailUrl(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_URL_COL)));
+                update.setThumbnailFilename(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_FILENAME_COL)));
+                update.setVideoUrl(cursor.getString(cursor.getColumnIndexOrThrow(VIDEO_URL_COL)));
+                update.setVideoFilename(cursor.getString(cursor.getColumnIndexOrThrow(VIDEO_FILENAME_COL)));
+                update.setPhotoCaption(cursor.getString(cursor.getColumnIndexOrThrow(PHOTO_CAPTION_COL)));
+                update.setPhotoCredit(cursor.getString(cursor.getColumnIndexOrThrow(PHOTO_CREDIT_COL)));
 				update.setDraft(0 != cursor.getInt(cursor.getColumnIndexOrThrow(DRAFT_COL)));
 				update.setUnsent(0 != cursor.getInt(cursor.getColumnIndexOrThrow(UNSENT_COL)));
 				update.setDate(new Date(1000 * cursor.getLong(cursor.getColumnIndexOrThrow(CREATED_COL))));

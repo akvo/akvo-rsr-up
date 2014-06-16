@@ -72,7 +72,10 @@ public class UpdateListHandler extends DefaultHandler {
 	private boolean in_title = false;
 	private boolean in_project_id = false;
 	private boolean in_user_id = false;
-	private boolean in_photo = false;
+    private boolean in_photo = false;
+    private boolean in_photo_credit = false;
+    private boolean in_photo_caption = false;
+    private boolean in_video = false;
 	private boolean in_text = false;
 	private boolean in_time = false;
 	private boolean in_uuid = false;
@@ -80,7 +83,8 @@ public class UpdateListHandler extends DefaultHandler {
 	private Update currentUpd;
 	private int updateCount;
 	private boolean syntaxError = false;
-	private boolean insert;
+    private boolean insert;
+    private boolean extra;
 	private int depth = 0;
 	private SimpleDateFormat df1;
 	private String buffer;
@@ -91,10 +95,11 @@ public class UpdateListHandler extends DefaultHandler {
 	/*
 	 * constructor
 	 */
-	public UpdateListHandler(RsrDbAdapter aDba, boolean insert) {
+	public UpdateListHandler(RsrDbAdapter aDba, boolean insert, boolean extra) {
 		super();
 		dba = aDba;
-		this.insert = insert;
+        this.insert = insert;
+        this.extra = extra;
 		df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
 		df1.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
@@ -156,8 +161,14 @@ public class UpdateListHandler extends DefaultHandler {
 				this.in_user_id = true;
 			} else if (localName.equals("uuid")) {
 				this.in_uuid = true;
-			} else if (localName.equals("photo")) {
-				this.in_photo = true;
+            } else if (localName.equals("photo")) {
+                this.in_photo = true;
+            } else if (localName.equals("photo_credit")) {
+                this.in_photo_credit = true;
+            } else if (localName.equals("photo_caption")) {
+                this.in_photo_caption = true;
+            } else if (localName.equals("video")) {
+                this.in_video = true;
 			}
 		}
 		
@@ -171,7 +182,16 @@ public class UpdateListHandler extends DefaultHandler {
 			throws SAXException {
 		depth--;
 
-		if (localName.equals("id")) {
+		if (localName.equals("object")) { //we are done
+            this.in_update = false;
+            if (currentUpd != null && currentUpd.getId() != null) {
+                updateCount++;
+                if (insert) {
+                    dba.saveUpdate(currentUpd, false); //preserve name of any cached image
+                    currentUpd = null;
+                }
+            }
+        } else if (localName.equals("id")) {
 			this.in_id = false;
 			currentUpd.setId(buffer);
 		} else if (localName.equals("title")) {
@@ -196,18 +216,18 @@ public class UpdateListHandler extends DefaultHandler {
 		} else if (localName.equals("uuid")) {
 			this.in_uuid = false;
 			currentUpd.setUuid(buffer);
-		} else if (localName.equals("object")) {
-			this.in_update = false;
-			if (currentUpd != null && currentUpd.getId() != null) {
-				updateCount++;
-				if (insert) {
-					dba.saveUpdate(currentUpd, false); //preserve name of any cached image
-					currentUpd = null;
-				}
-			}
 		} else if (localName.equals("photo")) {
 			this.in_photo = false;
 			currentUpd.setThumbnailUrl(buffer);
+        } else if (localName.equals("photo_credit")) {
+            this.in_photo_credit = false;
+            currentUpd.setPhotoCredit(buffer);
+        } else if (localName.equals("photo_caption")) {
+            this.in_photo_caption = false;
+            currentUpd.setPhotoCaption(buffer);
+        } else if (localName.equals("video")) {
+            this.in_video = false;
+            currentUpd.setVideoUrl(buffer);
 		}
 	}
 	
@@ -221,7 +241,10 @@ public class UpdateListHandler extends DefaultHandler {
 			 || this.in_uuid
 			 || this.in_user_id
 			 || this.in_project_id
-			 || this.in_photo
+             || this.in_photo
+             || this.in_photo_credit
+             || this.in_photo_caption
+             || this.in_video
 			 || this.in_text
 			 || this.in_time
 			 ) { //remember content
