@@ -545,7 +545,9 @@ public class Downloader {
 				"<user_agent>%s</user_agent><text>%s</text>";
 		final String bodyTemplate2  = "</object>";
 		final String imagePreamble  = "<photo type=\"hash\"><name>dummy.jpg</name><content_type>image/jpeg</content_type><file>";
-		final String imagePostamble = "</file></photo>";
+        final String imagePostamble = "</file></photo>";
+        final String imageCaptionTemplate = "<photo_caption>%s</photo_caption>";
+        final String imageCreditTemplate = "<photo_credit>%s</photo_credit>";
 		boolean allSent = false;
 		try {
 			URL url = new URL(String.format(Locale.US, urlTemplate, user.getApiKey(), user.getUsername()));
@@ -595,6 +597,13 @@ public class Downloader {
 							raf.close();
 						}
 						h.send(imagePostamble);
+						//any image metadata?
+                        if (update.getPhotoCaption() != null) {
+                            h.send(String.format(imageCaptionTemplate, update.getPhotoCaption()));
+                        }
+                        if (update.getPhotoCredit() != null) {
+                            h.send(String.format(imageCreditTemplate, update.getPhotoCredit()));
+                        }
 					}
 				}
 			}

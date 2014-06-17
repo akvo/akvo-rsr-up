@@ -91,7 +91,7 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 		dba.open();
 		try {
             author = dba.findUser(cursor.getString(authorIdCol));
-            if (author.getOrgId() != null) org = dba.findOrganisation(author.getOrgId());
+            if (author !=null && author.getOrgId() != null) org = dba.findOrganisation(author.getOrgId());
         } finally {
             dba.close();    
         }

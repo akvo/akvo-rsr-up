@@ -81,7 +81,7 @@ public class UpdateEditorActivity extends Activity {
     private TextView projTitleLabel;
     private EditText projupdTitleText;
     private EditText projupdDescriptionText;
-    private EditText photoDescriptionText;
+    private EditText photoCaptionText;
     private EditText photoCreditText;
     private ImageView projupdImage;
     private Button btnSubmit;
@@ -128,11 +128,13 @@ public class UpdateEditorActivity extends Activity {
         progressGroup = findViewById(R.id.sendprogress_group);
         inProgress = (ProgressBar) findViewById(R.id.sendProgressBar);
         projTitleLabel = (TextView) findViewById(R.id.projupd_edit_proj_title);
-        projupdTitleText = (EditText) findViewById(R.id.edit_projupd_title);
-        projupdDescriptionText = (EditText) findViewById(R.id.edit_projupd_description);
+        projupdTitleText = (EditText) findViewById(R.id.projupd_edit_title);
+        projupdDescriptionText = (EditText) findViewById(R.id.projupd_edit_description);
         projupdImage = (ImageView) findViewById(R.id.image_update_detail);
         photoAndToolsGroup = findViewById(R.id.image_with_tools);
         photoAddGroup = findViewById(R.id.photo_buttons);
+        photoCaptionText = (EditText) findViewById(R.id.projupd_edit_photo_caption);
+        photoCreditText = (EditText) findViewById(R.id.projupd_edit_photo_credit);
 
         // Activate buttons
         btnSubmit = (Button) findViewById(R.id.btn_send_update);
@@ -225,6 +227,8 @@ public class UpdateEditorActivity extends Activity {
                                               // sent
                 projupdTitleText.setText(update.getTitle());
                 projupdDescriptionText.setText(update.getText());
+                photoCaptionText.setText(update.getPhotoCaption());
+                photoCreditText.setText(update.getPhotoCredit());
 
                 // show preexisting image
                 if (update.getThumbnailFilename() != null) {
@@ -370,6 +374,16 @@ public class UpdateEditorActivity extends Activity {
     
 
     /**
+     * fetches text field data from form to object
+     */
+    private void fetchFields(){
+        update.setTitle(projupdTitleText.getText().toString());
+        update.setText(projupdDescriptionText.getText().toString());        
+        update.setPhotoCaption(photoCaptionText.getText().toString());        
+        update.setPhotoCredit(photoCreditText.getText().toString());        
+    }
+    
+    /**
      * Saves current update as draft, if it has a title and this is done by the
      * user
      */
@@ -383,13 +397,13 @@ public class UpdateEditorActivity extends Activity {
                 toast.show();
                 return;
             } else {
-                projupdTitleText.setText("?"); // must have something
+                projupdTitleText.setText("?"); // must have something.
+                //In retrospect, we should have allowed nulls in this column and just disallowed posting
             }
         }
         update.setDraft(true);
         update.setUnsent(false);
-        update.setTitle(projupdTitleText.getText().toString());
-        update.setText(projupdDescriptionText.getText().toString());
+        fetchFields();
         // update.setDate(new Date()); //should have date from when it was created
         if (update.getId() == null) {// new
             // MUST have project and a local update id
@@ -424,8 +438,7 @@ public class UpdateEditorActivity extends Activity {
 
         update.setUnsent(true);
         update.setDraft(false);
-        update.setTitle(projupdTitleText.getText().toString());
-        update.setText(projupdDescriptionText.getText().toString());
+        fetchFields();
         update.setProjectId(projectId);
         // update.setDate(new Date()); //keep date from when it was created
         if (update.getId() == null) {// new

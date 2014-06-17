@@ -721,7 +721,7 @@ public class RsrDbAdapter {
 	}
 
 	/**
-	 * Gets updates for a specific project, all columns
+	 * Gets unsent updates, all columns
 	 */
 	public Cursor listAllUpdatesUnsent() {
 		Cursor cursor = database.query(UPDATE_TABLE,

@@ -83,16 +83,16 @@ public class UpdateDetailActivity extends Activity {
 		projTitleLabel = (TextView) findViewById(R.id.projupd_edit_proj_title);
 		projupdTitleText = (TextView) findViewById(R.id.projupd_detail_title);
         projupdDescriptionText = (TextView) findViewById(R.id.projupd_detail_descr);
-        projupdPhotoCaption= (TextView) findViewById(R.id.projupd_detail_photo_caption);
-        projupdPhotoCredit= (TextView) findViewById(R.id.projupd_detail_photo_credit);
-		projupdImage = (ImageView) findViewById(R.id.image_update_detail);
-		projupdUser = (TextView) findViewById(R.id.projupd_detail_user);
-		synchFlag= (TextView) findViewById(R.id.projupd_detail_synchronising);
+        projupdPhotoCaption = (TextView) findViewById(R.id.projupd_detail_photo_caption);
+        projupdPhotoCredit = (TextView) findViewById(R.id.projupd_detail_photo_credit);
+        projupdImage = (ImageView) findViewById(R.id.image_update_detail);
+        projupdUser = (TextView) findViewById(R.id.projupd_detail_user);
+        synchFlag = (TextView) findViewById(R.id.projupd_detail_synchronising);
 
 		//Activate buttons
 				
-		btnEdit = (Button) findViewById(R.id.btn_edit_update);
-		btnEdit.setOnClickListener( new View.OnClickListener() {
+        btnEdit = (Button) findViewById(R.id.btn_edit_update);
+        btnEdit.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {
 				Intent i = new Intent(view.getContext(), UpdateEditorActivity.class);
 				i.putExtra(ConstantUtil.PROJECT_ID_KEY, projectId);
