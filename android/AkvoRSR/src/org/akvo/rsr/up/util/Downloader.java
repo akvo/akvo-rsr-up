@@ -538,6 +538,7 @@ public class Downloader {
 	application/xml
 
 	 */
+	//TODO must return more info to user on failure! Probably should throw a fail exception and return false if unknown
 	public static int postXmlUpdateStreaming(String urlTemplate, Update update, boolean sendImage, User user, String agent, ProgressReporter prog) {
 		final String contentType = "application/xml";
 		final String bodyTemplate1  =	"<object><update_method>M</update_method><project>%s</project>" + //Mobile update method
@@ -599,10 +600,10 @@ public class Downloader {
 						h.send(imagePostamble);
 						//any image metadata?
                         if (update.getPhotoCaption() != null) {
-                            h.send(String.format(imageCaptionTemplate, update.getPhotoCaption()));
+                            h.send(String.format(imageCaptionTemplate, oneLine(update.getPhotoCaption(), 75)));
                         }
                         if (update.getPhotoCredit() != null) {
-                            h.send(String.format(imageCreditTemplate, update.getPhotoCredit()));
+                            h.send(String.format(imageCreditTemplate, oneLine(update.getPhotoCredit(), 25)));
                         }
 					}
 				}

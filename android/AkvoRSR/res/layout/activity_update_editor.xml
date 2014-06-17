@@ -198,7 +198,7 @@
                     android:background="@drawable/box"
                     android:hint="@string/hint_update_caption"
                     android:inputType="textCapSentences"
-                    android:maxLength="50"
+                    android:maxLength="75"
                     android:padding="5dp"
                     android:singleLine="true" />
 
@@ -210,7 +210,7 @@
                     android:background="@drawable/box"
                     android:hint="@string/hint_update_credit"
                     android:inputType="textCapSentences"
-                    android:maxLength="50"
+                    android:maxLength="25"
                     android:padding="5dp"
                     android:singleLine="true" />
             </LinearLayout>
