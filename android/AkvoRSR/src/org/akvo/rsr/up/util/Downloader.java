@@ -481,19 +481,30 @@ public class Downloader {
 	private final static char SPC = '\u0020';
 
 	/**
-	 * returns a string without newlines and with a maximum length
+	 * returns a string without control chars or XML syntax elements and with a maximum length
 	 * @param s
 	 * @param maxLength
 	 * @return
 	 */
 	private static String oneLine(String s, int maxLength) {
 		String result = "";
-		for (int i = 0; i < Math.min(s.length(), maxLength); i++)
-			if (s.charAt(i) < SPC) {
-				result += SPC;
-			} else {
-				result += s.charAt(i);
+		for (int i = 0; i < s.length(); i++) {
+		    String t;
+            if (s.charAt(i) < SPC) {
+                t = Character.toString(SPC);
+            } else if (s.charAt(i) == '&') {
+                t = "&amp;";
+            } else if (s.charAt(i) == '<') {
+                t = "&lt;";
+            } else if (s.charAt(i) == '>') {
+                t = "&gt;";
+            } else t = Character.toString(s.charAt(i));
+            //Would it make it overflow?
+            if (result.length() + t.length() > maxLength) {
+                return result;
 			}
+            result += t;
+		}
 		return result;
 	}
 
