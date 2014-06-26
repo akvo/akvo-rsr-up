@@ -90,7 +90,8 @@
             android:text="@string/dummy_count"
             android:textColor="@color/rsr_purple"
             android:textSize="20sp"
-            android:typeface="sans" />
+            android:typeface="sans"
+            />
 
         <!-- The seach field splits unused space in the bar with label when visible -->
         <EditText
@@ -107,7 +108,8 @@
             android:textSize="20sp"
             android:typeface="sans"
             android:visibility="gone"
-             />
+            android:singleLine="true"
+            />
         <Button
             android:id="@+id/btn_projsearch"
             android:layout_width="wrap_content"
