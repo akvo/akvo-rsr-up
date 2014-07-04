@@ -25,7 +25,7 @@ import org.akvo.rsr.up.util.SettingsUtil;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Activity;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,7 +36,7 @@ import android.widget.TextView;
 import android.content.Intent;
 import android.content.res.Resources;
 
-public class ProjectDetailActivity extends Activity {
+public class ProjectDetailActivity extends ActionBarActivity {
 
 	private String projId = null;
 	private Project project = null;

@@ -25,7 +25,6 @@ import org.akvo.rsr.up.util.SettingsUtil;
 import org.akvo.rsr.up.viewadapter.ProjectListCursorAdapter;
 
 import android.os.Bundle;
-import android.app.ListActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -33,6 +32,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -42,13 +43,14 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.ActionBarActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 
-public class ProjectListActivity extends ListActivity {
+public class ProjectListActivity extends ActionBarActivity {
 
 
 	private static final String TAG = "ProjectListActivity";
@@ -61,9 +63,12 @@ public class ProjectListActivity extends ListActivity {
 	private ProgressBar inProgress1;
 	private ProgressBar inProgress2;
 	private ProgressBar inProgress3;
+	private ListView mList;
+    private TextView mEmptyText;
+    private TextView mFirstTimeText;
 	private BroadcastReceiver broadRec;
     private Button searchButton;
-    private Button refreshButton;
+//    private Button refreshButton;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -74,8 +79,22 @@ public class ProjectListActivity extends ListActivity {
 		inProgress = (LinearLayout) findViewById(R.id.projlistprogress);
 		inProgress1 = (ProgressBar) findViewById(R.id.progressBar1);
 		inProgress2 = (ProgressBar) findViewById(R.id.progressBar2);
-		inProgress3 = (ProgressBar) findViewById(R.id.progressBar3);
+        inProgress3 = (ProgressBar) findViewById(R.id.progressBar3);
 
+        mList = (ListView) findViewById(R.id.list_projects);
+        mEmptyText = (TextView) findViewById(R.id.list_empty_text);
+        mFirstTimeText = (TextView) findViewById(R.id.first_time_text);
+        mList.setOnItemClickListener(new OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent i = new Intent(view.getContext(), ProjectDetailActivity.class);
+                i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(R.id.project_id_tag)).toString());
+                startActivity(i); 
+            }
+        });
+        
+        
         searchButton = (Button) findViewById(R.id.btn_projsearch);        
         searchButton.setOnClickListener( new View.OnClickListener() {
             public void onClick(View view) {
@@ -104,7 +123,7 @@ public class ProjectListActivity extends ListActivity {
             }
         );
 
-        
+/*        
         refreshButton = (Button) findViewById(R.id.btn_refresh_projects);        
         refreshButton.setOnClickListener( new View.OnClickListener() {
             public void onClick(View view) {
@@ -112,7 +131,7 @@ public class ProjectListActivity extends ListActivity {
                 startGetProjectsService();
             }
         });
- 
+*/ 
         //Create db
         ad = new RsrDbAdapter(this);
         Log.d(TAG, "Opening DB during create");
@@ -126,7 +145,7 @@ public class ProjectListActivity extends ListActivity {
         
         //in case we came back here during a refresh
         if (GetProjectDataService.isRunning(this)) {
-            refreshButton.setEnabled(false);
+//            refreshButton.setEnabled(false);
             inProgress.setVisibility(View.VISIBLE);
         }
 	}
@@ -142,9 +161,12 @@ public class ProjectListActivity extends ListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
+        case R.id.menu_refresh:
+            startGetProjectsService();
+            return true;
         case R.id.menu_settings:
-			Intent i = new Intent(this, SettingsActivity.class);
-			startActivity(i);
+            Intent i = new Intent(this, SettingsActivity.class);
+            startActivity(i);
             return true;
         case R.id.menu_logout:
         	SettingsUtil.signOut(this);
@@ -208,42 +230,51 @@ public class ProjectListActivity extends ListActivity {
 		}
 		String searchString = searchField.getText().toString();
 
+		int count;
 		if (searchString == null || searchString.length() == 0) {
 		    dataCursor = ad.listVisibleProjectsWithCountry();
 	        //Show count
-	        projCountLabel.setText(Integer.valueOf(dataCursor.getCount()).toString());
+		    count = dataCursor.getCount();
+	        projCountLabel.setText(Integer.valueOf(count).toString());
 		} else {
             dataCursor = ad.listVisibleProjectsWithCountryMatching(searchString);		    
             //Show count
-            projCountLabel.setText("(" + Integer.valueOf(dataCursor.getCount()).toString() + ")");
+            count = dataCursor.getCount();
+            projCountLabel.setText("(" + Integer.valueOf(count).toString() + ")");
+		}
+		if (count == 0) { //no records, but why?
+            mList.setVisibility(View.GONE);
+            if (searchString == null || searchString.length() == 0) { //must be empty DB
+                mEmptyText.setVisibility(View.GONE);
+                mFirstTimeText.setVisibility(View.VISIBLE);
+            } else { //too filtered
+                mEmptyText.setVisibility(View.VISIBLE);
+                mFirstTimeText.setVisibility(View.GONE);
+            }
+		} else {
+		    mList.setVisibility(View.VISIBLE);
+            mEmptyText.setVisibility(View.GONE);
+            mFirstTimeText.setVisibility(View.GONE);
 		}
 		//Populate list view
 		ProjectListCursorAdapter projects = new ProjectListCursorAdapter(this, dataCursor);
-		setListAdapter(projects);
+		mList.setAdapter(projects);
+//		setListAdapter(projects);
 	}
 
-	
-	/**
-	 *  gets the id of the clicked list item and opens the one-project activity.
-	 */
-	@Override
-	protected void onListItemClick(ListView list, View view, int position, long id) {
-		super.onListItemClick(list, view, position, id);
-
-		Intent i = new Intent(view.getContext(), ProjectDetailActivity.class);
-		i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(R.id.project_id_tag)).toString());
-		startActivity(i);
-	}
-
-	
+		
 	/**
 	 * starts the service fetching new project data
 	 */
 	private void startGetProjectsService() {
+        if (GetProjectDataService.isRunning(this)) { //TODO should disable menu choice instead
+            return; //only one at a time
+        }
+	    
 		//disable refresh button
-		refreshButton.setEnabled(false);
-		//start a service
-		
+//		refreshButton.setEnabled(false);
+		//TODO: disable menu choice
+		//start a service		
 		Intent i = new Intent(this, GetProjectDataService.class);
 		getApplicationContext().startService(i);
 		
@@ -256,7 +287,7 @@ public class ProjectListActivity extends ListActivity {
 
 	
 	/**
-	 * handles result of server login attempt
+	 * handles result of refresh service
 	 * @param intent
 	 */
 	private void onFetchFinished(Intent intent) {
@@ -272,7 +303,7 @@ public class ProjectListActivity extends ListActivity {
 		}
 
 		//re-enable the refresh button
-		refreshButton.setEnabled(true);		
+//		refreshButton.setEnabled(true);		
 		//Refresh the list
 		getData();
 	}

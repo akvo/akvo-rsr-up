@@ -28,15 +28,16 @@ import org.akvo.rsr.up.util.FileUtil;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
-import android.app.Activity;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
-import android.view.View;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 
-public class DiagnosticActivity extends Activity {
+public class DiagnosticActivity extends ActionBarActivity {
 
 	private TextView mTextView;
 	private Button mBtnUpdates;
@@ -174,6 +175,28 @@ public class DiagnosticActivity extends Activity {
 		super.onDestroy();
 	}
 
-	
+	@Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.diagnostics, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+/*
+        case R.id.action_clear_diagnostics:
+            return true;
+        case R.id.action_settings:
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+            return true;
+            */
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+
+    }
 
 }

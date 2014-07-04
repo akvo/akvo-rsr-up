@@ -28,7 +28,7 @@ import org.akvo.rsr.up.util.FileUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
 
 import android.os.Bundle;
-import android.app.Activity;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,7 +37,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.content.Intent;
 
-public class UpdateDetailActivity extends Activity {
+public class UpdateDetailActivity extends ActionBarActivity {
 	
 	private String projectId = null;
 	private String updateId = null;

@@ -40,7 +40,6 @@ import org.akvo.rsr.up.util.SettingsUtil;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Activity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -51,6 +50,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.ActionBarActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -62,7 +62,7 @@ import android.provider.MediaStore;
  * implements the page where the user inputs and sends an update
  */
 
-public class UpdateEditorActivity extends Activity {
+public class UpdateEditorActivity extends ActionBarActivity {
 
     private final int photoRequest = 777;
     private final int photoPick = 888;

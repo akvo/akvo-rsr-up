@@ -1,8 +1,11 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-        
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:upapp="http://schemas.android.com/apk/res-auto"
+    >
+            
     <item android:id="@+id/action_add_update"
         android:title="@string/action_add_update"
-        android:icon="@drawable/ic_menu_add"        
+        android:icon="@drawable/ic_menu_add_dk"        
          />
     
     <item android:id="@+id/action_settings"

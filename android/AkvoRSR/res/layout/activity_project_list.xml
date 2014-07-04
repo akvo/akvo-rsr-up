@@ -123,7 +123,7 @@
     <!-- list of projects. if it is empty, the TextView will be shown instead -->
 
     <ListView
-        android:id="@android:id/list"
+        android:id="@+id/list_projects"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -131,14 +131,26 @@
         android:drawSelectorOnTop="false" />
 
     <TextView
-        android:id="@android:id/empty"
+        android:id="@+id/list_empty_text"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="@string/label_empty_proj_list" />
+        android:text="@string/label_empty_proj_list"
+        android:visibility="gone"
+        />
 
-    <!-- Refresh button -->
+    <TextView
+        android:id="@+id/first_time_text"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/label_first_proj_list" 
+        android:visibility="gone"
+        />
+
+    <!-- Refresh button
 
     <RelativeLayout
         android:layout_width="fill_parent"
@@ -159,5 +171,5 @@
             android:typeface="sans" />
 
     </RelativeLayout>
-
+ -->
 </LinearLayout>
