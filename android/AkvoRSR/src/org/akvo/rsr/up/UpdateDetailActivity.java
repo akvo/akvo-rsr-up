@@ -166,21 +166,24 @@ public class UpdateDetailActivity extends ActionBarActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
-        case R.id.action_delete_update:
-            if (update.getUnsent() || update.getDraft()) {
-                dba.open();
-                dba.deleteUpdate(update.getId());
-                dba.close();
-                update = null;
-                finish();
-            }
-            return true;
-        case R.id.action_settings:
-			Intent intent = new Intent(this, SettingsActivity.class);
-			startActivity(intent);
-            return true;
-	    default:
-	        return super.onOptionsItemSelected(item);
+	        case android.R.id.home:
+	            finish();
+	            return true;
+            case R.id.action_delete_update:
+                if (update.getUnsent() || update.getDraft()) {
+                    dba.open();
+                    dba.deleteUpdate(update.getId());
+                    dba.close();
+                    update = null;
+                    finish();
+                }
+                return true;
+            case R.id.action_settings:
+    			Intent intent = new Intent(this, SettingsActivity.class);
+    			startActivity(intent);
+                return true;
+    	    default:
+    	        return super.onOptionsItemSelected(item);
 	    }
 
 	}
