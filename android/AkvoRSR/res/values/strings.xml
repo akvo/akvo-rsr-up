@@ -77,8 +77,8 @@
     <string name="count_draft">&#160;Draft</string>
     <string name="count_published">&#160;Published</string>
     <string name="count_zero">No updates</string>
-    <string name="updates_txt">UPDATES STATUS</string>
     <string name="count_unsynch">&#160;Unsynchronised</string>
+    <string name="updates_txt">UPDATES STATUS</string>
     <string name="username">Username</string>
     <string name="email_address">Email Address</string>
     <string name="password">Password</string>
@@ -96,6 +96,7 @@
     <string name="btncaption_clear_data">Clear all data</string>
     <string name="btncaption_send_update">Send update</string>
     <string name="btncaption_save_draft">Save draft</string>
+    <string name="btncaption_get_position">Get position</string>
     
     <string name="host_dialog_title">Enter new data host name.</string>
     <string name="host_dialog_msg">All local data will be deleted.\nExample: rsr.akvo.org or https://rsr.akvotest.org</string>
@@ -137,6 +138,14 @@
             
     <string name="cleared_dialog_title">Cache cleared</string>
     <string name="cleared_dialog_msg">%1$d files deleted (%2$d MB)</string>
+    
+    <string name="gpsdisabled_dialog_msg">GPS must be enabled to do this. Select OK to go to the settings page. Select Use GPS Satellites and then press the back button to return. Once GPS is enabled you can click Check Geo Location again to get your position.</string>
+    <string name="label_gps_searching">Searching</string>
+    <string name="label_gps_ready">Ready</string>
+    <string name="label_accuracy">Accuracy:</string>
+    <string name="label_latitude">Latitude:</string>
+    <string name="label_longitude">Longitude:</string>
+    <string name="label_elevation">Elevation:</string>
     
     <string name="msg_update_published">Update published</string>
     <string name="msg_update_success">Update successfully sent to server</string>

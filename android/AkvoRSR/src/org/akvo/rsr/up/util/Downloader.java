@@ -560,6 +560,7 @@ public class Downloader {
         final String imagePostamble = "</file></photo>";
         final String imageCaptionTemplate = "<photo_caption>%s</photo_caption>";
         final String imageCreditTemplate = "<photo_credit>%s</photo_credit>";
+        final String locationTemplate = "<primary_location><longitude>%s</longitude><latitude>%s</latitude></primary_location>";
 		boolean allSent = false;
 		try {
 			URL url = new URL(String.format(Locale.US, urlTemplate, user.getApiKey(), user.getUsername()));
@@ -618,7 +619,11 @@ public class Downloader {
                         }
 					}
 				}
-			}
+			} //end image
+
+			if (update.validLatLon()) {
+                h.send(String.format(locationTemplate, update.getLongitude(), update.getLatitude()));
+            }
 			
 			h.send(bodyTemplate2);
 			allSent = true;
@@ -633,7 +638,7 @@ public class Downloader {
 				update.setId(id);
 				return ConstantUtil.POST_SUCCESS; //Yes!
 			} else {
-				String e = "Unable to post update, code " + code + " " +  msg;
+				String e = "Unable to post update, code " + code + " " + msg;
 				Log.e(TAG, e);
 				Log.e(TAG, bod);
 				return ConstantUtil.POST_FAILURE;

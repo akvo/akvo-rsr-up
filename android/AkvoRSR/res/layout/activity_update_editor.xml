@@ -129,7 +129,7 @@
                     android:layout_margin="5dp"
                     android:layout_weight="1"
                     android:background="@android:color/black"
-                    android:drawableTop="@drawable/ic_menu_camera"
+                    android:drawableTop="@drawable/ic_menu_gallery"
                     android:padding="5dp"
                     android:text="@string/btncaption_attach_photo"
                     android:textColor="@android:color/white"
@@ -215,6 +215,111 @@
                     android:singleLine="true" />
             </LinearLayout>
 
+            <Button
+                android:id="@+id/btn_get_position"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@android:color/black"
+                android:drawableLeft="@drawable/ic_menu_mylocation"
+                android:padding="5dp"
+                android:text="@string/btncaption_get_position"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:typeface="sans" />
+
+            <!-- The sometimes visible position part -->
+
+            <LinearLayout
+                android:id="@+id/position_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@color/pale_gray"
+                android:orientation="vertical"
+                android:padding="5dp"
+                android:visibility="gone" >
+        
+                <TextView
+                    android:id="@+id/gps_searching"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:text=""
+                    android:textSize="18sp" />
+            
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" >
+    
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical" >
+    
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_accuracy"
+                            android:textSize="18sp" />
+    
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_latitude"
+                            android:textSize="18sp" />
+    
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_longitude"
+                            android:textSize="18sp" />
+    
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/label_elevation"
+                            android:textSize="18sp" />
+    
+                    </LinearLayout>
+    
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical" >
+    
+                        <TextView
+                            android:id="@+id/gps_accuracy"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:textSize="18sp" />
+                        
+                        <TextView
+                            android:id="@+id/latitude"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/dummy_count"
+                            android:textSize="18sp" />
+    
+                        <TextView
+                            android:id="@+id/longitude"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/dummy_count"
+                            android:textSize="18sp" />
+    
+                        <TextView
+                            android:id="@+id/elevation"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/dummy_count"
+                            android:textSize="18sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+            
+            
             <!-- some fudge to fill the viewport if necessary -->
 
             <View
@@ -237,7 +342,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@color/btn_face"
-                    android:drawableTop="@drawable/ic_menu_share"
+                    android:drawableTop="@drawable/ic_menu_upload_dk"
                     android:padding="5dp"
                     android:text="@string/btncaption_send_update"
                     android:textColor="@color/rsr_purple"
@@ -251,7 +356,7 @@
                     android:layout_marginLeft="5dp"
                     android:layout_weight="1"
                     android:background="@color/btn_face"
-                    android:drawableTop="@drawable/ic_menu_save"
+                    android:drawableTop="@drawable/ic_menu_save_dk"
                     android:padding="5dp"
                     android:text="@string/btncaption_save_draft"
                     android:textColor="@color/rsr_purple"

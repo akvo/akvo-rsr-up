@@ -5,6 +5,7 @@ import org.akvo.rsr.up.R;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -246,4 +247,36 @@ public class DialogUtil {
 	public interface AdminAuthDialogListener {
 		void onAuthenticated();
 	}
+	
+	
+    /**
+     * displays the alert dialog box warning that the GPS receiver is off. If
+     * the affirmative button is clicked, the Location Settings panel is
+     * launched. If the negative button is clicked, it will just close the
+     * dialog
+     * 
+     * @param parentContext
+     */
+    public static void showGPSDialog(final Context parentContext) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
+        builder.setMessage(R.string.gpsdisabled_dialog_msg)
+                .setCancelable(true)
+                .setPositiveButton(R.string.btncaption_ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                parentContext
+                                        .startActivity(new Intent(
+                                                "android.settings.LOCATION_SOURCE_SETTINGS"));
+                            }
+                        })
+                .setNegativeButton(R.string.btncaption_cancel,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+        builder.show();
+    }
+
+
 }

@@ -56,6 +56,19 @@ http://www.iicd.org/articles/video-screenings-are-starting-point-for-better-crop
 <resource_uri>/api/v1/project_update/2505/</resource_uri>
 </object>
 
+Example of location (maybe not right tag):
+ 
+ <primary_location>
+ <city>Nairobi</city>
+ <country>/api/v1/country/27/</country>
+ <primary type="boolean">True</primary>
+ <longitude type="float">36.819185</longitude>
+ <project>/api/v1/project/1350/</project>
+ <state>PO Box 36655-0200</state>
+ <address_1>Suite 4</address_1><address_2>25 Parklands Road, Westlands</address_2>
+ <latitude type="float">-1.267924</latitude>
+ <postcode/><id type="integer">2069</id><resource_uri>/api/v1/project_location/2069/</resource_uri>
+ </primary_location>
  */
 
 
@@ -79,6 +92,13 @@ public class UpdateListHandler extends DefaultHandler {
 	private boolean in_text = false;
 	private boolean in_time = false;
 	private boolean in_uuid = false;
+
+	private boolean in_location = false;
+    private boolean in_country = false;
+    private boolean in_state = false;
+    private boolean in_city = false;
+    private boolean in_long = false;
+    private boolean in_lat = false;
 
 	private Update currentUpd;
 	private int updateCount;
@@ -169,7 +189,18 @@ public class UpdateListHandler extends DefaultHandler {
                 this.in_photo_caption = true;
             } else if (localName.equals("video")) {
                 this.in_video = true;
-			}
+            } else if (localName.equals("primary_location")) {
+                this.in_location = true;
+            } else if (localName.equals("country") && in_location) {
+                this.in_country = true;
+            } else if (localName.equals("state") && in_location) {
+                this.in_state = true;
+            } else if (localName.equals("city") && in_location) {
+                this.in_city = true;
+            } else if (localName.equals("latitude") && in_location) {
+                this.in_lat = true;
+            } else if (localName.equals("longitude") && in_location) {
+                this.in_long = true;			}
 		}
 		
 		depth++;
@@ -228,7 +259,24 @@ public class UpdateListHandler extends DefaultHandler {
         } else if (localName.equals("video")) {
             this.in_video = false;
             currentUpd.setVideoUrl(buffer);
-		}
+        } else if (localName.equals("primary_location")) {
+            this.in_location = false;
+        } else if (localName.equals("country") && in_location) {
+            this.in_country = false;
+            currentUpd.setCountry(buffer);
+        } else if (localName.equals("state") && in_location) {
+            this.in_state = false;
+            currentUpd.setState(buffer);
+        } else if (localName.equals("city") && in_location) {
+            this.in_city = false;
+            currentUpd.setCity(buffer);
+        } else if (localName.equals("latitude") && in_location) {
+            this.in_lat = false;
+            currentUpd.setLatitude(buffer);
+        } else if (localName.equals("longitude") && in_location) {
+            this.in_long = false;
+            currentUpd.setLongitude(buffer);
+        }
 	}
 	
 	/** Gets called on the following structure: 
@@ -247,6 +295,11 @@ public class UpdateListHandler extends DefaultHandler {
              || this.in_video
 			 || this.in_text
 			 || this.in_time
+			 || this.in_country
+			 || this.in_state
+			 || this.in_city
+			 || this.in_long
+			 || this.in_lat
 			 ) { //remember content
 				buffer += new String(ch, start, length);
 			}

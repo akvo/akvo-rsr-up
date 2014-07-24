@@ -139,7 +139,36 @@
 		        android:textSize="12sp"
 	            android:text=""
 			    />
-	        
+            
+            <!-- Location -->
+	        <TextView
+                style="?android:attr/listSeparatorTextViewStyle"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="10dip"
+                android:layout_marginTop="5dp"
+                android:gravity="center_horizontal" />
+            
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_marginBottom="5dp"
+                android:text="@string/label_project_location"
+                android:textColor="@color/rsr_purple"
+                android:textSize="20sp"
+                android:typeface="sans" />
+
+            <TextView
+                android:id="@+id/text_projupd_location"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:textColor="@color/dk_gray"
+                android:textSize="14sp"
+                android:typeface="sans" />
+
+            
 	        <!-- fudge to fill the viewport if necessary -->
 		    <View
 		        android:layout_width="fill_parent"

@@ -29,7 +29,7 @@ public class Update {
 	private boolean draft;
 	private boolean unsent;
 	private String text;
-	private String location;
+	private String location; //unused
 	private String thumbnailUrl;
 	private String thumbnailFilename;	
 	private String uuid;	
@@ -38,7 +38,20 @@ public class Update {
     private String photoCaption;
     private String videoUrl;
     private String videoFilename;
+    private String longitude; //fractional degrees with decimal point
+    private String latitude;  //ditto
+    private String elevation;  //m
+    private String country;
+    private String state;
+    private String city;
 
+    private boolean isEmpty(String s) {
+        if ((s != null) && (s.length() > 0))
+            return false;
+        else
+            return true;
+    }
+    
 	public String getId() {
 		return id;
 	}
@@ -166,6 +179,61 @@ public class Update {
 
     public void setVideoFilename(String fn) {
         videoFilename = fn;
+    }
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String lon) {
+        this.longitude = lon;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String lat) {
+        this.latitude = lat;
+    }
+
+    public String getElevation() {
+        return elevation;
+    }
+
+    public void setElevation(String ele) {
+        this.elevation = ele;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public boolean validLatLon() {
+        return (!isEmpty(latitude)) && (!isEmpty(longitude));
+    }
+    
+    public boolean validLatLonEle() {
+        return (!isEmpty(latitude)) && (!isEmpty(longitude)) && (!isEmpty(elevation));
     }
 
 }

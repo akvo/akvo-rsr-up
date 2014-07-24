@@ -66,7 +66,8 @@ public class RsrDbAdapter {
     public static final String PHOTO_CAPTION_COL = "photo_caption";
 
 	public static final String LAT_COL = "latitude";
-	public static final String LON_COL = "longitude";
+    public static final String LON_COL = "longitude";
+    public static final String ELE_COL = "elevation";
 	public static final String COUNTRY_COL = "country_id";
 	public static final String STATE_COL = "state";
 	public static final String CITY_COL = "city";
@@ -90,7 +91,8 @@ public class RsrDbAdapter {
 	private DatabaseHelper databaseHelper;
 	private SQLiteDatabase database;
 	
-	private static final String PROJECT_JOIN = "project LEFT OUTER JOIN country ON (project.country_id = country._id)";
+    private static final String PROJECT_JOIN = "project LEFT OUTER JOIN country ON (project.country_id = country._id)";
+    private static final String UPDATE_JOIN  = "_update LEFT OUTER JOIN country ON (_update.country_id = country._id)";
 
 	/**
 	 * Database creation sql statements
@@ -99,7 +101,7 @@ public class RsrDbAdapter {
 			"create table project (_id integer primary key, "+
 			"title text not null, subtitle text, summary text, funds real, "+
 			"thumbnail_url text, thumbnail_fn text," +
-			"longitude text, latitude text, country_id integer, state text, city text, hidden integer);";
+			"longitude text, latitude text, elevation text, country_id integer, state text, city text, hidden integer);";
 	private static final String UPDATE_TABLE_CREATE =
 			"create table _update (_id integer primary key, project integer not null, userid integer not null, "+
 			"title text not null, _text text, location text, uuid text,"+
@@ -107,8 +109,8 @@ public class RsrDbAdapter {
             "video_url text, video_fn text," +
             "photo_caption text, photo_credit text," +
 			"draft integer, unsent integer," +
-			CREATED_COL + " INTEGER NOT NULL DEFAULT (strftime('%s','now'))" +
-			");";
+			CREATED_COL + " INTEGER NOT NULL DEFAULT (strftime('%s','now'))," +
+			"longitude text, latitude text, country_id integer, state text, city text, elevation text);";
 	private static final String COUNTRY_TABLE_CREATE =
 			"create table country (_id integer primary key, "+
 			"name text not null, continent text, "+
@@ -142,7 +144,8 @@ public class RsrDbAdapter {
 //	private static final int DATABASE_VERSION = 11; //user columns attribute change
 //  private static final int DATABASE_VERSION = 12; //uuid for updates
 //  private static final int DATABASE_VERSION = 13; //org table
-    private static final int DATABASE_VERSION = 14; //update now has photo metadata and video
+//  private static final int DATABASE_VERSION = 14; //update now has photo metadata and video
+    private static final int DATABASE_VERSION = 15; //update now has location
 
 	private final Context context;
 
@@ -200,6 +203,14 @@ public class RsrDbAdapter {
                     db.execSQL("alter table " + UPDATE_TABLE + " add column video_fn text");
                     db.execSQL("alter table " + UPDATE_TABLE + " add column photo_caption text");
                     db.execSQL("alter table " + UPDATE_TABLE + " add column photo_credit text");
+                }
+                if (oldVersion < 15) { //more update columns
+                    db.execSQL("alter table " + UPDATE_TABLE + " add column longitude text");
+                    db.execSQL("alter table " + UPDATE_TABLE + " add column latitude text");
+                    db.execSQL("alter table " + UPDATE_TABLE + " add column elevation text");
+                    db.execSQL("alter table " + UPDATE_TABLE + " add column state text");
+                    db.execSQL("alter table " + UPDATE_TABLE + " add column city text");
+                    db.execSQL("alter table " + UPDATE_TABLE + " add column country_id integer");
                 }
             }
 			/*
@@ -487,7 +498,14 @@ public class RsrDbAdapter {
         updatedValues.put(PHOTO_CAPTION_COL, update.getPhotoCaption());
         updatedValues.put(PHOTO_CREDIT_COL, update.getPhotoCredit());
 
-		updatedValues.put(DRAFT_COL, update.getDraft()?"1":"0");
+        updatedValues.put(COUNTRY_COL, update.getCountry());
+        updatedValues.put(STATE_COL, update.getState());
+        updatedValues.put(CITY_COL, update.getCity());
+        updatedValues.put(LAT_COL, update.getLatitude());
+        updatedValues.put(LON_COL, update.getLongitude());
+        updatedValues.put(ELE_COL, update.getElevation());
+
+        updatedValues.put(DRAFT_COL, update.getDraft()?"1":"0");
 		updatedValues.put(UNSENT_COL, update.getUnsent()?"1":"0");
 		updatedValues.put(CREATED_COL, update.getDate().getTime()/1000); //1-second precision only
 
@@ -894,9 +912,9 @@ public class RsrDbAdapter {
 	 */
 	public Update findUpdate(String _id) {
 		Update update = null;
-		Cursor cursor = database.query(UPDATE_TABLE,
+		Cursor cursor = database.query(UPDATE_JOIN,
 										null,
-										PK_ID_COL + " = ?",
+										"_update._id = ?",
 										new String[] { _id }, null, null, null);
 		if (cursor != null) {
 			if (cursor.getCount() > 0) {
@@ -917,6 +935,12 @@ public class RsrDbAdapter {
 				update.setDraft(0 != cursor.getInt(cursor.getColumnIndexOrThrow(DRAFT_COL)));
 				update.setUnsent(0 != cursor.getInt(cursor.getColumnIndexOrThrow(UNSENT_COL)));
 				update.setDate(new Date(1000 * cursor.getLong(cursor.getColumnIndexOrThrow(CREATED_COL))));
+				update.setCountry(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
+				update.setState(cursor.getString(cursor.getColumnIndexOrThrow(STATE_COL)));
+				update.setCity(cursor.getString(cursor.getColumnIndexOrThrow(CITY_COL)));
+				update.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(LAT_COL)));
+                update.setLongitude(cursor.getString(cursor.getColumnIndexOrThrow(LON_COL)));
+                update.setElevation(cursor.getString(cursor.getColumnIndexOrThrow(ELE_COL)));
 				}
 			cursor.close();
 		}

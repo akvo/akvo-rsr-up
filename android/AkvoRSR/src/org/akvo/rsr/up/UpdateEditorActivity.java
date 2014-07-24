@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.UUID;
 
@@ -38,6 +39,9 @@ import org.akvo.rsr.up.util.Downloader;
 import org.akvo.rsr.up.util.FileUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
 
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
@@ -56,13 +60,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.provider.MediaStore;
 
 /**
  * implements the page where the user inputs and sends an update
  */
 
-public class UpdateEditorActivity extends ActionBarActivity {
+public class UpdateEditorActivity extends ActionBarActivity implements LocationListener {
 
     private final int photoRequest = 777;
     private final int photoPick = 888;
@@ -93,8 +98,21 @@ public class UpdateEditorActivity extends ActionBarActivity {
     private View photoAndToolsGroup;
     private View photoAddGroup;
     private View progressGroup;
+    private View positionGroup;
     private ProgressBar inProgress;
 
+    //Geo
+    private static final float UNKNOWN_ACCURACY = 99999999f;
+    private static final float ACCURACY_THRESHOLD = 25f;
+    private Button btnGeo;
+    private TextView latField;
+    private TextView lonField;
+    private TextView eleField;
+    private TextView accuracyField;
+    private TextView searchingIndicator;
+    private float lastAccuracy;
+    private boolean needUpdate = false;
+    
     // Database
     private RsrDbAdapter dba;
 
@@ -135,6 +153,13 @@ public class UpdateEditorActivity extends ActionBarActivity {
         photoAddGroup = findViewById(R.id.photo_buttons);
         photoCaptionText = (EditText) findViewById(R.id.projupd_edit_photo_caption);
         photoCreditText = (EditText) findViewById(R.id.projupd_edit_photo_credit);
+
+        positionGroup = findViewById(R.id.position_group);
+        latField = (TextView) findViewById(R.id.latitude);
+        lonField = (TextView) findViewById(R.id.longitude);
+        eleField = (TextView) findViewById(R.id.elevation);
+        accuracyField = (TextView) findViewById(R.id.gps_accuracy);
+        searchingIndicator = (TextView) findViewById(R.id.gps_searching);
 
         // Activate buttons
         btnSubmit = (Button) findViewById(R.id.btn_send_update);
@@ -192,6 +217,13 @@ public class UpdateEditorActivity extends ActionBarActivity {
             }
         });
 
+        btnGeo = (Button) findViewById(R.id.btn_get_position);
+        btnGeo.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                onGetGPSClick(view);
+            }
+        });
+
         dba = new RsrDbAdapter(this);
         dba.open();
 
@@ -229,7 +261,12 @@ public class UpdateEditorActivity extends ActionBarActivity {
                 projupdDescriptionText.setText(update.getText());
                 photoCaptionText.setText(update.getPhotoCaption());
                 photoCreditText.setText(update.getPhotoCredit());
-
+                latField.setText(update.getLatitude());
+                lonField.setText(update.getLongitude());
+                eleField.setText(update.getElevation());
+                if (update.validLatLon()) {
+                    positionGroup.setVisibility(View.VISIBLE);
+                }
                 // show preexisting image
                 if (update.getThumbnailFilename() != null) {
                     // btnTakePhoto.setText(R.string.btncaption_rephoto);
@@ -381,6 +418,9 @@ public class UpdateEditorActivity extends ActionBarActivity {
         update.setText(projupdDescriptionText.getText().toString());        
         update.setPhotoCaption(photoCaptionText.getText().toString());        
         update.setPhotoCredit(photoCreditText.getText().toString());        
+        update.setLatitude(latField.getText().toString());        
+        update.setLongitude(lonField.getText().toString());        
+        update.setElevation(eleField.getText().toString());        
     }
     
     /**
@@ -625,6 +665,96 @@ public class UpdateEditorActivity extends ActionBarActivity {
                                 intent.getExtras().getInt(ConstantUtil.TOTAL_KEY, 100));
             }
         }
+    }
+
+    
+    /**
+     * When the user clicks the "Get Location" button, start listening for
+     * location updates
+     */
+    public void onGetGPSClick(View v) {
+        LocationManager locMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+
+            positionGroup.setVisibility(View.VISIBLE);
+
+            accuracyField.setText("?");
+            accuracyField.setTextColor(Color.WHITE);
+            latField.setText("");
+            lonField.setText("");
+            eleField.setText("");
+            needUpdate = true;
+            searchingIndicator.setText(R.string.label_gps_searching);
+            lastAccuracy = UNKNOWN_ACCURACY;
+            locMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        } else {
+            // we can't turn GPS on directly, the best we can do is launch the
+            // settings page
+            DialogUtil.showGPSDialog(this);
+        }
+
+    }
+
+    /**
+     * populates the fields on the UI with the location info from the event
+     * 
+     * @param loc
+     */
+    private void populateLocation(Location loc) {
+        if (loc.hasAccuracy()) {
+            accuracyField.setText(new DecimalFormat("#").format(loc.getAccuracy()) + " m");
+            if (loc.getAccuracy() <= ACCURACY_THRESHOLD) {
+                accuracyField.setTextColor(Color.GREEN);
+            } else {
+                accuracyField.setTextColor(Color.RED);
+            }
+        }
+        latField.setText(loc.getLatitude() + "");
+        lonField.setText(loc.getLongitude() + "");
+        // elevation is in meters, even one decimal is way more than GPS precision
+        eleField.setText(new DecimalFormat("#.#").format(loc.getAltitude()));
+    }
+
+    /**
+     * called by the system when it gets location updates.
+     */
+    public void onLocationChanged(Location location) {
+        float currentAccuracy = location.getAccuracy();
+        // if accuracy is 0 then the gps has no idea where we're at
+        if (currentAccuracy > 0) {
+
+            // If we are below the accuracy treshold, stop listening for updates.
+            // This means that after the geolocation is 'green', it stays the same,
+            // otherwise it keeps on listening
+            if (currentAccuracy <= ACCURACY_THRESHOLD) {
+                LocationManager locMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                locMgr.removeUpdates(this);
+                searchingIndicator.setText(R.string.label_gps_ready);
+            }
+
+            // if the location reading is more accurate than the last, update
+            // the view
+            if (lastAccuracy > currentAccuracy || needUpdate) {
+                lastAccuracy = currentAccuracy;
+                needUpdate = false;
+                populateLocation(location);
+            }
+        } else if (needUpdate) {
+            needUpdate = true;
+            populateLocation(location);
+        }
+    }
+
+    public void onProviderDisabled(String provider) {
+        // no op. needed for LocationListener interface
+    }
+
+    public void onProviderEnabled(String provider) {
+        // no op. needed for LocationListener interface
+    }
+
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        // no op. needed for LocationListener interface
     }
 
 

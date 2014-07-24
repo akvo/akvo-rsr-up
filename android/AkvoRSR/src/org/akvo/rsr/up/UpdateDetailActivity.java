@@ -27,11 +27,13 @@ import org.akvo.rsr.up.util.DialogUtil;
 import org.akvo.rsr.up.util.FileUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -53,6 +55,7 @@ public class UpdateDetailActivity extends ActionBarActivity {
     private TextView projupdPhotoCredit;
     private TextView projupdPhotoCaption;
 	private TextView synchFlag;
+	private TextView projupdLocationText;
 	private ImageView projupdImage;
 	private Button btnEdit;
 	//Database
@@ -87,6 +90,7 @@ public class UpdateDetailActivity extends ActionBarActivity {
         projupdPhotoCredit = (TextView) findViewById(R.id.projupd_detail_photo_credit);
         projupdImage = (ImageView) findViewById(R.id.image_update_detail);
         projupdUser = (TextView) findViewById(R.id.projupd_detail_user);
+        projupdLocationText = (TextView) findViewById(R.id.text_projupd_location);
         synchFlag = (TextView) findViewById(R.id.projupd_detail_synchronising);
 
 		//Activate buttons
@@ -135,6 +139,39 @@ public class UpdateDetailActivity extends ActionBarActivity {
     			}
     		    projupdUser.setText(sig);
     		    FileUtil.setPhotoFile(projupdImage,update.getThumbnailUrl(),update.getThumbnailFilename(), null, updateId);
+    		    
+    		    String loc = "";
+	            if (update.getCity() != null && update.getCity().length() > 0) {
+	                loc += update.getCity() + ", ";
+	            }
+	            if (update.getState() != null && update.getState().length() > 0) {
+	                loc += update.getState() + ", ";           
+	            }
+	            if (update.getCountry() != null && update.getCountry().length() > 0) {
+	                loc += update.getCountry() + ", ";         
+	            }
+	            if (loc.length() > 1) {
+	                loc = loc.substring(0, loc.length()-2);
+	            }
+	    
+	            //TODO check against 0,0 too?
+	            //TODO string constant!
+	            if (update.validLatLon()) {
+	                loc += "\nLatitude " + update.getLatitude() +
+ 	                        " Longitude " + update.getLongitude();
+	                projupdLocationText.setOnClickListener(
+	                    new OnClickListener() {
+	                        @Override
+	                        public void onClick(View v) {
+	                            launchLatLonIntent();
+	                        }
+	                    });
+	            } else {
+	                projupdLocationText.setOnClickListener(null);
+	            }
+	    
+	            projupdLocationText.setText(loc);
+
     		}
 		}
 		finally {
@@ -192,4 +229,11 @@ public class UpdateDetailActivity extends ActionBarActivity {
 		finish();
 	}
 
+	private void launchLatLonIntent() {
+        if (update != null && update.validLatLon() ) {
+            Uri uri = Uri.parse("geo:" + update.getLatitude() + "," + update.getLongitude()); //Possibly add "?zoom=z"
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
+        }
+	}
 }
