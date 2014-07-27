@@ -101,10 +101,12 @@ public class GetProjectDataService extends IntentService {
                         int i = 0;
                         while (c.moveToNext()) {
                             i++;
-                            dl.fetchUpdateList(this,
-                                    new URL(host +
-                                            "/api/v1/project_update/?format=xml&limit=0&project=" + // TODO move to constants
-                                            c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL)))
+                            String projId = c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL));
+//                            dl.fetchUpdateList(this,
+//                                    new URL(host + "/api/v1/project_update/?format=xml&limit=0&project=" + projId)// TODO move to constants                                            
+//                                    );
+                            dl.fetchUpdateListRestApi(this,
+                                    new URL(host + "/rest/v1/project_update/?format=xml&limit=0&project=" + projId)// TODO move to constants                                            
                                     );
                             broadcastProgress(1, i, c.getCount());
                         }

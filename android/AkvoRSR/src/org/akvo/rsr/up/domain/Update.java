@@ -29,7 +29,7 @@ public class Update {
 	private boolean draft;
 	private boolean unsent;
 	private String text;
-	private String location; //unused
+	private Location mLocation;
 	private String thumbnailUrl;
 	private String thumbnailFilename;	
 	private String uuid;	
@@ -38,18 +38,16 @@ public class Update {
     private String photoCaption;
     private String videoUrl;
     private String videoFilename;
-    private String longitude; //fractional degrees with decimal point
-    private String latitude;  //ditto
-    private String elevation;  //m
-    private String country;
-    private String state;
-    private String city;
-
+ 
     private boolean isEmpty(String s) {
         if ((s != null) && (s.length() > 0))
             return false;
         else
             return true;
+    }
+    
+    public Update() {
+       mLocation = new Location(); 
     }
     
 	public String getId() {
@@ -100,12 +98,12 @@ public class Update {
 		this.text= text;
 	}
 
-	public String getLocation() {
-		return location;
+	public Location getLocation() {
+		return mLocation;
 	}
 
-	public void setLocation(String location) {
-		this.location = location;
+	public void setLocation(Location location) {
+		mLocation = location;
 	}
 
 	public String getThumbnailUrl() {
@@ -180,60 +178,61 @@ public class Update {
     public void setVideoFilename(String fn) {
         videoFilename = fn;
     }
+    
     public String getLongitude() {
-        return longitude;
+        return mLocation.getLongitude();
     }
 
     public void setLongitude(String lon) {
-        this.longitude = lon;
+        mLocation.setLongitude(lon);
     }
 
     public String getLatitude() {
-        return latitude;
+        return mLocation.getLatitude();
     }
 
     public void setLatitude(String lat) {
-        this.latitude = lat;
+        mLocation.setLatitude(lat);
     }
 
     public String getElevation() {
-        return elevation;
+        return mLocation.getElevation();
     }
 
     public void setElevation(String ele) {
-        this.elevation = ele;
+        mLocation.setElevation(ele);
     }
 
     public String getCountry() {
-        return country;
+        return mLocation.getCountry();
     }
 
     public void setCountry(String country) {
-        this.country = country;
+        mLocation.setCountry(country);
     }
 
     public String getState() {
-        return state;
+        return mLocation.getState();
     }
 
     public void setState(String state) {
-        this.state = state;
+        mLocation.setState(state);
     }
 
     public String getCity() {
-        return city;
+        return mLocation.getCity();
     }
 
     public void setCity(String city) {
-        this.city = city;
+        mLocation.setCity(city);
     }
 
     public boolean validLatLon() {
-        return (!isEmpty(latitude)) && (!isEmpty(longitude));
+        return mLocation.validLatLon();
     }
     
     public boolean validLatLonEle() {
-        return (!isEmpty(latitude)) && (!isEmpty(longitude)) && (!isEmpty(elevation));
+        return mLocation.validLatLonEle();
     }
 
 }

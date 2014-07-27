@@ -20,8 +20,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -37,6 +39,7 @@ import org.akvo.rsr.up.xml.AuthHandler;
 import org.akvo.rsr.up.xml.CountryListHandler;
 import org.akvo.rsr.up.xml.OrganisationHandler;
 import org.akvo.rsr.up.xml.ProjectListHandler;
+import org.akvo.rsr.up.xml.UpdateExtraRestListHandler;
 import org.akvo.rsr.up.xml.UpdateListHandler;
 import org.akvo.rsr.up.xml.UserListHandler;
 import org.xml.sax.InputSource;
@@ -144,35 +147,78 @@ public class Downloader {
 		Log.i(TAG, "Fetched " + myProjectListHandler.getCount() + " projects");
 	}
 	
-	/**
-	 * populates the updates table in the db from a server URL
-	 * Typically the url will specify updates for a single project.
-	 * 
-	 * @param ctx
-	 * @param url
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws IOException
-	 */
-	public void fetchUpdateList(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
+    /**
+     * populates the updates table in the db from a server URL
+     * Typically the url will specify updates for a single project.
+     * 
+     * @param ctx
+     * @param url
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     */
+    public void fetchUpdateList(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
 
-		/* Get a SAXParser from the SAXPArserFactory. */
-		SAXParserFactory spf = SAXParserFactory.newInstance();
-		SAXParser sp = spf.newSAXParser();
+        /* Get a SAXParser from the SAXPArserFactory. */
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        SAXParser sp = spf.newSAXParser();
 
-		/* Get the XMLReader of the SAXParser we created. */
-		XMLReader xr = sp.getXMLReader();
-		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
-		UpdateListHandler myUpdateListHandler = new UpdateListHandler(new RsrDbAdapter(ctx), true, false);
-		xr.setContentHandler(myUpdateListHandler);
-		/* Parse the xml-data from our URL. */
-		xr.parse(new InputSource(url.openStream()));
-		/* Parsing has finished. */
+        /* Get the XMLReader of the SAXParser we created. */
+        XMLReader xr = sp.getXMLReader();
+        /* Create a new ContentHandler and apply it to the XML-Reader*/ 
+        UpdateListHandler myUpdateListHandler = new UpdateListHandler(new RsrDbAdapter(ctx), true, false);
+        xr.setContentHandler(myUpdateListHandler);
+        /* Parse the xml-data from our URL. */
+        xr.parse(new InputSource(url.openStream()));
+        /* Parsing has finished. */
 
-		/* Check if anything went wrong. */
-		err = myUpdateListHandler.getError();
-		Log.i(TAG, "Fetched " + myUpdateListHandler.getCount() + " updates");
-	}
+        /* Check if anything went wrong. */
+        err = myUpdateListHandler.getError();
+        Log.i(TAG, "Fetched " + myUpdateListHandler.getCount() + " updates");
+    }
+
+
+    /**
+     * populates the updates table in the db from a server URL
+     * in the REST API
+     * Typically the url will specify updates for a single project.
+     * 
+     * @param ctx
+     * @param url
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     */
+    public void fetchUpdateListRestApi(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
+
+        User user = SettingsUtil.getAuthUser(ctx);
+        HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
+        h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
+        int code = h.code();//evaluation starts the exchange
+        if (code == 200) {
+            /* Get a SAXParser from the SAXPArserFactory. */
+            SAXParserFactory spf = SAXParserFactory.newInstance();
+            SAXParser sp = spf.newSAXParser();
+            /* Get the XMLReader of the SAXParser we created. */
+            XMLReader xr = sp.getXMLReader();
+            /* Create a new ContentHandler and apply it to the XML-Reader*/ 
+            UpdateExtraRestListHandler myUpdateListHandler = new UpdateExtraRestListHandler(new RsrDbAdapter(ctx), true, false);//TODO: true, true
+            xr.setContentHandler(myUpdateListHandler);
+            /* Parse the xml-data from our URL. */
+            xr.parse(new InputSource(h.stream()));
+            /* Parsing has finished. */
+            /* Check if anything went wrong. */
+            err = myUpdateListHandler.getError();
+            Log.i(TAG, "Fetched " + myUpdateListHandler.getCount() + " updates");
+
+        } else {
+            //Vanilla case is 403 forbidden on an auth failure
+            Log.e(TAG, "Fetch update list HTTP error code:" + code);
+            Log.e(TAG, h.body());
+            throw new IOException("Unexpected server response " + code);
+        }
+
+    }
 
 
 	/**
