@@ -498,7 +498,7 @@ public class RsrDbAdapter {
         updatedValues.put(PHOTO_CAPTION_COL, update.getPhotoCaption());
         updatedValues.put(PHOTO_CREDIT_COL, update.getPhotoCredit());
 
-        updatedValues.put(COUNTRY_COL, update.getCountry());
+        updatedValues.put(COUNTRY_COL, update.getLocation().getCountryId());
         updatedValues.put(STATE_COL, update.getState());
         updatedValues.put(CITY_COL, update.getCity());
         updatedValues.put(LAT_COL, update.getLatitude());
@@ -935,7 +935,8 @@ public class RsrDbAdapter {
 				update.setDraft(0 != cursor.getInt(cursor.getColumnIndexOrThrow(DRAFT_COL)));
 				update.setUnsent(0 != cursor.getInt(cursor.getColumnIndexOrThrow(UNSENT_COL)));
 				update.setDate(new Date(1000 * cursor.getLong(cursor.getColumnIndexOrThrow(CREATED_COL))));
-				update.setCountry(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
+                update.setCountry(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
+                update.getLocation().setCountryId(cursor.getString(cursor.getColumnIndexOrThrow("country._id")));
 				update.setState(cursor.getString(cursor.getColumnIndexOrThrow(STATE_COL)));
 				update.setCity(cursor.getString(cursor.getColumnIndexOrThrow(CITY_COL)));
 				update.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(LAT_COL)));

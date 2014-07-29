@@ -420,7 +420,8 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
         update.setPhotoCredit(photoCreditText.getText().toString());        
         update.setLatitude(latField.getText().toString());        
         update.setLongitude(lonField.getText().toString());        
-        update.setElevation(eleField.getText().toString());        
+        update.setElevation(eleField.getText().toString()); 
+        update.getLocation().setCountryId("18"); //sweden. TODO: where do we get this?
     }
     
     /**

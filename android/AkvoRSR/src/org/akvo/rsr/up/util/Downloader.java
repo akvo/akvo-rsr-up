@@ -39,7 +39,7 @@ import org.akvo.rsr.up.xml.AuthHandler;
 import org.akvo.rsr.up.xml.CountryListHandler;
 import org.akvo.rsr.up.xml.OrganisationHandler;
 import org.akvo.rsr.up.xml.ProjectListHandler;
-import org.akvo.rsr.up.xml.UpdateExtraRestListHandler;
+import org.akvo.rsr.up.xml.UpdateRestListHandler;
 import org.akvo.rsr.up.xml.UpdateListHandler;
 import org.akvo.rsr.up.xml.UserListHandler;
 import org.xml.sax.InputSource;
@@ -202,7 +202,7 @@ public class Downloader {
             /* Get the XMLReader of the SAXParser we created. */
             XMLReader xr = sp.getXMLReader();
             /* Create a new ContentHandler and apply it to the XML-Reader*/ 
-            UpdateExtraRestListHandler myUpdateListHandler = new UpdateExtraRestListHandler(new RsrDbAdapter(ctx), true, false);//TODO: true, true
+            UpdateRestListHandler myUpdateListHandler = new UpdateRestListHandler(new RsrDbAdapter(ctx), true, false);//TODO: true, true
             xr.setContentHandler(myUpdateListHandler);
             /* Parse the xml-data from our URL. */
             xr.parse(new InputSource(h.stream()));
@@ -574,7 +574,7 @@ public class Downloader {
 	 *   
 	 * What to submit:
 	<object>
-	<update_method>W</update_method>
+	<update_method>M</update_method>
 	<project>/api/v1/project/277/</project>
 	<user>/api/v1/project/1/</user>
 	<uuid>nn-nn-nn-nnnnnnn</uuid>
@@ -598,30 +598,46 @@ public class Downloader {
 	//TODO must return more info to user on failure! Probably should throw a fail exception and return false if unknown
 	public static int postXmlUpdateStreaming(String urlTemplate, Update update, boolean sendImage, User user, String agent, ProgressReporter prog) {
 		final String contentType = "application/xml";
-		final String bodyTemplate1  =	"<object><update_method>M</update_method><project>%s</project>" + //Mobile update method
+		final String bodyTemplate1  =	"<root><update_method>M</update_method><project>%s</project>" + //Mobile update method
 				"<photo_location>E</photo_location><uuid>%s</uuid><user>%s</user><title>%s</title>" +
 				"<user_agent>%s</user_agent><text>%s</text>";
-		final String bodyTemplate2  = "</object>";
-		final String imagePreamble  = "<photo type=\"hash\"><name>dummy.jpg</name><content_type>image/jpeg</content_type><file>";
-        final String imagePostamble = "</file></photo>";
+		final String bodyTemplate2  = "</root>";
+//        final String imagePreamble  = "<photo type=\"hash\"><name>dummy.jpg</name><content_type>image/jpeg</content_type><file>";
+        final String imagePreamble  = "<photo>";
+//        final String imagePostamble = "</file></photo>";
+        final String imagePostamble = "</photo>";
         final String imageCaptionTemplate = "<photo_caption>%s</photo_caption>";
         final String imageCreditTemplate = "<photo_credit>%s</photo_credit>";
-        final String locationTemplate = "<primary_location><longitude>%s</longitude><latitude>%s</latitude></primary_location>";
-		boolean allSent = false;
+//        final String locationTemplate = "<primary_location><longitude>%s</longitude><latitude>%s</latitude></primary_location>";
+        final String locationTemplate = "<locations><list-item><longitude>%s</longitude><latitude>%s</latitude><country>%s</country></list-item></locations>";
+        //TODO what about:
+//        <city>Stockholm</city>
+ //       <state>no states here</state>
+  //      <country>18</country>
+//        <address_1/>
+//        <address_2/>
+//        <postcode/>
+
+        boolean allSent = false;
 		try {
-			URL url = new URL(String.format(Locale.US, urlTemplate, user.getApiKey(), user.getUsername()));
+			URL url = new URL(String.format(Locale.US, urlTemplate
+			        //, user.getApiKey(), user.getUsername()
+			        ));
 	
-			//user and project references have to be in URL form
-			String projectPath = String.format(Locale.US, ConstantUtil.PROJECT_PATH_PATTERN, update.getProjectId());
-			String userPath = String.format(Locale.US, ConstantUtil.USER_PATH_PATTERN, user.getId());
+			//user and project references had to be in URL form
+//			String projectPath = String.format(Locale.US, ConstantUtil.PROJECT_PATH_PATTERN, update.getProjectId());
+//			String userPath = String.format(Locale.US, ConstantUtil.USER_PATH_PATTERN, user.getId());
 
 			String requestBody = String.format(Locale.US, bodyTemplate1,
-					projectPath, update.getUuid(), userPath,
-					oneLine(update.getTitle(),50), //TODO: WHAT ABOUT XML?
+			        update.getProjectId(), update.getUuid(), user.getId(),
+					oneLine(update.getTitle(), 50),
 					agent,
 					update.getText());
 	
 			HttpRequest h = HttpRequest.post(url).contentType(contentType);//OutOfMemory here...
+//	        h.connectTimeout(10000); //10 sec timeout
+	        h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
+
 			h.readTimeout(READ_TIMEOUT_MS);
 			h.send(requestBody);
 	
@@ -668,7 +684,7 @@ public class Downloader {
 			} //end image
 
 			if (update.validLatLon()) {
-                h.send(String.format(locationTemplate, update.getLongitude(), update.getLatitude()));
+                h.send(String.format(locationTemplate, update.getLongitude(), update.getLatitude(), update.getLocation().getCountryId()));
             }
 			
 			h.send(bodyTemplate2);
@@ -678,6 +694,7 @@ public class Downloader {
 			String msg = h.message();
 			String bod = h.body(); //On success, XML representation of created object
 			if (code == 201) { //Created
+			    //TODO this does not work in new API
 				String idPath = h.header(HttpRequest.HEADER_LOCATION);//Path-ified ID
 				int penSlash = idPath.lastIndexOf('/', idPath.length() - 2);
 				String id = idPath.substring(penSlash + 1, idPath.length() - 1);

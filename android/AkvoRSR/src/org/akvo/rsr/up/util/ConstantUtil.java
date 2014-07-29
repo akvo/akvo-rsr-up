@@ -33,7 +33,9 @@ public class ConstantUtil {
 	public static final String PWD_URL = "/accounts/password/reset/";
 	public static final String AUTH_URL = "/auth/token/";
 	public static final String API_KEY_PATTERN = "&api_key=%s&username=%s";
-	public static final String POST_UPDATE_URL = "/api/v1/project_update/?format=xml";
+//    public static final String POST_UPDATE_URL = "/api/v1/project_update/?format=xml";
+    public static final String POST_UPDATE_URL = "/rest/v1/project_update/?format=xml";
+    public static final String FETCH_UPDATE_URL_PATTERN = "/rest/v1/project_update/?format=xml&limit=all&project=%s"; // /api/v1/project_update/?format=xml&limit=0&project=
 	public static final String VERIFY_UPDATE_PATTERN = "/api/v1/project_update/?format=xml&uuid=%s&limit=2";
 	public static final String FETCH_PROJ_URL_PATTERN = "/api/v1/project/?format=xml&limit=0&partnerships__organisation=%s";
 	public static final String FETCH_COUNTRIES_URL = "/api/v1/country/?format=xml&limit=0";

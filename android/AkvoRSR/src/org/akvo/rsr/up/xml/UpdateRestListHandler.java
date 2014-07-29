@@ -29,8 +29,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 
 /*
- * Class to handle XML parsing for a project update from REST API.
- * Always requested as a list, where each update object's tags of the XML will be encapsulated in <root><results><list-item>
+ * Class to handle XML parsing for a project update.
+ * Always requested as a list, where each object's tags of the XML will be encapsulated in <root><results><list-item>
  * Example start of list:
  * 
 <root>
@@ -39,43 +39,33 @@ import org.xml.sax.helpers.DefaultHandler;
 <previous/>
 <results>
 <list-item>
-    <photo>/media/db/project/2/update/5298/ProjectUpdate_5298_photo_2014-07-24_13.35.05.jpg</photo>
-    <primary_location>
-        <id>2</id>
-        <latitude>59.0</latitude>
-        <longitude>18.0</longitude>
-        <city>Stockholm</city><state>Stockholms län</state>
-        <country>
-            <id>18</id><name>Sweden</name><iso_code>se</iso_code><continent>Europe</continent><continent_code>eu</continent_code>
-        </country>
-        <address_1/>
-        <address_2/>
-        <postcode/>
-    </primary_location>
-    <project>2</project>
-    <user>
-        <first_name>Gabriel</first_name><last_name>von Heijne</last_name>
-        <organisation>
-            <logo>/media/db/org/42/Organisation_42_logo_2012-10-23_10.56.32.jpg</logo><long_name>Akvo Foundation</long_name><name>Akvo</name>
-            <primary_location>
-                <id>34</id><latitude>52.3723</latitude><longitude>4.907987</longitude><city>Amsterdam</city><state>Noord-Holland</state><country><id>3</id><name>Netherlands</name><iso_code>nl</iso_code><continent>Europe</continent><continent_code>eu</continent_code></country><address_1>'s-Gravenhekje 1A</address_1><address_2/><postcode>1011 TG</postcode>
-            </primary_location>
-            <absolute_url>/organisation/42/</absolute_url>
-        </organisation>
-    </user>
+    <locations>
+        <list-item>
+            <id>2</id>
+            <latitude>59.0</latitude><longitude>18.0</longitude>
+            <city>Stockholm</city><state>Stockholms län</state>
+            <country>18</country>
+            <address_1/><address_2/><postcode/>
+            <location_target>5298</location_target>
+        </list-item>
+    </locations>
+    <photo>db/project/2/update/5298/ProjectUpdate_5298_photo_2014-07-24_13.35.05.jpg</photo>
     <id>5298</id>
-    <created_at>2014-07-24T13:35:03</created_at>
-    <last_modified_at>2014-07-24T13:35:05</last_modified_at>
+    <created_at>2014-07-24 13:35:03</created_at>
+    <last_modified_at>2014-07-24 13:35:05</last_modified_at>
+    <project>2</project>
+    <user>1</user>
     <title>Electro-cute</title>
-    <text>Moar warm!</text>
-    <language>en</language>
+    <text>Moar warm!</text><language>en</language>
+    <primary_location>2</primary_location>
     <photo_caption>Purrrr</photo_caption>
-    <photo_credit/>
-    <video/><video_caption/><video_credit/>
+    <photo_credit/><video/>
+    <video_caption/>
+    <video_credit/>
     <update_method>M</update_method>
     <user_agent/>
-    <uuid/><notes/>
-    <absolute_url>/project/2/update/5298/</absolute_url>
+    <uuid/>
+    <notes/>
 </list-item>
 ...
 </results>
@@ -85,23 +75,20 @@ import org.xml.sax.helpers.DefaultHandler;
 
 
 
-public class UpdateExtraRestListHandler extends DefaultHandler {
+public class UpdateRestListHandler extends DefaultHandler {
+
 
     private static String LIST_ITEM = "list-item";
-    private static String PRIMARY_LOCATION = "primary_location";
-    
     
 	// ===========================================================
 	// Fields
 	// ===========================================================
 	
-    private boolean in_results = false;
-    private boolean in_update = false;
+	private boolean in_update = false;
 	private boolean in_id = false;
 	private boolean in_title = false;
 	private boolean in_project_id = false;
-    private boolean in_user = false;
-    private boolean in_user_id = false;
+	private boolean in_user_id = false;
     private boolean in_photo = false;
     private boolean in_photo_credit = false;
     private boolean in_photo_caption = false;
@@ -109,14 +96,15 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
 	private boolean in_text = false;
 	private boolean in_time = false;
 	private boolean in_uuid = false;
+    private boolean in_primary_location = false;
+    private boolean in_locations = false;
+    private boolean in_results = false;
 
 	private boolean in_location = false;
-    private boolean in_country = false;
+    private boolean in_location_id = false;
+    private boolean in_country_id = false;
     private boolean in_state = false;
     private boolean in_city = false;
-    private boolean in_address1 = false;
-    private boolean in_address2 = false;
-    private boolean in_postcode = false;
     private boolean in_long = false;
     private boolean in_lat = false;
 
@@ -124,10 +112,11 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
 	private int updateCount;
 	private boolean syntaxError = false;
     private boolean insert;
-    private boolean extra;
 	private int depth = 0;
 	private SimpleDateFormat df1;
 	private String buffer;
+    private String stored_location_id;
+    private String primary_location_id;
 	
 	//where to store results
 	private RsrDbAdapter dba;
@@ -135,12 +124,11 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
 	/*
 	 * constructor
 	 */
-	public UpdateExtraRestListHandler(RsrDbAdapter aDba, boolean insert, boolean extra) {
+	public UpdateRestListHandler(RsrDbAdapter aDba, boolean insert, boolean extra) {
 		super();
 		dba = aDba;
         this.insert = insert;
-        this.extra = extra;
-		df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
+        df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
 		df1.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
 	// ===========================================================
@@ -186,16 +174,18 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
         if (depth == 1 && localName.equals("results")) {
             this.in_results = true;
         } else if (depth == 2 && in_results && localName.equals(LIST_ITEM)) {
-			this.in_update = true;
-			currentUpd = new Update();
-		} else if (in_update) {
+            this.in_update = true;
+            currentUpd = new Update();
+            primary_location_id = null;
+            currentUpd.setUuid("");//db cannot take null
+        } else if (depth == 3 && in_update) {
 			if (localName.equals("id")) {
 				this.in_id = true;
 			} else if (localName.equals("title")) {
 				this.in_title = true;
 			} else if (localName.equals("text")) {
 				this.in_text = true;
-			} else if (localName.equals("time")) {
+			} else if (localName.equals("created_at")) {
 				this.in_time = true;
 			} else if (localName.equals("project")) {
 				this.in_project_id = true;
@@ -211,20 +201,34 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
                 this.in_photo_caption = true;
             } else if (localName.equals("video")) {
                 this.in_video = true;
-            } else if (localName.equals(PRIMARY_LOCATION)) {
-                this.in_location = true;
-            } else if (localName.equals("country") && in_location) {
-                this.in_country = true;
-            } else if (localName.equals("state") && in_location) {
-                this.in_state = true;
-            } else if (localName.equals("city") && in_location) {
-                this.in_city = true;
-            } else if (localName.equals("latitude") && in_location) {
-                this.in_lat = true;
-            } else if (localName.equals("longitude") && in_location) {
-                this.in_long = true;			}
-		}
-		
+            } else if (localName.equals("primary_location")) {
+                this.in_primary_location = true;
+            } else if (localName.equals("locations")) {
+                this.in_locations = true;
+            }
+        } else if (in_locations && localName.equals(LIST_ITEM)) {
+            this.in_location = true;
+            //forget any previous location info
+            stored_location_id = null;
+            currentUpd.setCity(null);
+            currentUpd.getLocation().setCountryId(null);
+            currentUpd.setLatitude(null);
+            currentUpd.setLongitude(null);
+            currentUpd.setState(null);
+            currentUpd.setElevation(""); //Not yet on server
+        } else if (localName.equals("id") && in_location) {
+            this.in_location_id = true;
+        } else if (localName.equals("country") && in_location) {
+            this.in_country_id = true;
+        } else if (localName.equals("state") && in_location) {
+            this.in_state = true;
+        } else if (localName.equals("city") && in_location) {
+            this.in_city = true;
+        } else if (localName.equals("latitude") && in_location) {
+            this.in_lat = true;
+        } else if (localName.equals("longitude") && in_location) {
+            this.in_long = true;           
+        }
 		depth++;
 	}
 	
@@ -235,25 +239,37 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
 			throws SAXException {
 		depth--;
 
-		if (localName.equals("object")) { //we are done
-            this.in_update = false;
-            if (currentUpd != null && currentUpd.getId() != null) {
-                updateCount++;
-                if (insert) {
-                    dba.saveUpdate(currentUpd, false); //preserve name of any cached image
-                    currentUpd = null;
+        if (depth == 1 && localName.equals("results")) {
+            this.in_results = false;
+        } else if (localName.equals(LIST_ITEM)) { 
+            if (in_location) {//we are done with this location
+                this.in_location = false;
+            } else { //we are done with an update
+                //TODO: verify that stored location is the primary one, otherwise raise an error
+                this.in_update = false;
+                if (currentUpd != null && currentUpd.getId() != null) {
+                    updateCount++;
+                    if (insert) {
+                        dba.saveUpdate(currentUpd, false); //preserve name of any cached image
+                        currentUpd = null;
+                    }
                 }
             }
         } else if (localName.equals("id")) {
-			this.in_id = false;
-			currentUpd.setId(buffer);
+            if (in_location_id) {
+                stored_location_id = buffer;
+                in_location_id = false;
+            } else {
+                this.in_id = false;
+                currentUpd.setId(buffer);
+            }
 		} else if (localName.equals("title")) {
 			this.in_title = false;
 			currentUpd.setTitle(buffer);
 		} else if (localName.equals("text")) {
 			this.in_text = false;
 			currentUpd.setText(buffer);
-		} else if (localName.equals("time")) {
+		} else if (localName.equals("created_at")) {
 			this.in_time = false;
 			try {
 				currentUpd.setDate(df1.parse(buffer));
@@ -262,10 +278,10 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
 			}
 		} else if (localName.equals("project")) {
 			this.in_project_id = false;
-			currentUpd.setProjectId(idFromUrl(buffer));
+			currentUpd.setProjectId(buffer);
 		} else if (localName.equals("user")) {
 			this.in_user_id = false;
-			currentUpd.setUserId(idFromUrl(buffer));
+			currentUpd.setUserId(buffer);
 		} else if (localName.equals("uuid")) {
 			this.in_uuid = false;
 			currentUpd.setUuid(buffer);
@@ -282,10 +298,11 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
             this.in_video = false;
             currentUpd.setVideoUrl(buffer);
         } else if (localName.equals("primary_location")) {
-            this.in_location = false;
+            this.in_primary_location = false;
+            primary_location_id = buffer;
         } else if (localName.equals("country") && in_location) {
-            this.in_country = false;
-            currentUpd.setCountry(buffer);
+            this.in_country_id = false;
+            currentUpd.getLocation().setCountryId(buffer);
         } else if (localName.equals("state") && in_location) {
             this.in_state = false;
             currentUpd.setState(buffer);
@@ -298,6 +315,8 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
         } else if (localName.equals("longitude") && in_location) {
             this.in_long = false;
             currentUpd.setLongitude(buffer);
+        } else if (localName.equals("locations")) {
+            this.in_locations = false;
         }
 	}
 	
@@ -309,7 +328,8 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
 			if (this.in_id
 			 || this.in_title
 			 || this.in_uuid
-			 || this.in_user_id
+             || this.in_user_id
+             || this.in_location_id
 			 || this.in_project_id
              || this.in_photo
              || this.in_photo_credit
@@ -317,7 +337,7 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
              || this.in_video
 			 || this.in_text
 			 || this.in_time
-			 || this.in_country
+			 || this.in_country_id
 			 || this.in_state
 			 || this.in_city
 			 || this.in_long

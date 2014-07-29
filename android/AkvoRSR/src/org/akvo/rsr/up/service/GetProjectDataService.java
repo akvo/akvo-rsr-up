@@ -94,19 +94,15 @@ public class GetProjectDataService extends IntentService {
 
                 if (mFetchUpdates) {
                     // We only get published projects from that URL,
-                    // so we need to iterate on them and get corresponding
-                    // updates
+                    // so we need to iterate on them and get corresponding updates
                     Cursor c = ad.listAllProjects();
                     try {
                         int i = 0;
                         while (c.moveToNext()) {
                             i++;
                             String projId = c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL));
-//                            dl.fetchUpdateList(this,
-//                                    new URL(host + "/api/v1/project_update/?format=xml&limit=0&project=" + projId)// TODO move to constants                                            
-//                                    );
-                            dl.fetchUpdateListRestApi(this,
-                                    new URL(host + "/rest/v1/project_update/?format=xml&limit=0&project=" + projId)// TODO move to constants                                            
+                            dl.fetchUpdateListRestApi(this, //TODO: use _extra for fewer fetches, as country and user is included
+                                    new URL(host + String.format(ConstantUtil.FETCH_UPDATE_URL_PATTERN, projId))                                            
                                     );
                             broadcastProgress(1, i, c.getCount());
                         }

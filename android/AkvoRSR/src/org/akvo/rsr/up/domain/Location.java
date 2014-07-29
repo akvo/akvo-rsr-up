@@ -27,6 +27,7 @@ public class Location {
     private String mLatitude;  //ditto
     private String mElevation;  //m
     private String mCountry;
+    private String mCountryId;
     private String mState;
     private String mCity;
     private String mAddress1;
@@ -78,6 +79,14 @@ public class Location {
 
     public void setCountry(String country) {
         mCountry = country;
+    }
+
+    public String getCountryId() {
+        return mCountryId;
+    }
+
+    public void setCountryId(String countryId) {
+        mCountryId = countryId;
     }
 
     public String getState() {

@@ -34,7 +34,7 @@ public class SubmitProjectUpdateService extends IntentService {
 		try {
 			Downloader.sendUpdate(this,
 					localUpdateId,
-					SettingsUtil.host(this) + ConstantUtil.POST_UPDATE_URL + ConstantUtil.API_KEY_PATTERN,
+					SettingsUtil.host(this) + ConstantUtil.POST_UPDATE_URL, //+ ConstantUtil.API_KEY_PATTERN,
 					SettingsUtil.host(this) + ConstantUtil.VERIFY_UPDATE_PATTERN,
 					sendImg,
 					user,
