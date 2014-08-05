@@ -129,6 +129,19 @@ public class Location {
         mPostcode = postcode;
     }
 
+    public void clear() {
+        mId = null;
+        mLatitude = null;
+        mLongitude = null;
+        mElevation = null;
+        mCountry = null;
+        mCountryId = null;
+        mState = null;
+        mAddress1 = null;
+        mAddress2 = null;
+        mPostcode = null;
+    }
+
     public boolean validLatLon() {
         return (!isEmpty(mLatitude)) && (!isEmpty(mLongitude));
     }

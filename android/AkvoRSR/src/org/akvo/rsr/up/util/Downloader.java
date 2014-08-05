@@ -20,10 +20,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -39,6 +37,7 @@ import org.akvo.rsr.up.xml.AuthHandler;
 import org.akvo.rsr.up.xml.CountryListHandler;
 import org.akvo.rsr.up.xml.OrganisationHandler;
 import org.akvo.rsr.up.xml.ProjectListHandler;
+import org.akvo.rsr.up.xml.UpdateRestHandler;
 import org.akvo.rsr.up.xml.UpdateRestListHandler;
 import org.akvo.rsr.up.xml.UpdateListHandler;
 import org.akvo.rsr.up.xml.UserListHandler;
@@ -65,16 +64,16 @@ public class Downloader {
 	
 	private final static int READ_TIMEOUT_MS = 60000;
 		
-	public static class PostUnresolvedException extends Exception {
-		public PostUnresolvedException(String string) {
+	public static class UnresolvedPostException extends IOException {
+		UnresolvedPostException(String string) {
 			super(string);
 		}
 
 		private static final long serialVersionUID = -630304430323100535L;
 	}
 
-	public static class PostFailedException extends Exception {
-		public PostFailedException(String string) {
+	public static class FailedPostException extends Exception {
+		public FailedPostException(String string) {
 			super(string);
 		}
 
@@ -227,61 +226,58 @@ public class Downloader {
 	 * @param ctx
 	 * @param url
 	 * @throws ParserConfigurationException
+	 * @throws FailedPostException 
 	 */
-	public static int verifyUpdate(Context ctx, URL url, RsrDbAdapter dba, String localId) throws ParserConfigurationException {
+	public static boolean verifyUpdate(Context ctx, URL url, RsrDbAdapter dba, String localId) throws ParserConfigurationException, FailedPostException {
 
 		Log.v(TAG, "Verifying update " + localId);
 
 		/* Get a SAXParser from the SAXPArserFactory. */
 		SAXParserFactory spf = SAXParserFactory.newInstance();
 		try {
-		SAXParser sp = spf.newSAXParser();
-
-		/* Get the XMLReader of the SAXParser we created. */
-		XMLReader xr = sp.getXMLReader();
-		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
-		UpdateListHandler myUpdateListHandler = new UpdateListHandler(dba, false, false);
-		xr.setContentHandler(myUpdateListHandler);
-		/* Parse the xml-data from our URL. */
-		xr.parse(new InputSource(url.openStream()));
-		/* Parsing has finished. */
-
-		/* Check if anything went wrong. */
-		boolean err = myUpdateListHandler.getError();
-		if (err) {
-			Log.e(TAG, "Verification error");
-			return ConstantUtil.POST_UNKNOWN;
-		}
-		int count = myUpdateListHandler.getCount();
-		Log.v(TAG, "Verification count: " + count);
-		 //TODO, check that more than UUID matches?
-		if (count == 1) {  //1 is good, Update present on server, just note that
-			Update u = myUpdateListHandler.getLastUpdate(); //this is the result, db has not been changed
-			u.setUnsent(false); //we are done
-			u.setDraft(false); //published, not draft
-			dba.updateUpdateVerifiedByUuid(u);
-			return ConstantUtil.POST_SUCCESS;
-		} else {
-			if (count == 0) {  //0 is bad, update never made it to server, will need to be re-sent
-				Update u = dba.findUpdate(localId);
-				u.setUnsent(false); //status is resolved
-				u.setDraft(true); //go back to being draft
-				dba.updateUpdateVerifiedByUuid(u);
-			} else {
-				Log.e(TAG, "more than one match for Update UUID!");
-			}
-			return ConstantUtil.POST_FAILURE;
-		}
+    		SAXParser sp = spf.newSAXParser();
+    
+    		/* Get the XMLReader of the SAXParser we created. */
+    		XMLReader xr = sp.getXMLReader();
+    		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
+    		UpdateRestHandler updateHandler = new UpdateRestHandler();
+    		xr.setContentHandler(updateHandler);
+    		/* Parse the xml-data from our URL. */
+    		xr.parse(new InputSource(url.openStream()));
+    		/* Parsing has finished. */
+    
+    		/* Check if anything went wrong. */
+    		boolean err = updateHandler.getError();
+    		if (err) {
+    			Log.e(TAG, "Verification error");
+    			return false;
+    		}
+    		int count = updateHandler.getCount();
+    		Log.v(TAG, "Verification count: " + count);
+    		if (count == 1) {  //1 is good, Update present on server, just note that
+    			Update u = updateHandler.getLastUpdate(); //this is the result, db has not been changed
+    			u.setUnsent(false); //we are done
+    			u.setDraft(false); //published, not draft
+    			dba.updateUpdateVerifiedByUuid(u);
+    			return true;
+    		} else {
+    			if (count == 0) {  //0 is unfortunate, update never made it to server, will need to be re-sent
+    				Update u = dba.findUpdate(localId);
+    				u.setUnsent(false); //status is resolved
+    				u.setDraft(true); //go back to being draft
+    				dba.updateUpdateVerifiedByUuid(u);
+    	            throw new FailedPostException("Update " + localId + " is not on server");
+    			} else { //more than one is bad! TODO, maybe other exception to raise to user level!
+    	            throw new FailedPostException("Verify got more than one match for Update UUID!");
+    			}
+    		}
 		} 
 		catch (IOException e) {
-			return ConstantUtil.POST_UNKNOWN;
-					
+			return false; //connection problem - transient, still don't know
 		}
-		catch (SAXException e) {
-			return ConstantUtil.POST_UNKNOWN;
-			
+		catch (SAXException e) { //broken XML? - probably transient, still don't know
+			return false;
 		}
-		
 	}
 
 	
@@ -292,8 +288,9 @@ public class Downloader {
 	 * @param urlPattern
 	 * @throws ParserConfigurationException
 	 * @throws MalformedURLException 
+	 * @throws FailedPostException
 	 */
-	public static int verifyUpdates(Context ctx, String urlPattern) throws  MalformedURLException, ParserConfigurationException{
+	public static int verifyUpdates(Context ctx, String urlPattern) throws  MalformedURLException, ParserConfigurationException, FailedPostException{
 		RsrDbAdapter dba = new RsrDbAdapter(ctx);
 		dba.open();
 		int count = 0, unresolvedCount = 0;
@@ -304,16 +301,13 @@ public class Downloader {
 				String localId = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL));
 				String uuid = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.UUID_COL));
 				URL url = new URL(String.format(urlPattern, uuid));
-				switch (verifyUpdate(ctx, url, dba, localId)) {
-					case ConstantUtil.POST_SUCCESS:
-						break;
-					case ConstantUtil.POST_FAILURE:
-						break;
-					case ConstantUtil.POST_UNKNOWN:
-						unresolvedCount++;
-						break;
-				}
-				
+		        try {
+		            if (!verifyUpdate(ctx, url, dba, localId)) {
+		                unresolvedCount++;
+		            }
+		        } catch (FailedPostException e) {
+		            //This is OK here, it just notes the status for the Update
+		        }
 			}
 			cursor.close();
 		}
@@ -566,6 +560,7 @@ public class Downloader {
      * @param prog
 	 * 
 	 * @return int
+     * @throws UnresolvedPostException 
 	 * 
 	 * There are three outcomes:
 	 *   0  Success, we got the server id back
@@ -596,7 +591,7 @@ public class Downloader {
 
 	 */
 	//TODO must return more info to user on failure! Probably should throw a fail exception and return false if unknown
-	public static int postXmlUpdateStreaming(String urlTemplate, Update update, boolean sendImage, User user, String agent, ProgressReporter prog) {
+	public static boolean postXmlUpdateStreaming(String urlTemplate, Update update, boolean sendImage, User user, String agent, ProgressReporter prog) throws FailedPostException {
 		final String contentType = "application/xml";
 		final String bodyTemplate1  =	"<root><update_method>M</update_method><project>%s</project>" + //Mobile update method
 				"<photo_location>E</photo_location><uuid>%s</uuid><user>%s</user><title>%s</title>" +
@@ -608,15 +603,9 @@ public class Downloader {
         final String imagePostamble = "</photo>";
         final String imageCaptionTemplate = "<photo_caption>%s</photo_caption>";
         final String imageCreditTemplate = "<photo_credit>%s</photo_credit>";
+        //Just long+lat for location. We do not currently do reverse geocoding in athe app.
 //        final String locationTemplate = "<primary_location><longitude>%s</longitude><latitude>%s</latitude></primary_location>";
-        final String locationTemplate = "<locations><list-item><longitude>%s</longitude><latitude>%s</latitude><country>%s</country></list-item></locations>";
-        //TODO what about:
-//        <city>Stockholm</city>
- //       <state>no states here</state>
-  //      <country>18</country>
-//        <address_1/>
-//        <address_2/>
-//        <postcode/>
+        final String locationTemplate = "<locations><list-item><longitude>%s</longitude><latitude>%s</latitude></list-item></locations>";
 
         boolean allSent = false;
 		try {
@@ -624,10 +613,6 @@ public class Downloader {
 			        //, user.getApiKey(), user.getUsername()
 			        ));
 	
-			//user and project references had to be in URL form
-//			String projectPath = String.format(Locale.US, ConstantUtil.PROJECT_PATH_PATTERN, update.getProjectId());
-//			String userPath = String.format(Locale.US, ConstantUtil.USER_PATH_PATTERN, user.getId());
-
 			String requestBody = String.format(Locale.US, bodyTemplate1,
 			        update.getProjectId(), update.getUuid(), user.getId(),
 					oneLine(update.getTitle(), 50),
@@ -684,7 +669,7 @@ public class Downloader {
 			} //end image
 
 			if (update.validLatLon()) {
-                h.send(String.format(locationTemplate, update.getLongitude(), update.getLatitude(), update.getLocation().getCountryId()));
+                h.send(String.format(locationTemplate, update.getLongitude(), update.getLatitude()));
             }
 			
 			h.send(bodyTemplate2);
@@ -692,42 +677,66 @@ public class Downloader {
 			
 			int code = h.code(); //closes output
 			String msg = h.message();
-			String bod = h.body(); //On success, XML representation of created object
 			if (code == 201) { //Created
-			    //TODO this does not work in new API
-				String idPath = h.header(HttpRequest.HEADER_LOCATION);//Path-ified ID
-				int penSlash = idPath.lastIndexOf('/', idPath.length() - 2);
-				String id = idPath.substring(penSlash + 1, idPath.length() - 1);
-				update.setId(id);
-				return ConstantUtil.POST_SUCCESS; //Yes!
+			    /* Get a SAXParser from the SAXPArserFactory. */
+		        SAXParser sp = SAXParserFactory.newInstance().newSAXParser();
+		        /* Get the XMLReader of the SAXParser we created. */
+		        XMLReader xr = sp.getXMLReader();
+		        /* Create a new ContentHandler and apply it to the XML-Reader */
+		        UpdateRestHandler updateHandler = new UpdateRestHandler();
+		        xr.setContentHandler(updateHandler);
+		        /* Parse the xml-data from our URL. */
+		        xr.parse(new InputSource(h.stream()));
+		        /* Parsing has finished. Check if anything went wrong. */
+		        boolean err = updateHandler.getError();
+		        if (err) {
+		            Log.e(TAG, "Post parse error");
+		            return false;
+		        }
+		        int count = updateHandler.getCount();
+		        Log.v(TAG, "Post returned obj count: " + count);
+		        if (count == 1) {  //1 is good
+		            Update u = updateHandler.getLastUpdate(); //this is the result, db has not been changed
+		            update.setId(u.getId());
+		            //TODO copy other things? like country-id that may have been filled in by server?
+		            return true; // Yes!
+		        } else {
+	                throw new FailedPostException("More than one Update with same UUID!"); //TODO: localize
+		        }
 			} else {
-				String e = "Unable to post update, code " + code + " " + msg;
-				Log.e(TAG, e);
-				Log.e(TAG, bod);
-				return ConstantUtil.POST_FAILURE;
+				String e = "Server rejected Update, code " + code + " " + msg;
+                throw new FailedPostException(e); //TODO: localize
 			}
 		}
 		catch (HttpRequestException e) { //connection problem
 			if (allSent) {
 				Log.w(TAG, "Unknown-result post", e);
-				return ConstantUtil.POST_UNKNOWN;
+				return false;
 			} else {
 				Log.w(TAG, "Failed post", e);
-				return ConstantUtil.POST_FAILURE;
+                throw new FailedPostException(e.getMessage());
 			}
 		}
 		catch (MalformedURLException e) { //server string is bad or coding error
 			Log.e(TAG, "Bad URL", e);
-			return ConstantUtil.POST_FAILURE;
+            throw new FailedPostException(e.getMessage());
 		}
 		catch (FileNotFoundException e) {
 			Log.e(TAG, "Cannot find image file", e);
-			return ConstantUtil.POST_FAILURE;
+            throw new FailedPostException(e.getMessage());
 		}
 		catch (IOException e) {
 			Log.e(TAG, "Cannot read image file", e);
-			return ConstantUtil.POST_FAILURE;
+            throw new FailedPostException(e.getMessage());
 		}
+		catch (SAXException e) {
+            Log.e(TAG, "SAX parser error", e);
+            throw new FailedPostException(e.getMessage());
+        }
+		catch (ParserConfigurationException e) {
+            Log.e(TAG, "SAX parser config error", e);
+            throw new FailedPostException(e.getMessage());
+        }
 	}
 
 
@@ -737,7 +746,7 @@ public class Downloader {
 	 * @param urlTemplate
 	 * @param sendImages
 	 * @param user
-	 * @throws PostFailedException 
+	 * @throws FailedPostException 
 	 * @throws PostUnresolvedException 
 	 * @throws MalformedURLException 
 	 * @throws ParserConfigurationException 
@@ -747,7 +756,7 @@ public class Downloader {
 			String urlTemplate, String verifyUrlTemplate,
 			boolean sendImages, User user,
 			ProgressReporter prog)
-					throws PostFailedException, PostUnresolvedException, MalformedURLException, ParserConfigurationException  {
+					throws FailedPostException, UnresolvedPostException, MalformedURLException, ParserConfigurationException  {
 		//Log.v(TAG, "Sending update " + localId);
 		RsrDbAdapter dba = new RsrDbAdapter(ctx);
 		dba.open();
@@ -764,28 +773,32 @@ public class Downloader {
                 userAgent = "(not found)";
             }
 
-			int status = postXmlUpdateStreaming(urlTemplate, upd, sendImages, user, userAgent, prog);
-
-			if (status == ConstantUtil.POST_UNKNOWN) { //try to check on sts immediately
+			boolean resolved;
+			try {
+    			resolved = postXmlUpdateStreaming(urlTemplate, upd, sendImages, user, userAgent, prog);
+            } catch (FailedPostException e) { //did not happen, user should try again
+                upd.setUnsent(false);
+                upd.setDraft(true);
+                dba.updateUpdateIdSent(upd, localId); //remember status for this update
+                throw e; //and tell user about it
+            }
+    
+			if (!resolved) { //try to check on sts immediately
 				URL url = new URL(String.format(verifyUrlTemplate, upd.getUuid()));
-				status = verifyUpdate(ctx, url, dba, localId);
+				resolved = verifyUpdate(ctx, url, dba, localId);
 			}	
 
-			switch (status) {
-				case ConstantUtil.POST_SUCCESS:
-					upd.setUnsent(false);
-					upd.setDraft(false);
-					dba.updateUpdateIdSent(upd, localId); //remember new ID and status for this update
-					Log.i(TAG, "Sent update" + localId);
-					return;
-				case ConstantUtil.POST_FAILURE:
-					upd.setUnsent(false);
-					upd.setDraft(true);
-					dba.updateUpdateIdSent(upd, localId); //remember status for this update
-					throw new PostFailedException("Could not post Update");
-				case ConstantUtil.POST_UNKNOWN: //try to check sts immediately
-					throw new PostUnresolvedException("Update status unknown, needs verification");
-			}
+			if (resolved) {  //remember new ID and status for this update
+				upd.setUnsent(false);
+				upd.setDraft(false);
+				dba.updateUpdateIdSent(upd, localId);
+				Log.i(TAG, "Sent update" + localId);
+				return;
+			} else {
+			    //still unresolved, leave record in limbo state and retry later
+			    throw new UnresolvedPostException("Update status unknown, needs verification");
+            }
+
 		} finally {
 			dba.close();
 		}
@@ -799,7 +812,7 @@ public class Downloader {
 	 * @param sendImages
 	 * @param user
 	 * @throws Exception
-	 */
+	 *
 	public void sendAllUnsentUpdates(Context ctx, String urlTemplate, boolean sendImages, User user) throws Exception {
 		Log.i(TAG, "Sending all unsent updates");
 		RsrDbAdapter dba = new RsrDbAdapter(ctx);
@@ -840,7 +853,7 @@ public class Downloader {
 		}
 		Log.i(TAG, "Sent " + successCount + " updates");
 	}
-
+*/
 
 	/**
 	 * logs in to server and fetches API key
@@ -885,8 +898,9 @@ public class Downloader {
 		}
 	}
 
+	
     /**
-     * checks connectivity.
+     * checks connectivity by asking Android.
      */
     public static boolean haveNetworkConnection(Context context, boolean wifiOnly) {
         ConnectivityManager connMgr = (ConnectivityManager) context

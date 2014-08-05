@@ -3,9 +3,9 @@ package org.akvo.rsr.up.service;
 import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.Downloader;
+import org.akvo.rsr.up.util.Downloader.UnresolvedPostException;
 import org.akvo.rsr.up.util.SettingsUtil;
-import org.akvo.rsr.up.util.Downloader.PostFailedException;
-import org.akvo.rsr.up.util.Downloader.PostUnresolvedException;
+import org.akvo.rsr.up.util.Downloader.FailedPostException;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -45,13 +45,13 @@ public class SubmitProjectUpdateService extends IntentService {
                             broadcastProgress(0, sofar, total);
                         }
                     });
-		} catch (PostFailedException e) {
+		} catch (FailedPostException e) {
 			i.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, e.getMessage());
 		}
-		catch (PostUnresolvedException e) {
+		catch (UnresolvedPostException e) {
 			i.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, e.getMessage());
 			i.putExtra(ConstantUtil.SERVICE_UNRESOLVED_KEY, true);
-		} catch (Exception e) {
+		} catch (Exception e) {//TODO: show to user
 			Log.e(TAG, "Config problem", e);
 		}
 

@@ -45,8 +45,8 @@ import android.util.Log;
  * 
  */
 public class RsrDbAdapter {
-	public static final String PK_ID_COL = "_id";
-	public static final String TITLE_COL = "title";
+    public static final String PK_ID_COL = "_id";
+    public static final String TITLE_COL = "title";
 	public static final String SUBTITLE_COL = "subtitle";
 	public static final String SUMMARY_COL = "summary";
 	public static final String FUNDS_COL = "funds";
@@ -911,15 +911,14 @@ public class RsrDbAdapter {
 	 * Gets a single update from the db using its primary key
 	 */
 	public Update findUpdate(String _id) {
-		Update update = null;
+	    Update update = null;
 		Cursor cursor = database.query(UPDATE_JOIN,
-										null,
+										null, //all columns
 										"_update._id = ?",
 										new String[] { _id }, null, null, null);
 		if (cursor != null) {
-			if (cursor.getCount() > 0) {
-				cursor.moveToFirst();
-				update = new Update();
+		    if (cursor.moveToFirst()) {
+		        update = new Update();
 				update.setId(_id);
 				update.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(TITLE_COL)));
 				update.setProjectId(cursor.getString(cursor.getColumnIndexOrThrow(PROJECT_COL)));
@@ -936,16 +935,15 @@ public class RsrDbAdapter {
 				update.setUnsent(0 != cursor.getInt(cursor.getColumnIndexOrThrow(UNSENT_COL)));
 				update.setDate(new Date(1000 * cursor.getLong(cursor.getColumnIndexOrThrow(CREATED_COL))));
                 update.setCountry(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
-                update.getLocation().setCountryId(cursor.getString(cursor.getColumnIndexOrThrow("country._id")));
+                update.getLocation().setCountryId(cursor.getString(cursor.getColumnIndexOrThrow(COUNTRY_COL)));
 				update.setState(cursor.getString(cursor.getColumnIndexOrThrow(STATE_COL)));
 				update.setCity(cursor.getString(cursor.getColumnIndexOrThrow(CITY_COL)));
 				update.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(LAT_COL)));
                 update.setLongitude(cursor.getString(cursor.getColumnIndexOrThrow(LON_COL)));
                 update.setElevation(cursor.getString(cursor.getColumnIndexOrThrow(ELE_COL)));
-				}
+			}
 			cursor.close();
-		}
-
+		    }
 		return update;
 	}
 
