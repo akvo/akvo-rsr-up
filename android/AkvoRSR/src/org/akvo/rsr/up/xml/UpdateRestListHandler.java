@@ -22,6 +22,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.akvo.rsr.up.dao.RsrDbAdapter;
+import org.akvo.rsr.up.domain.Location;
 import org.akvo.rsr.up.domain.Update;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -108,7 +109,8 @@ public class UpdateRestListHandler extends DefaultHandler {
     private boolean in_long = false;
     private boolean in_lat = false;
 
-	private Update currentUpd;
+    private Update currentUpd;
+    private Location currentLoc;
 	private int updateCount;
 	private boolean syntaxError = false;
     private boolean insert;
@@ -124,7 +126,7 @@ public class UpdateRestListHandler extends DefaultHandler {
 	/*
 	 * constructor
 	 */
-	public UpdateRestListHandler(RsrDbAdapter aDba, boolean insert, boolean extra) {
+	public UpdateRestListHandler(RsrDbAdapter aDba, boolean insert) {
 		super();
 		dba = aDba;
         this.insert = insert;
@@ -152,7 +154,7 @@ public class UpdateRestListHandler extends DefaultHandler {
 	// ===========================================================
 	@Override
 	public void startDocument() throws SAXException {
-		dba.open();
+		if (insert) dba.open();
 		updateCount = 0;
 		depth = 0;
 		syntaxError = false;
@@ -160,7 +162,7 @@ public class UpdateRestListHandler extends DefaultHandler {
 
 	@Override
 	public void endDocument() throws SAXException {
-		dba.close();
+		if (insert) dba.close();
 	}
 
 	/** Gets be called on opening tags like: 
@@ -176,6 +178,7 @@ public class UpdateRestListHandler extends DefaultHandler {
         } else if (depth == 2 && in_results && localName.equals(LIST_ITEM)) {
             this.in_update = true;
             currentUpd = new Update();
+            currentLoc = currentUpd.getLocation();
             primary_location_id = null;
             currentUpd.setUuid("");//db cannot take null
         } else if (depth == 3 && in_update) {
@@ -210,12 +213,8 @@ public class UpdateRestListHandler extends DefaultHandler {
             this.in_location = true;
             //forget any previous location info
             stored_location_id = null;
-            currentUpd.setCity(null);
-            currentUpd.getLocation().setCountryId(null);
-            currentUpd.setLatitude(null);
-            currentUpd.setLongitude(null);
-            currentUpd.setState(null);
-            currentUpd.setElevation(""); //Not yet on server
+            currentLoc.clear();
+            currentLoc.setElevation(""); //Not yet on server
         } else if (localName.equals("id") && in_location) {
             this.in_location_id = true;
         } else if (localName.equals("country") && in_location) {
@@ -348,15 +347,5 @@ public class UpdateRestListHandler extends DefaultHandler {
 	}
 	
 	
-	// extract id from things like /api/v1/project/574/
-	private String idFromUrl(String s) {
-		if (s.endsWith("/")) {
-			int i = s.lastIndexOf('/',s.length()-2);
-			if (i>=0) {
-				return s.substring(i+1, s.length()-1);
-			} else syntaxError = true;
-		} else syntaxError = true;
-		return null;
-	}
 
 }
