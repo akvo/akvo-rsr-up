@@ -2,7 +2,6 @@
 package org.akvo.rsr.up.util;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -13,15 +12,16 @@ import org.akvo.rsr.up.dao.RsrDbAdapter;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -210,6 +210,16 @@ public class FileUtil {
                 //TODO: how to update the list cursor content?
                 //Otherwise we need a URL-filename lookaside list
             }
+            
+            imgView.setTag(R.id.thumbnail_fn_tag, fn);
+            // make it clickable
+            imgView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showFullImageDefaultViewer((ImageView) v);
+                }
+            });
+
         }
     }
 
@@ -391,6 +401,23 @@ public class FileUtil {
         }).start();
 
     }
+
+    
+    /**
+     *  ask OS to show the full-size image when clicked - probably handled by Gallery app
+     */
+    static void showFullImageDefaultViewer(ImageView iv) {
+        final String fn = (String) iv.getTag(R.id.thumbnail_fn_tag);
+        
+        // Launch default viewer for the file
+        Intent intent = new Intent();                   
+        intent.setAction(android.content.Intent.ACTION_VIEW);
+        Uri hacked_uri = Uri.parse("file://" + fn); 
+        intent.setDataAndType(hacked_uri, "image/*");
+        iv.getContext().startActivity(intent);
+
+    }
+
 
     /**
      * counts size of all files in the image cache
