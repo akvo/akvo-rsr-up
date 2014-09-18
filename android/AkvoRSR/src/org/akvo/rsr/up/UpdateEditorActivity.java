@@ -692,9 +692,7 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
     public void onGetGPSClick(View v) {
         LocationManager locMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-
             positionGroup.setVisibility(View.VISIBLE);
-
             accuracyField.setText("?");
             accuracyField.setTextColor(Color.WHITE);
             latField.setText("");
@@ -717,6 +715,7 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
      * When the user clicks the "Get photo Location" button
      */
     public void onGetPhotoLocationClick(View v) {
+        positionGroup.setVisibility(View.VISIBLE);
         accuracyField.setText("?");
         accuracyField.setTextColor(Color.WHITE);
         latField.setText(photoLocation.getLatitude());
