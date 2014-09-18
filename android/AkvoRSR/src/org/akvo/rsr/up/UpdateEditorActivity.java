@@ -104,7 +104,8 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
     //Geo
     private static final float UNKNOWN_ACCURACY = 99999999f;
     private static final float ACCURACY_THRESHOLD = 25f;
-    private Button btnGeo;
+    private Button btnPhotoGeo;
+    private Button btnGpsGeo;
     private TextView latField;
     private TextView lonField;
     private TextView eleField;
@@ -112,6 +113,7 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
     private TextView searchingIndicator;
     private float lastAccuracy;
     private boolean needUpdate = false;
+    private org.akvo.rsr.up.domain.Location photoLocation;
     
     // Database
     private RsrDbAdapter dba;
@@ -217,10 +219,17 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
             }
         });
 
-        btnGeo = (Button) findViewById(R.id.btn_get_position);
-        btnGeo.setOnClickListener(new View.OnClickListener() {
+        btnGpsGeo = (Button) findViewById(R.id.btn_gps_position);
+        btnGpsGeo.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 onGetGPSClick(view);
+            }
+        });
+
+        btnPhotoGeo = (Button) findViewById(R.id.btn_photo_position);
+        btnPhotoGeo.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                onGetPhotoLocationClick(view);
             }
         });
 
@@ -272,6 +281,7 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
                     // btnTakePhoto.setText(R.string.btncaption_rephoto);
                     FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(),
                             update.getThumbnailFilename(), null, null);
+                    photoLocation = FileUtil.exifLocation(captureFilename);
                     showPhoto(true);
                 }
             }
@@ -296,6 +306,11 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
         if (show) {
             photoAndToolsGroup.setVisibility(View.VISIBLE);
             photoAddGroup.setVisibility(View.GONE);
+            if (photoLocation == null) {
+                btnPhotoGeo.setVisibility(View.GONE);
+            } else {
+                btnPhotoGeo.setVisibility(View.VISIBLE);
+            }
         } else {
             photoAndToolsGroup.setVisibility(View.GONE);
             photoAddGroup.setVisibility(View.VISIBLE);
@@ -394,7 +409,7 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
             }
             if (shrinkBigImage) {
                 // make long edge 1024 px
-                if (!FileUtil.shrinkImageFileExactly(captureFilename, shrinkSize, false)) { 
+                if (!FileUtil.shrinkImageFileExactlyKeepExif(captureFilename, shrinkSize)) { 
                     DialogUtil.errorAlert(this, R.string.shrinkbig_dialog_title,
                             R.string.shrinkbig_dialog_msg);
                 }
@@ -402,9 +417,10 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
             update.setThumbnailFilename(captureFilename);
             update.setThumbnailUrl("dummyUrl"); // absence will be interpreted
                                                 // as unset thumbnail
-            FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename, null,
-                    null);
+            FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename, null, null);
             // show result
+            photoLocation = FileUtil.exifLocation(captureFilename);
+            
             showPhoto(true);
         }
     }
@@ -418,10 +434,10 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
         update.setText(projupdDescriptionText.getText().toString());        
         update.setPhotoCaption(photoCaptionText.getText().toString());        
         update.setPhotoCredit(photoCreditText.getText().toString());        
-        update.setLatitude(latField.getText().toString());        
-        update.setLongitude(lonField.getText().toString());        
-        update.setElevation(eleField.getText().toString()); 
-        update.getLocation().setCountryId("18"); //sweden. TODO: where do we get this?
+        update.setLatitude(latField.getText().toString());
+        update.setLongitude(lonField.getText().toString());
+        update.setElevation(eleField.getText().toString());
+//        update.getLocation().setCountryId("18"); //dummy sweden. No longer mandatory
     }
     
     /**
@@ -694,6 +710,18 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
             DialogUtil.showGPSDialog(this);
         }
 
+    }
+
+
+    /**
+     * When the user clicks the "Get photo Location" button
+     */
+    public void onGetPhotoLocationClick(View v) {
+        accuracyField.setText("?");
+        accuracyField.setTextColor(Color.WHITE);
+        latField.setText(photoLocation.getLatitude());
+        lonField.setText(photoLocation.getLongitude());
+        eleField.setText("");
     }
 
     /**

@@ -56,6 +56,24 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+/*
+ * This class originally used only the API at //server/api/V1
+ * but is being migrated to use the //server/rest/v1.
+ * Method status (lowest level only):
+ *  Authorize()  OLD
+ *  postXmlUpdateStreaming() NEW (necessary for geolocated updates)
+ *  verifyUpdate() NEW
+ *  fetchcountryList() OLD - should be rolled into fetchUpdateListRestApi
+ *  fetchNewThumbnails() OLD
+ *  fetchOrg() OLD - will be rolled into fetchUpdateListRestApi
+ *  fetchProjectList() OLD
+ *  fetchUpdateList() OLD - unused
+ *  fetchUpdateListRestApi() NEW - should call project_update_extra call
+ *  fetchUser() OLD - will be rolled into fetchUpdateListRestApi
+ * 
+ * New parser classes have names containing the word REST.
+ * The old parsers should be removed once the migration is complete.
+ */
 public class Downloader {
 
 	private static final String TAG = "Downloader";
@@ -149,6 +167,8 @@ public class Downloader {
      * populates the updates table in the db from a server URL
      * in the REST API
      * Typically the url will specify updates for a single project.
+     * should eventually call project_update_extra call
+     * this will avoid having to call country/org/user APIs separately
      * 
      * @param ctx
      * @param url
@@ -542,9 +562,9 @@ public class Downloader {
      * @throws FailedPostException 
 	 * 
 	 * There are three outcomes:
-	 *   0  Success, we got the server id back
-	 *   1  Failure, we never got to send the whole thing
-	 *   2  Unknown, server may or may not have got it. Verification will be necessary.
+	 *   true      Success, we got the server id back and updated the "update" object
+	 *   false     Unknown, server may or may not have got it. Verification will be necessary.
+     *   exception Failure, we never got to send the whole thing
 	 *   
 	 * What to submit:
 	<object>
@@ -582,10 +602,11 @@ public class Downloader {
         final String imagePostamble = "</photo>";
         final String imageCaptionTemplate = "<photo_caption>%s</photo_caption>";
         final String imageCreditTemplate = "<photo_credit>%s</photo_credit>";
-        //Just long+lat for location. We do not currently do reverse geocoding in athe app.
+        //Just long+lat for location. We do not currently do reverse geocoding in the app.
+        //Country used to be mandatory, but that was changed
 //        final String locationTemplate = "<primary_location><longitude>%s</longitude><latitude>%s</latitude></primary_location>";
         final String locationTemplate = "<locations><list-item><longitude>%s</longitude><latitude>%s</latitude></list-item></locations>";
-        final boolean simulateUnresolvedPost = true;
+        final boolean simulateUnresolvedPost = false;
         
         boolean allSent = false;
 		try {

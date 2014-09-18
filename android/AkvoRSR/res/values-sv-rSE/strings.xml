@@ -96,6 +96,8 @@
     <string name="btncaption_clear_data">Töm alla data</string>
     <string name="btncaption_send_update">Skicka uppdatering</string>
     <string name="btncaption_save_draft">Spara utkast</string>
+    <string name="btncaption_gps_position">GPS-position</string>
+    <string name="btncaption_photo_position">Använd bildposition</string>
     
     <string name="host_dialog_title">Mata in server</string>
     <string name="host_dialog_msg">Exempel: rsr.akvo.org eller https://rsr.akvotest.org</string>

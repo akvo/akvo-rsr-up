@@ -30,8 +30,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /*
  * Class to handle XML parsing for a project update.
- * Always requested as a list, where each object's tags of the XML will be encapsulated in <root><results><list-item>
- * Example start of list:
+ * Always requested as a single object, where tags will be encapsulated in <root>
+ * Example:
  * 
 <root>
     <locations>
@@ -106,7 +106,6 @@ public class UpdateRestHandler extends DefaultHandler {
     private Location currentLoc; //just one for now
 	private int updateCount;
 	private boolean syntaxError = false;
-    private boolean insert;
 	private int depth = 0;
 	private SimpleDateFormat df1;
     private String buffer;
@@ -133,7 +132,7 @@ public class UpdateRestHandler extends DefaultHandler {
 	}
 
 	public Update getLastUpdate() {
-		return currentUpd; //only valid if insert==False
+		return currentUpd;
 	}
 
 	// ===========================================================
@@ -338,15 +337,5 @@ public class UpdateRestHandler extends DefaultHandler {
 	}
 	
 	
-	// extract id from things like /api/v1/project/574/
-	private String idFromUrl(String s) {
-		if (s.endsWith("/")) {
-			int i = s.lastIndexOf('/',s.length()-2);
-			if (i>=0) {
-				return s.substring(i+1, s.length()-1);
-			} else syntaxError = true;
-		} else syntaxError = true;
-		return null;
-	}
 
 }

@@ -9,6 +9,7 @@ import java.net.URL;
 
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
+import org.akvo.rsr.up.domain.Location;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -294,10 +295,10 @@ public class FileUtil {
 
     
     /**
-     * shrinks an image file so long edge becomes exactly maxSize pixels
-     * if already smaller, do nothing unless flag is set
+     * shrinks an image file so long edge becomes exactly maxSize pixels.
+     * If already smaller, do nothing unless flag is set.
      * 
-     * This will lose any EXIF information if it shrinks
+     * This will lose any EXIF information if it shrinks.
      * Rotation will be normalized (if library is well-written)
      */
     public static boolean shrinkImageFileExactly(String filename, int maxSize, boolean alwaysRewrite) {
@@ -339,6 +340,29 @@ public class FileUtil {
         return true;
     }
 
+    /**
+     * propagates the EXIF geolocation
+     * @param filename
+     * @param maxSize
+     */
+    public static boolean shrinkImageFileExactlyKeepExif(String filename, int maxSize) {
+        try {
+            ExifInterface exif1 = new ExifInterface(filename);
+ 
+            if (!shrinkImageFileExactly(filename, maxSize, false)) return false;
+            //TODO: test this
+            exif1.setAttribute(ExifInterface.TAG_ORIENTATION, Integer.toString(ExifInterface.ORIENTATION_NORMAL));
+
+            exif1.saveAttributes();
+               
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    
     /**
      *  fetches and displays a delayed-load icon when clicked
      */
@@ -460,6 +484,7 @@ public class FileUtil {
         }
     }
 
+    
     /**
      * rotates the image in a file 90 degrees
      * @param filename
@@ -509,5 +534,67 @@ public class FileUtil {
         }
  
     }
+
+    
+    /**
+     * propagates the EXIF geolocation
+     * @param originalImage
+     * @param resizedImage
+     * @return true if original image had a position and it was copied
+     */
+    public static boolean propagateLocation(String originalImage, String resizedImage) {
+        try {
+            ExifInterface exif1 = new ExifInterface(originalImage);
+            ExifInterface exif2 = new ExifInterface(resizedImage);
+ 
+            final String lon1 = exif1.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
+            final String lat1 = exif1.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
+//            final String alt1 = exif1.getAttribute(ExifInterface.TAG_GPS_ALTITUDE);
+            //more??
+ 
+            if (!TextUtils.isEmpty(lon1) && !TextUtils.isEmpty(lat1)) {
+                Log.d(TAG, "Location defined. Propagating it.");
+                exif2.setAttribute(ExifInterface.TAG_GPS_LATITUDE, lat1);
+                exif2.setAttribute(ExifInterface.TAG_GPS_LONGITUDE, lon1);
+//                exif2.setAttribute(ExifInterface.TAG_GPS_ALTITUDE, alt1);
+                exif2.saveAttributes();
+                return true;
+            }
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        return false;
+    }
+
+    
+    /**
+     * reads the EXIF geolocation
+     * @param originalImage
+     * @return location object or null
+     */
+    public static Location exifLocation(String originalImage) {
+        try {
+            ExifInterface exif1 = new ExifInterface(originalImage);
+            float[] latlon = new float[2];
+            
+//            double altitude = exif1.getAttributeDouble(ExifInterface.TAG_GPS_ALTITUDE, -1);
+//            int ref = exif1.getAttributeInt(ExifInterface.TAG_GPS_ALTITUDE_REF, -1);
+
+
+            if (exif1.getLatLong(latlon)) {
+                Location loc = new Location();
+                loc.setLatitude(Float.toString(latlon[0]));
+                loc.setLongitude(Float.toString(latlon[1]));
+//                if (altitude >= 0 && ref >= 0) {
+//                    loc.setElevation(Double.toString(altitude * ((ref == 1) ? -1 : 1)));
+//                }
+                return loc;
+            }
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        return null;
+    }
+    
     
 }
