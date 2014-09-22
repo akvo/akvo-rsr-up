@@ -510,6 +510,14 @@ public class FileUtil {
         }       
     }
 
+    public static void rotateImageFileKeepExif(String filename, boolean clockwise) throws IOException {
+        ExifInterface exif1 = new ExifInterface(filename);
+        rotateImageFile(filename, clockwise);
+        exif1.setAttribute(ExifInterface.TAG_ORIENTATION, Integer.toString(ExifInterface.ORIENTATION_NORMAL));
+        exif1.saveAttributes();
+    }
+
+    
     
     /**
      * propagates the EXIF rotation attribute
@@ -594,6 +602,28 @@ public class FileUtil {
             Log.e(TAG, e.getMessage());
         }
         return null;
+    }
+    
+    
+    /**
+     * removes the EXIF geolocation, if any
+     * @param fn
+     */
+    public static void removeExifLocation(String fn) {
+        try {
+            ExifInterface exif1 = new ExifInterface(fn);
+            final String lon1 = exif1.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
+            final String lat1 = exif1.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
+ 
+            if (!TextUtils.isEmpty(lon1) && !TextUtils.isEmpty(lat1)) { //has location  
+                exif1.setAttribute(ExifInterface.TAG_GPS_LATITUDE, "0/1,0/1,0/1");
+                exif1.setAttribute(ExifInterface.TAG_GPS_LONGITUDE, "0/1,0/1,0/1");
+//                exif1.setAttribute(ExifInterface.TAG_GPS_ALTITUDE, null);
+                exif1.saveAttributes();
+            }
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
     }
     
     

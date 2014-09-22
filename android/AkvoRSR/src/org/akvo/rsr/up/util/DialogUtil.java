@@ -54,19 +54,32 @@ public class DialogUtil {
         alert.show();
     }
     
-	public static void infoAlert(Context ctx, String title, String msg) {
-		/* Display an info dialog to the GUI. */
-		AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
-	    alert.setTitle(title).setMessage(msg).setIcon(android.R.drawable.ic_dialog_info);
-	
-	    alert.setPositiveButton(R.string.btncaption_ok, new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int whichButton) {
-		    	dialog.cancel();
-		    	}
-		    });
-	    alert.show();
-	}
-	
+    public static void infoAlert(Context ctx, String title, String msg) {
+        /* Display an info dialog to the GUI. */
+        AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
+        alert.setTitle(title).setMessage(msg).setIcon(android.R.drawable.ic_dialog_info);
+    
+        alert.setPositiveButton(R.string.btncaption_ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.cancel();
+                }
+            });
+        alert.show();
+    }
+    
+    public static void infoAlert(Context ctx, int title, int msg) {
+        /* Display an info dialog to the GUI. */
+        AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
+        alert.setTitle(title).setMessage(msg).setIcon(android.R.drawable.ic_dialog_info);
+    
+        alert.setPositiveButton(R.string.btncaption_ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.cancel();
+                }
+            });
+        alert.show();
+    }
+    
 	/**
 	 * shows an authentication dialog that asks for the administrator passcode
 	 * 
@@ -130,19 +143,32 @@ public class DialogUtil {
 	 * @param textId
 	 * @param parentContext
 	 */
-	public static void showConfirmDialog(int titleId, int textId,
-			Context parentContext, boolean includeNegative,
-			DialogInterface.OnClickListener listener) {
-		showConfirmDialog(titleId, textId, parentContext, includeNegative,
-				listener, new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						if (dialog != null) {
-							dialog.dismiss();
-						}
-					}
-				});
-	}
+    public static void showConfirmDialog(int titleId, int textId,
+            Context parentContext, boolean includeNegative,
+            DialogInterface.OnClickListener listener) {
+        showConfirmDialog(titleId, textId, parentContext, includeNegative,
+                listener, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (dialog != null) {
+                            dialog.dismiss();
+                        }
+                    }
+                });
+    }
+    public static void showConfirmDialog(int titleId, String textId,
+            Context parentContext, boolean includeNegative,
+            DialogInterface.OnClickListener listener) {
+        showConfirmDialog(titleId, textId, parentContext, includeNegative,
+                listener, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (dialog != null) {
+                            dialog.dismiss();
+                        }
+                    }
+                });
+    }
 
 
 	/**
@@ -164,40 +190,74 @@ public class DialogUtil {
 	 *            listener so pressing back to dismiss the dialog will have the
 	 *            same effect as clicking the negative button.
 	 */
-	public static void showConfirmDialog(int titleId, int textId,
-			Context parentContext, boolean includeNegative,
-			final DialogInterface.OnClickListener positiveListener,
-			final DialogInterface.OnClickListener negativeListener) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
-		TextView tipText = new TextView(parentContext);
-		builder.setTitle(titleId);
-		tipText.setText(textId);
-		builder.setView(tipText);
-		builder.setPositiveButton(R.string.btncaption_ok, positiveListener);
-		tipText.setBackgroundColor(parentContext.getResources().getColor(R.color.rsr_blue));
-		tipText.setPadding(10, 10, 10,10);
+    public static void showConfirmDialog(int titleId, int textId,
+            Context parentContext, boolean includeNegative,
+            final DialogInterface.OnClickListener positiveListener,
+            final DialogInterface.OnClickListener negativeListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
+        TextView tipText = new TextView(parentContext);
+        builder.setTitle(titleId);
+        tipText.setText(textId);
+        builder.setView(tipText);
+        builder.setPositiveButton(R.string.btncaption_ok, positiveListener);
+        tipText.setBackgroundColor(parentContext.getResources().getColor(R.color.rsr_blue));
+        tipText.setPadding(10, 10, 10,10);
 
-		if (includeNegative) {
-			builder.setNegativeButton(R.string.btncaption_cancel, negativeListener);
-			if (negativeListener != null) {
-				builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-					@Override
-					public void onCancel(DialogInterface dialog) {
-						negativeListener.onClick(dialog, -1);
-					}
-				});
-			}
-		} else if (positiveListener != null) {
-			builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-				@Override
-				public void onCancel(DialogInterface dialog) {
-					positiveListener.onClick(dialog, -1);
-				}
-			});
-		}
+        if (includeNegative) {
+            builder.setNegativeButton(R.string.btncaption_cancel, negativeListener);
+            if (negativeListener != null) {
+                builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        negativeListener.onClick(dialog, -1);
+                    }
+                });
+            }
+        } else if (positiveListener != null) {
+            builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    positiveListener.onClick(dialog, -1);
+                }
+            });
+        }
 
-		builder.show();
-	}
+        builder.show();
+    }
+    public static void showConfirmDialog(int titleId, String text,
+            Context parentContext, boolean includeNegative,
+            final DialogInterface.OnClickListener positiveListener,
+            final DialogInterface.OnClickListener negativeListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
+        TextView tipText = new TextView(parentContext);
+        builder.setTitle(titleId);
+        tipText.setText(text);
+        builder.setView(tipText);
+        builder.setPositiveButton(R.string.btncaption_ok, positiveListener);
+        tipText.setBackgroundColor(parentContext.getResources().getColor(R.color.rsr_blue));
+        tipText.setPadding(10, 10, 10,10);
+
+        if (includeNegative) {
+            builder.setNegativeButton(R.string.btncaption_cancel, negativeListener);
+            if (negativeListener != null) {
+                builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        negativeListener.onClick(dialog, -1);
+                    }
+                });
+            }
+        } else if (positiveListener != null) {
+            builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    positiveListener.onClick(dialog, -1);
+                }
+            });
+        }
+
+        builder.show();
+    }
 
 
 	/**

@@ -68,9 +68,11 @@
     <string name="label_setting_host">Data server</string>    
     <string name="label_setting_feedback">Give feedback</string>    
     <string name="label_setting_feedback_version">Give feedback on ver %s</string>
-    <string name="label_setting_debuginfo">Debug</string>    
+    <string name="label_setting_debuginfo">Debug</string> 
+    <string name="label_setting_removeloc">Remove photo location</string> 
     <string name="summary_setting_feedback">Open a web feedback form where you can tell us what you think of this app.</string>    
-    <string name="summary_setting_debuginfo">Show project and update ids and other debug info</string>    
+    <string name="summary_setting_debuginfo">Show project and update ids and other debug info.</string>    
+    <string name="summary_setting_removeloc">Geolocation info in photo files will be removed before upload.</string>    
     <string name="state_draft">Draft</string>
     <string name="state_published">Published</string>
     <string name="state_synchronising">Synchronising</string>

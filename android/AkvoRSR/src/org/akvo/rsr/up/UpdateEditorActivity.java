@@ -55,6 +55,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -281,7 +282,7 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
                     // btnTakePhoto.setText(R.string.btncaption_rephoto);
                     FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(),
                             update.getThumbnailFilename(), null, null);
-                    photoLocation = FileUtil.exifLocation(captureFilename);
+                    photoLocation = FileUtil.exifLocation(update.getThumbnailFilename());
                     showPhoto(true);
                 }
             }
@@ -320,7 +321,7 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
     
     private void rotatePhoto(boolean clockwise) {
         try {
-            FileUtil.rotateImageFile(update.getThumbnailFilename(), clockwise);
+            FileUtil.rotateImageFileKeepExif(update.getThumbnailFilename(), clockwise);
         }
         catch (IOException e) {
             DialogUtil.errorAlert(this, R.string.norot_dialog_title, R.string.norot_dialog_msg);
@@ -493,6 +494,12 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
             return;
         }
 
+        boolean stripExif = SettingsUtil.ReadBoolean(this, "setting_remove_image_location", false);
+        String fn = update.getThumbnailFilename();
+        if (stripExif && !TextUtils.isEmpty(fn)) {
+            FileUtil.removeExifLocation(fn);
+        }
+        
         update.setUnsent(true);
         update.setDraft(false);
         fetchFields();
@@ -548,34 +555,50 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
         if (err == null) {
             msgTitle = R.string.msg_update_published;
             msgText = R.string.msg_update_success;
+            // display result dialog
+            DialogUtil.showConfirmDialog(msgTitle,
+                    msgText,
+                    this,
+                    false,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (dialog != null) {
+                                dialog.dismiss();
+                                // Return to project or update list
+                                finish();
+                            }
+                        }
+                    });
         } else {
+            //TODO expose err
             if (unresolved) {
                 // Update still has unsent flag set, start service for
                 // background synchronisation
                 getApplicationContext().startService(
                         new Intent(this, VerifyProjectUpdateService.class));
-                msgTitle = R.string.msg_network_problem;
-                msgText = R.string.msg_synchronising;
+                msgTitle = R.string.msg_synchronising;
             } else { // was saved as draft
-                msgTitle = R.string.msg_network_problem;
-                msgText = R.string.msg_update_drafted;
+//                msgTitle = R.string.msg_network_problem;
+//                msgText = R.string.msg_update_drafted;
+                msgTitle = R.string.msg_update_drafted;
             }
-        }
-        // display result dialog
-        DialogUtil.showConfirmDialog(msgTitle,
-                msgText,
-                this,
-                false,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (dialog != null) {
-                            dialog.dismiss();
-                            // Return to project or update list
-                            finish();
+            // display result dialog
+            DialogUtil.showConfirmDialog(msgTitle,
+                    err,
+                    this,
+                    false,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (dialog != null) {
+                                dialog.dismiss();
+                                // Return to project or update list
+                                finish();
+                            }
                         }
-                    }
-                });
+                    });
+        }
     }
 
 

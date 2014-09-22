@@ -69,8 +69,10 @@
     <string name="label_setting_feedback">Tyck</string>    
     <string name="label_setting_feedback_version">Tyck till om ver %s</string>
     <string name="label_setting_debuginfo">Debuggning</string>    
+    <string name="label_setting_removeloc">Tag bort GPS-position i bilder</string> 
     <string name="summary_setting_feedback">Öppnar ett webbformulär där du kan berätta vad du tycker om denna app.</string>    
     <string name="summary_setting_debuginfo">Visa teknisk info som id-nummer etc.</string>    
+    <string name="summary_setting_removeloc">Positionsinformation i bildfiler skickas inte vid publicering.</string>    
     <string name="state_draft">Utkast</string>
     <string name="state_published">Publicerat</string>
     <string name="state_synchronising">Synkroniserar</string>
@@ -142,7 +144,7 @@
     
     <string name="msg_update_published">Uppdatering publicerad</string>
     <string name="msg_update_success">Uppdatering skickad</string>
-    <string name="msg_network_problem">Netvärksproblem</string>
+    <string name="msg_network_problem">Nätverksproblem</string>
     <string name="msg_synchronising">Uppdatering synkroniseras fortfarande...</string>
     <string name="msg_update_drafted">Uppdatering sparad som utkast</string>
     <string name="msg_success_drafted">Utkast sparat</string>
