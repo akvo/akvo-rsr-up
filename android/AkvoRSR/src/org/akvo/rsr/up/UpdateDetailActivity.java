@@ -193,13 +193,25 @@ public class UpdateDetailActivity extends ActionBarActivity {
 	}
 
 	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.update_detail, menu);
-		return true;
-	}
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.update_detail, menu);
+        return true;
+    }
 
+    /**
+     * disables/enables delete button to match update status
+     */
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        MenuItem del = menu.findItem(R.id.action_delete_update);
+        del.setEnabled(update.getUnsent() || update.getDraft());
+        return true;
+    }
+
+    
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
