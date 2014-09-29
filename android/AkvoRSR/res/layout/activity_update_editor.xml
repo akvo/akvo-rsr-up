@@ -316,21 +316,21 @@
                             android:id="@+id/latitude"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/dummy_count"
+                            android:text=""
                             android:textSize="18sp" />
     
                         <TextView
                             android:id="@+id/longitude"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/dummy_count"
+                            android:text=""
                             android:textSize="18sp" />
     
                         <TextView
                             android:id="@+id/elevation"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="@string/dummy_count"
+                            android:text=""
                             android:textSize="18sp" />
                     </LinearLayout>
                 </LinearLayout>
