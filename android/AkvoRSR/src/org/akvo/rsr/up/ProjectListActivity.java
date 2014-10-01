@@ -30,6 +30,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -102,12 +103,17 @@ public class ProjectListActivity extends ActionBarActivity {
                 if (searchField.getVisibility() == View.VISIBLE){
                     searchField.setVisibility(View.GONE);
                     searchField.setText("");
+                    // show magnifying glass
+                    searchButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_search,0,0,0);
                     getData();
                 } else {
                     searchField.setVisibility(View.VISIBLE);
-                    searchField.requestFocus();
+                    //show X instead of magnifying glass
+                    searchButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_close_normal,0,0,0);
                     searchField.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
-                }
+                    searchField.requestFocus();
+                    showSoftKeyBoard(searchField);
+                    }
             }
         });
  
@@ -207,14 +213,19 @@ public class ProjectListActivity extends ActionBarActivity {
 		super.onDestroy();
 	}
 
-	private void hideSoftKeyBoard() {
-	    InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+    private void hideSoftKeyBoard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
-	    if(imm.isAcceptingText()) { // verify if the soft keyboard is open                      
-	        imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-	    }
-	}
-	
+        if(imm.isAcceptingText()) { // verify if the soft keyboard is open                      
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+    
+    private void showSoftKeyBoard(View v) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        imm.showSoftInput(v, 0);
+    }
+    
 	/**
 	 * shows all projects visible to this user.
 	 * Assumes DB is open
