@@ -100,7 +100,8 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
     private View photoAddGroup;
     private View progressGroup;
     private View positionGroup;
-    private ProgressBar inProgress;
+    private ProgressBar uploadProgress;
+    private ProgressBar gpsProgress;
 
     //Geo
     private static final float UNKNOWN_ACCURACY = 99999999f;
@@ -147,7 +148,7 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
         setContentView(R.layout.activity_update_editor);
         // find the fields
         progressGroup = findViewById(R.id.sendprogress_group);
-        inProgress = (ProgressBar) findViewById(R.id.sendProgressBar);
+        uploadProgress = (ProgressBar) findViewById(R.id.sendProgressBar);
         projTitleLabel = (TextView) findViewById(R.id.projupd_edit_proj_title);
         projupdTitleText = (EditText) findViewById(R.id.projupd_edit_title);
         projupdDescriptionText = (EditText) findViewById(R.id.projupd_edit_description);
@@ -163,6 +164,7 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
         eleField = (TextView) findViewById(R.id.elevation);
         accuracyField = (TextView) findViewById(R.id.gps_accuracy);
         searchingIndicator = (TextView) findViewById(R.id.gps_searching);
+        gpsProgress = (ProgressBar) findViewById(R.id.progress_gps);
 
         // Activate buttons
         btnSubmit = (Button) findViewById(R.id.btn_send_update);
@@ -681,9 +683,9 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
      * @param total
      */
     private void onFetchProgress(int phase, int done, int total) {
-        inProgress.setIndeterminate(false);
-        inProgress.setProgress(done);
-        inProgress.setMax(total);
+        uploadProgress.setIndeterminate(false);
+        uploadProgress.setProgress(done);
+        uploadProgress.setMax(total);
     }
 
     /**
@@ -720,6 +722,7 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
             locMgr.removeUpdates(this);
             searchingIndicator.setText("");           
             accuracyField.setText("");
+            gpsProgress.setVisibility(View.GONE); //show a in-progress wheel
         } else {//turn on
             if (locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 positionGroup.setVisibility(View.VISIBLE);
@@ -729,7 +732,7 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
                 lonField.setText("");
                 eleField.setText("");
                 btnGpsGeo.setText(R.string.btncaption_gps_cancel);
-                //TODO show a spinner
+                gpsProgress.setVisibility(View.VISIBLE); //Hide progress
                 needUpdate = true;
                 searchingIndicator.setText(R.string.label_gps_searching);
                 lastAccuracy = UNKNOWN_ACCURACY;

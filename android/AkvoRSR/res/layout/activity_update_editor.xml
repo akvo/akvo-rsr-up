@@ -232,19 +232,32 @@
 
                 </LinearLayout>
 
-            <Button
-                android:id="@+id/btn_gps_position"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:background="@android:color/black"
-                android:drawableLeft="@drawable/ic_menu_mylocation"
-                android:padding="5dp"
-                android:text="@string/btncaption_gps_position"
-                android:textColor="@android:color/white"
-                android:textSize="18sp"
-                android:typeface="sans" />
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" >
 
+                    <ProgressBar
+                        android:id="@+id/progress_gps"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/btn_gps_position"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:background="@android:color/black"
+                    android:drawableLeft="@drawable/ic_menu_mylocation"
+                    android:padding="5dp"
+                    android:text="@string/btncaption_gps_position"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp"
+                    android:typeface="sans" />
+
+            </LinearLayout>
             <!-- The sometimes visible position part -->
 
             <LinearLayout
