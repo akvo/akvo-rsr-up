@@ -714,21 +714,31 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
      */
     public void onGetGPSClick(View v) {
         LocationManager locMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            positionGroup.setVisibility(View.VISIBLE);
-            accuracyField.setText("?");
-            accuracyField.setTextColor(Color.WHITE);
-            latField.setText("");
-            lonField.setText("");
-            eleField.setText("");
-            needUpdate = true;
-            searchingIndicator.setText(R.string.label_gps_searching);
-            lastAccuracy = UNKNOWN_ACCURACY;
-            locMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-        } else {
-            // we can't turn GPS on directly, the best we can do is launch the
-            // settings page
-            DialogUtil.showGPSDialog(this);
+        if (needUpdate) {//turn off
+            needUpdate = false;
+            btnGpsGeo.setText(R.string.btncaption_gps_position);
+            locMgr.removeUpdates(this);
+            searchingIndicator.setText("");           
+            accuracyField.setText("");
+        } else {//turn on
+            if (locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                positionGroup.setVisibility(View.VISIBLE);
+                accuracyField.setText("?");
+                accuracyField.setTextColor(Color.WHITE);
+                latField.setText("");
+                lonField.setText("");
+                eleField.setText("");
+                btnGpsGeo.setText(R.string.btncaption_gps_cancel);
+                //TODO show a spinner
+                needUpdate = true;
+                searchingIndicator.setText(R.string.label_gps_searching);
+                lastAccuracy = UNKNOWN_ACCURACY;
+                locMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+            } else {
+                // we can't turn GPS on directly, the best we can do is launch the
+                // settings page
+                DialogUtil.showGPSDialog(this);
+            }
         }
 
     }
