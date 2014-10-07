@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -37,6 +38,7 @@ import org.akvo.rsr.up.xml.AuthHandler;
 import org.akvo.rsr.up.xml.CountryListHandler;
 import org.akvo.rsr.up.xml.OrganisationHandler;
 import org.akvo.rsr.up.xml.ProjectListHandler;
+import org.akvo.rsr.up.xml.UpdateExtraRestListHandler;
 import org.akvo.rsr.up.xml.UpdateRestHandler;
 import org.akvo.rsr.up.xml.UpdateRestListHandler;
 import org.akvo.rsr.up.xml.UpdateListHandler;
@@ -54,6 +56,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.text.method.DateTimeKeyListener;
 import android.util.Log;
 
 /*
@@ -176,12 +179,14 @@ public class Downloader {
      * @throws SAXException
      * @throws IOException
      */
-    public void fetchUpdateListRestApi(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
+    public Date fetchUpdateListRestApi(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
 
         User user = SettingsUtil.getAuthUser(ctx);
         HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
         h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
         int code = h.code();//evaluation starts the exchange
+        String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
+        Date serverDate = new Date(h.date());
         if (code == 200) {
             /* Get a SAXParser from the SAXPArserFactory. */
             SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -190,6 +195,7 @@ public class Downloader {
             XMLReader xr = sp.getXMLReader();
             /* Create a new ContentHandler and apply it to the XML-Reader*/ 
             UpdateRestListHandler myUpdateListHandler = new UpdateRestListHandler(new RsrDbAdapter(ctx), true);
+//            UpdateExtraRestListHandler myUpdateListHandler = new UpdateExtraRestListHandler(new RsrDbAdapter(ctx), true, serverVersion);
             xr.setContentHandler(myUpdateListHandler);
             /* Parse the xml-data from our URL. */
             xr.parse(new InputSource(h.stream()));
@@ -204,7 +210,7 @@ public class Downloader {
             Log.e(TAG, h.body());
             throw new IOException("Unexpected server response " + code);
         }
-
+        return serverDate;
     }
 
 
@@ -519,16 +525,16 @@ public class Downloader {
 
 	private final static char SPC = '\u0020';
 
-	/**
-	 * returns a string without control chars or XML syntax elements and with a maximum length
-	 * @param s
-	 * @param maxLength
-	 * @return
-	 */
-	private static String oneLine(String s, int maxLength) {
-		String result = "";
-		for (int i = 0; i < s.length(); i++) {
-		    String t;
+    /**
+     * returns a string without control chars or XML syntax elements and with a maximum length
+     * @param s
+     * @param maxLength
+     * @return
+     */
+    private static String oneLine(String s, int maxLength) {
+        String result = "";
+        for (int i = 0; i < s.length(); i++) {
+            String t;
             if (s.charAt(i) < SPC) {
                 t = Character.toString(SPC);
             } else if (s.charAt(i) == '&') {
@@ -537,15 +543,41 @@ public class Downloader {
                 t = "&lt;";
             } else if (s.charAt(i) == '>') {
                 t = "&gt;";
+            } else if (s.charAt(i) > '~') {
+                t = "&#"+String.valueOf((int)s.charAt(i))+";";
             } else t = Character.toString(s.charAt(i));
             //Would it make it overflow?
             if (result.length() + t.length() > maxLength) {
                 return result;
-			}
+            }
             result += t;
-		}
-		return result;
-	}
+        }
+        return result;
+    }
+
+
+    /**
+     * returns a string without control chars or XML syntax elements
+     * @param s
+     * @return
+     */
+    private static String xmlQuote(String s) {
+        String result = "";
+        for (int i = 0; i < s.length(); i++) {
+            String t;
+            if (s.charAt(i) == '&') {
+                t = "&amp;";
+            } else if (s.charAt(i) == '<') {
+                t = "&lt;";
+            } else if (s.charAt(i) == '>') {
+                t = "&gt;";
+            } else if (s.charAt(i) > '~') {
+                t = "&#"+String.valueOf((int)s.charAt(i))+";";
+            } else t = Character.toString(s.charAt(i));
+            result += t;
+        }
+        return result;
+    }
 
 
 	
@@ -604,7 +636,6 @@ public class Downloader {
         final String imageCreditTemplate = "<photo_credit>%s</photo_credit>";
         //Just long+lat for location. We do not currently do reverse geocoding in the app.
         //Country used to be mandatory, but that was changed
-//        final String locationTemplate = "<primary_location><longitude>%s</longitude><latitude>%s</latitude></primary_location>";
         final String locationTemplate = "<locations><list-item><longitude>%s</longitude><latitude>%s</latitude></list-item></locations>";
         final boolean simulateUnresolvedPost = false;
         
@@ -618,7 +649,7 @@ public class Downloader {
 			        update.getProjectId(), update.getUuid(), user.getId(),
 					oneLine(update.getTitle(), 50),
 					agent,
-					update.getText());
+					xmlQuote(update.getText()));
 	
 			HttpRequest h = HttpRequest.post(url).contentType(contentType);//OutOfMemory here...
 //	        h.connectTimeout(10000); //10 sec timeout
@@ -671,6 +702,8 @@ public class Downloader {
 
 			if (update.validLatLon()) {
                 h.send(String.format(locationTemplate, update.getLongitude(), update.getLatitude()));
+            } else {
+                h.send(String.format(locationTemplate, "0", "0"));
             }
 			
 			h.send(bodyTemplate2);
@@ -706,8 +739,9 @@ public class Downloader {
 	                throw new FailedPostException("More than one Update with same UUID!"); //TODO: localize
 		        }
 			} else {
-				String e = "Server rejected Update, code " + code + " " + msg;
-                throw new FailedPostException(e); //TODO: localize
+				String e = "Server rejected Update, code " + code + " " + msg; //TODO: localize
+				String body = h.body(); //for debug
+                throw new FailedPostException(e);
 			}
 		}
 		catch (HttpRequestException e) { //connection problem
@@ -806,56 +840,6 @@ public class Downloader {
 	}
 
 	
-	/**
-	 * Sends all unsent updates - currently unused
-	 * @param ctx
-	 * @param urlTemplate
-	 * @param sendImages
-	 * @param user
-	 * @throws Exception
-	 *
-	public void sendAllUnsentUpdates(Context ctx, String urlTemplate, boolean sendImages, User user) throws Exception {
-		Log.i(TAG, "Sending all unsent updates");
-		RsrDbAdapter dba = new RsrDbAdapter(ctx);
-		dba.open();
-		int successCount = 0;
-		int failCount = 0;
-		int unknownCount = 0;
-		try {
-			Cursor cursor2 = dba.listAllUpdatesUnsent();
-			if (cursor2 != null) {
-				while (cursor2.moveToNext()) {
-					String localId = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.PK_ID_COL));
-					Update upd = dba.findUpdate(localId);
-					
-					switch (postXmlUpdateStreaming(urlTemplate, upd, sendImages, user, "", null)) {
-					case ConstantUtil.POST_SUCCESS:
-						upd.setUnsent(false);
-						upd.setDraft(false);
-						dba.updateUpdateIdSent(upd, localId); //remember new ID and status for this update
-						successCount++;
-						break;
-					case ConstantUtil.POST_FAILURE:
-						upd.setUnsent(false);
-						upd.setDraft(true);
-						dba.updateUpdateIdSent(upd, localId); //remember new ID and status for this update
-						failCount++;
-						break;
-					case ConstantUtil.POST_UNKNOWN:
-						//dba.updateUpdateIdSent(upd, localId); //no change in status for this update
-						unknownCount++;
-						break;						
-					}
-				}
-				cursor2.close();
-			}
-		} finally {
-			dba.close();
-		}
-		Log.i(TAG, "Sent " + successCount + " updates");
-	}
-*/
-
 	/**
 	 * logs in to server and fetches API key
 	 * @param url

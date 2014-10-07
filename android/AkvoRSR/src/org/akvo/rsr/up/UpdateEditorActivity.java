@@ -55,6 +55,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
+import android.text.InputFilter;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -121,7 +124,7 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
     private RsrDbAdapter dba;
 
     private BroadcastReceiver broadRec;
-
+        
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -144,6 +147,40 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
                     .getString(ConstantUtil.UPDATE_ID_KEY) : null;
         }
 
+        //Limit what we can write
+        InputFilter postFilter = new InputFilter() {
+ 
+            @Override
+            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+            boolean keepOriginal = true;
+            StringBuilder sb = new StringBuilder(end - start);
+            for (int i = start; i < end; i++) {
+                char c = source.charAt(i);
+                if (isCharAllowed(c)) // put your condition here
+                            sb.append(c);
+                        else
+                            keepOriginal = false;
+                    }
+                    if (keepOriginal)
+                        return null;
+                    else {
+                        if (source instanceof Spanned) {
+                            SpannableString sp = new SpannableString(sb);
+                            TextUtils.copySpansFrom((Spanned) source, start, sb.length(), null, sp, 0);
+                            return sp;
+                        } else {
+                            return sb;
+                        }           
+                    }
+                }
+
+                private boolean isCharAllowed(char c) {
+//                    return !Character.isSurrogate(c); //From API 19
+                    return !(c >= 0xD800 && c <= 0xDFFF);
+                }
+          };
+        
+        
         // get the look
         setContentView(R.layout.activity_update_editor);
         // find the fields
@@ -151,12 +188,16 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
         uploadProgress = (ProgressBar) findViewById(R.id.sendProgressBar);
         projTitleLabel = (TextView) findViewById(R.id.projupd_edit_proj_title);
         projupdTitleText = (EditText) findViewById(R.id.projupd_edit_title);
+        projupdTitleText.setFilters(new InputFilter[]{postFilter});
         projupdDescriptionText = (EditText) findViewById(R.id.projupd_edit_description);
+        projupdDescriptionText.setFilters(new InputFilter[]{postFilter});
         projupdImage = (ImageView) findViewById(R.id.image_update_detail);
         photoAndToolsGroup = findViewById(R.id.image_with_tools);
         photoAddGroup = findViewById(R.id.photo_buttons);
         photoCaptionText = (EditText) findViewById(R.id.projupd_edit_photo_caption);
+        photoCaptionText.setFilters(new InputFilter[]{postFilter});
         photoCreditText = (EditText) findViewById(R.id.projupd_edit_photo_credit);
+        photoCreditText.setFilters(new InputFilter[]{postFilter});
 
         positionGroup = findViewById(R.id.position_group);
         latField = (TextView) findViewById(R.id.latitude);
