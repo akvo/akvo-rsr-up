@@ -73,18 +73,35 @@
                 android:textSize="20sp"
                 android:typeface="sans" />
 
-            <EditText
-                android:id="@+id/projupd_edit_title"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:background="@drawable/box"
-                android:hint="@string/hint_update_title"
-                android:inputType="textCapSentences"
-                android:maxLength="50"
-                android:padding="5dp"
-                android:singleLine="true" />
+            <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" >
+                <EditText
+                    android:id="@+id/projupd_edit_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/box"
+                    android:hint="@string/hint_update_title"
+                    android:inputType="textCapSentences"
+                    android:maxLength="50"
+                    android:padding="5dp"
+                    android:singleLine="true" />
 
+                <TextView
+                    android:id="@+id/projupd_edit_titlecount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|center_vertical"
+                    android:paddingRight="5dp"
+                    android:text="@string/dummy_count"
+                    android:textColor="@color/dk_gray"
+                    android:typeface="sans" />
+
+                </LinearLayout>
+            
             <!-- The update text entry -->
 
             <EditText

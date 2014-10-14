@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 
@@ -55,10 +57,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBarActivity;
+import android.text.Editable;
 import android.text.InputFilter;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -73,6 +77,7 @@ import android.provider.MediaStore;
 
 public class UpdateEditorActivity extends ActionBarActivity implements LocationListener {
 
+    private final int TITLE_LENGTH = 50;
     private final int photoRequest = 777;
     private final int photoPick = 888;
     private String captureFilename = null;
@@ -88,6 +93,7 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
     private boolean editable;
     // UI
     private TextView projTitleLabel;
+    private TextView projupdTitleCount;
     private EditText projupdTitleText;
     private EditText projupdDescriptionText;
     private EditText photoCaptionText;
@@ -147,7 +153,7 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
                     .getString(ConstantUtil.UPDATE_ID_KEY) : null;
         }
 
-        //Limit what we can write
+        //Limit what we can write 
         InputFilter postFilter = new InputFilter() {
  
             @Override
@@ -187,17 +193,31 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
         progressGroup = findViewById(R.id.sendprogress_group);
         uploadProgress = (ProgressBar) findViewById(R.id.sendProgressBar);
         projTitleLabel = (TextView) findViewById(R.id.projupd_edit_proj_title);
+        projupdTitleCount = (TextView) findViewById(R.id.projupd_edit_titlecount);
+        projupdTitleCount.setText(Integer.toString(TITLE_LENGTH));
         projupdTitleText = (EditText) findViewById(R.id.projupd_edit_title);
-        projupdTitleText.setFilters(new InputFilter[]{postFilter});
+        projupdTitleText.setFilters(new InputFilter[] {new InputFilter.LengthFilter(TITLE_LENGTH), postFilter});
+        projupdTitleText.addTextChangedListener(new TextWatcher() {
+            //Show count of remaining characters
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                projupdTitleCount.setText(String.valueOf(TITLE_LENGTH - s.length()));
+            }
+
+            public void afterTextChanged(Editable s) {
+            }
+        });
         projupdDescriptionText = (EditText) findViewById(R.id.projupd_edit_description);
         projupdDescriptionText.setFilters(new InputFilter[]{postFilter});
         projupdImage = (ImageView) findViewById(R.id.image_update_detail);
         photoAndToolsGroup = findViewById(R.id.image_with_tools);
         photoAddGroup = findViewById(R.id.photo_buttons);
         photoCaptionText = (EditText) findViewById(R.id.projupd_edit_photo_caption);
-        photoCaptionText.setFilters(new InputFilter[]{postFilter});
+        photoCaptionText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(75), postFilter});
         photoCreditText = (EditText) findViewById(R.id.projupd_edit_photo_credit);
-        photoCreditText.setFilters(new InputFilter[]{postFilter});
+        photoCreditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(25), postFilter});
 
         positionGroup = findViewById(R.id.position_group);
         latField = (TextView) findViewById(R.id.latitude);
