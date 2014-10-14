@@ -105,10 +105,17 @@ public class LoginActivity extends Activity {
             }
         });
 
+        final TextView settings = (TextView) findViewById(R.id.link_to_settings);
+        settings.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                showSettings();
+            }
+        });
+        
         final TextView about = (TextView) findViewById(R.id.link_to_about);
         about.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	showAbout();
+                showAbout();
             }
         });
         
@@ -164,13 +171,20 @@ public class LoginActivity extends Activity {
 	}
 	
 	
-	/**
-	 *  shows the about activity
-	 */
-	private void showAbout() {
-		startActivity(new Intent(this, AboutActivity.class));
-	}
-	
+    /**
+     *  shows the settings activity
+     */
+    private void showSettings() {
+        startActivity(new Intent(this, SettingsActivity.class));
+    }
+    
+    /**
+     *  shows the about activity
+     */
+    private void showAbout() {
+        startActivity(new Intent(this, AboutActivity.class));
+    }
+    
     /**
      * starts the sign in process
      * @param view
