@@ -18,13 +18,12 @@ package org.akvo.rsr.up.viewadapter;
 
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
-import org.akvo.rsr.up.util.FileUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
+import org.akvo.rsr.up.util.ThumbnailUtil;
 
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,7 +96,7 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 		ImageView thumbnail = (ImageView) view.findViewById(R.id.list_item_thumbnail);
 		String fn = cursor.getString(cursor.getColumnIndexOrThrow(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
 		String url = cursor.getString(cursor.getColumnIndexOrThrow(RsrDbAdapter.THUMBNAIL_URL_COL));
-		FileUtil.setPhotoFile(thumbnail, url, fn, projId, null);
+		ThumbnailUtil.setPhotoFile(thumbnail, url, fn, projId, null, false);
 		
 		//set tag so we will know what got clicked
 		view.setTag(R.id.project_id_tag, thisId);

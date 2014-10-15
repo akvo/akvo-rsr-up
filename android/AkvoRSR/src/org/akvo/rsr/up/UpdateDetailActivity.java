@@ -26,6 +26,7 @@ import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.DialogUtil;
 import org.akvo.rsr.up.util.FileUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
+import org.akvo.rsr.up.util.ThumbnailUtil;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -138,7 +139,7 @@ public class UpdateDetailActivity extends ActionBarActivity {
     				sig += "[" + update.getUserId() + "]";
     			}
     		    projupdUser.setText(sig);
-    		    FileUtil.setPhotoFile(projupdImage,update.getThumbnailUrl(),update.getThumbnailFilename(), null, updateId);
+    		    ThumbnailUtil.setPhotoFile(projupdImage,update.getThumbnailUrl(),update.getThumbnailFilename(), null, updateId, true);
     		    
     		    String loc = "";
 	            if (update.getCity() != null && update.getCity().length() > 0) {

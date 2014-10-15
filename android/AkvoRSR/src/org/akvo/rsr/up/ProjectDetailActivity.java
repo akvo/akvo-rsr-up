@@ -22,6 +22,7 @@ import org.akvo.rsr.up.domain.Project;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.FileUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
+import org.akvo.rsr.up.util.ThumbnailUtil;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -157,7 +158,7 @@ public class ProjectDetailActivity extends ActionBarActivity {
     		publishedCountView.setText(Integer.toString(stateCounts[2]) + res.getString(R.string.count_published));
     		draftCountView.setText(Integer.toString(stateCounts[0]) + res.getString(R.string.count_draft));
     
-    		FileUtil.setPhotoFile(projImage,project.getThumbnailUrl(), project.getThumbnailFilename(), projId, null);
+    		ThumbnailUtil.setPhotoFile(projImage,project.getThumbnailUrl(), project.getThumbnailFilename(), projId, null, true);
 
 		} finally {
             dba.close();    

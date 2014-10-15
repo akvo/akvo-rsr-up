@@ -40,6 +40,7 @@ import org.akvo.rsr.up.util.DialogUtil;
 import org.akvo.rsr.up.util.Downloader;
 import org.akvo.rsr.up.util.FileUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
+import org.akvo.rsr.up.util.ThumbnailUtil;
 
 import android.location.Location;
 import android.location.LocationListener;
@@ -343,8 +344,8 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
                 // show preexisting image
                 if (update.getThumbnailFilename() != null) {
                     // btnTakePhoto.setText(R.string.btncaption_rephoto);
-                    FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(),
-                            update.getThumbnailFilename(), null, null);
+                    ThumbnailUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(),
+                            update.getThumbnailFilename(), null, null, false);
                     photoLocation = FileUtil.exifLocation(update.getThumbnailFilename());
                     showPhoto(true);
                 }
@@ -394,7 +395,7 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
             DialogUtil.errorAlert(this, R.string.norot_dialog_title2, R.string.norot_dialog_msg);
             return;
         }
-        FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), update.getThumbnailFilename(), null, null);
+        ThumbnailUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), update.getThumbnailFilename(), null, null, false);
     }
     
     /**
@@ -481,7 +482,7 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
             update.setThumbnailFilename(captureFilename);
             update.setThumbnailUrl("dummyUrl"); // absence will be interpreted
                                                 // as unset thumbnail
-            FileUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename, null, null);
+            ThumbnailUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename, null, null, false);
             // show result
             photoLocation = FileUtil.exifLocation(captureFilename);
             
