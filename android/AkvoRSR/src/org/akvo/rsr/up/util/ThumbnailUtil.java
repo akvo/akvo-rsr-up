@@ -73,7 +73,7 @@ public class ThumbnailUtil {
             // set tags so we will know what to load on a click
             if (projectId != null || updateId != null) {
                 imgView.setTag(R.id.thumbnail_url_tag, url);
-                imgView.setTag(R.id.thumbnail_expandable_tag, enableExpand);
+                imgView.setTag(R.id.thumbnail_expandable_tag, new Boolean(enableExpand));
                 // remember so we can update db when clicked
                 imgView.setTag(R.id.project_id_tag, projectId);
                 imgView.setTag(R.id.update_id_tag, updateId);
@@ -200,7 +200,7 @@ public class ThumbnailUtil {
                     final String url = (String) iv.getTag(R.id.thumbnail_url_tag);
                     final String pid = (String) iv.getTag(R.id.project_id_tag);
                     final String uid = (String) iv.getTag(R.id.update_id_tag);
-                    final boolean enableExpansion = (Boolean) iv.getTag(R.id.thumbnail_url_tag);
+                    final Boolean enableExpansion = (Boolean) iv.getTag(R.id.thumbnail_expandable_tag);
 
                     URL curl = new URL(SettingsUtil.host(iv.getContext()));
                     String directory = FileUtil.getExternalCacheDir(iv.getContext()).toString();
@@ -212,12 +212,10 @@ public class ThumbnailUtil {
                         dba.open();
                         final String fn;
                         if (pid != null) {
-                            fn = Downloader.httpGetToNewFile(new URL(curl, url), directory, "prj"
-                                    + pid + "_");
+                            fn = Downloader.httpGetToNewFile(new URL(curl, url), directory, "prj" + pid + "_");
                             dba.updateProjectThumbnailFile(pid, fn);
                         } else if (uid != null) {
-                            fn = Downloader.httpGetToNewFile(new URL(curl, url), directory, "upd"
-                                    + uid + "_");
+                            fn = Downloader.httpGetToNewFile(new URL(curl, url), directory, "upd" + uid + "_");
                             dba.updateUpdateThumbnailFile(uid, fn);
                         } else {
                             fn = null;
@@ -231,7 +229,7 @@ public class ThumbnailUtil {
                         // post UI work back to main thread
                         iv.post(new Runnable() {
                             public void run() {
-                                setPhotoFile(iv, url, fn, null, null, enableExpansion);
+                                setPhotoFile(iv, url, fn, null, null, enableExpansion!= null && enableExpansion.booleanValue());
                                 // nulls prevent infinite recursion
                             }
                         });
