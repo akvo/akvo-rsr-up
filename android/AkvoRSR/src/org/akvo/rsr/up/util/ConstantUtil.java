@@ -35,7 +35,7 @@ public class ConstantUtil {
 	public static final String API_KEY_PATTERN = "&api_key=%s&username=%s";
 //    public static final String POST_UPDATE_URL = "/api/v1/project_update/?format=xml";
     public static final String POST_UPDATE_URL = "/rest/v1/project_update/?format=xml";
-    public static final String FETCH_UPDATE_URL_PATTERN = "/rest/v1/project_update/?format=xml&limit=all&project=%s"; // /api/v1/project_update/?format=xml&limit=0&project=
+    public static final String FETCH_UPDATE_URL_PATTERN = "/rest/v1/project_update/?format=xml&limit=1000&project=%s"; // /api/v1/project_update/?format=xml&limit=0&project=
 //    public static final String VERIFY_UPDATE_PATTERN = "/api/v1/project_update/?format=xml&uuid=%s&limit=2";
     public static final String VERIFY_UPDATE_PATTERN = "/rest/v1/project_update/?format=xml&uuid=%s&limit=2";
 	public static final String FETCH_PROJ_URL_PATTERN = "/api/v1/project/?format=xml&limit=0&partnerships__organisation=%s";
@@ -46,7 +46,7 @@ public class ConstantUtil {
     public static final String FETCH_USER_URL_PATTERN = "/api/v1/user/%s/?format=xml&depth=1";
     public static final String FETCH_ORG_URL_PATTERN = "/api/v1/organisation/%s/?format=xml&depth=0";
 	public static final int    MAX_IMAGE_UPLOAD_SIZE = 2000000; //Nginx POST limit is 3MB, B64 encoding expands 33% and there may be long text 
-
+	public static final String SERVER_VERSION_HEADER = "x-akvo-server-version"; //TODO
 	/**
 	 * file system constants
 	 */
