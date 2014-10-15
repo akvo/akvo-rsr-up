@@ -3,7 +3,7 @@
   android:layout_width="fill_parent"
   android:layout_height="fill_parent"
   android:fillViewport="true" xmlns:tools="http://schemas.android.com/tools" tools:context=".LoginActivity">
-  <RelativeLayout
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
 		android:background="@color/rsr_purple"
@@ -37,10 +37,6 @@
 
 		</LinearLayout>
 		<!--  Header Ends -->
- 
-        <!-- Footer Start -->
-                   <!-- Place footer next to header to set z-index property to minus value -->
-        <!-- Footer Ends -->
  
 		<!-- Login Form -->
         <LinearLayout
@@ -81,41 +77,57 @@
                 />
           
           <!-- Link to Registration Screen -->
-          <TextView android:id="@+id/link_to_forgot"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dip"
-                android:layout_marginBottom="20dip"
-                android:text="@string/forgot_password_"
-                android:gravity="center"
-                android:textSize="20sp"
-                android:textColor="@color/rsr_blue"/>
-	 
-          <!-- Settings -->
-          <TextView android:id="@+id/link_to_settings"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dip"
-                android:layout_marginBottom="0dip"
-                android:text="@string/action_settings"
-                android:gravity="center"
-                android:textSize="20sp"
-		        android:textStyle="italic"
-                android:textColor="@color/rsr_blue"/>
-	 
-          <!-- About -->
-          <TextView android:id="@+id/link_to_about"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dip"
-                android:layout_marginBottom="40dip"
-                android:text="@string/action_about"
-                android:gravity="center"
-                android:textSize="20sp"
-		        android:textStyle="italic"
-                android:textColor="@color/rsr_blue"/>
-	 
-          	</LinearLayout>
-	<!-- Login Form Ends --> 
+
+          <TextView
+              android:id="@+id/link_to_forgot"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginBottom="10dp"
+              android:layout_marginTop="30dip"
+              android:gravity="center"
+              android:text="@string/forgot_password_"
+              android:textColor="@color/rsr_blue"
+              android:textSize="20sp" />
+ 
+          <LinearLayout
+              android:orientation="horizontal"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:padding="10dip"
+              >
+              
+              <!-- Settings -->
+
+              <TextView
+                  android:id="@+id/link_to_settings"
+                  android:layout_width="0dip"
+                  android:layout_height="wrap_content"
+                  android:layout_marginBottom="10dp"
+                  android:layout_marginTop="10dp"
+                  android:layout_weight="1"
+                  android:gravity="center"
+                  android:text="@string/action_settings"
+                  android:textColor="@color/rsr_blue"
+                  android:textSize="20sp"
+                  android:textStyle="italic" />
+    	 
+              <!-- About -->
+
+              <TextView
+                  android:id="@+id/link_to_about"
+                  android:layout_width="0dip"
+                  android:layout_height="wrap_content"
+                  android:layout_marginBottom="10dp"
+                  android:layout_marginTop="10dp"
+                  android:layout_weight="1"
+                  android:gravity="center"
+                  android:text="@string/action_about"
+                  android:textColor="@color/rsr_blue"
+                  android:textSize="20sp"
+                  android:textStyle="italic" />
+    	 
+              	</LinearLayout>
+       </LinearLayout>
+       <!-- Login Form Ends --> 
   </RelativeLayout>
 </ScrollView>
