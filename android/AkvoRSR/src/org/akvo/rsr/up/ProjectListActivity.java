@@ -78,7 +78,7 @@ public class ProjectListActivity extends ActionBarActivity {
 
         projCountLabel = (TextView) findViewById(R.id.projcountlabel);
 		inProgress = (LinearLayout) findViewById(R.id.projlistprogress);
-		inProgress1 = (ProgressBar) findViewById(R.id.progress_gps);
+		inProgress1 = (ProgressBar) findViewById(R.id.progressBar1);
 		inProgress2 = (ProgressBar) findViewById(R.id.progressBar2);
         inProgress3 = (ProgressBar) findViewById(R.id.progressBar3);
 
