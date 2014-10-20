@@ -23,8 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 
@@ -81,6 +79,8 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
     private final int TITLE_LENGTH = 50;
     private final int photoRequest = 777;
     private final int photoPick = 888;
+    private final String TITLE_PLACEHOLDER = "?";
+
     private String captureFilename = null;
     private boolean warnAboutBigImage = false;
     private boolean shrinkBigImage = true;
@@ -92,6 +92,7 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
     private String updateId = null;
     private Update update = null;
     private boolean editable;
+
     // UI
     private TextView projTitleLabel;
     private TextView projupdTitleCount;
@@ -329,9 +330,12 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
                 // populate fields
                 editable = update.getDraft(); // This should always be true with
                                               // the current UI flow - we go to
-                                              // UpdateDetailActivity if it is
-                                              // sent
-                projupdTitleText.setText(update.getTitle());
+                                              // UpdateDetailActivity if it is sent
+                if (update.getTitle().equals(TITLE_PLACEHOLDER)) {
+                    projupdTitleText.setText(""); //placeholder is just to satisfy db
+                } else {
+                    projupdTitleText.setText(update.getTitle());
+                }
                 projupdDescriptionText.setText(update.getText());
                 photoCaptionText.setText(update.getPhotoCaption());
                 photoCreditText.setText(update.getPhotoCredit());
@@ -502,7 +506,6 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
         update.setLatitude(latField.getText().toString());
         update.setLongitude(lonField.getText().toString());
         update.setElevation(eleField.getText().toString());
-//        update.getLocation().setCountryId("18"); //dummy sweden. No longer mandatory
     }
     
     /**
@@ -510,22 +513,19 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
      * user
      */
     private void saveAsDraft(boolean interactive) {
-        if (untitled()) {
-            if (interactive) {
-                // Tell user why not
-                Context context = getApplicationContext();
-                Toast toast = Toast.makeText(context, R.string.errmsg_empty_title,
-                        Toast.LENGTH_SHORT);
-                toast.show();
-                return;
-            } else {
-                projupdTitleText.setText("?"); // must have something.
-                //In retrospect, we should have allowed nulls in this column and just disallowed posting
-            }
-        }
-        update.setDraft(true);
+        if (interactive && untitled()) {
+            // Tell user why not
+            DialogUtil.errorAlert(this, R.string.error_dialog_title , R.string.errmsg_empty_title);
+            return;
+         }
+
+                update.setDraft(true);
         update.setUnsent(false);
         fetchFields();
+        if (untitled()) {
+            update.setTitle(TITLE_PLACEHOLDER); // must have something.
+            //In retrospect, we should have allowed nulls in this column and just disallowed posting
+        }
         // update.setDate(new Date()); //should have date from when it was created
         if (update.getId() == null) {// new
             // MUST have project and a local update id
@@ -550,6 +550,8 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
      */
     private void sendUpdate() {
         if (untitled()) {
+            // Tell user why not
+            DialogUtil.errorAlert(this, R.string.error_dialog_title , R.string.errmsg_empty_title);
             return;
         }
         if (!Downloader.haveNetworkConnection(this, false)) {
