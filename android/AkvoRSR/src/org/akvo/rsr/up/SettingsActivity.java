@@ -74,11 +74,13 @@ public class SettingsActivity extends PreferenceActivity {
 									public void onClick(
 											DialogInterface dialog,
 											int which) {
-										//String s = StringUtil.ControlToSPace(inputView.getText().toString());
 										String s = inputView.getText().toString();
 										try {
 											//make into valid "protocol://host[:port]" URL
 											URL u = new URL(s);
+											if (u.getHost().contains(" ")) {//common spelling "correction" problem
+											    throw new MalformedURLException();
+											}
 											s = u.getProtocol() + "://" + u.getHost();
 											if (u.getPort() >= 0)
 												s += ":" + u.getPort();
@@ -93,11 +95,12 @@ public class SettingsActivity extends PreferenceActivity {
 											mDb.open();
 									        mDb.clearAllData(); //will confuse open activities
 									        mDb.close();
-									        //Go back to proj list closing all other activities
-									        Intent intent = new Intent(getApplicationContext(), ProjectListActivity.class);
-									        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-									        startActivity(intent);
-//									        DialogUtil.infoAlert(this, "Data cleared", "All project and update info deleted");
+									        if (SettingsUtil.haveCredentials(SettingsActivity.this)) { //if logged in
+    									        //Go back to proj list closing all other activities
+    									        Intent intent = new Intent(getApplicationContext(), ProjectListActivity.class);
+    									        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    									        startActivity(intent);
+									        }
 
 											
 										} catch (MalformedURLException e) {
