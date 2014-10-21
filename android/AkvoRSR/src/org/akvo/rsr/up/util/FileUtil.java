@@ -16,8 +16,12 @@
 
 package org.akvo.rsr.up.util;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import org.akvo.rsr.up.R;
@@ -472,4 +476,27 @@ public class FileUtil {
         }
     }
 
+    
+    /**
+     * writes to the error log
+     * 
+     * @param record the string to append to the log
+     */
+    public static void appendToLog(Context context, String record) {
+        try {
+            // Open file
+            BufferedWriter buf = new BufferedWriter( new FileWriter(getExternalCacheDir(context) + ConstantUtil.LOG_FILE_NAME));
+            try {
+                buf.append(record);
+            } finally {
+                buf.close();
+            }
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
+    }
+
+
+    
+    
 }

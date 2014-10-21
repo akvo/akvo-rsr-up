@@ -96,6 +96,19 @@ public class DialogUtil {
         alert.show();
     }
     
+    public static void infoAlert(Context ctx, int title, String msg) {
+        /* Display an info dialog to the GUI. */
+        AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
+        alert.setTitle(title).setMessage(msg).setIcon(android.R.drawable.ic_dialog_info);
+    
+        alert.setPositiveButton(R.string.btncaption_ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.cancel();
+                }
+            });
+        alert.show();
+    }
+    
 	/**
 	 * shows an authentication dialog that asks for the administrator passcode
 	 * 
@@ -240,6 +253,27 @@ public class DialogUtil {
 
         builder.show();
     }
+    
+    
+    /**
+     * displays a simple dialog box with a single positive button and an
+     * optional (based on a flag) cancel button using the resource id of the
+     * string passed in for the title and a string for the text. users can install listeners for
+     * both the positive and negative buttons
+     * 
+     * @param titleId
+     * @param text
+     * @param parentContext
+     * @param includeNegative
+     * @param positiveListener
+     *            - if includeNegative is false, this will also be bound to the
+     *            cancel handler
+     * @param negativeListener
+     *            - only used if includeNegative is true - if the negative
+     *            listener is non-null, it will also be bound to the cancel
+     *            listener so pressing back to dismiss the dialog will have the
+     *            same effect as clicking the negative button.
+     */
     public static void showConfirmDialog(int titleId, String text,
             Context parentContext, boolean includeNegative,
             final DialogInterface.OnClickListener positiveListener,
@@ -276,6 +310,42 @@ public class DialogUtil {
     }
 
 
+    /**
+     * displays a simple dialog box with a single positive button and an
+     * optional (based on a flag) cancel button using the resource id of the
+     * string passed in for the title and a string for the text. users can install listeners for
+     * both the positive and negative buttons
+     * 
+     * @param titleId
+     * @param textId
+     * @param detailedMsg
+     * @param parentContext
+     */
+    public static void errorAlertWithDetail(
+            final Context parentContext,
+            int titleId, int textId,
+            final String detailedMsg) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
+        builder.setTitle(titleId);
+        builder.setMessage(textId);
+        builder.setIcon(android.R.drawable.ic_dialog_alert);
+        //The OK button just dismisses the dialog
+        builder.setPositiveButton(R.string.btncaption_ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                dialog.cancel();
+                }
+            });
+        //Details button shows the whole truth
+        builder.setNegativeButton(R.string.btncaption_details, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                infoAlert(parentContext, R.string.detail_dialog_title, detailedMsg);
+                }
+            });
+    
+        builder.show();
+    }
+
+
 	/**
 	 * shows a dialog that prompts the user to enter a single text value as
 	 * input
@@ -285,8 +355,11 @@ public class DialogUtil {
 	 * @param text
 	 * @param clickListener
 	 */
-	public static void showTextInputDialog(final Context parentContext,
-			int title, int text, EditText inputView,
+	public static void showTextInputDialog(
+	        final Context parentContext,
+			int title,
+			int text,
+			EditText inputView,
 			DialogInterface.OnClickListener clickListener) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
 		LinearLayout main = new LinearLayout(parentContext);

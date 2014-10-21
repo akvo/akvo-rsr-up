@@ -101,6 +101,7 @@
     <string name="btncaption_gps_position">Get GPS location</string>
     <string name="btncaption_gps_cancel">Cancel GPS location</string>
     <string name="btncaption_photo_position">Use photo location</string>
+    <string name="btncaption_details">Details</string>
     
     <string name="host_dialog_title">Enter new data host name.</string>
     <string name="host_dialog_msg">All local data will be deleted.\nExample: rsr.akvo.org or https://rsr.akvotest.org</string>
@@ -143,6 +144,8 @@
     <string name="cleared_dialog_title">Cache cleared</string>
     <string name="cleared_dialog_msg">%1$d files deleted (%2$d MB)</string>
     
+    <string name="detail_dialog_title">Error details</string>
+    
     <string name="gpsdisabled_dialog_msg">GPS must be enabled to do this. Select OK to go to the settings page. Select Use GPS Satellites and then press the back button to return. Once GPS is enabled you can click Check Geo Location again to get your position.</string>
     <string name="label_gps_searching">Searching</string>
     <string name="label_gps_ready">Ready</string>
@@ -159,10 +162,12 @@
     <string name="msg_success_drafted">Draft saved successfully</string>
     <string name="msg_logged_in_as_template">Logged in as %s</string>
     <string name="msg_fetch_complete">Fetch complete</string>
+    <string name="msg_check_network">Check your network connectivity</string>
     
     <string name="errmsg_empty_title">An update must have a title!</string>
     <string name="errmsg_bad_url">Invalid URL!</string>
     <string name="errmsg_not_found_on_server">Cannot find: </string>
+    <string name="errmsg_com_failure">Error communicating with server</string>
     <string name="errmsg_update_fetch_failed">Updates fetch failed: </string>
     <string name="errmsg_user_fetch_failed">User fetch failed: </string>
     <string name="errmsg_org_fetch_failed">Organisation fetch failed: </string>

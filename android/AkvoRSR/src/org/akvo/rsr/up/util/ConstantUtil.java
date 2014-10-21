@@ -54,9 +54,9 @@ public class ConstantUtil {
 	public static final String JPG_SUFFIX = ".jpg";
 //	public static final String TOP_DIR = "/akvorsr/";
 	public static final String PHOTO_DIR = "/akvorsr/photos/";
-	public static final String IMAGECACHE_DIR = "/akvorsr/imagecache/";
-	
-	
+    public static final String IMAGECACHE_DIR = "/akvorsr/imagecache/";
+    public static final String LOG_FILE_NAME = "error_messages.txt";
+
 	/**
 	 * status related constants
 	 */

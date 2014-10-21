@@ -30,7 +30,6 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -69,7 +68,6 @@ public class ProjectListActivity extends ActionBarActivity {
     private TextView mFirstTimeText;
 	private BroadcastReceiver broadRec;
     private Button searchButton;
-//    private Button refreshButton;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -129,15 +127,6 @@ public class ProjectListActivity extends ActionBarActivity {
             }
         );
 
-/*        
-        refreshButton = (Button) findViewById(R.id.btn_refresh_projects);        
-        refreshButton.setOnClickListener( new View.OnClickListener() {
-            public void onClick(View view) {
-                //fetch new data
-                startGetProjectsService();
-            }
-        });
-*/ 
         //Create db
         ad = new RsrDbAdapter(this);
         Log.d(TAG, "Opening DB during create");
@@ -151,7 +140,6 @@ public class ProjectListActivity extends ActionBarActivity {
         
         //in case we came back here during a refresh
         if (GetProjectDataService.isRunning(this)) {
-//            refreshButton.setEnabled(false);
             inProgress.setVisibility(View.VISIBLE);
         }
 	}
@@ -164,6 +152,7 @@ public class ProjectListActivity extends ActionBarActivity {
 		return true;
 	}
 
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
@@ -213,6 +202,7 @@ public class ProjectListActivity extends ActionBarActivity {
 		super.onDestroy();
 	}
 
+	
     private void hideSoftKeyBoard() {
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
@@ -220,11 +210,13 @@ public class ProjectListActivity extends ActionBarActivity {
             imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         }
     }
+
     
     private void showSoftKeyBoard(View v) {
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         imm.showSoftInput(v, 0);
     }
+
     
 	/**
 	 * shows all projects visible to this user.
@@ -282,8 +274,6 @@ public class ProjectListActivity extends ActionBarActivity {
             return; //only one at a time
         }
 	    
-		//disable refresh button
-//		refreshButton.setEnabled(false);
 		//TODO: disable menu choice
 		//start a service		
 		Intent i = new Intent(this, GetProjectDataService.class);
@@ -310,18 +300,16 @@ public class ProjectListActivity extends ActionBarActivity {
 			Toast.makeText(getApplicationContext(), R.string.msg_fetch_complete, Toast.LENGTH_SHORT).show();
 		} else {
 			//show a dialog instead
-			DialogUtil.errorAlert(this, "Error", err);
+			DialogUtil.errorAlertWithDetail(this, R.string.errmsg_com_failure, R.string.msg_check_network, err);
 		}
 
-		//re-enable the refresh button
-//		refreshButton.setEnabled(true);		
 		//Refresh the list
 		getData();
 	}
 
 
 	/**
-	 * updates the progress bars
+	 * updates the progress bars as fetch progresses
 	 * @param phase
 	 * @param done
 	 * @param total
