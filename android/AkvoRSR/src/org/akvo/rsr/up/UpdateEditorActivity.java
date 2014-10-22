@@ -786,7 +786,7 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
             locMgr.removeUpdates(this);
             searchingIndicator.setText("");           
             accuracyField.setText("");
-            gpsProgress.setVisibility(View.GONE); //show a in-progress wheel
+            gpsProgress.setVisibility(View.GONE); //hide in-progress wheel
         } else {//turn on
             if (locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 positionGroup.setVisibility(View.VISIBLE);
@@ -858,6 +858,7 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
                 LocationManager locMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 locMgr.removeUpdates(this);
                 searchingIndicator.setText(R.string.label_gps_ready);
+                gpsProgress.setVisibility(View.GONE); //hide in-progress wheel
             }
 
             // if the location reading is more accurate than the last, update
