@@ -31,6 +31,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Update;
 import org.akvo.rsr.up.domain.User;
@@ -253,7 +254,7 @@ public class Downloader {
         		}
         		int count = updateHandler.getCount();
         		Log.v(TAG, "Verification count: " + count);
-        		if (count == 1) {  //1 is good, Update present on server, just note that
+        		if (count == 1) {  //1 is good, Update present on server, so record that fact
         			Update u = updateHandler.getLastUpdate(); //this is the result, db has not been changed
         			u.setUnsent(false); //we are done
         			u.setDraft(false); //published, not draft
@@ -265,9 +266,11 @@ public class Downloader {
         				u.setUnsent(false); //status is resolved
         				u.setDraft(true); //go back to being draft
         				dba.updateUpdateVerifiedByUuid(u);
-        	            throw new FailedPostException("Update " + localId + " is not on server");
-        			} else { //more than one is bad! TODO, maybe other exception to raise to user level!
-        	            throw new FailedPostException("Verify got more than one match for Update UUID!");
+                        Log.e(TAG,"Update " + localId + " is not on server");
+                        throw new FailedPostException(ctx.getResources().getString(R.string.msg_update_interrupted)); //This is what must have happened to get here
+        			} else { //more than one is bad! 
+                        Log.e(TAG,"Verify got more than one match for Update UUID!");
+        	            throw new FailedPostException(ctx.getResources().getString(R.string.msg_update_duplicated));
         			}
         		}
     		} 

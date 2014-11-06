@@ -39,6 +39,7 @@
     <string name="title_activity_diagnostics">RSR Up Diagnostics</string>
     <string name="title_activity_about">RSR Up About</string>
     <string name="title_activity_license">RSR Up License information</string>
+    <string name="title_activity_messages">RSR Up Messages</string>
     <string name="license">License information</string>
     <string name="label_update_title">Add a project update:</string>
     <string name="hint_update_title">Title</string>
@@ -73,6 +74,8 @@
     <string name="summary_setting_feedback">Open a web feedback form where you can tell us what you think of this app.</string>    
     <string name="summary_setting_debuginfo">Show project and update ids and other debug info.</string>    
     <string name="summary_setting_removeloc">Geolocation info in photo files will be removed before upload.</string>    
+    <string name="label_setting_messages">Show messages</string>    
+    <string name="summary_setting_messages">Display a list of errors and other messages.</string>    
     <string name="state_draft">Draft</string>
     <string name="state_published">Published</string>
     <string name="state_synchronising">Synchronising</string>
@@ -156,6 +159,8 @@
     
     <string name="msg_update_published">Update published</string>
     <string name="msg_update_success">Update successfully sent to server</string>
+    <string name="msg_update_interrupted">Network connection was lost while sending update</string>
+    <string name="msg_update_duplicated">Update somehow duplicated on server. Please tell the developers!</string>
     <string name="msg_network_problem">Network connection problem</string>
     <string name="msg_synchronising">Update still synchronising...</string>
     <string name="msg_update_drafted">Update was saved as draft</string>
