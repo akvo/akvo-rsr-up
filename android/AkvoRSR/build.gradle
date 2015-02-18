@@ -1,26 +1,26 @@
+apply plugin: 'com.android.application'
+
 buildscript {
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.8.+'
+        classpath 'com.android.tools.build:gradle:1.0.0'
     }
 }
-apply plugin: 'android'
 
 repositories {
         mavenCentral()
     }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: '*.jar')
     compile 'com.google.android:support-v4:r7'
     compile 'com.github.kevinsawicki:http-request:5.4'
 }
 
 android {
     compileSdkVersion 10
-    buildToolsVersion "19.0.0"
+    buildToolsVersion "19.1.0"
 
     sourceSets {
         main {

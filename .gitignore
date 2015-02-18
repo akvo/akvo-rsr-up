@@ -29,7 +29,6 @@ Desktop.ini
 *.class
 
 ### Package Files #
-*.jar
 *.war
 *.ear
 
@@ -129,3 +128,13 @@ build/*
 xcuserdata
 profile
 *.moved-aside
+
+# Android Studio and Gradle
+local.properties
+*.iml
+*.iws
+*.ipr
+.idea/
+.gradle/
+build/
+gradle.properties
