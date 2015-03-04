@@ -30,7 +30,7 @@ public class ConstantUtil {
 	 */
 	public static final String TEST_HOST = "http://rsr.uat.akvo.org";
 	public static final String LIVE_HOST = "http://rsr.akvo.org";
-	public static final String PWD_URL = "/accounts/password/reset/";
+	public static final String PWD_URL = "/sign_in/";
 	public static final String AUTH_URL = "/auth/token/";
 	public static final String API_KEY_PATTERN = "&api_key=%s&username=%s";
 //    public static final String POST_UPDATE_URL = "/api/v1/project_update/?format=xml";
