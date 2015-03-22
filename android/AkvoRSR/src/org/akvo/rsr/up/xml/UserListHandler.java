@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -24,26 +24,16 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /*
  * http://rsr.uat.akvo.org/api/v1/user/2/?format=xml&depth=1
- * Example input:
+ * Example input if not same org:
  * 
 <object>
-<username>thomas</username>
-<first_name>Thomas</first_name>
-<last_name>Bjelkeman-Pettersson</last_name>
-<user_profile>
-	<organisation>/api/v1/organisation/42/</organisation>
-	<is_org_admin type="boolean">False</is_org_admin>
-	<is_org_editor type="boolean">False</is_org_editor>
-	<user>/api/v1/user/2/</user>
-	<resource_uri>/api/v1/user_profile/16/</resource_uri>
-</user_profile>
-<last_login>2013-11-14T12:21:59</last_login>
-<email>thomas@akvo.org</email>
-<resource_uri>/api/v1/user/2/</resource_uri>
+    <first_name>Robert </first_name>
+    <last_login>2013-01-11T10:43:21</last_login>
+    <last_name>Knol</last_name>
+    <resource_uri>/api/v1/user/222/</resource_uri>
 </object>
 
-V3: No profile anymore. if called by an admin, get a nested list
-TODO:handle this.
+If called by an admin, get a nested list of organisations
 
 <object><email>lissy@akvo.org</email><first_name>Lissy</first_name><last_login>2015-01-05T11:57:49</last_login><last_name>van Noort</last_name>
 <organisations type="list">
@@ -56,9 +46,6 @@ Akvo is a non-profit foundation with staff in the Netherlands, Britain, Sweden, 
 <resource_uri>/api/v1/user/394/</resource_uri>
 <username>Lissyvn</username>
 </object>
-
-
-
 
  */
 
