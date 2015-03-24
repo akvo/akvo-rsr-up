@@ -1,46 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<!-- 
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *
+ *  This file is part of Akvo RSR.
+ *
+ *  Akvo RSR is free software: you can redistribute it and modify it under the terms of
+ *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+ *  either version 3 of the License or any later version.
+ *
+ *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Affero General Public License included with this program for more details.
+ *
+ *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ -->
+ <resources>
 
     <string name="app_name">Akvo RSR Up</string>
-    <string name="app_version">dummyversion</string>
-    <string name="version">&#160;Version&#160;</string>
     <string name="app_subtitle">Really Simple Reporting</string>
-    <string name="powered_by_akvo">Powered by Akvo</string>
-    <string name="menu_logout">Log out</string>
-    <string name="menu_sendall">Send all unsent</string>
-    <string name="title_activity_login">Akvo RSR Up</string>
-    <string name="title_activity_project_list">Akvo RSR Up</string>
-    <string name="title_activity_project_detail">Akvo RSR Up</string>
-    <string name="title_activity_update_list">Akvo RSR Up</string>
-    <string name="title_activity_update_edit">Akvo RSR Up</string>
-    <string name="title_activity_update_detail">Akvo RSR Up</string>
-    <string name="title_activity_settings">Settings</string>
-    <string name="title_activity_about">AboutActivity</string>
-    <string name="title_activity_license">License information</string>
-    <string name="copyright">Copyright &#169; 2012-2014 Stichting Akvo</string>
-    <string name="license">License information</string>
-    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent pharetra ultricies ante, imperdiet viverra nisi rutrum a. Integer consequat laoreet malesuada. Nam fermentum risus id aliquet pellentesque. Sed nec nisl in turpis sodales ultricies. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Interdum et malesuada fames ac ante ipsum primis in faucibus.</string>
-    <string name="label_update_title">Add a project update:</string>
-    <string name="hint_update_title">Title</string>
-    <string name="label_update_description">Update Description:</string>
-    <string name="hint_update_description">Description</string>
-    <string name="label_empty_proj_list">Nothing fetched yet. Use the refresh button to see your projects.\n\nIf you have a low-bandwidth connection you should turn on delayed picture fetching in settings first.</string>
-    <string name="state_draft">Draft</string>
-    <string name="state_published">Published</string>
-    <string name="state_synchronising">Synchronising</string>
-    <string name="count_draft">&#160;Draft</string>
-    <string name="count_published">&#160;Published</string>
-    <string name="count_zero">No updates</string>
+    <string name="app_version">&#160;Version&#160;</string>
     <string name="action_settings">Settings</string>
     <string name="action_diagnostics">Diagnostics</string>
     <string name="action_about">About</string>
     <string name="action_add_update">Add Update</string>
     <string name="action_delete_update">Delete Update</string>
     <string name="action_attach_photo">Attach Photo</string>
+    <string name="action_logout">Log out</string>
+    <string name="action_sendall">Send all unsent</string>
+    <string name="copyright">Copyright &#169; 2012-2014 Stichting Akvo</string>
+    <string name="powered_by_akvo">Powered by Akvo</string>
+    <string name="title_activity_login">Akvo RSR Up</string>
+    <string name="title_activity_project_list">RSR Up</string>
+    <string name="title_activity_project_detail">RSR Up</string>
+    <string name="title_activity_update_list">RSR Up</string>
+    <string name="title_activity_update_edit">RSR Up</string>
+    <string name="title_activity_update_detail">RSR Up</string>
+    <string name="title_activity_settings">RSR Up Settings</string>
+    <string name="title_activity_diagnostics">RSR Up Diagnostics</string>
+    <string name="title_activity_about">RSR Up About</string>
+    <string name="title_activity_license">RSR Up License information</string>
+    <string name="title_activity_messages">RSR Up Messages</string>
+    <string name="license">License information</string>
+    <string name="label_update_title">Add a project update:</string>
+    <string name="hint_update_title">Title</string>
+    <string name="hint_search">Search</string>
+    <string name="label_update_description">Update Description:</string>
+    <string name="label_send_progress">Publishing update</string>
+    <string name="label_project_location">Location:</string>
+    <string name="label_project_summary">Summary:</string>
+    <string name="hint_update_description">Description</string>
+    <string name="hint_update_caption">Photo caption</string>
+    <string name="hint_update_credit">Photo credit</string>
+    <string name="label_photo_credit">Photo: %s</string>
+    <string name="label_empty_proj_list">Nothing to show with this filter.</string>
+    <string name="label_first_proj_list">Nothing fetched yet. Use the refresh button to see your projects.\n\nIf you have a low-bandwidth connection you should turn on delayed picture fetching in settings first.</string>
+    <string name="label_proj_list">Your Projects:</string>
+    <string name="label_update_list">Updates:</string>
+    <string name="label_refresh_progress">Refresh progress</string>
+    <string name="label_progress_projects">Projects</string>
+    <string name="label_progress_updates">Updates</string>
+    <string name="label_progress_pictures">Pictures</string>
+    <string name="label_clearcache_freespace">Frees %d MB. Pictures by you are kept.</string>
+    <string name="label_settings_general">General</string>
+    <string name="label_settings_testing">Testing</string>
+    <string name="label_setting_delaypics">Delay fetching pictures</string>    
+    <string name="summary_setting_delaypics">Do not fetch pictures until they are clicked. Refresh is fast, but pictures are unavailable when offline.</string>    
+    <string name="label_setting_clearcache">Delete cached pictures</string>    
+    <string name="label_setting_host">Data server</string>    
+    <string name="label_setting_feedback">Give feedback</string>    
+    <string name="label_setting_feedback_version">Give feedback on ver %s</string>
+    <string name="label_setting_debuginfo">Debug</string> 
+    <string name="label_setting_removeloc">Remove photo location</string> 
+    <string name="summary_setting_feedback">Open a web feedback form where you can tell us what you think of this app.</string>    
+    <string name="summary_setting_debuginfo">Show project and update ids and other debug info.</string>    
+    <string name="summary_setting_removeloc">Geolocation info in photo files will be removed before upload.</string>    
+    <string name="label_setting_messages">Show messages</string>    
+    <string name="summary_setting_messages">Display a list of errors and other messages.</string>    
+    <string name="state_draft">Draft</string>
+    <string name="state_published">Published</string>
+    <string name="state_synchronising">Synchronising</string>
+    <string name="count_draft">&#160;Draft</string>
+    <string name="count_published">&#160;Published</string>
+    <string name="count_zero">No updates</string>
+    <string name="count_unsynch">&#160;Unsynchronised</string>
     <string name="updates_txt">UPDATES STATUS</string>
-    <string name="published">&#160;Published</string>
-    <string name="unsynch">&#160;Unsynchronised</string>
-    <string name="drafts">&#160;Drafts</string>
     <string name="username">Username</string>
     <string name="email_address">Email Address</string>
     <string name="password">Password</string>
@@ -50,6 +93,7 @@
     <string name="btncaption_attach_photo">Attach photo</string>
     <string name="btncaption_rephoto">Replace photo</string>
     <string name="btncaption_dephoto">Delete photo</string>
+    <string name="btncaption_rotphoto">Rotate photo</string>
     <string name="btncaption_add_update">Add update</string>
     <string name="btncaption_edit_update">Edit this update</string>
     <string name="btncaption_refresh">Refresh project list</string> 
@@ -57,31 +101,100 @@
     <string name="btncaption_clear_data">Clear all data</string>
     <string name="btncaption_send_update">Send update</string>
     <string name="btncaption_save_draft">Save draft</string>
+    <string name="btncaption_gps_position">Get GPS location</string>
+    <string name="btncaption_gps_cancel">Cancel GPS location</string>
+    <string name="btncaption_photo_position">Use photo location</string>
+    <string name="btncaption_details">Details</string>
     
-    <string name="send_dialog_title">Publishing</string>
-    <string name="send_dialog_msg">Sending update to server...</string>
+    <string name="host_dialog_title">Enter new data host name.</string>
+    <string name="host_dialog_msg">All local data will be deleted.\nExample: rsr.akvo.org or https://rsr.akvotest.org</string>
+    
+    <string name="send_progress_title">Publishing</string>
+    <string name="send_progress_msg">Sending update to server...</string>
+
+    <string name="error_dialog_title">Error</string>
+    
+    <string name="nocard_dialog_title">No storage available</string>
+    <string name="nocard_dialog_msg">Akvo RSR Up requires a mounted, writable storage card for image files. Mount card and restart app.</string>
+			
+    <string name="noid_dialog_title">No project/update id</string>
+    <string name="noid_dialog_msg">Caller did not specify a project and update</string>
+			
+    <string name="noupd_dialog_title">Update missing</string>
+    <string name="noupd_dialog_msg">Cannot find update for display</string>
+    <string name="noupd2_dialog_msg">Cannot find update for edit</string>
+    			
+    <string name="noproj_dialog_title">No project id</string>
+    <string name="noproj_dialog_msg">Caller did not specify a project</string>
+			
+    <string name="norot_dialog_title">IO Error rotating photo file</string>
+    <string name="norot_dialog_title2">Photo file too big to rotate</string>
+    <string name="norot_dialog_msg">Try a lower resolution photo</string>
+    			
+    <string name="warnbig_dialog_title">Photo file too big</string>
+    <string name="warnbig_dialog_msg1">Set your camera to a lower resolution</string>
+    <string name="warnbig_dialog_msg2">Pick a smaller photo</string>
+    			
+    <string name="shrinkbig_dialog_title">Could not shrink photo</string>
+    <string name="shrinkbig_dialog_msg">Original was too big to process</string>
+    
+    <string name="nonet_dialog_title">No network available</string>
+    <string name="nonet_dialog_msg">You must be connected to the internet</string>
+    
+    <string name="login_progress_title">Signing in</string>
+    <string name="login_progress_msg">Sending login information</string>
+            
+    <string name="cleared_dialog_title">Cache cleared</string>
+    <string name="cleared_dialog_msg">%1$d files deleted (%2$d MB)</string>
+    
+    <string name="detail_dialog_title">Error details</string>
+    
+    <string name="gpsdisabled_dialog_msg">GPS must be enabled to do this. Select OK to go to the settings page. Select Use GPS Satellites and then press the back button to return. Once GPS is enabled you can click Check Geo Location again to get your position.</string>
+    <string name="label_gps_searching">Searching</string>
+    <string name="label_gps_ready">Ready</string>
+    <string name="label_accuracy">Accuracy:</string>
+    <string name="label_latitude">Latitude:</string>
+    <string name="label_longitude">Longitude:</string>
+    <string name="label_elevation">Elevation:</string>
     
     <string name="msg_update_published">Update published</string>
     <string name="msg_update_success">Update successfully sent to server</string>
+    <string name="msg_update_interrupted">Network connection was lost while sending update</string>
+    <string name="msg_update_duplicated">Update somehow duplicated on server. Please tell the developers!</string>
     <string name="msg_network_problem">Network connection problem</string>
     <string name="msg_synchronising">Update still synchronising...</string>
     <string name="msg_update_drafted">Update was saved as draft</string>
+    <string name="msg_success_drafted">Draft saved successfully</string>
+    <string name="msg_logged_in_as_template">Logged in as %s</string>
+    <string name="msg_fetch_complete">Fetch complete</string>
+    <string name="msg_check_network">Check your network connectivity</string>
     
     <string name="errmsg_empty_title">An update must have a title!</string>
     <string name="errmsg_bad_url">Invalid URL!</string>
+    <string name="errmsg_not_found_on_server">Cannot find: </string>
+    <string name="errmsg_com_failure">Error communicating with server</string>
+    <string name="errmsg_update_fetch_failed">Updates fetch failed: </string>
+    <string name="errmsg_user_fetch_failed">User fetch failed: </string>
+    <string name="errmsg_org_fetch_failed">Organisation fetch failed: </string>
+    <string name="errmsg_signin_denied">Wrong password and/or username</string>
+    <string name="errmsg_signin_failed">Unable to authorize: </string>
     
-    <string name="dialog_ok">OK</string>
-    <string name="error_title">Error</string>
-    <string name="okbutton">OK</string>
-    <string name="cancelbutton">Cancel</string>
+    <string name="btncaption_ok">OK</string>
+    <string name="btncaption_cancel">Cancel</string>
     <string name="authtitle">Authorization required</string>
     <string name="authtext">Please input the admin password</string>
-    <string name="host_dialog_title">Enter data host name</string>
-    <string name="host_dialog_text">Example: www.akvo.org or https://test.akvo.org</string>
     <string name="authfailed">Authorization failed</string>
     <string name="invalidpassword">Invalid password</string>
     
     <string name="dummy_project_title">Project title here</string>
+    <string name="dummy_update_title">Update title here</string>
+    <string name="dummy_update_description">Update description goes here, and can be any length. Update will scroll but button will stay at bottom of screen.</string>   
+    <string name="dummy_author">Nomen Nescio, Akvo</string>
+    <string name="dummy_count">17</string>
+    <string name="dummy_time">2014-04-23 17:18</string>
+    <string name="dummy_version">0.0</string>
+    
+    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent pharetra ultricies ante, imperdiet viverra nisi rutrum a. Integer consequat laoreet malesuada. Nam fermentum risus id aliquet pellentesque. Sed nec nisl in turpis sodales ultricies. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Interdum et malesuada fames ac ante ipsum primis in faucibus.</string>
     
     
     <string-array name="types">

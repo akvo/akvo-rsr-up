@@ -11,7 +11,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-	        android:text="Project title here"
+	        android:text="@string/dummy_project_title"
             android:textColor="@color/rsr_purple"
 	 	    android:background="@color/pale_gray"
             android:textSize="20sp"
@@ -33,7 +33,7 @@
 	            android:layout_gravity="left"
 		        android:layout_weight="1"
 	            android:padding="5dip"
-	            android:text="Updates:"
+	            android:text="@string/label_update_list"
 	            android:typeface="sans"
 	            />
 
@@ -44,13 +44,13 @@
 	            android:layout_gravity="right"
 		        android:layout_weight="0"
 	            android:padding="5dip"
-	            android:text="##"
+	            android:text="@string/dummy_count"
 		        android:typeface="sans"
 		        />
 		</LinearLayout>
 		
 		<!-- List fills rest of view -->
-        <ListView android:id="@android:id/list"
+        <ListView android:id="@+id/list_updates"
              android:layout_width="fill_parent"
              android:layout_height="0dip"
              android:background="@android:color/white"

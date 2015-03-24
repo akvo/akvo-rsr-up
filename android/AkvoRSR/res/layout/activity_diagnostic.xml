@@ -6,26 +6,20 @@
     android:background="@color/lt_gray"
 	>
 
-    <TextView
-   	    android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Diagnostics"
-         />
-
-    	<ScrollView
-		android:layout_width="fill_parent"
-		android:layout_height="0dp"
-		android:layout_weight="1"
-		>
+	<ScrollView
+	android:layout_width="fill_parent"
+	android:layout_height="0dp"
+	android:layout_weight="1"
+	>
 
     <TextView
     	android:id="@+id/text_field"
    	    android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Text starts here"
+        android:text="Diagnostic output:"
          />
 	</ScrollView>
-	<!-- the bottom buttons -->      		      		
+	<!-- the bottom buttons       		      		
 		    <LinearLayout
 		        android:layout_width="fill_parent"
 		        android:layout_height="wrap_content"
@@ -39,8 +33,6 @@
 			        android:layout_weight="1"
 			        android:text="Clear image cache"
 		            />
-			    <!-- View updates button -->
-		
 			    <Button
 		            android:id="@+id/btn_diag_b"
 			        android:layout_width="0dp"
@@ -50,4 +42,5 @@
 		            />
 		    	    	
    			</LinearLayout>
+            -->
 </LinearLayout>

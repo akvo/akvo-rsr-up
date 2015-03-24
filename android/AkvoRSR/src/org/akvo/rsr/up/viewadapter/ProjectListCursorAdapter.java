@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -9,7 +9,7 @@
  *
  *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  See the GNU Affero General Public License included with this program for more details.
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
@@ -18,13 +18,12 @@ package org.akvo.rsr.up.viewadapter;
 
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
-import org.akvo.rsr.up.util.FileUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
+import org.akvo.rsr.up.util.ThumbnailUtil;
 
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,7 +55,7 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 
-        Long thisId = cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL));
+        Long thisId = cursor.getLong(cursor.getColumnIndexOrThrow(RsrDbAdapter.PK_ID_COL));
 //        Long oldId = (Long) view.getTag(R.id.project_id_tag);
 //        if (oldId != null && oldId.compareTo(thisId) !=0 ) {
 //            Log.w(TAG,"switch!");
@@ -66,11 +65,11 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 		TextView titleView = (TextView) view.findViewById(R.id.list_item_title);
 		if (debug) {
 			titleView.setText("["+ thisId +"] "+
-					cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
+					cursor.getString(cursor.getColumnIndexOrThrow(RsrDbAdapter.TITLE_COL)));
 		} else {
-			titleView.setText(cursor.getString(cursor.getColumnIndex(RsrDbAdapter.TITLE_COL)));
+			titleView.setText(cursor.getString(cursor.getColumnIndexOrThrow(RsrDbAdapter.TITLE_COL)));
 		}
-		String projId = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL));
+		String projId = cursor.getString(cursor.getColumnIndexOrThrow(RsrDbAdapter.PK_ID_COL));
 		dba.open();
 		int [] stateCounts = {0,0,0};
 		try {
@@ -95,9 +94,9 @@ public class ProjectListCursorAdapter extends CursorAdapter{
 				
 		//Image
 		ImageView thumbnail = (ImageView) view.findViewById(R.id.list_item_thumbnail);
-		String fn = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
-		String url = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
-		FileUtil.setPhotoFile(thumbnail, url, fn, projId, null);
+		String fn = cursor.getString(cursor.getColumnIndexOrThrow(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
+		String url = cursor.getString(cursor.getColumnIndexOrThrow(RsrDbAdapter.THUMBNAIL_URL_COL));
+		ThumbnailUtil.setPhotoFile(thumbnail, url, fn, projId, null, false);
 		
 		//set tag so we will know what got clicked
 		view.setTag(R.id.project_id_tag, thisId);

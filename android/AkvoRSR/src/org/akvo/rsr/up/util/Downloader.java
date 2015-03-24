@@ -9,7 +9,7 @@
  *
  *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  See the GNU Affero General Public License included with this program for more details.
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -30,29 +31,53 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Update;
 import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.xml.AuthHandler;
 import org.akvo.rsr.up.xml.CountryListHandler;
+import org.akvo.rsr.up.xml.OrganisationHandler;
 import org.akvo.rsr.up.xml.ProjectListHandler;
+import org.akvo.rsr.up.xml.UpdateExtraRestListHandler;
+import org.akvo.rsr.up.xml.UpdateRestHandler;
+import org.akvo.rsr.up.xml.UpdateRestListHandler;
 import org.akvo.rsr.up.xml.UpdateListHandler;
 import org.akvo.rsr.up.xml.UserListHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 
 import com.github.kevinsawicki.http.HttpRequest;
 import com.github.kevinsawicki.http.HttpRequest.Base64;
 import com.github.kevinsawicki.http.HttpRequest.HttpRequestException;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.text.method.DateTimeKeyListener;
 import android.util.Log;
 
+/*
+ * This class originally used only the API at //server/api/V1
+ * but is being migrated to use the //server/rest/v1.
+ * Method status (lowest level only):
+ *  Authorize()  OLD
+ *  postXmlUpdateStreaming() NEW (necessary for geolocated updates)
+ *  verifyUpdate() NEW
+ *  fetchcountryList() OLD - should be rolled into fetchUpdateListRestApi
+ *  fetchNewThumbnails() OLD
+ *  fetchOrg() OLD - will be rolled into fetchUpdateListRestApi
+ *  fetchProjectList() OLD
+ *  fetchUpdateList() OLD - unused
+ *  fetchUpdateListRestApi() NEW - should call project_update_extra call
+ *  fetchUser() OLD - will be rolled into fetchUpdateListRestApi
+ * 
+ * New parser classes have names containing the word REST.
+ * The old parsers should be removed once the migration is complete.
+ */
 public class Downloader {
 
 	private static final String TAG = "Downloader";
@@ -61,16 +86,16 @@ public class Downloader {
 	
 	private final static int READ_TIMEOUT_MS = 60000;
 		
-	public static class PostUnresolvedException extends Exception {
-		public PostUnresolvedException(String string) {
+	public static class UnresolvedPostException extends IOException {
+		UnresolvedPostException(String string) {
 			super(string);
 		}
 
 		private static final long serialVersionUID = -630304430323100535L;
 	}
 
-	public static class PostFailedException extends Exception {
-		public PostFailedException(String string) {
+	public static class FailedPostException extends Exception {
+		public FailedPostException(String string) {
 			super(string);
 		}
 
@@ -111,67 +136,83 @@ public class Downloader {
 	}
 
 	
-	/**
-	 * populates the projects table in the db from a server URL
-	 * @param ctx
-	 * @param url
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws IOException
-	 */
-	public void enableAuthorizedProjects(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
+    /**
+     * populates the updates table in the db from a server URL
+     * Typically the url will specify updates for a single project.
+     * 
+     * @param ctx
+     * @param url
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     */
+    public void fetchUpdateList(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
 
-		Log.i(TAG, "Fetching project list from " + url);
+        /* Get a SAXParser from the SAXPArserFactory. */
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        SAXParser sp = spf.newSAXParser();
 
-		/* Get a SAXParser from the SAXPArserFactory. */
-		SAXParserFactory spf = SAXParserFactory.newInstance();
-		SAXParser sp = spf.newSAXParser();
+        /* Get the XMLReader of the SAXParser we created. */
+        XMLReader xr = sp.getXMLReader();
+        /* Create a new ContentHandler and apply it to the XML-Reader*/ 
+        UpdateListHandler myUpdateListHandler = new UpdateListHandler(new RsrDbAdapter(ctx), true, false);
+        xr.setContentHandler(myUpdateListHandler);
+        /* Parse the xml-data from our URL. */
+        xr.parse(new InputSource(url.openStream()));
+        /* Parsing has finished. */
 
-		/* Get the XMLReader of the SAXParser we created. */
-		XMLReader xr = sp.getXMLReader();
-		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
-		ProjectListHandler myProjectListHandler = new ProjectListHandler(new RsrDbAdapter(ctx));
-		xr.setContentHandler(myProjectListHandler);
-		/* Parse the xml-data from our URL. */
-		//TODO THIS MIGHT HANG, no timeout defined...
-		xr.parse(new InputSource(url.openStream()));
-		/* Parsing has finished. */
+        /* Check if anything went wrong. */
+        err = myUpdateListHandler.getError();
+        Log.i(TAG, "Fetched " + myUpdateListHandler.getCount() + " updates");
+    }
 
-		/* Check if anything went wrong. */
-		err = myProjectListHandler.getError();
 
-		Log.i(TAG, "Fetched " + myProjectListHandler.getCount() + " projects");
-	}
-	
-	/**
-	 * populates the updates table in the db from a server URL
-	 * Typically the url will specify updates for a single project.
-	 * 
-	 * @param ctx
-	 * @param url
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws IOException
-	 */
-	public void fetchUpdateList(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
+    /**
+     * populates the updates table in the db from a server URL
+     * in the REST API
+     * Typically the url will specify updates for a single project.
+     * should eventually call project_update_extra call
+     * this will avoid having to call country/org/user APIs separately
+     * 
+     * @param ctx
+     * @param url
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     */
+    public Date fetchUpdateListRestApi(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
 
-		/* Get a SAXParser from the SAXPArserFactory. */
-		SAXParserFactory spf = SAXParserFactory.newInstance();
-		SAXParser sp = spf.newSAXParser();
+        User user = SettingsUtil.getAuthUser(ctx);
+        HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
+        h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
+        int code = h.code();//evaluation starts the exchange
+        String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
+        Date serverDate = new Date(h.date());
+        if (code == 200) {
+            /* Get a SAXParser from the SAXPArserFactory. */
+            SAXParserFactory spf = SAXParserFactory.newInstance();
+            SAXParser sp = spf.newSAXParser();
+            /* Get the XMLReader of the SAXParser we created. */
+            XMLReader xr = sp.getXMLReader();
+            /* Create a new ContentHandler and apply it to the XML-Reader*/ 
+            UpdateRestListHandler myUpdateListHandler = new UpdateRestListHandler(new RsrDbAdapter(ctx), true);
+//            UpdateExtraRestListHandler myUpdateListHandler = new UpdateExtraRestListHandler(new RsrDbAdapter(ctx), true, serverVersion);
+            xr.setContentHandler(myUpdateListHandler);
+            /* Parse the xml-data from our URL. */
+            xr.parse(new InputSource(h.stream()));
+            /* Parsing has finished. */
+            /* Check if anything went wrong. */
+            err = myUpdateListHandler.getError();
+            Log.i(TAG, "Fetched " + myUpdateListHandler.getCount() + " updates");
 
-		/* Get the XMLReader of the SAXParser we created. */
-		XMLReader xr = sp.getXMLReader();
-		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
-		UpdateListHandler myUpdateListHandler = new UpdateListHandler(new RsrDbAdapter(ctx), true);
-		xr.setContentHandler(myUpdateListHandler);
-		/* Parse the xml-data from our URL. */
-		xr.parse(new InputSource(url.openStream()));
-		/* Parsing has finished. */
-
-		/* Check if anything went wrong. */
-		err = myUpdateListHandler.getError();
-		Log.i(TAG, "Fetched " + myUpdateListHandler.getCount() + " updates");
-	}
+        } else {
+            //Vanilla case is 403 forbidden on an auth failure
+            Log.e(TAG, "Fetch update list HTTP error code:" + code);
+            Log.e(TAG, h.body());
+            throw new IOException("Unexpected server response " + code);
+        }
+        return serverDate;
+    }
 
 
 	/**
@@ -180,61 +221,71 @@ public class Downloader {
 	 * @param ctx
 	 * @param url
 	 * @throws ParserConfigurationException
+	 * @throws FailedPostException 
 	 */
-	public static int verifyUpdate(Context ctx, URL url, RsrDbAdapter dba, String localId) throws ParserConfigurationException {
+	public static boolean verifyUpdate(Context ctx, URL url, RsrDbAdapter dba, String localId) throws ParserConfigurationException, FailedPostException {
 
 		Log.v(TAG, "Verifying update " + localId);
 
-		/* Get a SAXParser from the SAXPArserFactory. */
-		SAXParserFactory spf = SAXParserFactory.newInstance();
-		try {
-		SAXParser sp = spf.newSAXParser();
-
-		/* Get the XMLReader of the SAXParser we created. */
-		XMLReader xr = sp.getXMLReader();
-		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
-		UpdateListHandler myUpdateListHandler = new UpdateListHandler(dba, false);
-		xr.setContentHandler(myUpdateListHandler);
-		/* Parse the xml-data from our URL. */
-		xr.parse(new InputSource(url.openStream()));
-		/* Parsing has finished. */
-
-		/* Check if anything went wrong. */
-		boolean err = myUpdateListHandler.getError();
-		if (err) {
-			Log.e(TAG, "Verification error");
-			return ConstantUtil.POST_UNKNOWN;
-		}
-		int count = myUpdateListHandler.getCount();
-		Log.v(TAG, "Verification count: " + count);
-		 //TODO, check that more than UUID matches?
-		if (count == 1) {  //1 is good, Update present on server, just note that
-			Update u = myUpdateListHandler.getLastUpdate(); //this is the result, db has not been changed
-			u.setUnsent(false); //we are done
-			u.setDraft(false); //published, not draft
-			dba.updateUpdateVerifiedByUuid(u);
-			return ConstantUtil.POST_SUCCESS;
-		} else {
-			if (count == 0) {  //0 is bad, update never made it to server, will need to be re-sent
-				Update u = dba.findUpdate(localId);
-				u.setUnsent(false); //status is resolved
-				u.setDraft(true); //go back to being draft
-				dba.updateUpdateVerifiedByUuid(u);
-			} else {
-				Log.e(TAG, "more than one match for Update UUID!");
-			}
-			return ConstantUtil.POST_FAILURE;
-		}
-		} 
-		catch (IOException e) {
-			return ConstantUtil.POST_UNKNOWN;
-					
-		}
-		catch (SAXException e) {
-			return ConstantUtil.POST_UNKNOWN;
-			
-		}
-		
+        User user = SettingsUtil.getAuthUser(ctx);
+        HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
+        h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
+        int code = h.code();//evaluation starts the exchange
+        if (code == 200) {
+            /* Get a SAXParser from the SAXPArserFactory. */
+    		SAXParserFactory spf = SAXParserFactory.newInstance();
+    		try {
+        		SAXParser sp = spf.newSAXParser();
+        
+        		/* Get the XMLReader of the SAXParser we created. */
+        		XMLReader xr = sp.getXMLReader();
+        		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
+        		UpdateRestListHandler updateHandler = new UpdateRestListHandler(null, false);
+        		xr.setContentHandler(updateHandler);
+        		/* Parse the xml-data from our URL. */
+                xr.parse(new InputSource(h.stream()));
+        		/* Parsing has finished. */
+        
+        		/* Check if anything went wrong. */
+        		boolean err = updateHandler.getError();
+        		if (err) {
+        			Log.e(TAG, "Verification error");
+        			return false;
+        		}
+        		int count = updateHandler.getCount();
+        		Log.v(TAG, "Verification count: " + count);
+        		if (count == 1) {  //1 is good, Update present on server, so record that fact
+        			Update u = updateHandler.getLastUpdate(); //this is the result, db has not been changed
+        			u.setUnsent(false); //we are done
+        			u.setDraft(false); //published, not draft
+        			dba.updateUpdateVerifiedByUuid(u);
+        			return true;
+        		} else {
+        			if (count == 0) {  //0 is unfortunate, update never made it to server, will need to be re-sent
+        				Update u = dba.findUpdate(localId);
+        				u.setUnsent(false); //status is resolved
+        				u.setDraft(true); //go back to being draft
+        				dba.updateUpdateVerifiedByUuid(u);
+                        Log.e(TAG,"Update " + localId + " is not on server");
+                        throw new FailedPostException(ctx.getResources().getString(R.string.msg_update_interrupted)); //This is what must have happened to get here
+        			} else { //more than one is bad! 
+                        Log.e(TAG,"Verify got more than one match for Update UUID!");
+        	            throw new FailedPostException(ctx.getResources().getString(R.string.msg_update_duplicated));
+        			}
+        		}
+    		} 
+    		catch (IOException e) {
+    			return false; //connection problem - transient, still don't know
+    		}
+    		catch (SAXException e) { //broken XML? - probably transient, still don't know
+    			return false;
+    		}
+        } else {
+            //Vanilla case is 403 forbidden on an auth failure
+            Log.e(TAG, "Fetch update list HTTP error code:" + code);
+            Log.e(TAG, h.body());
+            return false;
+        }
 	}
 
 	
@@ -245,8 +296,9 @@ public class Downloader {
 	 * @param urlPattern
 	 * @throws ParserConfigurationException
 	 * @throws MalformedURLException 
+	 * @throws FailedPostException
 	 */
-	public static int verifyUpdates(Context ctx, String urlPattern) throws  MalformedURLException, ParserConfigurationException{
+	public static int verifyUpdates(Context ctx, String urlPattern) throws  MalformedURLException, ParserConfigurationException, FailedPostException{
 		RsrDbAdapter dba = new RsrDbAdapter(ctx);
 		dba.open();
 		int count = 0, unresolvedCount = 0;
@@ -257,16 +309,13 @@ public class Downloader {
 				String localId = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL));
 				String uuid = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.UUID_COL));
 				URL url = new URL(String.format(urlPattern, uuid));
-				switch (verifyUpdate(ctx, url, dba, localId)) {
-					case ConstantUtil.POST_SUCCESS:
-						break;
-					case ConstantUtil.POST_FAILURE:
-						break;
-					case ConstantUtil.POST_UNKNOWN:
-						unresolvedCount++;
-						break;
-				}
-				
+		        try {
+		            if (!verifyUpdate(ctx, url, dba, localId)) {
+		                unresolvedCount++;
+		            }
+		        } catch (FailedPostException e) {
+		            //This is OK here, it just notes the status for the Update
+		        }
 			}
 			cursor.close();
 		}
@@ -308,33 +357,62 @@ public class Downloader {
 	}
 
 
-	/**
-	 * populates the user table in the db from a server URL
-	 * 
-	 * @param ctx
-	 * @param url
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws IOException
-	 */
-	public void fetchUser(Context ctx, URL url, String defaultId) throws ParserConfigurationException, SAXException, IOException {
+    /**
+     * populates the user table in the db from a server URL
+     * 
+     * @param ctx
+     * @param url
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     */
+    public void fetchUser(Context ctx, URL url, String defaultId) throws ParserConfigurationException, SAXException, IOException {
 
-		/* Get a SAXParser from the SAXPArserFactory. */
-		SAXParserFactory spf = SAXParserFactory.newInstance();
-		SAXParser sp = spf.newSAXParser();
+        /* Get a SAXParser from the SAXPArserFactory. */
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        SAXParser sp = spf.newSAXParser();
 
-		/* Get the XMLReader of the SAXParser we created. */
-		XMLReader xr = sp.getXMLReader();
-		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
-		UserListHandler myUserListHandler = new UserListHandler(new RsrDbAdapter(ctx), defaultId);
-		xr.setContentHandler(myUserListHandler);
-		/* Parse the xml-data from our URL. */
-		xr.parse(new InputSource(url.openStream()));
-		/* Parsing has finished. */
+        /* Get the XMLReader of the SAXParser we created. */
+        XMLReader xr = sp.getXMLReader();
+        /* Create a new ContentHandler and apply it to the XML-Reader*/ 
+        UserListHandler myUserListHandler = new UserListHandler(new RsrDbAdapter(ctx), defaultId);
+        xr.setContentHandler(myUserListHandler);
+        /* Parse the xml-data from our URL. */
+        xr.parse(new InputSource(url.openStream()));
+        /* Parsing has finished. */
 
-		/* Check if anything went wrong. */
-		err = myUserListHandler.getError();
-	}
+        /* Check if anything went wrong. */
+        err = myUserListHandler.getError();
+    }
+
+
+    /**
+     * populates the user table in the db from a server URL
+     * 
+     * @param ctx
+     * @param url
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     */
+    public void fetchOrg(Context ctx, URL url, String defaultId) throws ParserConfigurationException, SAXException, IOException {
+
+        /* Get a SAXParser from the SAXPArserFactory. */
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        SAXParser sp = spf.newSAXParser();
+
+        /* Get the XMLReader of the SAXParser we created. */
+        XMLReader xr = sp.getXMLReader();
+        /* Create a new ContentHandler and apply it to the XML-Reader*/ 
+        OrganisationHandler myOrgHandler = new OrganisationHandler(new RsrDbAdapter(ctx), defaultId);
+        xr.setContentHandler(myOrgHandler);
+        /* Parse the xml-data from our URL. */
+        xr.parse(new InputSource(url.openStream()));
+        /* Parsing has finished. */
+
+        /* Check if anything went wrong. */
+        err = myOrgHandler.getError();
+    }
 
 
 	/**
@@ -450,43 +528,82 @@ public class Downloader {
 
 	private final static char SPC = '\u0020';
 
-	/**
-	 * returns a string without newlines and with a maximum length
-	 * @param s
-	 * @param maxLength
-	 * @return
-	 */
-	private static String oneLine(String s, int maxLength) {
-		String result = "";
-		for (int i = 0; i < Math.min(s.length(), maxLength); i++)
-			if (s.charAt(i) < SPC) {
-				result += SPC;
-			} else {
-				result += s.charAt(i);
-			}
-		return result;
-	}
+    /**
+     * returns a string without control chars or XML syntax elements and with a maximum length
+     * @param s
+     * @param maxLength
+     * @return
+     */
+    private static String oneLine(String s, int maxLength) {
+        String result = "";
+        for (int i = 0; i < s.length(); i++) {
+            String t;
+            if (s.charAt(i) < SPC) {
+                t = Character.toString(SPC);
+            } else if (s.charAt(i) == '&') {
+                t = "&amp;";
+            } else if (s.charAt(i) == '<') {
+                t = "&lt;";
+            } else if (s.charAt(i) == '>') {
+                t = "&gt;";
+            } else if (s.charAt(i) > '~') {
+                t = "&#"+String.valueOf((int)s.charAt(i))+";";
+            } else t = Character.toString(s.charAt(i));
+            //Would it make it overflow?
+            if (result.length() + t.length() > maxLength) {
+                return result;
+            }
+            result += t;
+        }
+        return result;
+    }
+
+
+    /**
+     * returns a string without control chars or XML syntax elements
+     * @param s
+     * @return
+     */
+    private static String xmlQuote(String s) {
+        String result = "";
+        for (int i = 0; i < s.length(); i++) {
+            String t;
+            if (s.charAt(i) == '&') {
+                t = "&amp;";
+            } else if (s.charAt(i) == '<') {
+                t = "&lt;";
+            } else if (s.charAt(i) == '>') {
+                t = "&gt;";
+            } else if (s.charAt(i) > '~') {
+                t = "&#"+String.valueOf((int)s.charAt(i))+";";
+            } else t = Character.toString(s.charAt(i));
+            result += t;
+        }
+        return result;
+    }
 
 
 	
 	/**
-	 *  Publishes an update to the server
+	 * Publishes an update to the server
 	 *  
 	 * @param urlTemplate
 	 * @param update
 	 * @param sendImage
-	 * @param user
+     * @param user
+     * @param prog
 	 * 
-	 * @return int
+	 * @return boolean
+     * @throws FailedPostException 
 	 * 
 	 * There are three outcomes:
-	 *   0  Success, we got the server id back
-	 *   1  Failure, we never got to send the whole thing
-	 *   2  Unknown, server may or may not have got it. Verification will be necessary.
+	 *   true      Success, we got the server id back and updated the "update" object
+	 *   false     Unknown, server may or may not have got it. Verification will be necessary.
+     *   exception Failure, we never got to send the whole thing
 	 *   
 	 * What to submit:
 	<object>
-	<update_method>W</update_method>
+	<update_method>M</update_method>
 	<project>/api/v1/project/277/</project>
 	<user>/api/v1/project/1/</user>
 	<uuid>nn-nn-nn-nnnnnnn</uuid>
@@ -501,35 +618,46 @@ public class Downloader {
 	</object>
 
 	 * To URL:
-	/api/v1/project_update/?format=xml&api_key=62a101a36893397300cbf62fbbf0debaa2818496&username=gabriel
+	/api/v1/project_update/?format=xml&api_key=62nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn96&username=uuuuuuuu
 
 	 * As:  
 	application/xml
 
 	 */
-	public static int postXmlUpdateStreaming(String urlTemplate, Update update, boolean sendImage, User user, String agent) {
+	//TODO must return more info to user on failure! Probably should throw a fail exception and return false if unknown
+	public static boolean postXmlUpdateStreaming(String urlTemplate, Update update, boolean sendImage, User user, String agent, ProgressReporter prog) throws FailedPostException {
 		final String contentType = "application/xml";
-		final String bodyTemplate1  =	"<object><update_method>M</update_method><project>%s</project>" + //Mobile update method
+		final String bodyTemplate1  =	"<root><update_method>M</update_method><project>%s</project>" + //Mobile update method
 				"<photo_location>E</photo_location><uuid>%s</uuid><user>%s</user><title>%s</title>" +
 				"<user_agent>%s</user_agent><text>%s</text>";
-		final String bodyTemplate2  = "</object>";
-		final String imagePreamble  = "<photo type=\"hash\"><name>dummy.jpg</name><content_type>image/jpeg</content_type><file>";
-		final String imagePostamble = "</file></photo>";
-		boolean allSent = false;
+		final String bodyTemplate2  = "</root>";
+//        final String imagePreamble  = "<photo type=\"hash\"><name>dummy.jpg</name><content_type>image/jpeg</content_type><file>";
+        final String imagePreamble  = "<photo>";
+//        final String imagePostamble = "</file></photo>";
+        final String imagePostamble = "</photo>";
+        final String imageCaptionTemplate = "<photo_caption>%s</photo_caption>";
+        final String imageCreditTemplate = "<photo_credit>%s</photo_credit>";
+        //Just long+lat for location. We do not currently do reverse geocoding in the app.
+        //Country used to be mandatory, but that was changed
+        final String locationTemplate = "<locations><list-item><longitude>%s</longitude><latitude>%s</latitude></list-item></locations>";
+        final boolean simulateUnresolvedPost = false;
+        
+        boolean allSent = false;
 		try {
-			URL url = new URL(String.format(Locale.US, urlTemplate, user.getApiKey(), user.getUsername()));
+			URL url = new URL(String.format(Locale.US, urlTemplate
+			        //, user.getApiKey(), user.getUsername()
+			        ));
 	
-			//user and project references have to be in URL form
-			String projectPath = String.format(Locale.US, ConstantUtil.PROJECT_PATH_PATTERN, update.getProjectId());
-			String userPath = String.format(Locale.US, ConstantUtil.USER_PATH_PATTERN, user.getId());
-
 			String requestBody = String.format(Locale.US, bodyTemplate1,
-					projectPath, update.getUuid(), userPath,
-					oneLine(update.getTitle(),50), //TODO: WHAT ABOUT XML?
+			        update.getProjectId(), update.getUuid(), user.getId(),
+					oneLine(update.getTitle(), 50),
 					agent,
-					update.getText());
+					xmlQuote(update.getText()));
 	
 			HttpRequest h = HttpRequest.post(url).contentType(contentType);//OutOfMemory here...
+//	        h.connectTimeout(10000); //10 sec timeout
+	        h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
+
 			h.readTimeout(READ_TIMEOUT_MS);
 			h.send(requestBody);
 	
@@ -552,6 +680,10 @@ public class Downloader {
 								raf.readFully(rawBuf);
 								byte[] b64buf = Base64.encodeBytesToBytes(rawBuf, 0, bufferSize);
 								h.send(b64buf);
+								//only send progress updates for image, which is almost all the payload
+								if (prog != null) {
+								    prog.sendUpdate((int)i, (int)wholeChunks);
+								}
 							}
 							int n = raf.read(rawBuf); //read last piece
 							byte[] b64buf = Base64.encodeBytesToBytes(rawBuf, 0, n);
@@ -560,50 +692,90 @@ public class Downloader {
 							raf.close();
 						}
 						h.send(imagePostamble);
+						//any image metadata?
+                        if (update.getPhotoCaption() != null) {
+                            h.send(String.format(imageCaptionTemplate, oneLine(update.getPhotoCaption(), 75)));
+                        }
+                        if (update.getPhotoCredit() != null) {
+                            h.send(String.format(imageCreditTemplate, oneLine(update.getPhotoCredit(), 25)));
+                        }
 					}
 				}
-			}
+			} //end image
+
+			if (update.validLatLon()) {
+                h.send(String.format(locationTemplate, update.getLongitude(), update.getLatitude()));
+            } else {
+                h.send(String.format(locationTemplate, "0", "0"));
+            }
 			
 			h.send(bodyTemplate2);
 			allSent = true;
 			
 			int code = h.code(); //closes output
+			if (simulateUnresolvedPost) return false;
 			String msg = h.message();
-			String bod = h.body(); //On success, XML representation of created object
 			if (code == 201) { //Created
-				String idPath = h.header(HttpRequest.HEADER_LOCATION);//Path-ified ID
-				int penSlash = idPath.lastIndexOf('/', idPath.length() - 2);
-				String id = idPath.substring(penSlash + 1, idPath.length() - 1);
-				update.setId(id);
-				return ConstantUtil.POST_SUCCESS; //Yes!
+			    /* Get a SAXParser from the SAXPArserFactory. */
+		        SAXParser sp = SAXParserFactory.newInstance().newSAXParser();
+		        /* Get the XMLReader of the SAXParser we created. */
+		        XMLReader xr = sp.getXMLReader();
+		        /* Create a new ContentHandler and apply it to the XML-Reader */
+		        UpdateRestHandler updateHandler = new UpdateRestHandler();
+		        xr.setContentHandler(updateHandler);
+		        /* Parse the xml-data from our URL. */
+		        xr.parse(new InputSource(h.stream()));
+		        /* Parsing has finished. Check if anything went wrong. */
+		        boolean err = updateHandler.getError();
+		        if (err) {
+		            Log.e(TAG, "Post parse error");
+		            return false;
+		        }
+		        int count = updateHandler.getCount();
+		        Log.v(TAG, "Post returned obj count: " + count);
+		        if (count == 1) {  //1 is good
+		            Update u = updateHandler.getLastUpdate(); //this is the result, db has not been changed
+		            update.setId(u.getId());
+		            //TODO copy other things? like country-id that may have been filled in by server?
+		            return true; // Yes!
+		        } else {
+	                throw new FailedPostException("More than one Update with same UUID!"); //TODO: localize
+		        }
 			} else {
-				String e = "Unable to post update, code " + code + " " +  msg;
-				Log.e(TAG, e);
-				Log.e(TAG, bod);
-				return ConstantUtil.POST_FAILURE;
+				String e = "Server rejected Update, code " + code + " " + msg; //TODO: localize
+				String body = h.body(); //for debug
+                throw new FailedPostException(e);
 			}
 		}
 		catch (HttpRequestException e) { //connection problem
 			if (allSent) {
 				Log.w(TAG, "Unknown-result post", e);
-				return ConstantUtil.POST_UNKNOWN;
+				return false;
 			} else {
 				Log.w(TAG, "Failed post", e);
-				return ConstantUtil.POST_FAILURE;
+                throw new FailedPostException(e.getMessage());
 			}
 		}
 		catch (MalformedURLException e) { //server string is bad or coding error
 			Log.e(TAG, "Bad URL", e);
-			return ConstantUtil.POST_FAILURE;
+            throw new FailedPostException(e.getMessage());
 		}
 		catch (FileNotFoundException e) {
 			Log.e(TAG, "Cannot find image file", e);
-			return ConstantUtil.POST_FAILURE;
+            throw new FailedPostException(e.getMessage());
 		}
 		catch (IOException e) {
 			Log.e(TAG, "Cannot read image file", e);
-			return ConstantUtil.POST_FAILURE;
+            throw new FailedPostException(e.getMessage());
 		}
+		catch (SAXException e) {
+            Log.e(TAG, "SAX parser error", e);
+            throw new FailedPostException(e.getMessage());
+        }
+		catch (ParserConfigurationException e) {
+            Log.e(TAG, "SAX parser config error", e);
+            throw new FailedPostException(e.getMessage());
+        }
 	}
 
 
@@ -613,16 +785,16 @@ public class Downloader {
 	 * @param urlTemplate
 	 * @param sendImages
 	 * @param user
-	 * @throws PostFailedException 
-	 * @throws PostUnresolvedException 
+	 * @throws FailedPostException 
+	 * @throws UnresolvedPostException 
 	 * @throws MalformedURLException 
 	 * @throws ParserConfigurationException 
-	 * @throws Exception
 	 */
 	static public void sendUpdate(Context ctx, String localId,
 			String urlTemplate, String verifyUrlTemplate,
-			boolean sendImages, User user)
-					throws PostFailedException, PostUnresolvedException, MalformedURLException, ParserConfigurationException  {
+			boolean sendImages, User user,
+			ProgressReporter prog)
+					throws FailedPostException, UnresolvedPostException, MalformedURLException, ParserConfigurationException  {
 		//Log.v(TAG, "Sending update " + localId);
 		RsrDbAdapter dba = new RsrDbAdapter(ctx);
 		dba.open();
@@ -630,6 +802,7 @@ public class Downloader {
 			Update upd = dba.findUpdate(localId);
 			String userAgent;
 			try {
+			    //Not to be localized
 			    userAgent = "Akvo RSR Up v" + ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0).versionName +
                         " on Android " + android.os.Build.VERSION.RELEASE +
                         " device " + android.os.Build.MANUFACTURER + 
@@ -638,84 +811,38 @@ public class Downloader {
                 userAgent = "(not found)";
             }
 
-			int status = postXmlUpdateStreaming(urlTemplate, upd, sendImages, user, userAgent);
-
-			if (status == ConstantUtil.POST_UNKNOWN) { //try to check on sts immediately
+			boolean resolved;
+			try {
+    			resolved = postXmlUpdateStreaming(urlTemplate, upd, sendImages, user, userAgent, prog);
+            } catch (FailedPostException e) { //did not happen, user should try again
+                upd.setUnsent(false);
+                upd.setDraft(true);
+                dba.updateUpdateIdSent(upd, localId); //remember status for this update
+                throw e; //and tell user about it
+            }
+    
+			if (!resolved) { //try to check on sts immediately
 				URL url = new URL(String.format(verifyUrlTemplate, upd.getUuid()));
-				status = verifyUpdate(ctx, url, dba, localId);
+				resolved = verifyUpdate(ctx, url, dba, localId);
 			}	
 
-			switch (status) {
-				case ConstantUtil.POST_SUCCESS:
-					upd.setUnsent(false);
-					upd.setDraft(false);
-					dba.updateUpdateIdSent(upd, localId); //remember new ID and status for this update
-					Log.i(TAG, "Sent update" + localId);
-					return;
-				case ConstantUtil.POST_FAILURE:
-					upd.setUnsent(false);
-					upd.setDraft(true);
-					dba.updateUpdateIdSent(upd, localId); //remember status for this update
-					throw new PostFailedException("Could not post Update");
-				case ConstantUtil.POST_UNKNOWN: //try to check sts immediately
-					throw new PostUnresolvedException("Update status unknown, needs verification");
-			}
+			if (resolved) {  //remember new ID and status for this update
+				upd.setUnsent(false);
+				upd.setDraft(false);
+				dba.updateUpdateIdSent(upd, localId);
+				Log.i(TAG, "Sent update" + localId);
+				return;
+			} else {
+			    //still unresolved, leave record in limbo state and retry later
+			    throw new UnresolvedPostException("Update status unknown, needs verification");
+            }
+
 		} finally {
 			dba.close();
 		}
 	}
 
 	
-	/**
-	 * Sends all unsent updates - currently unused
-	 * @param ctx
-	 * @param urlTemplate
-	 * @param sendImages
-	 * @param user
-	 * @throws Exception
-	 */
-	public void sendAllUnsentUpdates(Context ctx, String urlTemplate, boolean sendImages, User user) throws Exception {
-		Log.i(TAG, "Sending all unsent updates");
-		RsrDbAdapter dba = new RsrDbAdapter(ctx);
-		dba.open();
-		int successCount = 0;
-		int failCount = 0;
-		int unknownCount = 0;
-		try {
-			Cursor cursor2 = dba.listAllUpdatesUnsent();
-			if (cursor2 != null) {
-				while (cursor2.moveToNext()) {
-					String localId = cursor2.getString(cursor2.getColumnIndex(RsrDbAdapter.PK_ID_COL));
-					Update upd = dba.findUpdate(localId);
-					
-					switch (postXmlUpdateStreaming(urlTemplate, upd, sendImages, user, "")) {
-					case ConstantUtil.POST_SUCCESS:
-						upd.setUnsent(false);
-						upd.setDraft(false);
-						dba.updateUpdateIdSent(upd, localId); //remember new ID and status for this update
-						successCount++;
-						break;
-					case ConstantUtil.POST_FAILURE:
-						upd.setUnsent(false);
-						upd.setDraft(true);
-						dba.updateUpdateIdSent(upd, localId); //remember new ID and status for this update
-						failCount++;
-						break;
-					case ConstantUtil.POST_UNKNOWN:
-						//dba.updateUpdateIdSent(upd, localId); //no change in status for this update
-						unknownCount++;
-						break;						
-					}
-				}
-				cursor2.close();
-			}
-		} finally {
-			dba.close();
-		}
-		Log.i(TAG, "Sent " + successCount + " updates");
-	}
-
-
 	/**
 	 * logs in to server and fetches API key
 	 * @param url
@@ -759,6 +886,35 @@ public class Downloader {
 		}
 	}
 
-
+	
+    /**
+     * checks connectivity by asking Android.
+     */
+    public static boolean haveNetworkConnection(Context context, boolean wifiOnly) {
+        ConnectivityManager connMgr = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connMgr != null) {
+            NetworkInfo[] infoArr = connMgr.getAllNetworkInfo();
+            if (infoArr != null) {
+                for (int i = 0; i < infoArr.length; i++) {
+                    if (!wifiOnly) {
+                        // if we don't care what KIND of
+                        // connection we have, just that there is one
+                        if (NetworkInfo.State.CONNECTED == infoArr[i].getState()) {
+                            return true;
+                        }
+                    } else {
+                        // if we only want to use wifi, we need to check the
+                        // type
+                        if (infoArr[i].getType() == ConnectivityManager.TYPE_WIFI
+                                && NetworkInfo.State.CONNECTED == infoArr[i].getState()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
 }

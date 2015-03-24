@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -9,7 +9,7 @@
  *
  *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  See the GNU Affero General Public License included with this program for more details.
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
@@ -23,20 +23,23 @@ import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.viewadapter.UpdateListCursorAdapter;
 
 import android.os.Bundle;
-import android.app.ListActivity;
+import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.database.Cursor;
 
-public class UpdateListActivity extends ListActivity {
+public class UpdateListActivity extends ActionBarActivity {
 
 
 	private static final String TAG = "UpdateListActivity";
@@ -45,6 +48,7 @@ public class UpdateListActivity extends ListActivity {
 	private Cursor dataCursor;
 	private TextView projectTitleLabel;
 	private TextView updateCountLabel;
+    private ListView mList;
 	private String projId;
 	private BroadcastReceiver broadRec;
 
@@ -66,18 +70,22 @@ public class UpdateListActivity extends ListActivity {
 
 		projectTitleLabel = (TextView) findViewById(R.id.ulisttitlelabel);
 		updateCountLabel = (TextView) findViewById(R.id.updatecountlabel);
+        mList = (ListView) findViewById(R.id.list_updates);
+        mList.setOnItemClickListener(new OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent i = new Intent(view.getContext(), UpdateDetailActivity.class);
+                i.putExtra(ConstantUtil.UPDATE_ID_KEY, ((Long) view.getTag(R.id.update_id_tag)).toString());
+                i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(R.id.project_id_tag)).toString());
+                startActivity(i);
+            }
+        });
+        
+        
 
 		View listFooter = getLayoutInflater().inflate(R.layout.update_list_footer, null, false);
 		//if the button were not the outermost view we would need to find it to set onClick
-/*		
-		listFooter = new Button(this);
-		listFooter.setWidth(ViewGroup.LayoutParams.FILL_PARENT);
-		listFooter.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-		listFooter.setText(R.string.action_add_update);
-		listFooter.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 24);
-		listFooter.setCompoundDrawablesWithIntrinsicBounds(0,R.drawable.ic_menu_add,0,0);
-		//this worked somewhat, but button text was not shown
-		 */
 		Button addButton = (Button) listFooter.findViewById(R.id.btn_add_update2);
 		addButton.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {
@@ -85,11 +93,14 @@ public class UpdateListActivity extends ListActivity {
 			}
 		});
 		
-		getListView().addFooterView(listFooter);
+		mList.addFooterView(listFooter);
+		
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		
         //Create db
 
 		ad = new RsrDbAdapter(this);
+        ad.open();
 	}
 
 	private void startEditorNew() {
@@ -108,25 +119,27 @@ public class UpdateListActivity extends ListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
-        case R.id.action_settings:
-			Intent intent = new Intent(this, SettingsActivity.class);
-			startActivity(intent);
-            return true;
-        case R.id.action_add_update:
-        	startEditorNew();
-        	return true;
-	    default:
-	        return super.onOptionsItemSelected(item);
+	        case android.R.id.home:
+	            finish();
+	            //NavUtils.navigateUpFromSameTask(this);
+	            return true;
+    	    case R.id.action_settings:
+    			Intent intent = new Intent(this, SettingsActivity.class);
+    			startActivity(intent);
+                return true;
+            case R.id.action_add_update:
+            	startEditorNew();
+            	return true;
+    	    default:
+    	        return super.onOptionsItemSelected(item);
 	    }
 
 	}
 	
 
-	
 	@Override
 	public void onResume() {
 		super.onResume();
-		ad.open();
 		getData();
 	}
 	
@@ -170,25 +183,8 @@ public class UpdateListActivity extends ListActivity {
 		updateCountLabel.setText(Integer.valueOf(dataCursor.getCount()).toString());
 		//Populate list view
 		UpdateListCursorAdapter updates = new UpdateListCursorAdapter(this, dataCursor);
-		setListAdapter(updates);
+		mList.setAdapter(updates);
 
-	}
-	
-
-	/**
-	 * when a list item is clicked, get the id of the selected
-	 * item and open the update detail activity.
-	 */
-	@Override
-	protected void onListItemClick(ListView list, View view, int position, long id) {
-		super.onListItemClick(list, view, position, id);
-
-		Intent i = new Intent(view.getContext(), UpdateDetailActivity.class);
-		i.putExtra(ConstantUtil.UPDATE_ID_KEY, ((Long) view.getTag(R.id.update_id_tag)).toString());
-		i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(R.id.project_id_tag)).toString());
-		startActivity(i);
-	}
-
-	
+	}	
 
 }

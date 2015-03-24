@@ -9,7 +9,7 @@
 		android:id="@+id/btn_add_update2"
 	   	android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
-	    android:drawableTop="@drawable/ic_menu_add"
+	    android:drawableTop="@drawable/ic_menu_add_dk"
 		android:padding="5dip"
 	    android:text="@string/btncaption_add_update"
 		android:textColor="@color/rsr_purple"

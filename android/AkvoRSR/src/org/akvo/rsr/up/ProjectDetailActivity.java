@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -9,7 +9,7 @@
  *
  *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  See the GNU Affero General Public License included with this program for more details.
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
@@ -22,10 +22,11 @@ import org.akvo.rsr.up.domain.Project;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.FileUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
+import org.akvo.rsr.up.util.ThumbnailUtil;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Activity;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,7 +37,7 @@ import android.widget.TextView;
 import android.content.Intent;
 import android.content.res.Resources;
 
-public class ProjectDetailActivity extends Activity {
+public class ProjectDetailActivity extends ActionBarActivity {
 
 	private String projId = null;
 	private Project project = null;
@@ -157,7 +158,7 @@ public class ProjectDetailActivity extends Activity {
     		publishedCountView.setText(Integer.toString(stateCounts[2]) + res.getString(R.string.count_published));
     		draftCountView.setText(Integer.toString(stateCounts[0]) + res.getString(R.string.count_draft));
     
-    		FileUtil.setPhotoFile(projImage,project.getThumbnailUrl(), project.getThumbnailFilename(), projId, null);
+    		ThumbnailUtil.setPhotoFile(projImage,project.getThumbnailUrl(), project.getThumbnailFilename(), projId, null, true);
 
 		} finally {
             dba.close();    
@@ -173,9 +174,6 @@ public class ProjectDetailActivity extends Activity {
 
 	@Override
 	protected void onDestroy() {
-		if (dba != null) {
-			dba.close();
-		}
 		super.onDestroy();
 	}
 

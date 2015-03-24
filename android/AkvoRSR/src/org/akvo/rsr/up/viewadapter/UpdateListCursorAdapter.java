@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -9,26 +9,24 @@
  *
  *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  See the GNU Affero General Public License included with this program for more details.
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
 package org.akvo.rsr.up.viewadapter;
 
-import java.io.File;
 import java.util.Date;
 
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
-import org.akvo.rsr.up.util.FileUtil;
+import org.akvo.rsr.up.domain.Organisation;
+import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.util.SettingsUtil;
+import org.akvo.rsr.up.util.ThumbnailUtil;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapFactory.Options;
 import android.graphics.Color;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -41,7 +39,7 @@ import android.widget.TextView;
 public class UpdateListCursorAdapter extends CursorAdapter{
 
 /**
- * This adaptor formats Update list items using the update_list_item.xml template
+ * This adapter formats Update list items using the update_list_item.xml template
  * 
  * @author Stellan Lagerstroem
  * 
@@ -49,23 +47,26 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 	
 	private boolean debug = false;
 	private java.text.DateFormat dfmt;
-	private int idcol, titleCol, draftCol, unsentCol;
+	private int idcol, titleCol, draftCol, unsentCol, authorIdCol;
+    private RsrDbAdapter dba;
 	
 	public UpdateListCursorAdapter(Context context, Cursor cursor) {
 		super(context, cursor);
+		dba = new RsrDbAdapter(context);
 		debug = SettingsUtil.ReadBoolean(context, "setting_debug", false);
 		dfmt = DateFormat.getDateFormat(context);
 		idcol = cursor.getColumnIndex(RsrDbAdapter.PK_ID_COL);
 		titleCol = cursor.getColumnIndex(RsrDbAdapter.TITLE_COL);
 		draftCol = cursor.getColumnIndex(RsrDbAdapter.DRAFT_COL);
-		unsentCol = cursor.getColumnIndex(RsrDbAdapter.UNSENT_COL);
+        unsentCol = cursor.getColumnIndex(RsrDbAdapter.UNSENT_COL);
+        authorIdCol = cursor.getColumnIndex(RsrDbAdapter.USER_COL);
 	}
 
 	
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
 
-		//Text data
+		//Title
 		TextView titleView = (TextView) view.findViewById(R.id.ulist_item_title);
 		if (debug) {
 			titleView.setText("["+ cursor.getString(idcol) + "] "+
@@ -74,12 +75,36 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 			titleView.setText(cursor.getString(titleCol));
 		}
 
+		//Date
 		TextView dateView = (TextView) view.findViewById(R.id.ulist_item_date);
 		long s = cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.CREATED_COL));
 		Date d = new Date(1000 * s);
 		dateView.setText(dfmt.format(d));
-		TextView stateView = (TextView) view.findViewById(R.id.ulist_item_state);
+		
+		//Author
+		User author = null;
+		Organisation org = null;
+		dba.open();
+		try {
+            author = dba.findUser(cursor.getString(authorIdCol));
+            if (author !=null && author.getOrgId() != null) org = dba.findOrganisation(author.getOrgId());
+        } finally {
+            dba.close();    
+        }
 
+        TextView authorView = (TextView) view.findViewById(R.id.ulist_item_author);
+        String sig = "";
+        if (author != null) {
+            sig += author.getFirstname() + " " + author.getLastname();
+            if (org != null) sig += ", " + org.getName();
+        }
+        if (author == null || debug) {
+            sig += "[" + cursor.getString(authorIdCol) + "]";
+        }
+        authorView.setText(sig);
+
+        //State
+		TextView stateView = (TextView) view.findViewById(R.id.ulist_item_state);
 		if (0 != cursor.getInt(unsentCol)) {
 			//Show synchronising updates as red with a "Synchronising" label
 			view.setBackgroundColor(context.getResources().getColor(R.color.red));
@@ -104,7 +129,7 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 		//Find file containing thumbnail
 		String fn = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
 		String url = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
-		FileUtil.setPhotoFile(thumbnail, url, fn, null, cursor.getString(idcol));
+		ThumbnailUtil.setPhotoFile(thumbnail, url, fn, null, cursor.getString(idcol), false);
 
 		//set tags so we will know what got clicked
 		view.setTag(R.id.project_id_tag, cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PROJECT_COL)));

@@ -9,7 +9,7 @@
  *
  *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  See the GNU Affero General Public License included with this program for more details.
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
@@ -36,6 +36,13 @@ public class Project {
 	private String city;
 	private boolean hidden;
 
+    private boolean isEmpty(String s) {
+        if ((s != null) && (s.length() > 0))
+            return false;
+        else
+            return true;
+    }
+    
 	public String getId() {
 		return id;
 	}
@@ -148,6 +155,11 @@ public class Project {
 		this.hidden = hidden;
 	}
 
+
+    public boolean validLatLon() {
+        return (!isEmpty(latitude)) && (!isEmpty(longitude));
+    }
+    
 
 	/*
 	public String get() {

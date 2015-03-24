@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -9,7 +9,7 @@
  *
  *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  See the GNU Affero General Public License included with this program for more details.
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
@@ -29,12 +29,27 @@ public class Update {
 	private boolean draft;
 	private boolean unsent;
 	private String text;
-	private String location;
+	private Location mLocation;
 	private String thumbnailUrl;
 	private String thumbnailFilename;	
 	private String uuid;	
 	private Date date;
-
+    private String photoCredit;
+    private String photoCaption;
+    private String videoUrl;
+    private String videoFilename;
+ 
+    private boolean isEmpty(String s) {
+        if ((s != null) && (s.length() > 0))
+            return false;
+        else
+            return true;
+    }
+    
+    public Update() {
+       mLocation = new Location(); 
+    }
+    
 	public String getId() {
 		return id;
 	}
@@ -83,12 +98,12 @@ public class Update {
 		this.text= text;
 	}
 
-	public String getLocation() {
-		return location;
+	public Location getLocation() {
+		return mLocation;
 	}
 
-	public void setLocation(String location) {
-		this.location = location;
+	public void setLocation(Location location) {
+		mLocation = location;
 	}
 
 	public String getThumbnailUrl() {
@@ -129,7 +144,95 @@ public class Update {
 	}
 
 	public void setUuid(String uuid) {
-		this.uuid= uuid;
+		this.uuid = uuid;
 	}
+
+    public String getPhotoCredit() {
+        return photoCredit;
+    }
+
+    public void setPhotoCredit(String credit) {
+        photoCredit = credit;
+    }
+
+    public String getPhotoCaption() {
+        return photoCaption;
+    }
+
+    public void setPhotoCaption(String caption) {
+        photoCaption = caption;
+    }
+
+    public String getVideoUrl() {
+        return videoUrl;
+    }
+
+    public void setVideoUrl(String url) {
+        videoUrl = url;
+    }
+
+    public String getVideoFilename() {
+        return videoFilename;
+    }
+
+    public void setVideoFilename(String fn) {
+        videoFilename = fn;
+    }
+    
+    public String getLongitude() {
+        return mLocation.getLongitude();
+    }
+
+    public void setLongitude(String lon) {
+        mLocation.setLongitude(lon);
+    }
+
+    public String getLatitude() {
+        return mLocation.getLatitude();
+    }
+
+    public void setLatitude(String lat) {
+        mLocation.setLatitude(lat);
+    }
+
+    public String getElevation() {
+        return mLocation.getElevation();
+    }
+
+    public void setElevation(String ele) {
+        mLocation.setElevation(ele);
+    }
+
+    public String getCountry() {
+        return mLocation.getCountry();
+    }
+
+    public void setCountry(String country) {
+        mLocation.setCountry(country);
+    }
+
+    public String getState() {
+        return mLocation.getState();
+    }
+
+    public void setState(String state) {
+        mLocation.setState(state);
+    }
+
+    public String getCity() {
+        return mLocation.getCity();
+    }
+
+    public void setCity(String city) {
+        mLocation.setCity(city);
+    }
+
+    public boolean validLatLon() {
+        return mLocation.validLatLon();
+    }
+    
+    public boolean validLatLonEle() {
+        return mLocation.validLatLonEle();
+    }
 
 }

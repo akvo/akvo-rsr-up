@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -9,18 +9,21 @@
  *
  *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  See the GNU Affero General Public License included with this program for more details.
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
 package org.akvo.rsr.up.dao;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.akvo.rsr.up.domain.Country;
+import org.akvo.rsr.up.domain.Organisation;
 import org.akvo.rsr.up.domain.Project;
 import org.akvo.rsr.up.domain.Update;
 import org.akvo.rsr.up.domain.User;
@@ -42,29 +45,34 @@ import android.util.Log;
  * 
  */
 public class RsrDbAdapter {
-	public static final String PK_ID_COL = "_id";
-	public static final String TITLE_COL = "title";
+    public static final String PK_ID_COL = "_id";
+    public static final String TITLE_COL = "title";
 	public static final String SUBTITLE_COL = "subtitle";
 	public static final String SUMMARY_COL = "summary";
 	public static final String FUNDS_COL = "funds";
-	public static final String THUMBNAIL_URL_COL = "thumbnail_url";
-	public static final String THUMBNAIL_FILENAME_COL = "thumbnail_fn";
+    public static final String THUMBNAIL_URL_COL = "thumbnail_url";
+    public static final String THUMBNAIL_FILENAME_COL = "thumbnail_fn";
+    public static final String VIDEO_URL_COL = "video_url";
+    public static final String VIDEO_FILENAME_COL = "video_fn";
 	public static final String PROJECT_COL = "project";
 	public static final String USER_COL = "userid";
 	public static final String TEXT_COL = "_text";
 	public static final String DRAFT_COL = "draft";
-	public static final String UNSENT_COL = "unsent"; //currently unused
+	public static final String UNSENT_COL = "unsent";
 	public static final String HIDDEN_COL = "hidden";
 	public static final String CREATED_COL = "creation_date";
-	public static final String UUID_COL = "uuid";
+    public static final String UUID_COL = "uuid";
+    public static final String PHOTO_CREDIT_COL = "photo_credit";
+    public static final String PHOTO_CAPTION_COL = "photo_caption";
 
 	public static final String LAT_COL = "latitude";
-	public static final String LON_COL = "longitude";
+    public static final String LON_COL = "longitude";
+    public static final String ELE_COL = "elevation";
 	public static final String COUNTRY_COL = "country_id";
 	public static final String STATE_COL = "state";
 	public static final String CITY_COL = "city";
 
-	public static final String NAME_COL = "name";
+    public static final String NAME_COL = "name";
 	public static final String CONTINENT_COL = "continent";
 	public static final String ISO_CODE_COL = "iso_code";
 	
@@ -74,11 +82,17 @@ public class RsrDbAdapter {
 	public static final String EMAIL_COL = "email";
 	public static final String ORGANISATION_COL = "organisation";
 
-	private static final String TAG = "RsrDbAdapter";
+    public static final String LONG_NAME_COL = "long_name";
+    public static final String URL_COL = "url";
+
+    private static final String TAG = "RsrDbAdapter";
+	private static final boolean LOG = true;
+
 	private DatabaseHelper databaseHelper;
 	private SQLiteDatabase database;
 	
-	private static final String PROJECT_JOIN = "project LEFT OUTER JOIN country ON (project.country_id = country._id)";
+    private static final String PROJECT_JOIN = "project LEFT OUTER JOIN country ON (project.country_id = country._id)";
+    private static final String UPDATE_JOIN  = "_update LEFT OUTER JOIN country ON (_update.country_id = country._id)";
 
 	/**
 	 * Database creation sql statements
@@ -87,22 +101,27 @@ public class RsrDbAdapter {
 			"create table project (_id integer primary key, "+
 			"title text not null, subtitle text, summary text, funds real, "+
 			"thumbnail_url text, thumbnail_fn text," +
-			"longitude text, latitude text, country_id integer, state text, city text, hidden integer);";
+			"longitude text, latitude text, elevation text, country_id integer, state text, city text, hidden integer);";
 	private static final String UPDATE_TABLE_CREATE =
 			"create table _update (_id integer primary key, project integer not null, userid integer not null, "+
 			"title text not null, _text text, location text, uuid text,"+
-			"thumbnail_url text, thumbnail_fn text," +
+            "thumbnail_url text, thumbnail_fn text," +
+            "video_url text, video_fn text," +
+            "photo_caption text, photo_credit text," +
 			"draft integer, unsent integer," +
-			CREATED_COL + " INTEGER NOT NULL DEFAULT (strftime('%s','now'))" +
-			");";
+			CREATED_COL + " INTEGER NOT NULL DEFAULT (strftime('%s','now'))," +
+			"longitude text, latitude text, country_id integer, state text, city text, elevation text);";
 	private static final String COUNTRY_TABLE_CREATE =
 			"create table country (_id integer primary key, "+
 			"name text not null, continent text, "+
 			"iso_code text);";
-	private static final String USER_TABLE_CREATE =
-			"create table user (_id integer primary key, "+
-			"username text, organisation integer, "+
-			"first_name text, last_name text, email text);";
+    private static final String USER_TABLE_CREATE =
+            "create table user (_id integer primary key, "+
+            "username text, organisation integer, "+
+            "first_name text, last_name text, email text);";
+    private static final String ORG_TABLE_CREATE =
+            "create table _organisation (_id integer primary key, "+
+            "name text, long_name text, email text, url text)";
 
 	private static final String[] DEFAULT_PROJECT_INSERTS = new String[] {
 //		"insert into project values(1,'Sample Proj1', 'Sample proj 1 subtitle', 'sum1', 4711.00, 'url1', 'fn1')",
@@ -113,7 +132,8 @@ public class RsrDbAdapter {
 	private static final String PROJECT_TABLE = "project";
 	private static final String UPDATE_TABLE  = "_update";
 	private static final String COUNTRY_TABLE = "country";
-	private static final String USER_TABLE    = "user";
+    private static final String USER_TABLE    = "user";
+    private static final String ORG_TABLE     = "_organisation";
 
 //	private static final int DATABASE_VERSION = 5;
 //	private static final int DATABASE_VERSION = 6; //added project columns:long, lat, country, state, city
@@ -122,7 +142,10 @@ public class RsrDbAdapter {
 //	private static final int DATABASE_VERSION = 9; //added update.creation_date
 //	private static final int DATABASE_VERSION = 10; //added update.user and user table
 //	private static final int DATABASE_VERSION = 11; //user columns attribute change
-	private static final int DATABASE_VERSION = 12; //uuid for updates
+//  private static final int DATABASE_VERSION = 12; //uuid for updates
+//  private static final int DATABASE_VERSION = 13; //org table
+//  private static final int DATABASE_VERSION = 14; //update now has photo metadata and video
+    private static final int DATABASE_VERSION = 15; //update now has location
 
 	private final Context context;
 
@@ -150,7 +173,8 @@ public class RsrDbAdapter {
 			db.execSQL(PROJECT_TABLE_CREATE);
 			db.execSQL(UPDATE_TABLE_CREATE);
 			db.execSQL(COUNTRY_TABLE_CREATE);
-			db.execSQL(USER_TABLE_CREATE);
+            db.execSQL(USER_TABLE_CREATE);
+            db.execSQL(ORG_TABLE_CREATE);
 			for (int i = 0; i < DEFAULT_PROJECT_INSERTS.length; i++) {
 				db.execSQL(DEFAULT_PROJECT_INSERTS[i]);
 			}			
@@ -162,14 +186,33 @@ public class RsrDbAdapter {
 					+ newVersion);
 
 			
-			if (oldVersion < DATABASE_VERSION) { //start over fresh, consider everything to be a cache
-				db.execSQL("DROP TABLE IF EXISTS " + PROJECT_TABLE);
-				db.execSQL("DROP TABLE IF EXISTS " + UPDATE_TABLE);
-				db.execSQL("DROP TABLE IF EXISTS " + COUNTRY_TABLE);
-				db.execSQL("DROP TABLE IF EXISTS " + USER_TABLE);
-				onCreate(db);
-			}			
-			
+            if (oldVersion < 12) { //prereleases only, start over fresh, consider everything to be a cache
+                db.execSQL("DROP TABLE IF EXISTS " + PROJECT_TABLE);
+                db.execSQL("DROP TABLE IF EXISTS " + UPDATE_TABLE);
+                db.execSQL("DROP TABLE IF EXISTS " + COUNTRY_TABLE);
+                db.execSQL("DROP TABLE IF EXISTS " + USER_TABLE);
+                db.execSQL("DROP TABLE IF EXISTS " + ORG_TABLE);
+                onCreate(db);
+            } else {
+                if (oldVersion < 13) { //need an org table
+                    db.execSQL(ORG_TABLE_CREATE);
+                }           
+
+                if (oldVersion < 14) { //more update columns
+                    db.execSQL("alter table " + UPDATE_TABLE + " add column video_url text");
+                    db.execSQL("alter table " + UPDATE_TABLE + " add column video_fn text");
+                    db.execSQL("alter table " + UPDATE_TABLE + " add column photo_caption text");
+                    db.execSQL("alter table " + UPDATE_TABLE + " add column photo_credit text");
+                }
+                if (oldVersion < 15) { //more update columns
+                    db.execSQL("alter table " + UPDATE_TABLE + " add column longitude text");
+                    db.execSQL("alter table " + UPDATE_TABLE + " add column latitude text");
+                    db.execSQL("alter table " + UPDATE_TABLE + " add column elevation text");
+                    db.execSQL("alter table " + UPDATE_TABLE + " add column state text");
+                    db.execSQL("alter table " + UPDATE_TABLE + " add column city text");
+                    db.execSQL("alter table " + UPDATE_TABLE + " add column country_id integer");
+                }
+            }
 			/*
 			if (oldVersion < 57) {
 				db.execSQL("DROP TABLE IF EXISTS " + RESPONSE_TABLE);
@@ -311,6 +354,7 @@ public class RsrDbAdapter {
 	 *             if the database could be neither opened or created
 	 */
 	public RsrDbAdapter open() throws SQLException {
+	    if (LOG) Log.d(TAG, "Opening DB");
 		databaseHelper = new DatabaseHelper(context);
 		database = databaseHelper.getWritableDatabase();
 		return this;
@@ -320,6 +364,7 @@ public class RsrDbAdapter {
 	 * close the db
 	 */
 	public void close() {
+        if (LOG) Log.d(TAG, "Closing DB");
 		databaseHelper.close();
 	}
 
@@ -443,12 +488,24 @@ public class RsrDbAdapter {
 		updatedValues.put(TEXT_COL, update.getText());
 		updatedValues.put(USER_COL, update.getUserId());
 		updatedValues.put(UUID_COL, update.getUuid());
-		updatedValues.put(THUMBNAIL_URL_COL, update.getThumbnailUrl());
+        updatedValues.put(THUMBNAIL_URL_COL, update.getThumbnailUrl());
+        updatedValues.put(VIDEO_URL_COL, update.getVideoUrl());
 		//not always done here to preserve a cache connection
 		if (saveFn) {
-			updatedValues.put(THUMBNAIL_FILENAME_COL, update.getThumbnailFilename());
+            updatedValues.put(THUMBNAIL_FILENAME_COL, update.getThumbnailFilename());
+            updatedValues.put(VIDEO_FILENAME_COL, update.getVideoFilename());
 		}
-		updatedValues.put(DRAFT_COL, update.getDraft()?"1":"0");
+        updatedValues.put(PHOTO_CAPTION_COL, update.getPhotoCaption());
+        updatedValues.put(PHOTO_CREDIT_COL, update.getPhotoCredit());
+
+        updatedValues.put(COUNTRY_COL, update.getLocation().getCountryId());
+        updatedValues.put(STATE_COL, update.getState());
+        updatedValues.put(CITY_COL, update.getCity());
+        updatedValues.put(LAT_COL, update.getLatitude());
+        updatedValues.put(LON_COL, update.getLongitude());
+        updatedValues.put(ELE_COL, update.getElevation());
+
+        updatedValues.put(DRAFT_COL, update.getDraft()?"1":"0");
 		updatedValues.put(UNSENT_COL, update.getUnsent()?"1":"0");
 		updatedValues.put(CREATED_COL, update.getDate().getTime()/1000); //1-second precision only
 
@@ -478,29 +535,21 @@ public class RsrDbAdapter {
 	 * @param old_id
 	 * @return
 	 */
-	public void updateUpdateIdSent(Update update, String old_id) {
+	public boolean updateUpdateIdSent(Update update, String old_id) {
 		ContentValues updatedValues = new ContentValues();
 		updatedValues.put(PK_ID_COL, update.getId());
 		updatedValues.put(UNSENT_COL, update.getUnsent()?"1":"0");
 		updatedValues.put(DRAFT_COL, update.getDraft()?"1":"0");
 
-		Cursor cursor = database.query(UPDATE_TABLE,
-				new String[] { PK_ID_COL },
-				PK_ID_COL + " = ?",
-				new String[] { old_id, },
-				null, null, null);
-
-		if (cursor != null && cursor.getCount() > 0) {
-			// if we found an item, it's an update, otherwise, it's an error
-			database.update(UPDATE_TABLE, updatedValues, PK_ID_COL + " = ?",
-					new String[] { old_id });
-		} else {
-			Log.e(TAG, "Tried to update id/sent sts of nonexistent update " + old_id);
-		}
-
-		if (cursor != null) {
-			cursor.close();
-		}
+		// if we change exactly one item, we are good
+		int rowsAffected = database.update(UPDATE_TABLE, updatedValues, PK_ID_COL + " = ?",
+		        new String[] { old_id });
+        if (rowsAffected == 1) {
+            return true;
+        } else {
+            Log.e(TAG, "Tried to update id/sent/draft sts of nonexistent update " + old_id);
+            return false;
+        }
 	}
 
 	
@@ -543,9 +592,10 @@ public class RsrDbAdapter {
 	/*
 	 *  Clear the local filenames of all updates
 	 */
-	public void clearUpdateThumbnailFiles() {
+	public void clearUpdateMediaFiles() {
 		ContentValues updatedValues = new ContentValues();
-		updatedValues.putNull(THUMBNAIL_FILENAME_COL);
+        updatedValues.putNull(THUMBNAIL_FILENAME_COL);
+        updatedValues.putNull(VIDEO_FILENAME_COL);
 		database.update(UPDATE_TABLE, updatedValues, null, null);
 	}
 
@@ -575,7 +625,7 @@ public class RsrDbAdapter {
 	/**
 	 * Gets updates for a specific project, all columns
 	 */
-	public Cursor listAllVisibleProjects() {
+	public Cursor listVisibleProjects() {
 		Cursor cursor = database.query(PROJECT_TABLE,
 										null,
 										HIDDEN_COL + " = ?",
@@ -588,19 +638,59 @@ public class RsrDbAdapter {
 	}
 
 
-	/**
-	 * Gets all projects, all columns and country data
-	 */
-	public Cursor listAllProjectsWithCountry() {
-		Cursor cursor = database.query(PROJECT_JOIN,
-										null,
-										null,
-										null,
-										null,
-										null,
-										null);
-		return cursor;
-	}
+    /**
+     * Gets all projects, all columns and country data
+     */
+    public Cursor listAllProjectsWithCountry() {
+        Cursor cursor = database.query(PROJECT_JOIN,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null);
+        return cursor;
+    }
+
+
+    /**
+     * Gets visible projects, all columns and country data
+     */
+    public Cursor listVisibleProjectsWithCountry() {
+        Cursor cursor = database.query(PROJECT_JOIN,
+                new String[] { "project._id", "project.title", "project.hidden", "project.thumbnail_url", "project.thumbnail_fn", "country.name", "country.continent" },
+                HIDDEN_COL + " = ?",
+                new String[] { "0" },
+                null,
+                null,
+                null);
+        return cursor;
+    }
+
+
+    /**
+     * Gets visible projects, all columns and country data
+     * where project title or country name or continent matches the search string
+     */
+    public Cursor listVisibleProjectsWithCountryMatching(String search) {
+        //Prevent any SQL injection problems
+        /* probably not necessary
+        search = search.replaceAll("\"", " ");
+        search = search.replaceAll("'", " ");
+        search = search.replaceAll("(", " ");
+        search = search.replaceAll(")", " ");
+        search = search.replaceAll(",", " ");
+        */
+        //Match caseless, assume country or continent is present in entirety
+        Cursor cursor = database.query(PROJECT_JOIN,
+                new String[] { "project._id", "project.title", "project.hidden", "project.thumbnail_url", "project.thumbnail_fn", "country.name", "country.continent" },
+                HIDDEN_COL + " = ? AND ( title LIKE ? OR name LIKE ? OR continent LIKE ? OR project._id = ?)",
+                new String[] { "0", "%" + search + "%", search, search, search },
+                null,
+                null,
+                null);
+        return cursor;
+    }
 
 
 	/**
@@ -649,7 +739,7 @@ public class RsrDbAdapter {
 	}
 
 	/**
-	 * Gets updates for a specific project, all columns
+	 * Gets unsent updates, all columns
 	 */
 	public Cursor listAllUpdatesUnsent() {
 		Cursor cursor = database.query(UPDATE_TABLE,
@@ -694,28 +784,94 @@ public class RsrDbAdapter {
 
 
 	/**
-	 * gets users that are referenced by updates but not loaded
-	 * 
-	 * query crashes with NullPointerException if update table is empty
-	 */
-	public Cursor listMissingUsers() {
-	    try {
-    		Cursor cursor = database.query(true, //distinct
-    										"_update LEFT JOIN user ON (userid = user._id)",
-    										new String[] {"userid", "user._id"},
-    										"user._id IS NULL",
-    										null,//selection vals
-    										"userid",
-    										null,
-    										null,
-    										null);
-    
-    		return cursor;
-	    }
-	    catch (NullPointerException e) {
-	        return null;
-	    }
-	}
+     * Gets all users, all columns
+     */
+    public Cursor listAllUsers() {
+        Cursor cursor = database.query(USER_TABLE,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null);
+        return cursor;
+    }
+
+
+
+    /**
+     * gets users that are referenced by updates but not loaded
+     * 
+     * query crashes with NullPointerException if update table is empty
+     * always returns at least an empty list, not null
+     */
+    public List<String> getMissingUsersList() {
+        List<String> idList = new ArrayList<String>();  
+        try {
+            Cursor cursor = database.query(true, //distinct
+                                            "_update LEFT JOIN user ON (userid = user._id)",
+                                            new String[] {"userid", "user._id"},
+                                            "user._id IS NULL",
+                                            null,//selection vals
+                                            "userid",
+                                            null,
+                                            null,
+                                            null);
+            int c = cursor.getColumnIndex("userid");
+            while (cursor.moveToNext()) {
+                idList.add(cursor.getString(c));
+            }
+            cursor.close();
+        }
+        catch (NullPointerException e) {
+        }
+        return idList;
+    }
+
+
+    /**
+     * Gets all orgs, all columns
+     */
+    public Cursor listAllOrgs() {
+        Cursor cursor = database.query(ORG_TABLE,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null,
+                                        null);
+        return cursor;
+    }
+
+
+    /**
+     * gets orgs that are referenced by users but not loaded
+     * 
+     * query might crash with NullPointerException if user table is empty
+     * always return at least an empty list, not null
+     */
+    public List<String> getMissingOrgsList() {
+        List<String> idList = new ArrayList<String>();  
+        try {
+            Cursor cursor = database.query(true, //distinct
+                                            "user LEFT JOIN _organisation ON (organisation = _organisation._id)",
+                                            new String[] {"organisation", "_organisation._id"},
+                                            "(organisation NOT NULL) AND (_organisation._id IS NULL)",
+                                            null,//selection vals
+                                            "organisation",
+                                            null,
+                                            null,
+                                            null);
+            int c = cursor.getColumnIndex("organisation");
+            while (cursor.moveToNext()) {
+                idList.add(cursor.getString(c));
+            }
+            cursor.close();
+        }
+        catch (NullPointerException e) {
+        }
+        return idList;
+    }
 
 
 	/**
@@ -755,30 +911,39 @@ public class RsrDbAdapter {
 	 * Gets a single update from the db using its primary key
 	 */
 	public Update findUpdate(String _id) {
-		Update update = null;
-		Cursor cursor = database.query(UPDATE_TABLE,
-										null,
-										PK_ID_COL + " = ?",
+	    Update update = null;
+		Cursor cursor = database.query(UPDATE_JOIN,
+										null, //all columns
+										"_update._id = ?",
 										new String[] { _id }, null, null, null);
 		if (cursor != null) {
-			if (cursor.getCount() > 0) {
-				cursor.moveToFirst();
-				update = new Update();
+		    if (cursor.moveToFirst()) {
+		        update = new Update();
 				update.setId(_id);
 				update.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(TITLE_COL)));
 				update.setProjectId(cursor.getString(cursor.getColumnIndexOrThrow(PROJECT_COL)));
 				update.setText(cursor.getString(cursor.getColumnIndexOrThrow(TEXT_COL)));
 				update.setUuid(cursor.getString(cursor.getColumnIndexOrThrow(UUID_COL)));
 				update.setUserId(cursor.getString(cursor.getColumnIndexOrThrow(USER_COL)));
-				update.setThumbnailUrl(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_URL_COL)));
-				update.setThumbnailFilename(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_FILENAME_COL)));
+                update.setThumbnailUrl(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_URL_COL)));
+                update.setThumbnailFilename(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_FILENAME_COL)));
+                update.setVideoUrl(cursor.getString(cursor.getColumnIndexOrThrow(VIDEO_URL_COL)));
+                update.setVideoFilename(cursor.getString(cursor.getColumnIndexOrThrow(VIDEO_FILENAME_COL)));
+                update.setPhotoCaption(cursor.getString(cursor.getColumnIndexOrThrow(PHOTO_CAPTION_COL)));
+                update.setPhotoCredit(cursor.getString(cursor.getColumnIndexOrThrow(PHOTO_CREDIT_COL)));
 				update.setDraft(0 != cursor.getInt(cursor.getColumnIndexOrThrow(DRAFT_COL)));
 				update.setUnsent(0 != cursor.getInt(cursor.getColumnIndexOrThrow(UNSENT_COL)));
 				update.setDate(new Date(1000 * cursor.getLong(cursor.getColumnIndexOrThrow(CREATED_COL))));
-				}
+                update.setCountry(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
+                update.getLocation().setCountryId(cursor.getString(cursor.getColumnIndexOrThrow(COUNTRY_COL)));
+				update.setState(cursor.getString(cursor.getColumnIndexOrThrow(STATE_COL)));
+				update.setCity(cursor.getString(cursor.getColumnIndexOrThrow(CITY_COL)));
+				update.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(LAT_COL)));
+                update.setLongitude(cursor.getString(cursor.getColumnIndexOrThrow(LON_COL)));
+                update.setElevation(cursor.getString(cursor.getColumnIndexOrThrow(ELE_COL)));
+			}
 			cursor.close();
-		}
-
+		    }
 		return update;
 	}
 
@@ -841,68 +1006,128 @@ public class RsrDbAdapter {
 	}
 
 	
-	/**
-	 * Gets a single user from the db using its primary key
-	 */
-	public User findUser(String _id) {
-		User user = null;
-		Cursor cursor = database.query(USER_TABLE,
-									   null,
-									   "_id = ?",
-									   new String[] { _id }, null, null, null);
-		if (cursor != null) {
-			if (cursor.getCount() > 0) {
-				cursor.moveToFirst();
-				user = new User();
-				user.setId(_id); //no confusion with country id
-				user.setUsername(cursor.getString(cursor.getColumnIndexOrThrow(USERNAME_COL)));
-				user.setFirstname(cursor.getString(cursor.getColumnIndexOrThrow(FIRST_NAME_COL)));
-				user.setLastname(cursor.getString(cursor.getColumnIndexOrThrow(LAST_NAME_COL)));
-				user.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(EMAIL_COL)));
-				user.setOrgId(cursor.getString(cursor.getColumnIndexOrThrow(ORGANISATION_COL)));
-				}
-			cursor.close();
-			}
+    /**
+     * Gets a single user from the db using its primary key
+     */
+    public User findUser(String _id) {
+        User user = null;
+        Cursor cursor = database.query(USER_TABLE,
+                                       null,
+                                       "_id = ?",
+                                       new String[] { _id }, null, null, null);
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                user = new User();
+                user.setId(_id); //no confusion with country id
+                user.setUsername(cursor.getString(cursor.getColumnIndexOrThrow(USERNAME_COL)));
+                user.setFirstname(cursor.getString(cursor.getColumnIndexOrThrow(FIRST_NAME_COL)));
+                user.setLastname(cursor.getString(cursor.getColumnIndexOrThrow(LAST_NAME_COL)));
+                user.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(EMAIL_COL)));
+                user.setOrgId(cursor.getString(cursor.getColumnIndexOrThrow(ORGANISATION_COL)));
+                }
+            cursor.close();
+            }
 
-		return user;
-	}
+        return user;
+    }
 
 
-	/**
-	* creates or updates a user in the db
-	*
-	* @param user
-	* @return
-	*/
-	public void saveUser(User user) {
-		ContentValues updatedValues = new ContentValues();
-		updatedValues.put(PK_ID_COL, user.getId());
-		updatedValues.put(USERNAME_COL, user.getUsername());
-		updatedValues.put(FIRST_NAME_COL, user.getFirstname());
-		updatedValues.put(LAST_NAME_COL, user.getLastname());
-		updatedValues.put(EMAIL_COL, user.getEmail());
-		updatedValues.put(ORGANISATION_COL, user.getOrgId());
-		
-		Cursor cursor = database.query(USER_TABLE,
-										new String[] { PK_ID_COL },
-										PK_ID_COL + " = ?",
-										new String[] { user.getId(), },
-										null, null, null);
-		
-		if (cursor != null && cursor.getCount() > 0) {
-			// if we found an item, it's an update, otherwise, it's an insert
-			database.update(USER_TABLE, updatedValues, PK_ID_COL + " = ?",
-					new String[] { user.getId() });
-		} else {
-			database.insert(USER_TABLE, null, updatedValues);
-		}
-		
-		if (cursor != null) {
-			cursor.close();
-		}
-	}
+    /**
+    * creates or updates a user in the db
+    *
+    * @param user
+    * @return
+    */
+    public void saveUser(User user) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(PK_ID_COL, user.getId());
+        updatedValues.put(USERNAME_COL, user.getUsername());
+        updatedValues.put(FIRST_NAME_COL, user.getFirstname());
+        updatedValues.put(LAST_NAME_COL, user.getLastname());
+        updatedValues.put(EMAIL_COL, user.getEmail());
+        updatedValues.put(ORGANISATION_COL, user.getOrgId());
+        
+        Cursor cursor = database.query(USER_TABLE,
+                                        new String[] { PK_ID_COL },
+                                        PK_ID_COL + " = ?",
+                                        new String[] { user.getId(), },
+                                        null, null, null);
+        
+        if (cursor != null && cursor.getCount() > 0) {
+            // if we found an item, it's an update, otherwise, it's an insert
+            database.update(USER_TABLE, updatedValues, PK_ID_COL + " = ?",
+                    new String[] { user.getId() });
+        } else {
+            database.insert(USER_TABLE, null, updatedValues);
+        }
+        
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
 
-	
+    
+    /**
+     * Gets a single user from the db using its primary key
+     */
+    public Organisation findOrganisation(String _id) {
+        Organisation org = null;
+        Cursor cursor = database.query(ORG_TABLE,
+                                       null,
+                                       "_id = ?",
+                                       new String[] { _id }, null, null, null);
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                org = new Organisation();
+                org.setId(_id);
+                org.setName(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
+                org.setLongName(cursor.getString(cursor.getColumnIndexOrThrow(LONG_NAME_COL)));
+                org.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(EMAIL_COL)));
+                org.setUrl(cursor.getString(cursor.getColumnIndexOrThrow(URL_COL)));
+                }
+            cursor.close();
+            }
+
+        return org;
+    }
+
+
+    /**
+    * creates or updates a user in the db
+    *
+    * @param org
+    * @return
+    */
+    public void saveOrganisation(Organisation org) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(PK_ID_COL, org.getId());
+        updatedValues.put(NAME_COL, org.getName());
+        updatedValues.put(LONG_NAME_COL, org.getLongName());
+        updatedValues.put(EMAIL_COL, org.getEmail());
+        updatedValues.put(URL_COL, org.getUrl());
+        
+        Cursor cursor = database.query(ORG_TABLE,
+                                        new String[] { PK_ID_COL },
+                                        PK_ID_COL + " = ?",
+                                        new String[] { org.getId(), },
+                                        null, null, null);
+        
+        if (cursor != null && cursor.getCount() > 0) {
+            // if we found an item, it's an update, otherwise, it's an insert
+            database.update(ORG_TABLE, updatedValues, PK_ID_COL + " = ?",
+                    new String[] { org.getId() });
+        } else {
+            database.insert(ORG_TABLE, null, updatedValues);
+        }
+        
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
+
+    
 
 	
 	
@@ -920,14 +1145,15 @@ public class RsrDbAdapter {
 
 
 	/**
-	 * permanently deletes all projects, updates, users and countries
+	 * permanently deletes all records
 	 * from the database
 	 */
 	public void clearAllData() {
-		executeSql("delete from project");
-        executeSql("delete from _update");
-        executeSql("delete from user");
-        executeSql("delete from country");
+	    executeSql("delete from " + UPDATE_TABLE);
+	    executeSql("delete from " + USER_TABLE);
+	    executeSql("delete from " + ORG_TABLE);
+	    executeSql("delete from " + PROJECT_TABLE);
+	    executeSql("delete from " + COUNTRY_TABLE);
 	}
 
 	public Cursor listAllCountries() {

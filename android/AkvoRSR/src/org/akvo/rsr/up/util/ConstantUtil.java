@@ -9,7 +9,7 @@
  *
  *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
+ *  See the GNU Affero General Public License included with this program for more details.
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
@@ -30,19 +30,23 @@ public class ConstantUtil {
 	 */
 	public static final String TEST_HOST = "http://rsr.uat.akvo.org";
 	public static final String LIVE_HOST = "http://rsr.akvo.org";
-	public static final String PWD_URL = "/accounts/password/reset/";
+	public static final String PWD_URL = "/sign_in/";
 	public static final String AUTH_URL = "/auth/token/";
 	public static final String API_KEY_PATTERN = "&api_key=%s&username=%s";
-	public static final String POST_UPDATE_URL = "/api/v1/project_update/?format=xml";
-	public static final String VERIFY_UPDATE_PATTERN = "/api/v1/project_update/?format=xml&uuid=%s&limit=2";
+//    public static final String POST_UPDATE_URL = "/api/v1/project_update/?format=xml";
+    public static final String POST_UPDATE_URL = "/rest/v1/project_update/?format=xml";
+    public static final String FETCH_UPDATE_URL_PATTERN = "/rest/v1/project_update/?format=xml&limit=1000&project=%s"; // /api/v1/project_update/?format=xml&limit=0&project=
+//    public static final String VERIFY_UPDATE_PATTERN = "/api/v1/project_update/?format=xml&uuid=%s&limit=2";
+    public static final String VERIFY_UPDATE_PATTERN = "/rest/v1/project_update/?format=xml&uuid=%s&limit=2";
 	public static final String FETCH_PROJ_URL_PATTERN = "/api/v1/project/?format=xml&limit=0&partnerships__organisation=%s";
 	public static final String FETCH_COUNTRIES_URL = "/api/v1/country/?format=xml&limit=0";
 	public static final String FETCH_PROJ_COUNT_URL = "/api/v1/project/?format=xml&limit=0&partnerships__organisation=%s";
 	public static final String PROJECT_PATH_PATTERN = "/api/v1/project/%s/";
 	public static final String USER_PATH_PATTERN= "/api/v1/user/%s/";
-	public static final String FETCH_USER_URL_PATTERN = "/api/v1/user/%s/?format=xml&depth=1";
+    public static final String FETCH_USER_URL_PATTERN = "/api/v1/user/%s/?format=xml&depth=1";
+    public static final String FETCH_ORG_URL_PATTERN = "/api/v1/organisation/%s/?format=xml&depth=0";
 	public static final int    MAX_IMAGE_UPLOAD_SIZE = 2000000; //Nginx POST limit is 3MB, B64 encoding expands 33% and there may be long text 
-
+	public static final String SERVER_VERSION_HEADER = "X-RSR-Version";
 	/**
 	 * file system constants
 	 */
@@ -50,9 +54,9 @@ public class ConstantUtil {
 	public static final String JPG_SUFFIX = ".jpg";
 //	public static final String TOP_DIR = "/akvorsr/";
 	public static final String PHOTO_DIR = "/akvorsr/photos/";
-	public static final String IMAGECACHE_DIR = "/akvorsr/imagecache/";
-	
-	
+    public static final String IMAGECACHE_DIR = "/akvorsr/imagecache/";
+    public static final String LOG_FILE_NAME = "error_messages.txt";
+
 	/**
 	 * status related constants
 	 */
@@ -98,6 +102,7 @@ public class ConstantUtil {
     public static final String PROJECTS_FETCHED_ACTION = "org.akvo.rsr.up.PROJECTS_FETCHED";
     public static final String PROJECTS_PROGRESS_ACTION = "org.akvo.rsr.up.PROJECTS_PROGRESS";
     public static final String UPDATES_SENT_ACTION = "org.akvo.rsr.up.UPDATES_SENT";
+    public static final String UPDATES_SENDPROGRESS_ACTION = "org.akvo.rsr.up.UPDATES_PROGRESS";
     public static final String UPDATES_VERIFIED_ACTION = "org.akvo.rsr.up.UPDATES_VERIFIED";
     public static final String AUTHORIZATION_RESULT_ACTION = "org.akvo.rsr.up.AUTHORIZATION_RESULT";
 

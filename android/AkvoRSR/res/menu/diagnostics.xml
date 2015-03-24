@@ -1,0 +1,17 @@
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:upapp="http://schemas.android.com/apk/res-auto"
+    >
+<!-- 
+    <item android:id="@+id/action_clear_diagnostics"
+        android:title="@string/action_delete_update"
+        android:icon="@drawable/ic_menu_close_clear_cancel"
+        upapp:showAsAction="ifRoom"        
+        />
+    <item android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:icon="@drawable/ic_menu_settings_holo_light"        
+        upapp:showAsAction="ifRoom"        
+        />
+     -->
+</menu>
