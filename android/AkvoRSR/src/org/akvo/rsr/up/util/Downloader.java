@@ -113,7 +113,7 @@ public class Downloader {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public void fetchProject(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
+	public void fetchProject(Context ctx, RsrDbAdapter dba, URL url) throws ParserConfigurationException, SAXException, IOException {
 
         User user = SettingsUtil.getAuthUser(ctx);
         HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
@@ -134,11 +134,13 @@ public class Downloader {
             xr.parse(new InputSource(h.stream()));
     		/* Parsing has finished. */
     		Project proj  = myHandler.getProject();
-    		if (proj != null){
+    		if (proj != null) {
+    		    dba.saveProject(proj);
     	        Log.i(TAG, "Fetched project #" + proj.getId());
-    		} 
-    		/* Check what went wrong. */
-    		err = myHandler.getError();
+    		} else {
+                Log.e(TAG, "Fetch update failed:" + myHandler.getError());
+    		    
+    		}
         } else {
             //Vanilla case is 403 forbidden on an auth failure
             Log.e(TAG, "Fetch update list HTTP error code:" + code);
