@@ -78,6 +78,7 @@ public class GetProjectDataService extends IntentService {
                 //Iterate over projects instead of using a complex query URL, since it can take so long that the proxy times out
                 for (String id : user.getPublishedProjIds()) {
                     dl.fetchProject(this,
+                                    ad, 
                                     new URL(SettingsUtil.host(this) +
                                             String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN,id)));
                     broadcastProgress(0, i++, projects);
