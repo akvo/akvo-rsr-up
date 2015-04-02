@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -66,12 +66,18 @@ public class ProjectListActivity extends ActionBarActivity {
 	private ListView mList;
     private TextView mEmptyText;
     private TextView mFirstTimeText;
+    private TextView mUnemployedText;
 	private BroadcastReceiver broadRec;
     private Button searchButton;
+
+    private boolean mEmployed; //False if user is not employed with any organisation
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	    //employment can for now only change at login, so assign it for life of activity
+	    mEmployed = SettingsUtil.getAuthUser(this).getOrgIds().size() > 0;
+	    
+	    super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_project_list);
 
         projCountLabel = (TextView) findViewById(R.id.projcountlabel);
@@ -83,6 +89,7 @@ public class ProjectListActivity extends ActionBarActivity {
         mList = (ListView) findViewById(R.id.list_projects);
         mEmptyText = (TextView) findViewById(R.id.list_empty_text);
         mFirstTimeText = (TextView) findViewById(R.id.first_time_text);
+        mUnemployedText = (TextView) findViewById(R.id.unemployed_text);
         mList.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
@@ -247,17 +254,25 @@ public class ProjectListActivity extends ActionBarActivity {
 		}
 		if (count == 0) { //no records, but why?
             mList.setVisibility(View.GONE);
+            if (!mEmployed) {
+                mEmptyText.setVisibility(View.GONE);
+                mFirstTimeText.setVisibility(View.GONE);
+                mUnemployedText.setVisibility(View.VISIBLE);
+            } else
             if (searchString == null || searchString.length() == 0) { //must be empty DB
                 mEmptyText.setVisibility(View.GONE);
                 mFirstTimeText.setVisibility(View.VISIBLE);
+                mUnemployedText.setVisibility(View.GONE);
             } else { //too filtered
                 mEmptyText.setVisibility(View.VISIBLE);
                 mFirstTimeText.setVisibility(View.GONE);
+                mUnemployedText.setVisibility(View.GONE);
             }
 		} else {
 		    mList.setVisibility(View.VISIBLE);
             mEmptyText.setVisibility(View.GONE);
             mFirstTimeText.setVisibility(View.GONE);
+            mUnemployedText.setVisibility(View.GONE);
 		}
 		//Populate list view
 		ProjectListCursorAdapter projects = new ProjectListCursorAdapter(this, dataCursor);
@@ -270,10 +285,14 @@ public class ProjectListActivity extends ActionBarActivity {
 	 * starts the service fetching new project data
 	 */
 	private void startGetProjectsService() {
+        if (!mEmployed) { //TODO should disable menu choice instead
+            return; //fetch would fail
+        }
+        
         if (GetProjectDataService.isRunning(this)) { //TODO should disable menu choice instead
             return; //only one at a time
         }
-	    
+        
 		//TODO: disable menu choice
 		//start a service		
 		Intent i = new Intent(this, GetProjectDataService.class);

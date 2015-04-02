@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -30,12 +30,9 @@ import org.akvo.rsr.up.util.Downloader;
 import org.akvo.rsr.up.util.FileUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
 
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningServiceInfo;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -55,18 +52,14 @@ public class GetProjectDataService extends IntentService {
 	
     public static boolean isRunning(Context context) {
 	    return mRunning;
-	    /* this solution uses an interface documented as intended for debug use
-	    ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (GetProjectDataService.class.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
-        */
     }
 	
 	
+
+    /**
+     * Fetch data from server.
+     * TODO: Send the object type as a string in the broadcastProgress call so we can have that displayed as part of the progress bar.
+     */
     @Override
     protected void onHandleIntent(Intent intent) {
         mRunning = true;
@@ -77,38 +70,32 @@ public class GetProjectDataService extends IntentService {
         String host = SettingsUtil.host(this);
 
         ad.open();
+        User user = SettingsUtil.getAuthUser(this);
         try {
             try {
-                dl.fetchProjectList(this,
-                        new URL(SettingsUtil.host(this) +
-                                String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN,
-                                        SettingsUtil.Read(this, "authorized_orgid"))));
-                broadcastProgress(0, 50, 100);
+                int i = 0;
+                int projects = user.getPublishedProjIds().size();
+                //Iterate over projects instead of using a complex query URL, since it can take so long that the proxy times out
+                for (String id : user.getPublishedProjIds()) {
+                    dl.fetchProject(this,
+                                    new URL(SettingsUtil.host(this) +
+                                            String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN,id)));
+                    broadcastProgress(0, i++, projects);
+                }
                 if (mFetchCountries) {
-                    // TODO: rarely changes, so only fetch countries if we never
-                    // did that
+                    // TODO: rarely changes, so only fetch countries if we never did that
                     dl.fetchCountryList(this, new URL(SettingsUtil.host(this) +
                             String.format(ConstantUtil.FETCH_COUNTRIES_URL)));
                 }
                 broadcastProgress(0, 100, 100);
 
                 if (mFetchUpdates) {
-                    // We only get published projects from that URL,
-                    // so we need to iterate on them and get corresponding updates
-                    Cursor c = ad.listAllProjects();
-                    try {
-                        int i = 0;
-                        while (c.moveToNext()) {
-                            i++;
-                            String projId = c.getString(c.getColumnIndex(RsrDbAdapter.PK_ID_COL));
-                            dl.fetchUpdateListRestApi(this, //TODO: use _extra for fewer fetches, as country and user is included
-                                    new URL(host + String.format(ConstantUtil.FETCH_UPDATE_URL_PATTERN, projId))                                            
-                                    );
-                            broadcastProgress(1, i, c.getCount());
-                        }
-                    } finally {
-                        if (c != null)
-                            c.close();
+                    int j = 0;
+                    for (String projId : user.getPublishedProjIds()) {
+                        dl.fetchUpdateListRestApi(this, //TODO: use _extra for fewer fetches, as country and user data is included
+                            new URL(host + String.format(ConstantUtil.FETCH_UPDATE_URL_PATTERN, projId))                                            
+                        );
+                        broadcastProgress(1, j++, projects);
                     }
                 }
 
@@ -120,13 +107,12 @@ public class GetProjectDataService extends IntentService {
                 errMsg = getResources().getString(R.string.errmsg_update_fetch_failed) + e.getMessage();
             }
 
-            if (mFetchUsers) {
+            if (mFetchUsers) { //Remove this once we use the _extra update API
                 // Fetch missing user data for authors of the updates.
                 // This API requires authorization
-                User user = SettingsUtil.getAuthUser(this);
                 String key = String.format(Locale.US, ConstantUtil.API_KEY_PATTERN,
                         user.getApiKey(), user.getUsername());
-                int j = 0;
+//                int k = 0;
                 List<String> orgIds = ad.getMissingUsersList();
                 for (String id : orgIds) {
                     try {
@@ -139,7 +125,7 @@ public class GetProjectDataService extends IntentService {
                                         key),
                                 id
                                 );
-                        j++;
+//                        k++;
                     } catch (FileNotFoundException e) {
                         // possibly because user is no longer active
                         Log.w(TAG, "Cannot find user:" + id);

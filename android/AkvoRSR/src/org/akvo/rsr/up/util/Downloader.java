@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -33,11 +33,13 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
+import org.akvo.rsr.up.domain.Project;
 import org.akvo.rsr.up.domain.Update;
 import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.xml.AuthHandler;
 import org.akvo.rsr.up.xml.CountryListHandler;
 import org.akvo.rsr.up.xml.OrganisationHandler;
+import org.akvo.rsr.up.xml.ProjectExtraRestHandler;
 import org.akvo.rsr.up.xml.ProjectListHandler;
 import org.akvo.rsr.up.xml.UpdateExtraRestListHandler;
 import org.akvo.rsr.up.xml.UpdateRestHandler;
@@ -64,7 +66,7 @@ import android.util.Log;
  * This class originally used only the API at //server/api/V1
  * but is being migrated to use the //server/rest/v1.
  * Method status (lowest level only):
- *  Authorize()  OLD
+ *  Authorize()  - Special API, updated for RSR V3
  *  postXmlUpdateStreaming() NEW (necessary for geolocated updates)
  *  verifyUpdate() NEW
  *  fetchcountryList() OLD - should be rolled into fetchUpdateListRestApi
@@ -111,28 +113,39 @@ public class Downloader {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public void fetchProjectList(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
+	public void fetchProject(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
 
-		//Log.v(TAG, "Fetching project list from " + url);
+        User user = SettingsUtil.getAuthUser(ctx);
+        HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
+        h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
+        int code = h.code();//evaluation starts the exchange
+        String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
+        Date serverDate = new Date(h.date());
+        if (code == 200) {
+    		/* Get a SAXParser from the SAXPArserFactory. */
+    		SAXParserFactory spf = SAXParserFactory.newInstance();
+    		SAXParser sp = spf.newSAXParser();
+    		/* Get the XMLReader of the SAXParser we created. */
+    		XMLReader xr = sp.getXMLReader();
+    		/* Create a new ContentHandler and apply it to the XML-Reader*/
+            ProjectExtraRestHandler myHandler = new ProjectExtraRestHandler(serverVersion);
+    		xr.setContentHandler(myHandler);
+    		/* Parse the xml-data from our URL. */
+            xr.parse(new InputSource(h.stream()));
+    		/* Parsing has finished. */
+    		Project proj  = myHandler.getProject();
+    		if (proj != null){
+    	        Log.i(TAG, "Fetched project #" + proj.getId());
+    		} 
+    		/* Check what went wrong. */
+    		err = myHandler.getError();
+        } else {
+            //Vanilla case is 403 forbidden on an auth failure
+            Log.e(TAG, "Fetch update list HTTP error code:" + code);
+            Log.e(TAG, h.body());
+            throw new IOException("Unexpected server response " + code);
+        }
 
-		/* Get a SAXParser from the SAXPArserFactory. */
-		SAXParserFactory spf = SAXParserFactory.newInstance();
-		SAXParser sp = spf.newSAXParser();
-
-		/* Get the XMLReader of the SAXParser we created. */
-		XMLReader xr = sp.getXMLReader();
-		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
-		ProjectListHandler myProjectListHandler = new ProjectListHandler(new RsrDbAdapter(ctx));
-		xr.setContentHandler(myProjectListHandler);
-		/* Parse the xml-data from our URL. */
-		//TODO THIS MIGHT HANG, no timeout defined...
-		xr.parse(new InputSource(url.openStream()));
-		/* Parsing has finished. */
-
-		/* Check if anything went wrong. */
-		err = myProjectListHandler.getError();
-
-		Log.i(TAG, "Fetched " + myProjectListHandler.getCount() + " projects");
 	}
 
 	
@@ -640,7 +653,7 @@ public class Downloader {
         //Just long+lat for location. We do not currently do reverse geocoding in the app.
         //Country used to be mandatory, but that was changed
         final String locationTemplate = "<locations><list-item><longitude>%s</longitude><latitude>%s</latitude></list-item></locations>";
-        final boolean simulateUnresolvedPost = false;
+        final boolean simulateUnresolvedPost = true;
         
         boolean allSent = false;
 		try {
@@ -814,6 +827,11 @@ public class Downloader {
 			boolean resolved;
 			try {
     			resolved = postXmlUpdateStreaming(urlTemplate, upd, sendImages, user, userAgent, prog);
+                if (resolved) {  //remember new ID and status for this update
+                    upd.setUnsent(false);//TODO: this fails if verifyUpdate worked
+                    upd.setDraft(false);
+                    dba.updateUpdateIdSent(upd, localId);
+                }
             } catch (FailedPostException e) { //did not happen, user should try again
                 upd.setUnsent(false);
                 upd.setDraft(true);
@@ -827,9 +845,6 @@ public class Downloader {
 			}	
 
 			if (resolved) {  //remember new ID and status for this update
-				upd.setUnsent(false);
-				upd.setDraft(false);
-				dba.updateUpdateIdSent(upd, localId);
 				Log.i(TAG, "Sent update" + localId);
 				return;
 			} else {
@@ -858,7 +873,8 @@ public class Downloader {
 		Map<String, String> data = new HashMap<String, String>();
 		data.put("username", username);
 		data.put("password", password);
-
+		data.put("handles_unemployed", "True");
+		
 		HttpRequest h = HttpRequest.post(url).form(data).connectTimeout(10000); //10 sec timeout
 		int code = h.code();
 		if (code == 200) {

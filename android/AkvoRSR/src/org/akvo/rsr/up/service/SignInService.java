@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -57,7 +57,7 @@ public class SignInService extends IntentService {
 				//use project list to set projects visible
 				RsrDbAdapter dba = new RsrDbAdapter(this);
 				dba.open();
-				dba.setVisibleProjects(user.getPublishedProjects());
+				dba.setVisibleProjects(user.getPublishedProjIds());
 				dba.close();
 
 			}

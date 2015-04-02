@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -28,10 +28,12 @@ public class User {
 	private String email;
 	private String apiKey;
 	private String orgId;
-	private Set<String> publishedProjects;
+    private Set<String> mOrgIds;
+    private Set<String> publishedProjects;
 
 	public User() {
-		publishedProjects = new HashSet<String>(10);
+        mOrgIds = new HashSet<String>(2);
+        publishedProjects = new HashSet<String>(10);
 	}
 	
 	public String getId() {
@@ -90,15 +92,47 @@ public class User {
 		this.apiKey = summary;
 	}
 
-	public Set<String> getPublishedProjects() {
-		return publishedProjects;
-	}
+    public Set<String> getPublishedProjIds() {
+        return publishedProjects;
+    }
 
-	public void addPublishedProject(String id) {
-		this.publishedProjects.add(id);
-	}
+    public String getPublishedProjIdsString() {
+        String projlist = "";
+        for (String id : publishedProjects) {
+            projlist += id + ",";
+        }
+        if (projlist.length() > 0)
+            projlist = projlist.substring(0, projlist.length()-1);
+        return projlist;
+    }
 
-	public void clearPublishedProjects() {
-		this.publishedProjects.clear();
-	}
+    public void addPublishedProjId(String id) {
+        this.publishedProjects.add(id);
+    }
+
+    public void clearPublishedProjIds() {
+        this.publishedProjects.clear();
+    }
+    
+    public Set<String> getOrgIds() {
+        return mOrgIds;
+    }
+    
+    public String getOrgIdsString() {
+        String orglist = "";
+        for (String id : mOrgIds) {
+            orglist += id + ",";
+        }
+        if (orglist.length() > 0)
+            orglist=orglist.substring(0, orglist.length()-1);
+        return orglist;
+    }
+
+    public void addOrgId(String id) {
+        this.mOrgIds.add(id);
+    }
+
+    public void clearOrgIds() {
+        this.mOrgIds.clear();
+    }
 }
