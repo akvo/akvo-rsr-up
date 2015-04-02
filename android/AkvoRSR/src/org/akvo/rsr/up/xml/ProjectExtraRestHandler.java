@@ -77,9 +77,7 @@ import org.xml.sax.helpers.DefaultHandler;
     </categories>
     <current_image type="hash">
         <original>/media/db/project/2856/Project_2856_current_image_2015-03-27_14.21.04.jpg</original>
-        <thumbnails type="hash">
-            <map_thumb>/media/cache/53/95/53954c937cc643bffeca011dfbef9ae4.jpg</map_thumb>
-        </thumbnails>
+        <up>/media/cache/53/95/53954c937cc643bffeca011dfbef9ae4.jpg</up>
     </current_image>
 </root> 
 
@@ -104,7 +102,7 @@ public class ProjectExtraRestHandler extends DefaultHandler {
     private boolean in_primloc = false;
 	
 	private boolean in_current_image = false;
-	private boolean in_thumbnails = false;
+	private boolean in_original_url = false;
 	private boolean in_thumbnail_url = false;
 
     private boolean in_loc_id = false;
@@ -189,10 +187,10 @@ public class ProjectExtraRestHandler extends DefaultHandler {
 				this.in_long = true;
             } else if (localName.equals("current_image") && depth==1) {
                 this.in_current_image = true;
-            } else if (localName.equals("thumbnails") && in_current_image) {
-                this.in_thumbnails = true;
-            } else if (localName.equals("map_thumb") && in_thumbnails) {
+            } else if (localName.equals("up") && in_current_image) {
                 this.in_thumbnail_url = true;
+            } else if (localName.equals("original") && in_current_image) {
+                this.in_original_url = true;
 			}
 		depth++;
 	}
@@ -227,8 +225,6 @@ public class ProjectExtraRestHandler extends DefaultHandler {
 		} else if (localName.equals("project_plan_summary") && depth==1) {
 			this.in_summary = false;
 			mCurrentProj.setSummary(buffer);
-		} else if (localName.equals("current_image") && depth==1) {
-			this.in_current_image = false;
         } else if (localName.equals("id") && in_primloc) {
             this.in_loc_id= false;
 		} else if (localName.equals("country") && in_primloc) {
@@ -246,9 +242,12 @@ public class ProjectExtraRestHandler extends DefaultHandler {
 		} else if (localName.equals("longitude") && in_primloc) {
 			this.in_long = false;
 			mCurrentProj.setLongitude(buffer);
-        } else if (localName.equals("thumbnails") && in_current_image) {
-            this.in_thumbnails = false;
-        } else if (localName.equals("map_thumb") && in_thumbnails) {
+        } else if (localName.equals("current_image") && depth==1) {
+            this.in_current_image = false;
+        } else if (localName.equals("original") && in_current_image) {
+            this.in_original_url = false;
+//TODO            mCurrentProj.setOriginalUrl(buffer);
+        } else if (localName.equals("up") && in_current_image) {
             this.in_thumbnail_url = false;
             mCurrentProj.setThumbnailUrl(buffer);
 		}
@@ -262,7 +261,8 @@ public class ProjectExtraRestHandler extends DefaultHandler {
 		if (mCurrentProj != null) {
 			if (this.in_proj_id ||
 				this.in_summary ||
-				this.in_thumbnail_url ||
+                this.in_thumbnail_url ||
+                this.in_original_url ||
 				this.in_title ||
 				this.in_subtitle ||
 				this.in_country_id ||
