@@ -36,6 +36,13 @@ public class Project {
 	private String city;
 	private boolean hidden;
 
+    private boolean isEmpty(String s) {
+        if ((s != null) && (s.length() > 0))
+            return false;
+        else
+            return true;
+    }
+    
 	public String getId() {
 		return id;
 	}
@@ -148,6 +155,11 @@ public class Project {
 		this.hidden = hidden;
 	}
 
+
+    public boolean validLatLon() {
+        return (!isEmpty(latitude)) && (!isEmpty(longitude));
+    }
+    
 
 	/*
 	public String get() {

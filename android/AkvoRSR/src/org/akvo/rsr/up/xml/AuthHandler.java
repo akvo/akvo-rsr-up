@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -16,8 +16,6 @@
 
 package org.akvo.rsr.up.xml;
 
-import java.util.Set;
-
 import org.akvo.rsr.up.domain.User;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -27,15 +25,17 @@ import org.xml.sax.helpers.DefaultHandler;
  * Example input:
  * 
 <credentials>
-	<api_key>asdjklfhlasufhkjasdjfnhalkjdnkjsdhfkjsdnkjfnsdfkjhsdkjfs</api_key>
-	<user_id>666</user_id>
-	<org_id>42</org_id>
+    <api_key>asdjklfhlasufhkjasdjfnhalkjdnkjsdhfkjsdnkjfnsdfkjhsdkjfs</api_key>
+    <user_id>666</user_id>
+    <org_id>42</org_id>
+    <org_id>43</org_id>
 	<published_projects>
-	<id>42</id>
-	<id>4711</id>
-	</published_projects>
+        <id>42</id>
+        <id>4711</id>
+    </published_projects>
 </credentials>
 
+    From V3, we can get multiple org_id, and published_projects can be empty if user is not employed (yet).
  */
 
 
@@ -73,14 +73,6 @@ public class AuthHandler extends DefaultHandler {
 		return syntaxError;
 	}
 
-	public String getApiKey() {
-		return user.getApiKey();
-	}
-	
-	public Set<String> getPublishedProjects() {
-		return user.getPublishedProjects();
-	}
-	
 	public User getUser() {
 		return user;
 	}
@@ -143,10 +135,11 @@ public class AuthHandler extends DefaultHandler {
 			this.in_projects = false;
 		} else if (in_projid && localName.equals("id")) {
 			this.in_projid = false;
-			user.addPublishedProject(val);
+			user.addPublishedProjId(val);
 		} else if (localName.equals("org_id")) {
 			this.in_orgid = false;
-			user.setOrgId(val);
+            user.setOrgId(val); //backward compatibility
+            user.addOrgId(val);
 		}
 	}
 	

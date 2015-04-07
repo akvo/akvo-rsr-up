@@ -15,7 +15,7 @@
 		android:textColor="@color/rsr_purple"
  	    android:background="@color/pale_gray"
         android:textSize="20sp"
-        android:padding="5dip"
+        android:padding="5dp"
         android:typeface="sans"
       	android:text="@string/dummy_project_title"
       	/>
@@ -34,24 +34,44 @@
 	  		android:layout_height="wrap_content"
 			android:background="@android:color/white"
 		    android:orientation="vertical"
-	   	    android:padding="5dip"	    
+	   	    android:padding="5dp"	    
 			>
 			 	
-			<!-- The photo -->	
-			<ImageView
-	        	android:id="@+id/image_update_detail"
-		        android:layout_width="100dip"
-		        android:layout_height="80dip"
-		        android:layout_gravity="left"
-		        android:src="@drawable/ic_launcher"
-		        android:contentDescription="@string/app_name"
-	            android:scaleType="centerInside"
-		        />
-			
+			<!-- The photo with caption and credit-->
+            <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:orientation="horizontal"
+            android:padding="5dp"      
+            >
+            	
+    			<ImageView
+    	        	android:id="@+id/image_update_detail"
+    		        android:layout_width="100dp"
+    		        android:layout_height="80dp"
+    		        android:layout_gravity="left"
+    		        android:src="@drawable/ic_launcher"
+    		        android:contentDescription="@string/app_name"
+    	            android:scaleType="centerInside"
+    		        />
+
+    			<TextView
+    			    android:id="@+id/projupd_detail_photo_caption"
+    			    android:layout_width="0dp"
+    			    android:layout_height="wrap_content"
+    			    android:layout_gravity="center_vertical"
+    			    android:layout_weight="1"
+    			    android:paddingLeft="5dp"
+    			    android:text="Photo caption"
+    			    android:textStyle="italic" />
+
+    			</LinearLayout>
+            			
 			<!-- separator -->
 			<TextView
 			    style="?android:attr/listSeparatorTextViewStyle"
-			    android:paddingTop="5dip"
+			    android:paddingTop="5dp"
 			    android:gravity="center_horizontal"
 			    android:layout_width="match_parent"
 			    android:layout_height="1dp" />
@@ -63,8 +83,8 @@
 			    android:id="@+id/projupd_detail_synchronising"
 			    android:layout_width="fill_parent"
 			    android:layout_height="wrap_content"
-			    android:paddingBottom="10dip"
-			    android:paddingTop="10dip"
+			    android:paddingBottom="10dp"
+			    android:paddingTop="10dp"
 			    android:text="@string/state_synchronising"
 			    android:textColor="@color/red"
 			    android:textSize="18sp"
@@ -81,8 +101,8 @@
 		        android:textColor="@color/rsr_purple"
 		        android:textSize="18sp"
 		        android:typeface="sans"
-				android:paddingTop="10dip"
-				android:paddingBottom="10dip"
+				android:paddingTop="10dp"
+				android:paddingBottom="10dp"
 		        />
 	
 	        <!-- The update description -->	
@@ -108,11 +128,53 @@
 	            android:text="@string/dummy_author"
 			    />
 	        
-   	        <!-- fudge to fill the viewport if necessary -->
+			<!-- The photo credit -->	
+	        <TextView
+		        android:id="@+id/projupd_detail_photo_credit"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="left"
+		        android:gravity="right"
+		        android:textColor="@color/rsr_purple"
+		        android:textSize="12sp"
+	            android:text=""
+			    />
+            
+            <!-- Location -->
+	        <TextView
+                style="?android:attr/listSeparatorTextViewStyle"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="10dip"
+                android:layout_marginTop="5dp"
+                android:gravity="center_horizontal" />
+            
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_marginBottom="5dp"
+                android:text="@string/label_project_location"
+                android:textColor="@color/rsr_purple"
+                android:textSize="20sp"
+                android:typeface="sans" />
+
+            <TextView
+                android:id="@+id/text_projupd_location"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:textColor="@color/dk_gray"
+                android:textSize="14sp"
+                android:typeface="sans" />
+
+            
+	        <!-- fudge to fill the viewport if necessary -->
 		    <View
 		        android:layout_width="fill_parent"
         		android:layout_height="0dp"
-        		android:layout_weight="1"/>
+        		android:layout_weight="1"
+                />
 	        
 		    	    	
 		</LinearLayout>
@@ -122,14 +184,14 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@color/btn_border"
-	    android:padding="5dip"
+	    android:padding="5dp"
 	    >
 	    <Button
 	        android:id="@+id/btn_edit_update"
 	        android:layout_width="fill_parent"
 	        android:layout_height="wrap_content"
 			android:background="@color/btn_face"
-			android:padding="5dip"
+			android:padding="5dp"
 	        android:drawableTop="@drawable/ic_menu_edit"
 			android:textColor="@color/rsr_purple"
 	        android:text="@string/btncaption_edit_update"

@@ -90,7 +90,8 @@
             android:text="@string/dummy_count"
             android:textColor="@color/rsr_purple"
             android:textSize="20sp"
-            android:typeface="sans" />
+            android:typeface="sans"
+            />
 
         <!-- The seach field splits unused space in the bar with label when visible -->
         <EditText
@@ -107,7 +108,8 @@
             android:textSize="20sp"
             android:typeface="sans"
             android:visibility="gone"
-             />
+            android:singleLine="true"
+            />
         <Button
             android:id="@+id/btn_projsearch"
             android:layout_width="wrap_content"
@@ -121,7 +123,7 @@
     <!-- list of projects. if it is empty, the TextView will be shown instead -->
 
     <ListView
-        android:id="@android:id/list"
+        android:id="@+id/list_projects"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
@@ -129,33 +131,33 @@
         android:drawSelectorOnTop="false" />
 
     <TextView
-        android:id="@android:id/empty"
+        android:id="@+id/list_empty_text"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="@string/label_empty_proj_list" />
+        android:text="@string/label_empty_proj_list"
+        android:visibility="gone"
+        />
 
-    <!-- Refresh button -->
-
-    <RelativeLayout
+    <TextView
+        android:id="@+id/first_time_text"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/btn_border"
-        android:padding="5dip" >
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/label_first_proj_list" 
+        android:visibility="gone"
+        />
 
-        <Button
-            android:id="@+id/btn_refresh_projects"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/btn_face"
-            android:drawableLeft="@drawable/ic_menu_refresh"
-            android:padding="5dip"
-            android:text="@string/btncaption_refresh"
-            android:textColor="@color/rsr_purple"
-            android:textSize="18sp"
-            android:typeface="sans" />
-
-    </RelativeLayout>
+    <TextView
+        android:id="@+id/unemployed_text"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/label_unemployed_proj_list" 
+        android:visibility="gone"
+        />
 
 </LinearLayout>

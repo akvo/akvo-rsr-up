@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -17,15 +17,15 @@ package org.akvo.rsr.up;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import org.akvo.rsr.up.R;
 
-public class AboutActivity extends Activity {
+public class AboutActivity extends ActionBarActivity {
 
 	
 	@Override

@@ -105,10 +105,17 @@ public class LoginActivity extends Activity {
             }
         });
 
+        final TextView settings = (TextView) findViewById(R.id.link_to_settings);
+        settings.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startActivity(new Intent(LoginActivity.this, SettingsActivity.class));
+            }
+        });
+        
         final TextView about = (TextView) findViewById(R.id.link_to_about);
         about.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	showAbout();
+                startActivity(new Intent(LoginActivity.this, AboutActivity.class));
             }
         });
         
@@ -152,11 +159,10 @@ public class LoginActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
         case R.id.action_settings:
-			Intent i = new Intent(this, SettingsActivity.class);
-			startActivity(i);
+			startActivity(new Intent(this, SettingsActivity.class));
             return true;
         case R.id.action_about:
-        	showAbout();
+            startActivity(new Intent(this, AboutActivity.class));
             return true;
 	    default:
 	    	return super.onOptionsItemSelected(item);
@@ -164,20 +170,13 @@ public class LoginActivity extends Activity {
 	}
 	
 	
-	/**
-	 *  shows the about activity
-	 */
-	private void showAbout() {
-		startActivity(new Intent(this, AboutActivity.class));
-	}
-	
     /**
      * starts the sign in process
      * @param view
      */
     public void signIn(View view) {
 		//start a "progress" animation
-    	progress = new ProgressDialog(this);
+        progress = new ProgressDialog(this);
 		progress.setTitle(R.string.login_progress_title);
 		progress.setMessage(getResources().getString(R.string.login_progress_msg));
 		progress.show();

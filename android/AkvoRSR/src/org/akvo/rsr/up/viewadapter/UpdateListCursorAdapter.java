@@ -16,21 +16,17 @@
 
 package org.akvo.rsr.up.viewadapter;
 
-import java.io.File;
 import java.util.Date;
 
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Organisation;
 import org.akvo.rsr.up.domain.User;
-import org.akvo.rsr.up.util.FileUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
+import org.akvo.rsr.up.util.ThumbnailUtil;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapFactory.Options;
 import android.graphics.Color;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -91,7 +87,7 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 		dba.open();
 		try {
             author = dba.findUser(cursor.getString(authorIdCol));
-            if (author.getOrgId() != null) org = dba.findOrganisation(author.getOrgId());
+            if (author !=null && author.getOrgId() != null) org = dba.findOrganisation(author.getOrgId());
         } finally {
             dba.close();    
         }
@@ -133,7 +129,7 @@ public class UpdateListCursorAdapter extends CursorAdapter{
 		//Find file containing thumbnail
 		String fn = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_FILENAME_COL));
 		String url = cursor.getString(cursor.getColumnIndex(RsrDbAdapter.THUMBNAIL_URL_COL));
-		FileUtil.setPhotoFile(thumbnail, url, fn, null, cursor.getString(idcol));
+		ThumbnailUtil.setPhotoFile(thumbnail, url, fn, null, cursor.getString(idcol), false);
 
 		//set tags so we will know what got clicked
 		view.setTag(R.id.project_id_tag, cursor.getLong(cursor.getColumnIndex(RsrDbAdapter.PROJECT_COL)));

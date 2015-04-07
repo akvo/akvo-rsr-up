@@ -22,7 +22,13 @@
             android:key="data_host"
             android:title="@string/label_setting_host"
             />    
-    </PreferenceCategory>
+        <CheckBoxPreference
+            android:key="setting_remove_image_location"
+            android:title="@string/label_setting_removeloc"
+            android:summary="@string/summary_setting_removeloc"
+            android:defaultValue="false"
+            />
+        </PreferenceCategory>
 
     <PreferenceCategory
         android:title="@string/label_settings_testing">

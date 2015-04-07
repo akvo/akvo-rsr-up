@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -30,12 +30,13 @@ public class ConstantUtil {
 	 */
 	public static final String TEST_HOST = "http://rsr.uat.akvo.org";
 	public static final String LIVE_HOST = "http://rsr.akvo.org";
-	public static final String PWD_URL = "/accounts/password/reset/";
+	public static final String PWD_URL = "/sign_in/";
 	public static final String AUTH_URL = "/auth/token/";
 	public static final String API_KEY_PATTERN = "&api_key=%s&username=%s";
-	public static final String POST_UPDATE_URL = "/api/v1/project_update/?format=xml";
-	public static final String VERIFY_UPDATE_PATTERN = "/api/v1/project_update/?format=xml&uuid=%s&limit=2";
-	public static final String FETCH_PROJ_URL_PATTERN = "/api/v1/project/?format=xml&limit=0&partnerships__organisation=%s";
+    public static final String POST_UPDATE_URL = "/rest/v1/project_update/?format=xml";
+    public static final String FETCH_UPDATE_URL_PATTERN = "/rest/v1/project_update/?format=xml&limit=1000&project=%s";
+    public static final String VERIFY_UPDATE_PATTERN = "/rest/v1/project_update/?format=xml&uuid=%s&limit=2";
+    public static final String FETCH_PROJ_URL_PATTERN = "/rest/v1/project_up/%s/?format=xml&image_thumb_name=up&width=100"; //ask for thumbnail size
 	public static final String FETCH_COUNTRIES_URL = "/api/v1/country/?format=xml&limit=0";
 	public static final String FETCH_PROJ_COUNT_URL = "/api/v1/project/?format=xml&limit=0&partnerships__organisation=%s";
 	public static final String PROJECT_PATH_PATTERN = "/api/v1/project/%s/";
@@ -43,7 +44,7 @@ public class ConstantUtil {
     public static final String FETCH_USER_URL_PATTERN = "/api/v1/user/%s/?format=xml&depth=1";
     public static final String FETCH_ORG_URL_PATTERN = "/api/v1/organisation/%s/?format=xml&depth=0";
 	public static final int    MAX_IMAGE_UPLOAD_SIZE = 2000000; //Nginx POST limit is 3MB, B64 encoding expands 33% and there may be long text 
-
+	public static final String SERVER_VERSION_HEADER = "X-RSR-Version";
 	/**
 	 * file system constants
 	 */
@@ -51,9 +52,9 @@ public class ConstantUtil {
 	public static final String JPG_SUFFIX = ".jpg";
 //	public static final String TOP_DIR = "/akvorsr/";
 	public static final String PHOTO_DIR = "/akvorsr/photos/";
-	public static final String IMAGECACHE_DIR = "/akvorsr/imagecache/";
-	
-	
+    public static final String IMAGECACHE_DIR = "/akvorsr/imagecache/";
+    public static final String LOG_FILE_NAME = "error_messages.txt";
+
 	/**
 	 * status related constants
 	 */
@@ -90,7 +91,8 @@ public class ConstantUtil {
 	public static final String AUTH_USERNAME_KEY = "authorized_username";
 	public static final String AUTH_APIKEY_KEY = "authorized_apikey";
 	public static final String AUTH_USERID_KEY = "authorized_userid";
-	public static final String AUTH_ORGID_KEY = "authorized_orgid";
+    public static final String AUTH_ORGID_KEY = "authorized_orgid";
+    public static final String AUTH_PROJID_KEY = "authorized_projid";
 	public static final String LOCAL_ID_KEY	= "next_local_id";
 
 	/**

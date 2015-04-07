@@ -1,11 +1,27 @@
+/*
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
+ *
+ *  This file is part of Akvo RSR.
+ *
+ *  Akvo RSR is free software: you can redistribute it and modify it under the terms of
+ *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+ *  either version 3 of the License or any later version.
+ *
+ *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Affero General Public License included with this program for more details.
+ *
+ *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ */
+
 package org.akvo.rsr.up.service;
 
 import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.Downloader;
+import org.akvo.rsr.up.util.Downloader.UnresolvedPostException;
 import org.akvo.rsr.up.util.SettingsUtil;
-import org.akvo.rsr.up.util.Downloader.PostFailedException;
-import org.akvo.rsr.up.util.Downloader.PostUnresolvedException;
+import org.akvo.rsr.up.util.Downloader.FailedPostException;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -34,7 +50,7 @@ public class SubmitProjectUpdateService extends IntentService {
 		try {
 			Downloader.sendUpdate(this,
 					localUpdateId,
-					SettingsUtil.host(this) + ConstantUtil.POST_UPDATE_URL + ConstantUtil.API_KEY_PATTERN,
+					SettingsUtil.host(this) + ConstantUtil.POST_UPDATE_URL, //+ ConstantUtil.API_KEY_PATTERN,
 					SettingsUtil.host(this) + ConstantUtil.VERIFY_UPDATE_PATTERN,
 					sendImg,
 					user,
@@ -45,13 +61,13 @@ public class SubmitProjectUpdateService extends IntentService {
                             broadcastProgress(0, sofar, total);
                         }
                     });
-		} catch (PostFailedException e) {
+		} catch (FailedPostException e) {
 			i.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, e.getMessage());
 		}
-		catch (PostUnresolvedException e) {
+		catch (UnresolvedPostException e) {
 			i.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, e.getMessage());
 			i.putExtra(ConstantUtil.SERVICE_UNRESOLVED_KEY, true);
-		} catch (Exception e) {
+		} catch (Exception e) {//TODO: show to user
 			Log.e(TAG, "Config problem", e);
 		}
 

@@ -16,10 +16,10 @@
 package org.akvo.rsr.up;
 
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.webkit.WebView;
-import android.app.Activity;
 
-public class LicenseActivity extends Activity {
+public class LicenseActivity extends ActionBarActivity {
 
 	
 	@Override

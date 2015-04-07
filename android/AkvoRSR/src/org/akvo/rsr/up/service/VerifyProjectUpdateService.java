@@ -7,6 +7,7 @@ import org.akvo.rsr.up.LoginActivity;
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.Downloader;
+import org.akvo.rsr.up.util.Downloader.FailedPostException;
 import org.akvo.rsr.up.util.SettingsUtil;
 
 import android.app.Notification;
@@ -45,7 +46,10 @@ public class VerifyProjectUpdateService extends Service {
 
                 @Override
                 public void run() {
-                	verifyIt();
+                    //only try if we have network connection
+                    if (Downloader.haveNetworkConnection(VerifyProjectUpdateService.this, false)) {
+                        verifyIt();
+                    }
                 }
             }, INITIAL_DELAY_MS, INTERVAL_MS);
         }
@@ -61,12 +65,12 @@ public class VerifyProjectUpdateService extends Service {
 				Intent i = new Intent(ConstantUtil.UPDATES_VERIFIED_ACTION);
 
 				try {
-					int unresolveds = Downloader.verifyUpdates(VerifyProjectUpdateService.this, SettingsUtil.host(VerifyProjectUpdateService.this) + ConstantUtil.VERIFY_UPDATE_PATTERN);
+                    Context context = VerifyProjectUpdateService.this;                      
+					int unresolveds = Downloader.verifyUpdates(context, SettingsUtil.host(VerifyProjectUpdateService.this) + ConstantUtil.VERIFY_UPDATE_PATTERN);
 					if (unresolveds == 0) { //mission accomplished
 						Log.i(TAG, "Every update verified");
 						
 						//notify user
-						Context context = VerifyProjectUpdateService.this;						
 						String ns = Context.NOTIFICATION_SERVICE;
 						NotificationManager notifcationMgr = (NotificationManager) context.getSystemService(ns);
 						String headline = "Synchronization complete";
@@ -86,8 +90,10 @@ public class VerifyProjectUpdateService extends Service {
 						Log.i(TAG, "Still unverified:" + unresolveds);
 					}
 
-				} catch (Exception e) {
-					i.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, e.getMessage());
+                } catch (FailedPostException e) {
+                   
+                } catch (Exception e) {
+                    i.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, e.getMessage());
 				}
 				
 			}

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -25,7 +25,6 @@ import org.akvo.rsr.up.util.SettingsUtil;
 import org.akvo.rsr.up.viewadapter.ProjectListCursorAdapter;
 
 import android.os.Bundle;
-import android.app.ListActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -33,6 +32,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -42,13 +43,14 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.ActionBarActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 
-public class ProjectListActivity extends ListActivity {
+public class ProjectListActivity extends ActionBarActivity {
 
 
 	private static final String TAG = "ProjectListActivity";
@@ -61,21 +63,44 @@ public class ProjectListActivity extends ListActivity {
 	private ProgressBar inProgress1;
 	private ProgressBar inProgress2;
 	private ProgressBar inProgress3;
+	private ListView mList;
+    private TextView mEmptyText;
+    private TextView mFirstTimeText;
+    private TextView mUnemployedText;
 	private BroadcastReceiver broadRec;
     private Button searchButton;
-    private Button refreshButton;
+
+    private boolean mEmployed; //False if user is not employed with any organisation
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	    //employment can for now only change at login, so assign it for life of activity
+	    mEmployed = SettingsUtil.getAuthUser(this).getOrgIds().size() > 0;
+	    
+	    super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_project_list);
 
         projCountLabel = (TextView) findViewById(R.id.projcountlabel);
 		inProgress = (LinearLayout) findViewById(R.id.projlistprogress);
 		inProgress1 = (ProgressBar) findViewById(R.id.progressBar1);
 		inProgress2 = (ProgressBar) findViewById(R.id.progressBar2);
-		inProgress3 = (ProgressBar) findViewById(R.id.progressBar3);
+        inProgress3 = (ProgressBar) findViewById(R.id.progressBar3);
 
+        mList = (ListView) findViewById(R.id.list_projects);
+        mEmptyText = (TextView) findViewById(R.id.list_empty_text);
+        mFirstTimeText = (TextView) findViewById(R.id.first_time_text);
+        mUnemployedText = (TextView) findViewById(R.id.unemployed_text);
+        mList.setOnItemClickListener(new OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent i = new Intent(view.getContext(), ProjectDetailActivity.class);
+                i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(R.id.project_id_tag)).toString());
+                startActivity(i); 
+            }
+        });
+        
+        
         searchButton = (Button) findViewById(R.id.btn_projsearch);        
         searchButton.setOnClickListener( new View.OnClickListener() {
             public void onClick(View view) {
@@ -83,12 +108,17 @@ public class ProjectListActivity extends ListActivity {
                 if (searchField.getVisibility() == View.VISIBLE){
                     searchField.setVisibility(View.GONE);
                     searchField.setText("");
+                    // show magnifying glass
+                    searchButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_menu_search,0,0,0);
                     getData();
                 } else {
                     searchField.setVisibility(View.VISIBLE);
-                    searchField.requestFocus();
+                    //show X instead of magnifying glass
+                    searchButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_close_normal,0,0,0);
                     searchField.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
-                }
+                    searchField.requestFocus();
+                    showSoftKeyBoard(searchField);
+                    }
             }
         });
  
@@ -104,15 +134,6 @@ public class ProjectListActivity extends ListActivity {
             }
         );
 
-        
-        refreshButton = (Button) findViewById(R.id.btn_refresh_projects);        
-        refreshButton.setOnClickListener( new View.OnClickListener() {
-            public void onClick(View view) {
-                //fetch new data
-                startGetProjectsService();
-            }
-        });
- 
         //Create db
         ad = new RsrDbAdapter(this);
         Log.d(TAG, "Opening DB during create");
@@ -123,6 +144,11 @@ public class ProjectListActivity extends ListActivity {
 		f.addAction(ConstantUtil.PROJECTS_PROGRESS_ACTION);
 		broadRec = new ResponseReceiver();
         LocalBroadcastManager.getInstance(this).registerReceiver(broadRec, f);
+        
+        //in case we came back here during a refresh
+        if (GetProjectDataService.isRunning(this)) {
+            inProgress.setVisibility(View.VISIBLE);
+        }
 	}
 
 	
@@ -133,12 +159,16 @@ public class ProjectListActivity extends ListActivity {
 		return true;
 	}
 
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
+        case R.id.menu_refresh:
+            startGetProjectsService();
+            return true;
         case R.id.menu_settings:
-			Intent i = new Intent(this, SettingsActivity.class);
-			startActivity(i);
+            Intent i = new Intent(this, SettingsActivity.class);
+            startActivity(i);
             return true;
         case R.id.menu_logout:
         	SettingsUtil.signOut(this);
@@ -179,14 +209,22 @@ public class ProjectListActivity extends ListActivity {
 		super.onDestroy();
 	}
 
-	private void hideSoftKeyBoard() {
-	    InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-
-	    if(imm.isAcceptingText()) { // verify if the soft keyboard is open                      
-	        imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-	    }
-	}
 	
+    private void hideSoftKeyBoard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+
+        if(imm.isAcceptingText()) { // verify if the soft keyboard is open                      
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+
+    
+    private void showSoftKeyBoard(View v) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        imm.showSoftInput(v, 0);
+    }
+
+    
 	/**
 	 * shows all projects visible to this user.
 	 * Assumes DB is open
@@ -202,42 +240,61 @@ public class ProjectListActivity extends ListActivity {
 		}
 		String searchString = searchField.getText().toString();
 
+		int count;
 		if (searchString == null || searchString.length() == 0) {
 		    dataCursor = ad.listVisibleProjectsWithCountry();
 	        //Show count
-	        projCountLabel.setText(Integer.valueOf(dataCursor.getCount()).toString());
+		    count = dataCursor.getCount();
+	        projCountLabel.setText(Integer.valueOf(count).toString());
 		} else {
             dataCursor = ad.listVisibleProjectsWithCountryMatching(searchString);		    
             //Show count
-            projCountLabel.setText("(" + Integer.valueOf(dataCursor.getCount()).toString() + ")");
+            count = dataCursor.getCount();
+            projCountLabel.setText("(" + Integer.valueOf(count).toString() + ")");
+		}
+		if (count == 0) { //no records, but why?
+            mList.setVisibility(View.GONE);
+            if (!mEmployed) {
+                mEmptyText.setVisibility(View.GONE);
+                mFirstTimeText.setVisibility(View.GONE);
+                mUnemployedText.setVisibility(View.VISIBLE);
+            } else
+            if (searchString == null || searchString.length() == 0) { //must be empty DB
+                mEmptyText.setVisibility(View.GONE);
+                mFirstTimeText.setVisibility(View.VISIBLE);
+                mUnemployedText.setVisibility(View.GONE);
+            } else { //too filtered
+                mEmptyText.setVisibility(View.VISIBLE);
+                mFirstTimeText.setVisibility(View.GONE);
+                mUnemployedText.setVisibility(View.GONE);
+            }
+		} else {
+		    mList.setVisibility(View.VISIBLE);
+            mEmptyText.setVisibility(View.GONE);
+            mFirstTimeText.setVisibility(View.GONE);
+            mUnemployedText.setVisibility(View.GONE);
 		}
 		//Populate list view
 		ProjectListCursorAdapter projects = new ProjectListCursorAdapter(this, dataCursor);
-		setListAdapter(projects);
+		mList.setAdapter(projects);
+//		setListAdapter(projects);
 	}
 
-	
-	/**
-	 *  gets the id of the clicked list item and opens the one-project activity.
-	 */
-	@Override
-	protected void onListItemClick(ListView list, View view, int position, long id) {
-		super.onListItemClick(list, view, position, id);
-
-		Intent i = new Intent(view.getContext(), ProjectDetailActivity.class);
-		i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(R.id.project_id_tag)).toString());
-		startActivity(i);
-	}
-
-	
+		
 	/**
 	 * starts the service fetching new project data
 	 */
 	private void startGetProjectsService() {
-		//disable refresh button
-		refreshButton.setEnabled(false);
-		//start a service
-		
+        if (!mEmployed) { //TODO should disable menu choice instead
+            return; //fetch would fail
+        }
+        
+        if (GetProjectDataService.isRunning(this)) { //TODO should disable menu choice instead
+            return; //only one at a time
+        }
+        
+		//TODO: disable menu choice
+		//start a service		
 		Intent i = new Intent(this, GetProjectDataService.class);
 		getApplicationContext().startService(i);
 		
@@ -250,7 +307,7 @@ public class ProjectListActivity extends ListActivity {
 
 	
 	/**
-	 * handles result of server login attempt
+	 * handles result of refresh service
 	 * @param intent
 	 */
 	private void onFetchFinished(Intent intent) {
@@ -262,18 +319,16 @@ public class ProjectListActivity extends ListActivity {
 			Toast.makeText(getApplicationContext(), R.string.msg_fetch_complete, Toast.LENGTH_SHORT).show();
 		} else {
 			//show a dialog instead
-			DialogUtil.errorAlert(this, "Error", err);
+			DialogUtil.errorAlertWithDetail(this, R.string.errmsg_com_failure, R.string.msg_check_network, err);
 		}
 
-		//re-enable the refresh button
-		refreshButton.setEnabled(true);		
 		//Refresh the list
 		getData();
 	}
 
 
 	/**
-	 * updates the progress bars
+	 * updates the progress bars as fetch progresses
 	 * @param phase
 	 * @param done
 	 * @param total
