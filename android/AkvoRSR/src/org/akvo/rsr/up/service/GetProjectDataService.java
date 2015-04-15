@@ -66,7 +66,7 @@ public class GetProjectDataService extends IntentService {
         RsrDbAdapter ad = new RsrDbAdapter(this);
         Downloader dl = new Downloader();
         String errMsg = null;
-        boolean noimages = SettingsUtil.ReadBoolean(this, "setting_delay_image_fetch", false);
+        boolean fetchImages = !SettingsUtil.ReadBoolean(this, "setting_delay_image_fetch", false);
         String host = SettingsUtil.host(this);
 
         ad.open();
@@ -80,8 +80,8 @@ public class GetProjectDataService extends IntentService {
                     dl.fetchProject(this,
                                     ad, 
                                     new URL(SettingsUtil.host(this) +
-                                            String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN,id)));
-                    broadcastProgress(0, i++, projects);
+                                            String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN, id)));
+                    broadcastProgress(0, ++i, projects);
                 }
                 if (mFetchCountries) {
                     // TODO: rarely changes, so only fetch countries if we never did that
@@ -93,21 +93,24 @@ public class GetProjectDataService extends IntentService {
                 if (mFetchUpdates) {
                     int j = 0;
                     for (String projId : user.getPublishedProjIds()) {
-                        dl.fetchUpdateListRestApi(this, //TODO: use _extra for fewer fetches, as country and user data is included
+                        dl.fetchUpdateListRestApiPaged(this, //TODO: use _extra for fewer fetches, as country and user data is included
                             new URL(host + String.format(ConstantUtil.FETCH_UPDATE_URL_PATTERN, projId))                                            
                         );
-                        broadcastProgress(1, j++, projects);
+                        broadcastProgress(1, ++j, projects);
                     }
                 }
 
             } catch (FileNotFoundException e) {
                 Log.e(TAG, "Cannot find:", e);
                 errMsg = getResources().getString(R.string.errmsg_not_found_on_server) + e.getMessage();
-            } catch (Exception e) {
+            } catch (Exception e) {//get e==null here!!!!
                 Log.e(TAG, "Bad updates fetch:", e);
-                errMsg = getResources().getString(R.string.errmsg_update_fetch_failed) + e.getMessage();
+                if (e != null) {
+                    errMsg = getResources().getString(R.string.errmsg_update_fetch_failed) + e.getMessage();
+                } else {
+                    errMsg = getResources().getString(R.string.errmsg_update_fetch_failed) + "NULL exception";
+                }
             }
-
             if (mFetchUsers) { //Remove this once we use the _extra update API
                 // Fetch missing user data for authors of the updates.
                 // This API requires authorization
@@ -165,7 +168,7 @@ public class GetProjectDataService extends IntentService {
 
             broadcastProgress(1, 100, 100);
 
-            if (!noimages) {
+            if (fetchImages) {
                 try {
                     dl.fetchNewThumbnails(this,
                             host,

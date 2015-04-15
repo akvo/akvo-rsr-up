@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -31,9 +31,11 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import android.util.Log;
+
 
 /*
- * Class to handle XML parsing for a project update from REST API.
+ * Class to handle XML parsing for a project update, with expanded nested objects, from REST API.
  * Always requested as a list, where each update object's tags of the XML will be encapsulated in <root><results><list-item>
  * Example start of list:
  * 
@@ -98,13 +100,15 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class UpdateExtraRestListHandler extends DefaultHandler {
 
+    private static final String TAG = "UpdateExtraRestListHandler";
+
     private static String ID = "id";
     private static String LIST_ITEM = "list-item";
     private static String PRIMARY_LOCATION = "primary_location";
     private static String COUNTRY = "country";
     private static String USER = "user";
     private static String ORGANISATION = "organisation";
-    
+    private static String CITY = "city";    
     
 	// ===========================================================
 	// Fields
@@ -135,23 +139,23 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
     private int countryCount;
 
     private boolean syntaxError = false;
-    private boolean insert; //insert parsed objects in the database
+    private boolean mInsert; //mInsert parsed objects in the database
 	private int depth = 0;
-	private SimpleDateFormat df1;
+	private SimpleDateFormat mDateFormat;
 	private String buffer;
 	
 	//where to store results
-	private RsrDbAdapter dba;
+	private RsrDbAdapter mDba;
 	
 	/*
 	 * constructor
 	 */
 	public UpdateExtraRestListHandler(RsrDbAdapter aDba, boolean insert, String serverRsrVersion) {
 		super();
-		dba = aDba;
-        this.insert = insert;
-		df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
-		df1.setTimeZone(TimeZone.getTimeZone("UTC"));
+		mDba = aDba;
+        mInsert = insert;
+		mDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
+		mDateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
 	// ===========================================================
 	// Getter & Setter
@@ -166,7 +170,7 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
 	}
 
 	public Update getLastUpdate() {
-		return currentUpd; //only valid if insert==False
+		return currentUpd; //only valid if mInsert==False
 	}
 
 	// ===========================================================
@@ -174,7 +178,7 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
 	// ===========================================================
 	@Override
 	public void startDocument() throws SAXException {
-		dba.open();
+		mDba.open();
         updateCount = 0;
         countryCount = 0;
         userCount = 0;
@@ -185,21 +189,23 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
 
 	@Override
 	public void endDocument() throws SAXException {
-		dba.close();
+		mDba.close();
 	}
 
-	
+	//location of update
     void startLocationElement(String localName) {
         if (localName.equals(COUNTRY)) {
             this.in_country = true;
+            currentCountry = new Country();
         } else if ( localName.equals("state")
-            || localName.equals("city")
+            || localName.equals(CITY)
             || localName.equals("latitude")
             || localName.equals("longitude")) {
             in_leaf = true;
         }
     }
 
+    //country of location of update
     void startCountryElement(String localName) {
         if (   localName.equals(ID)
             || localName.equals("name")
@@ -209,6 +215,7 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
         }
     }
 
+    //org of user of update
     void startOrgElement(String localName) {
         //TODO: We do not care about org location yet
 //        if (localName.equals(PRIMARY_LOCATION)) {
@@ -221,6 +228,7 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
         }
     }
 
+    //user of update
     void startUserElement(String localName) {
         if (localName.equals(ORGANISATION)) {
             this.in_org = true;
@@ -295,7 +303,7 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
             currentCountry.setContinent(buffer);
         } else if (localName.equals("country")) {
             this.in_country = false;
-            dba.saveCountry(currentCountry);
+            mDba.saveCountry(currentCountry);
             countryCount++;
             currentCountry = null;
         }
@@ -315,7 +323,7 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
             currentLoc.setLongitude(buffer);
         } else if (localName.equals("state")) {
             currentLoc.setState(buffer);
-        } else if (localName.equals("city")) {
+        } else if (localName.equals(CITY)) {
             currentLoc.setCity(buffer);
         } else if (localName.equals(PRIMARY_LOCATION)) {
             this.in_location = false;
@@ -335,7 +343,7 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
             currentUser.setLastname(buffer);
         } else if (localName.equals(USER)) {
             this.in_user = false;
-            dba.saveCountry(currentCountry);
+            mDba.saveCountry(currentCountry);
             userCount++;
             currentUser = null;
         }
@@ -359,9 +367,11 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
             this.in_update = false;
             if (currentUpd != null && currentUpd.getId() != null) {
                 updateCount++;
-                if (insert) {
-                    dba.saveUpdate(currentUpd, false); //preserve name of any cached image
+                if (mInsert) {
+                    mDba.saveUpdate(currentUpd, false); //preserve name of any cached image
                     currentUpd = null;
+                } else {
+                    Log.i(TAG, "Did not store update" + currentUpd.getId());
                 }
             }
         } else if (localName.equals("id")) {
@@ -372,7 +382,7 @@ public class UpdateExtraRestListHandler extends DefaultHandler {
 			currentUpd.setText(buffer);
 		} else if (localName.equals("time")) {
 			try {
-				currentUpd.setDate(df1.parse(buffer));
+				currentUpd.setDate(mDateFormat.parse(buffer));
 			} catch (ParseException e1) {
 				syntaxError = true;
 			}

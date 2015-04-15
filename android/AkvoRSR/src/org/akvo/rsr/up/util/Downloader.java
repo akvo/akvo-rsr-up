@@ -40,11 +40,9 @@ import org.akvo.rsr.up.xml.AuthHandler;
 import org.akvo.rsr.up.xml.CountryListHandler;
 import org.akvo.rsr.up.xml.OrganisationHandler;
 import org.akvo.rsr.up.xml.ProjectExtraRestHandler;
-import org.akvo.rsr.up.xml.ProjectListHandler;
 import org.akvo.rsr.up.xml.UpdateExtraRestListHandler;
 import org.akvo.rsr.up.xml.UpdateRestHandler;
 import org.akvo.rsr.up.xml.UpdateRestListHandler;
-import org.akvo.rsr.up.xml.UpdateListHandler;
 import org.akvo.rsr.up.xml.UserListHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -96,13 +94,27 @@ public class Downloader {
 		private static final long serialVersionUID = -630304430323100535L;
 	}
 
-	public static class FailedPostException extends Exception {
-		public FailedPostException(String string) {
-			super(string);
-		}
+    public static class FailedPostException extends Exception {
+        public FailedPostException(String string) {
+            super(string);
+        }
 
-		private static final long serialVersionUID = -8091570663513780467L;
-	}
+        private static final long serialVersionUID = -8091570663513780467L;
+    }
+
+
+    public static class FailedFetchException extends Exception {
+
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 2355800973621221158L;
+
+        public FailedFetchException(String string) {
+            super(string);
+        }
+
+    }
 
 
 	/**
@@ -153,37 +165,6 @@ public class Downloader {
 	
     /**
      * populates the updates table in the db from a server URL
-     * Typically the url will specify updates for a single project.
-     * 
-     * @param ctx
-     * @param url
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws IOException
-     */
-    public void fetchUpdateList(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
-
-        /* Get a SAXParser from the SAXPArserFactory. */
-        SAXParserFactory spf = SAXParserFactory.newInstance();
-        SAXParser sp = spf.newSAXParser();
-
-        /* Get the XMLReader of the SAXParser we created. */
-        XMLReader xr = sp.getXMLReader();
-        /* Create a new ContentHandler and apply it to the XML-Reader*/ 
-        UpdateListHandler myUpdateListHandler = new UpdateListHandler(new RsrDbAdapter(ctx), true, false);
-        xr.setContentHandler(myUpdateListHandler);
-        /* Parse the xml-data from our URL. */
-        xr.parse(new InputSource(url.openStream()));
-        /* Parsing has finished. */
-
-        /* Check if anything went wrong. */
-        err = myUpdateListHandler.getError();
-        Log.i(TAG, "Fetched " + myUpdateListHandler.getCount() + " updates");
-    }
-
-
-    /**
-     * populates the updates table in the db from a server URL
      * in the REST API
      * Typically the url will specify updates for a single project.
      * should eventually call project_update_extra call
@@ -211,6 +192,7 @@ public class Downloader {
             XMLReader xr = sp.getXMLReader();
             /* Create a new ContentHandler and apply it to the XML-Reader*/ 
             UpdateRestListHandler myUpdateListHandler = new UpdateRestListHandler(new RsrDbAdapter(ctx), true);
+            //the following will need to be called in a loop to get it page by page, or it would probably take too long for server
 //            UpdateExtraRestListHandler myUpdateListHandler = new UpdateExtraRestListHandler(new RsrDbAdapter(ctx), true, serverVersion);
             xr.setContentHandler(myUpdateListHandler);
             /* Parse the xml-data from our URL. */
@@ -226,6 +208,70 @@ public class Downloader {
             Log.e(TAG, h.body());
             throw new IOException("Unexpected server response " + code);
         }
+        return serverDate;
+    }
+
+
+    /**
+     * populates the updates table in the db from a server URL
+     * in the REST API
+     * Typically the url will specify updates for a single project.
+     * should eventually call project_update_extra call
+     * this will avoid having to call country/org/user APIs separately
+     * 
+     * @param ctx
+     * @param url
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws FailedFetchException 
+     */
+    public Date fetchUpdateListRestApiPaged(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException, FailedFetchException {
+        Date serverDate = null;
+        User user = SettingsUtil.getAuthUser(ctx);
+        int total = 0;
+        //the is called in a loop to get it page by page, otherwise it would take too long for server
+        //and it would not scale beyond 1000 updates in any case
+        while (url != null) {
+            HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
+            h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
+            int code = h.code();//evaluation starts the exchange
+            if (code == 200) {
+                String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
+                serverDate = new Date(h.date());
+                SAXParserFactory spf = SAXParserFactory.newInstance();
+                XMLReader xr = spf.newSAXParser().getXMLReader();
+                UpdateRestListHandler xmlHandler = new UpdateRestListHandler(new RsrDbAdapter(ctx), true);
+    //            UpdateExtraRestListHandler myUpdateListHandler = new UpdateExtraRestListHandler(new RsrDbAdapter(ctx), true, serverVersion);
+                xr.setContentHandler(xmlHandler);
+                /* Parse the xml-data from our URL. */
+                xr.parse(new InputSource(h.stream()));
+                /* Parsing has finished. */
+                /* Check if anything went wrong. */
+                err = xmlHandler.getError();
+                Log.i(TAG, "Fetched " + xmlHandler.getCount() + " updates; target total = "+ xmlHandler.getTotalCount());
+                total += xmlHandler.getCount();
+                if (xmlHandler.getNextUrl().length() == 0) { //string needs to be trimmed from whitespace
+                    url = null;//we are done
+                } else {
+                    try {
+                        url = new URL(xmlHandler.getNextUrl());//TODO is this xml-escaped?
+                    }
+                    catch (MalformedURLException e) {
+                        url = null;
+                    }
+                }
+    
+            } else if (code == 404) {
+                url = null;//we are done
+            } else {
+                //Vanilla case is 403 forbidden on an auth failure
+                Log.e(TAG, "Fetch update list HTTP error code:" + code);
+                Log.e(TAG, h.body());
+                throw new FailedFetchException("Unexpected server response " + code);
+            }
+        }
+        Log.i(TAG, "Grand total of " + total + " updates");
         return serverDate;
     }
 
@@ -655,7 +701,7 @@ public class Downloader {
         //Just long+lat for location. We do not currently do reverse geocoding in the app.
         //Country used to be mandatory, but that was changed
         final String locationTemplate = "<locations><list-item><longitude>%s</longitude><latitude>%s</latitude></list-item></locations>";
-        final boolean simulateUnresolvedPost = true;
+        final boolean simulateUnresolvedPost = false;
         
         boolean allSent = false;
 		try {
