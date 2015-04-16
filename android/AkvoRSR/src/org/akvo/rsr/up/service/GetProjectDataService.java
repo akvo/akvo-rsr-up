@@ -85,7 +85,7 @@ public class GetProjectDataService extends IntentService {
                 }
                 if (mFetchCountries) {
                     // TODO: rarely changes, so only fetch countries if we never did that
-                    dl.fetchCountryList(this, new URL(SettingsUtil.host(this) +
+                    dl.fetchCountryListRestApiPaged(this, new URL(SettingsUtil.host(this) +
                             String.format(ConstantUtil.FETCH_COUNTRIES_URL)));
                 }
                 broadcastProgress(0, 100, 100);

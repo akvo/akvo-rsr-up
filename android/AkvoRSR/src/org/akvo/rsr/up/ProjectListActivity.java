@@ -75,7 +75,7 @@ public class ProjectListActivity extends ActionBarActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 	    //employment can for now only change at login, so assign it for life of activity
-	    mEmployed = SettingsUtil.getAuthUser(this).getOrgIds().size() > 0;
+	    mEmployed = !SettingsUtil.getAuthUser(this).getOrgIds().isEmpty();
 	    
 	    super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_project_list);

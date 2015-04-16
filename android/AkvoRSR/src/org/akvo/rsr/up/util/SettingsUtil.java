@@ -107,12 +107,12 @@ public class SettingsUtil {
         String idstr = SettingsUtil.Read(c, ConstantUtil.AUTH_ORGID_KEY);
         if (idstr != null) {
             String ids[] = idstr.split(",");
-            for (String id : ids) user.addOrgId(id);
+            for (String id : ids) if (id.length()>0) user.addOrgId(id);
         }
         String projstr = SettingsUtil.Read(c, ConstantUtil.AUTH_PROJID_KEY);
         if (projstr != null) {
             String ids[] = projstr.split(",");
-            for (String id : ids) user.addPublishedProjId(id);
+            for (String id : ids) if (id.length()>0) user.addPublishedProjId(id);
         }
 		user.setApiKey(SettingsUtil.Read(c, ConstantUtil.AUTH_APIKEY_KEY));
 		return user;

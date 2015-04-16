@@ -38,6 +38,7 @@ import org.akvo.rsr.up.domain.Update;
 import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.xml.AuthHandler;
 import org.akvo.rsr.up.xml.CountryListHandler;
+import org.akvo.rsr.up.xml.CountryRestListHandler;
 import org.akvo.rsr.up.xml.OrganisationHandler;
 import org.akvo.rsr.up.xml.ProjectExtraRestHandler;
 import org.akvo.rsr.up.xml.UpdateExtraRestListHandler;
@@ -416,6 +417,68 @@ public class Downloader {
 		err = myCountryListHandler.getError();
 		Log.i(TAG, "Fetched " + myCountryListHandler.getCount() + " countries");
 	}
+
+    /**
+     * populates the country table in the db from a server URL
+     * in the REST API
+     * Typically the url will specify all countries.
+     * 
+     * @param ctx
+     * @param url
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws FailedFetchException 
+     */
+    public Date fetchCountryListRestApiPaged(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException, FailedFetchException {
+        Date serverDate = null;
+        User user = SettingsUtil.getAuthUser(ctx);
+        int total = 0;
+        //the fetch is called in a loop to get it page by page, otherwise it would take too long for server
+        //and it would not scale beyond 1000 updates in any case
+        while (url != null) {
+            HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
+            h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
+            int code = h.code();//evaluation starts the exchange
+            if (code == 200) {
+                String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
+                serverDate = new Date(h.date());
+                SAXParserFactory spf = SAXParserFactory.newInstance();
+                XMLReader xr = spf.newSAXParser().getXMLReader();
+                CountryRestListHandler xmlHandler = new CountryRestListHandler(new RsrDbAdapter(ctx), serverVersion);
+                xr.setContentHandler(xmlHandler);
+                /* Parse the xml-data from our URL. */
+                xr.parse(new InputSource(h.stream()));
+                /* Parsing has finished. */
+                /* Check if anything went wrong. */
+                err = xmlHandler.getError();
+//                Log.i(TAG, "Fetched " + xmlHandler.getCount() + " updates; target total = "+ xmlHandler.getTotalCount());
+                Log.i(TAG, "Fetched " + xmlHandler.getCount() + " countries");
+                total += xmlHandler.getCount();
+                if (xmlHandler.getNextUrl().length() == 0) { //string must to be trimmed from whitespace
+                    url = null; //we are done
+                } else {
+                    try {
+                        url = new URL(xmlHandler.getNextUrl());
+                    }
+                    catch (MalformedURLException e) {
+                        url = null;
+                    }
+                }
+    
+            } else if (code == 404) {
+                url = null;//we are done
+            } else {
+                //Vanilla case is 403 forbidden on an auth failure
+                Log.e(TAG, "Fetch update list HTTP error code:" + code);
+                Log.e(TAG, h.body());
+                throw new FailedFetchException("Unexpected server response " + code);
+            }
+        }
+        Log.i(TAG, "Grand total of " + total + " countries");
+        return serverDate;
+    }
+
 
 
     /**
