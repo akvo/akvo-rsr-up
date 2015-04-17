@@ -36,9 +36,8 @@ public class ConstantUtil {
     public static final String POST_UPDATE_URL = "/rest/v1/project_update/?format=xml";
     public static final String FETCH_UPDATE_URL_PATTERN = "/rest/v1/project_update/?format=xml&project=%s";//use default limit
     public static final String VERIFY_UPDATE_PATTERN = "/rest/v1/project_update/?format=xml&uuid=%s&limit=2";
-    public static final String FETCH_PROJ_URL_PATTERN = "/rest/v1/project_up/%s/?format=xml&image_thumb_name=up&image_thumb_up_width=100"; //ask for thumbnail size
-//    public static final String FETCH_COUNTRIES_URL = "/api/v1/country/?format=xml&limit=0";
-    public static final String FETCH_COUNTRIES_URL = "/rest/v1/country/?format=xml";
+    public static final String FETCH_PROJ_URL_PATTERN = "/rest/v1/project_up/%s/?format=xml&image_thumb_name=up&image_thumb_up_width=100"; //now asks for thumbnail size
+    public static final String FETCH_COUNTRIES_URL = "/rest/v1/country/?format=xml&limit=50"; //very small objects - get many at a time
     public static final String FETCH_USER_URL_PATTERN = "/api/v1/user/%s/?format=xml&depth=1";
     public static final String FETCH_ORG_URL_PATTERN = "/api/v1/organisation/%s/?format=xml&depth=0";
 	public static final int    MAX_IMAGE_UPLOAD_SIZE = 2000000; //Nginx POST limit is 3MB, B64 encoding expands 33% and there may be long text 

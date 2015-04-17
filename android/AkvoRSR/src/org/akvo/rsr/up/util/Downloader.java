@@ -267,9 +267,9 @@ public class Downloader {
                 url = null;//we are done
             } else {
                 //Vanilla case is 403 forbidden on an auth failure
-                Log.e(TAG, "Fetch update list HTTP error code:" + code);
+                Log.e(TAG, "Fetch update list HTTP error code:" + code + ' ' + h.message());
                 Log.e(TAG, h.body());
-                throw new FailedFetchException("Unexpected server response " + code);
+                throw new FailedFetchException("Unexpected server response " + code + ' ' + h.message());
             }
         }
         Log.i(TAG, "Grand total of " + total + " updates");

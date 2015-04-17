@@ -123,7 +123,7 @@ public class CountryRestListHandler extends DefaultHandler {
         buffer = "";
         if (depth == 1 && localName.equals("next")) {
             this.in_next = true;
-        } else if (depth == 1 && localName.equals("list-item")) {
+        } else if (depth == 2 && localName.equals("list-item")) {
             this.in_country = true;
             currentCountry = new Country();
         } else if (in_country)

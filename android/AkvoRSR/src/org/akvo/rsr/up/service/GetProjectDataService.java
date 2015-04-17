@@ -83,8 +83,7 @@ public class GetProjectDataService extends IntentService {
                                             String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN, id)));
                     broadcastProgress(0, ++i, projects);
                 }
-                if (mFetchCountries) {
-                    // TODO: rarely changes, so only fetch countries if we never did that
+                if (mFetchCountries && ad.getCountryCount() == 0) { // rarely changes, so only fetch countries if we never did that
                     dl.fetchCountryListRestApiPaged(this, new URL(SettingsUtil.host(this) +
                             String.format(ConstantUtil.FETCH_COUNTRIES_URL)));
                 }
