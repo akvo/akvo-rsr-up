@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 
- *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -52,6 +52,7 @@
     <string name="label_project_summary">Sammanfattning:</string>
     <string name="label_photo_credit">Foto: %s</string>
     <string name="label_empty_proj_list">Inget att visa med detta filter.</string>
+    <string name="label_unemployed_proj_list">Du är inte med i några organisationer än.\n\nLogga in i RSR via webben och be att få bli med i en eller flera.</string>
     <string name="label_first_proj_list">Inget hämtat än. Tryck på uppdateringsknappen för att se dina projekt.\n\nOm du har långsam uppkoppling bör du slå på \'Vänta med att hämta bilder\' i inställningarna först.</string>
     <string name="label_proj_list">Dina Projekt:</string>
     <string name="label_update_list">Uppdateringar:</string>

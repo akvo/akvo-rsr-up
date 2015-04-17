@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -772,8 +772,9 @@ public class RsrDbAdapter {
 						draftCount++;
 					} else	if (cursor.getInt(unsentCol) > 0) {
 						unsentCount++;
-					} else
+					} else {
 						otherCount++;
+					}
 					cursor.moveToNext();
 				}
 			}
@@ -1097,7 +1098,7 @@ public class RsrDbAdapter {
     /**
     * creates or updates a user in the db
     *
-    * @param org
+    * @param org the organisation data to be updated
     * @return
     */
     public void saveOrganisation(Organisation org) {
@@ -1156,6 +1157,11 @@ public class RsrDbAdapter {
 	    executeSql("delete from " + COUNTRY_TABLE);
 	}
 
+    /**
+     * lists all Countries
+     * 
+     * @return a Cursor containing all countries
+     */
 	public Cursor listAllCountries() {
 		Cursor cursor = database.query(COUNTRY_TABLE,
 				null,
@@ -1166,6 +1172,18 @@ public class RsrDbAdapter {
 				null);
 		return cursor;
 	}
+	
+	
+	public int getCountryCount() {
+	    Cursor cursor = listAllCountries();
+	    int c = 0;
+	    if (cursor != null) {
+	        c = cursor.getCount();
+	        cursor.close();
+	    }
+	    return c;    
+	}
+	
 
 	/**
 	 * saves or updates a Country in the db

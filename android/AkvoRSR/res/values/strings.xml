@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 
- *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -54,6 +54,7 @@
     <string name="label_photo_credit">Photo: %s</string>
     <string name="label_empty_proj_list">Nothing to show with this filter.</string>
     <string name="label_first_proj_list">Nothing fetched yet. Use the refresh button to see your projects.\n\nIf you have a low-bandwidth connection you should turn on delayed picture fetching in settings first.</string>
+    <string name="label_unemployed_proj_list">You are not connected to any projects.\n\nYou must use the web interface to log in and request to be added to one first.</string>
     <string name="label_proj_list">Your Projects:</string>
     <string name="label_update_list">Updates:</string>
     <string name="label_refresh_progress">Refresh progress</string>

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2013 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -21,84 +21,118 @@ import java.util.Set;
 
 
 public class User {
-	private String id;
-	private String username;
-	private String firstname;
-	private String lastname;
-	private String email;
-	private String apiKey;
-	private String orgId;
-	private Set<String> publishedProjects;
+	private String mId;
+	private String mUsername;
+	private String mFirstname;
+	private String mLastname;
+	private String mEmail;
+	private String mApiKey;
+	private String mLegacyOrgId; //for other users, until we start handling them having more than one org
+    private Set<String> mOrgIds; //for the logged-in user
+    private Set<String> mPublishedProjIds;
 
 	public User() {
-		publishedProjects = new HashSet<String>(10);
+        mOrgIds = new HashSet<String>(2);
+        mPublishedProjIds = new HashSet<String>(10);
 	}
 	
 	public String getId() {
-		return id;
+		return mId;
 	}
 
 	public void setId(String id) {
-		this.id = id;
+		mId = id;
 	}
 
 	public String getOrgId() {
-		return orgId;
+		return mLegacyOrgId;
 	}
 
 	public void setOrgId(String id) {
-		this.orgId = id;
+		mLegacyOrgId = id;
 	}
 
 	public String getUsername() {
-		return username;
+		return mUsername;
 	}
 
 	public void setUsername(String name) {
-		this.username = name;
+		mUsername = name;
 	}
 
 	public String getFirstname() {
-		return firstname;
+		return mFirstname;
 	}
 
 	public void setFirstname(String name) {
-		this.firstname = name;
+		mFirstname = name;
 	}
 
 	public String getLastname() {
-		return lastname;
+		return mLastname;
 	}
 
 	public void setLastname(String name) {
-		this.lastname = name;
+		mLastname = name;
 	}
 
 	public String getEmail() {
-		return email;
+		return mEmail;
 	}
 
 	public void setEmail(String email) {
-		this.email = email;
+		mEmail = email;
 	}
 
 	public String getApiKey() {
-		return apiKey;
+		return mApiKey;
 	}
 
 	public void setApiKey(String summary) {
-		this.apiKey = summary;
+		mApiKey = summary;
 	}
 
-	public Set<String> getPublishedProjects() {
-		return publishedProjects;
-	}
+    public Set<String> getPublishedProjIds() {
+        return mPublishedProjIds;
+    }
 
-	public void addPublishedProject(String id) {
-		this.publishedProjects.add(id);
-	}
+    public String getPublishedProjIdsString() {
+        String projlist = "";
+        for (String id : mPublishedProjIds) {
+            projlist += id + ",";
+        }
+        if (projlist.length() > 0)
+            projlist = projlist.substring(0, projlist.length()-1);
+        return projlist;
+    }
 
-	public void clearPublishedProjects() {
-		this.publishedProjects.clear();
-	}
+    public void addPublishedProjId(String id) {
+        mPublishedProjIds.add(id);
+    }
+
+    public void clearPublishedProjIds() {
+        mPublishedProjIds.clear();
+    }
+    
+    public Set<String> getOrgIds() {
+        return mOrgIds;
+    }
+    
+    public String getOrgIdsString() {
+        String orglist = "";
+        for (String id : mOrgIds) {
+            orglist += id + ",";
+        }
+        if (orglist.length() > 0)
+            orglist=orglist.substring(0, orglist.length()-1);
+        return orglist;
+    }
+
+    public void addOrgId(String id) {
+        mOrgIds.add(id);
+    }
+
+    public void clearOrgIds() {
+        mOrgIds.clear();
+    }
 }

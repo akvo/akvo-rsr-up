@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -70,38 +70,51 @@ public class SettingsUtil {
     //TODO move auth keys to ConstantUtil
     public static void signOut(Context c) {
     	//destroy credentials
-		SettingsUtil.Write(c, "authorized_username", "");
-		SettingsUtil.Write(c, "authorized_userid",   "");
-		SettingsUtil.Write(c, "authorized_orgid",    "");
-		SettingsUtil.Write(c, "authorized_apikey",   "");
+		SettingsUtil.Write(c, ConstantUtil.AUTH_USERNAME_KEY, "");
+		SettingsUtil.Write(c, ConstantUtil.AUTH_USERID_KEY,   "");
+		SettingsUtil.Write(c, ConstantUtil.AUTH_ORGID_KEY,    "");
+        SettingsUtil.Write(c, ConstantUtil.AUTH_PROJID_KEY,   "");
+		SettingsUtil.Write(c, ConstantUtil.AUTH_APIKEY_KEY,   "");
     }
 
    
     public static void signIn(Context c, User user) {
     	//save credentials
-		SettingsUtil.Write(c, "authorized_username", user.getUsername());
-		SettingsUtil.Write(c, "authorized_userid",   user.getId());
-		SettingsUtil.Write(c, "authorized_orgid",    user.getOrgId());
-		SettingsUtil.Write(c, "authorized_apikey",   user.getApiKey());
+		SettingsUtil.Write(c, ConstantUtil.AUTH_USERNAME_KEY, user.getUsername());
+		SettingsUtil.Write(c, ConstantUtil.AUTH_USERID_KEY,   user.getId());
+        SettingsUtil.Write(c, ConstantUtil.AUTH_ORGID_KEY,    user.getOrgIdsString());//comma-separated list, possibly empty, never null
+        SettingsUtil.Write(c, ConstantUtil.AUTH_PROJID_KEY,   user.getPublishedProjIdsString());//comma-separated list, possibly empty, never null
+        SettingsUtil.Write(c, ConstantUtil.AUTH_APIKEY_KEY,   user.getApiKey());
     }
     
     public static boolean haveCredentials(Context c) {
-    	String u = SettingsUtil.Read(c, "authorized_username");
-		String i = SettingsUtil.Read(c, "authorized_userid");
-		String o = SettingsUtil.Read(c, "authorized_orgid");
-		String k = SettingsUtil.Read(c, "authorized_apikey");
+    	String u = SettingsUtil.Read(c, ConstantUtil.AUTH_USERNAME_KEY);
+		String i = SettingsUtil.Read(c, ConstantUtil.AUTH_USERID_KEY);
+        String o = SettingsUtil.Read(c, ConstantUtil.AUTH_ORGID_KEY);
+        String p = SettingsUtil.Read(c, ConstantUtil.AUTH_PROJID_KEY);
+		String k = SettingsUtil.Read(c, ConstantUtil.AUTH_APIKEY_KEY);
 		return u != null && !u.equals("")
 			&& i != null && !i.equals("")
-			&& o != null && !o.equals("")
+			&& o != null
+			&& p != null
 			&& k != null && !k.equals("");
     }
 
     public static User getAuthUser(Context c) {
 		User user = new User();
-		user.setUsername(SettingsUtil.Read(c, "authorized_username"));
-		user.setId(SettingsUtil.Read(c, "authorized_userid"));
-		user.setOrgId(SettingsUtil.Read(c, "authorized_orgid"));
-		user.setApiKey(SettingsUtil.Read(c, "authorized_apikey"));
+		user.setUsername(SettingsUtil.Read(c, ConstantUtil.AUTH_USERNAME_KEY));
+		user.setId(SettingsUtil.Read(c, ConstantUtil.AUTH_USERID_KEY));
+        String idstr = SettingsUtil.Read(c, ConstantUtil.AUTH_ORGID_KEY);
+        if (idstr != null) {
+            String ids[] = idstr.split(",");
+            for (String id : ids) if (id.length()>0) user.addOrgId(id);
+        }
+        String projstr = SettingsUtil.Read(c, ConstantUtil.AUTH_PROJID_KEY);
+        if (projstr != null) {
+            String ids[] = projstr.split(",");
+            for (String id : ids) if (id.length()>0) user.addPublishedProjId(id);
+        }
+		user.setApiKey(SettingsUtil.Read(c, ConstantUtil.AUTH_APIKEY_KEY));
 		return user;
     }
 
