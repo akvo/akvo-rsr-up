@@ -56,10 +56,17 @@ public class SettingsUtil {
     }
  
     public static void WriteInt(Context context, final String key, final int value) {
-          SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-          SharedPreferences.Editor editor = settings.edit();
-          editor.putInt(key, value);
-          editor.commit();        
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putInt(key, value);
+        editor.commit();        
+    }
+
+    public static void WriteLong(Context context, final String key, final long value) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putLong(key, value);
+        editor.commit();        
     }
 
     //convenience method to read current data host

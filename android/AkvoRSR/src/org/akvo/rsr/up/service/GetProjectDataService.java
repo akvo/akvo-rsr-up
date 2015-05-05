@@ -19,6 +19,7 @@ package org.akvo.rsr.up.service;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -68,7 +69,8 @@ public class GetProjectDataService extends IntentService {
         String errMsg = null;
         boolean fetchImages = !SettingsUtil.ReadBoolean(this, "setting_delay_image_fetch", false);
         String host = SettingsUtil.host(this);
-
+        Long start = System.currentTimeMillis();
+        
         ad.open();
         User user = SettingsUtil.getAuthUser(this);
         try {
@@ -91,11 +93,17 @@ public class GetProjectDataService extends IntentService {
 
                 if (mFetchUpdates) {
                     int j = 0;
+                    Date fetchdate = null;
                     for (String projId : user.getPublishedProjIds()) {
-                        dl.fetchUpdateListRestApiPaged(this, //TODO: use _extra for fewer fetches, as country and user data is included
+                        Date d = dl.fetchUpdateListRestApiPaged(this, //TODO: use _extra for fewer fetches, as country and user data is included
                             new URL(host + String.format(ConstantUtil.FETCH_UPDATE_URL_PATTERN, projId))                                            
                         );
+                        if (fetchdate == null) fetchdate = d; //grab the earliest server date
                         broadcastProgress(1, ++j, projects);
+                    }
+                    //fetch completed; remember fetch date
+                    if (fetchdate != null) {
+                    	SettingsUtil.WriteLong(this, "LastUpdatesFetchTime", fetchdate.getTime());
                     }
                 }
 
@@ -193,7 +201,10 @@ public class GetProjectDataService extends IntentService {
             if (ad != null)
                 ad.close();
         }
-
+        
+        Long end = System.currentTimeMillis();
+        Log.i(TAG, "Fetch complete in: "+ (end-start)/1000.0);
+        
         mRunning = false;
 
         // broadcast completion
