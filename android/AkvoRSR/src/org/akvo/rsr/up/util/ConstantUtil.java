@@ -91,6 +91,7 @@ public class ConstantUtil {
 	public static final String AUTH_USERID_KEY = "authorized_userid";
     public static final String AUTH_ORGID_KEY = "authorized_orgid";
     public static final String AUTH_PROJID_KEY = "authorized_projid";
+    public static final String AUTH_APPVERSION_KEY = "authorized_app_version";
 	public static final String LOCAL_ID_KEY	= "next_local_id";
 	public static final String FETCH_TIME_KEY = "last_updates_fetch_time";
 	/**
