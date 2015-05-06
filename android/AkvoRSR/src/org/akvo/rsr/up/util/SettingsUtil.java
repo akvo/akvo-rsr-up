@@ -21,6 +21,7 @@ import org.akvo.rsr.up.domain.User;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 
 public class SettingsUtil {
@@ -100,7 +101,8 @@ public class SettingsUtil {
             PackageInfo pInfo = c.getPackageManager().getPackageInfo(c.getPackageName(), 0);
             int version = pInfo.versionCode;
             SettingsUtil.WriteInt(c, ConstantUtil.AUTH_APPVERSION_KEY, version);
-        } catch (Exception e) {
+        }
+        catch (PackageManager.NameNotFoundException e) {
         }
 
     }
@@ -111,6 +113,17 @@ public class SettingsUtil {
         String o = SettingsUtil.Read(c, ConstantUtil.AUTH_ORGID_KEY);
         String p = SettingsUtil.Read(c, ConstantUtil.AUTH_PROJID_KEY);
         String k = SettingsUtil.Read(c, ConstantUtil.AUTH_APIKEY_KEY);
+        int oldVersion = ReadInt(c, ConstantUtil.AUTH_APPVERSION_KEY,0);
+        int version = -1;
+        try {
+            PackageInfo pInfo = c.getPackageManager().getPackageInfo(c.getPackageName(), 0);
+            version = pInfo.versionCode;
+            SettingsUtil.WriteInt(c, ConstantUtil.AUTH_APPVERSION_KEY, version);
+        }
+        catch (PackageManager.NameNotFoundException e) {
+        }
+        if (version != oldVersion) return false; //force new login when app was updated
+        
         return u != null && !u.equals("") && i != null && !i.equals("") && o != null && p != null && k != null && !k.equals("");
     }
 
