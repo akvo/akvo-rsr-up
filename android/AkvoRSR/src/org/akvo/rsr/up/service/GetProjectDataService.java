@@ -19,9 +19,11 @@ package org.akvo.rsr.up.service;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
@@ -92,18 +94,22 @@ public class GetProjectDataService extends IntentService {
                 broadcastProgress(0, 100, 100);
 
                 if (mFetchUpdates) {
+                	Date lastFetch = new Date(SettingsUtil.ReadLong(this, ConstantUtil.FETCH_TIME_KEY, 0L));
+                	SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
+            		df1.setTimeZone(TimeZone.getTimeZone("UTC"));
+                	
                     int j = 0;
                     Date fetchdate = null;
                     for (String projId : user.getPublishedProjIds()) {
-                        Date d = dl.fetchUpdateListRestApiPaged(this, //TODO: use _extra for fewer fetches, as country and user data is included
-                            new URL(host + String.format(ConstantUtil.FETCH_UPDATE_URL_PATTERN, projId))                                            
+                        Date d = dl.fetchUpdateListRestApiPaged(this, //Could use _extra API for fewer fetches, as country and user data is included
+                            new URL(host + String.format(ConstantUtil.FETCH_UPDATE_URL_PATTERN, projId, df1.format(lastFetch)))                                            
                         );
                         if (fetchdate == null) fetchdate = d; //grab the earliest server date
                         broadcastProgress(1, ++j, projects);
                     }
                     //fetch completed; remember fetch date
                     if (fetchdate != null) {
-                    	SettingsUtil.WriteLong(this, "LastUpdatesFetchTime", fetchdate.getTime());
+                    	SettingsUtil.WriteLong(this, ConstantUtil.FETCH_TIME_KEY, fetchdate.getTime());
                     }
                 }
 

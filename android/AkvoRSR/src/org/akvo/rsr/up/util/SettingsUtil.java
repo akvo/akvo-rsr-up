@@ -49,10 +49,14 @@ public class SettingsUtil {
           editor.commit();        
     }
     
-    // Integer
     public static int ReadInt(Context context, final String key, final int defaultValue) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         return settings.getInt(key, defaultValue);
+    }
+ 
+    public static long ReadLong(Context context, final String key, final long defaultValue) {
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+        return settings.getLong(key, defaultValue);
     }
  
     public static void WriteInt(Context context, final String key, final int value) {
@@ -74,7 +78,6 @@ public class SettingsUtil {
     	return Read(context,ConstantUtil.HOST_SETTING_KEY);
     }
    
-    //TODO move auth keys to ConstantUtil
     public static void signOut(Context c) {
     	//destroy credentials
 		SettingsUtil.Write(c, ConstantUtil.AUTH_USERNAME_KEY, "");
@@ -82,6 +85,7 @@ public class SettingsUtil {
 		SettingsUtil.Write(c, ConstantUtil.AUTH_ORGID_KEY,    "");
         SettingsUtil.Write(c, ConstantUtil.AUTH_PROJID_KEY,   "");
 		SettingsUtil.Write(c, ConstantUtil.AUTH_APIKEY_KEY,   "");
+		SettingsUtil.WriteLong(c, ConstantUtil.FETCH_TIME_KEY, 0); //if we later log in as sbdy else, force fetching of all updates
     }
 
    

@@ -34,7 +34,8 @@ public class ConstantUtil {
 	public static final String AUTH_URL = "/auth/token/";
 	public static final String API_KEY_PATTERN = "&api_key=%s&username=%s";
     public static final String POST_UPDATE_URL = "/rest/v1/project_update/?format=xml";
-    public static final String FETCH_UPDATE_URL_PATTERN = "/rest/v1/project_update/?format=xml&project=%s";//use default limit
+//    public static final String FETCH_UPDATE_URL_PATTERN = "/rest/v1/project_update/?format=xml&project=%s";//use default limit
+    public static final String FETCH_UPDATE_URL_PATTERN = "/rest/v1/project_update/?format=xml&project=%s&last_modified_at__gt=%s";//use default limit
     public static final String VERIFY_UPDATE_PATTERN = "/rest/v1/project_update/?format=xml&uuid=%s&limit=2";
     public static final String FETCH_PROJ_URL_PATTERN = "/rest/v1/project_up/%s/?format=xml&image_thumb_name=up&image_thumb_up_width=100"; //now asks for thumbnail size
     public static final String FETCH_COUNTRIES_URL = "/rest/v1/country/?format=xml&limit=50"; //very small objects - get many at a time
@@ -91,7 +92,7 @@ public class ConstantUtil {
     public static final String AUTH_ORGID_KEY = "authorized_orgid";
     public static final String AUTH_PROJID_KEY = "authorized_projid";
 	public static final String LOCAL_ID_KEY	= "next_local_id";
-
+	public static final String FETCH_TIME_KEY = "last_updates_fetch_time";
 	/**
 	 * intents
 	 */
