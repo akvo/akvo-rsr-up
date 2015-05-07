@@ -131,7 +131,7 @@ public class UpdateRestListHandler extends DefaultHandler {
 	/*
 	 * constructor
 	 */
-	public UpdateRestListHandler(RsrDbAdapter aDba, boolean insert) {
+	public UpdateRestListHandler(RsrDbAdapter aDba, boolean insert, String serverVersion) {
 		super();
 		dba = aDba;
         this.insert = insert;

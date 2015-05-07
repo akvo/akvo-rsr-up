@@ -41,7 +41,6 @@ import org.akvo.rsr.up.xml.CountryListHandler;
 import org.akvo.rsr.up.xml.CountryRestListHandler;
 import org.akvo.rsr.up.xml.OrganisationHandler;
 import org.akvo.rsr.up.xml.ProjectExtraRestHandler;
-import org.akvo.rsr.up.xml.UpdateExtraRestListHandler;
 import org.akvo.rsr.up.xml.UpdateRestHandler;
 import org.akvo.rsr.up.xml.UpdateRestListHandler;
 import org.akvo.rsr.up.xml.UserListHandler;
@@ -58,7 +57,6 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.text.method.DateTimeKeyListener;
 import android.util.Log;
 
 /*
@@ -126,7 +124,7 @@ public class Downloader {
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	public void fetchProject(Context ctx, RsrDbAdapter dba, URL url) throws ParserConfigurationException, SAXException, IOException {
+	public Date fetchProject(Context ctx, RsrDbAdapter dba, URL url) throws ParserConfigurationException, SAXException, IOException {
 
         User user = SettingsUtil.getAuthUser(ctx);
         HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
@@ -160,6 +158,7 @@ public class Downloader {
             Log.e(TAG, h.body());
             throw new IOException("Unexpected server response " + code);
         }
+        return serverDate;
 
 	}
 
@@ -183,18 +182,17 @@ public class Downloader {
         HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
         h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
         int code = h.code();//evaluation starts the exchange
-        String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
         Date serverDate = new Date(h.date());
         if (code == 200) {
+            String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
             /* Get a SAXParser from the SAXPArserFactory. */
             SAXParserFactory spf = SAXParserFactory.newInstance();
             SAXParser sp = spf.newSAXParser();
             /* Get the XMLReader of the SAXParser we created. */
             XMLReader xr = sp.getXMLReader();
             /* Create a new ContentHandler and apply it to the XML-Reader*/ 
-            UpdateRestListHandler myUpdateListHandler = new UpdateRestListHandler(new RsrDbAdapter(ctx), true);
+            UpdateRestListHandler myUpdateListHandler = new UpdateRestListHandler(new RsrDbAdapter(ctx), true, serverVersion);
             //the following will need to be called in a loop to get it page by page, or it would probably take too long for server
-//            UpdateExtraRestListHandler myUpdateListHandler = new UpdateExtraRestListHandler(new RsrDbAdapter(ctx), true, serverVersion);
             xr.setContentHandler(myUpdateListHandler);
             /* Parse the xml-data from our URL. */
             xr.parse(new InputSource(h.stream()));
@@ -231,7 +229,7 @@ public class Downloader {
         Date serverDate = null;
         User user = SettingsUtil.getAuthUser(ctx);
         int total = 0;
-        //the is called in a loop to get it page by page, otherwise it would take too long for server
+        //the fetch is called in a loop to get it page by page, otherwise it would take too long for server
         //and it would not scale beyond 1000 updates in any case
         while (url != null) {
             HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
@@ -242,8 +240,7 @@ public class Downloader {
                 serverDate = new Date(h.date());
                 SAXParserFactory spf = SAXParserFactory.newInstance();
                 XMLReader xr = spf.newSAXParser().getXMLReader();
-                UpdateRestListHandler xmlHandler = new UpdateRestListHandler(new RsrDbAdapter(ctx), true);
-    //            UpdateExtraRestListHandler myUpdateListHandler = new UpdateExtraRestListHandler(new RsrDbAdapter(ctx), true, serverVersion);
+                UpdateRestListHandler xmlHandler = new UpdateRestListHandler(new RsrDbAdapter(ctx), true, serverVersion);
                 xr.setContentHandler(xmlHandler);
                 /* Parse the xml-data from our URL. */
                 xr.parse(new InputSource(h.stream()));
@@ -294,6 +291,7 @@ public class Downloader {
         h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
         int code = h.code();//evaluation starts the exchange
         if (code == 200) {
+            String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
             /* Get a SAXParser from the SAXPArserFactory. */
     		SAXParserFactory spf = SAXParserFactory.newInstance();
     		try {
@@ -302,7 +300,7 @@ public class Downloader {
         		/* Get the XMLReader of the SAXParser we created. */
         		XMLReader xr = sp.getXMLReader();
         		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
-        		UpdateRestListHandler updateHandler = new UpdateRestListHandler(null, false);
+        		UpdateRestListHandler updateHandler = new UpdateRestListHandler(null, false, serverVersion);
         		xr.setContentHandler(updateHandler);
         		/* Parse the xml-data from our URL. */
                 xr.parse(new InputSource(h.stream()));
