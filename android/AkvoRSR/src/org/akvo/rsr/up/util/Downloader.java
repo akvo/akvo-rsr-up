@@ -66,13 +66,14 @@ import android.util.Log;
  *  Authorize()  - Special API, updated for RSR V3
  *  postXmlUpdateStreaming() NEW (necessary for geolocated updates)
  *  verifyUpdate() NEW
- *  fetchcountryList() OLD - should be rolled into fetchUpdateListRestApi
+ *  fetchcountryListRestApiPaged() NEW
  *  fetchNewThumbnails() OLD
- *  fetchOrg() OLD - will be rolled into fetchUpdateListRestApi
+ *  fetchOrg() OLD
  *  fetchProjectList() OLD
  *  fetchUpdateList() OLD - unused
- *  fetchUpdateListRestApi() NEW - should call project_update_extra call
- *  fetchUser() OLD - will be rolled into fetchUpdateListRestApi
+ *  fetchUpdateListRestApi() NEW
+ *  fetchUpdateListRestApiPaged() NEW
+ *  fetchUser() OLD
  * 
  * New parser classes have names containing the word REST.
  * The old parsers should be removed once the migration is complete.
