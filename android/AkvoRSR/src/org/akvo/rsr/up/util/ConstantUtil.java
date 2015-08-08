@@ -76,7 +76,8 @@ public class ConstantUtil {
 	 * keys for saved state and bundle extras
 	 */
 	public static final String PROJECT_ID_KEY = "org.akvo.rsr.up.PROJECT";
-	public static final String UPDATE_ID_KEY = "org.akvo.rsr.up.UPDATE";
+    public static final String UPDATE_ID_KEY = "org.akvo.rsr.up.UPDATE";
+    public static final String IMAGE_FILENAME_KEY = "org.akvo.rsr.up.IMAGE_FILENAME";
 
 	
 	/**
