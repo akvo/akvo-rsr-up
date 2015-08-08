@@ -27,7 +27,7 @@
     <string name="action_attach_photo">Attach Photo</string>
     <string name="action_logout">Log out</string>
     <string name="action_sendall">Send all unsent</string>
-    <string name="copyright">Copyright &#169; 2012-2014 Stichting Akvo</string>
+    <string name="copyright">Copyright &#169; 2012-2015 Stichting Akvo</string>
     <string name="powered_by_akvo">Powered by Akvo</string>
     <string name="title_activity_login">Akvo RSR Up</string>
     <string name="title_activity_project_list">RSR Up</string>

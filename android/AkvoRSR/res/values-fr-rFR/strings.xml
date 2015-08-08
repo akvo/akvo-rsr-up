@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
+ *
+ *  This file is part of Akvo RSR.
+ *
+ *  Akvo RSR is free software: you can redistribute it and modify it under the terms of
+ *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+ *  either version 3 of the License or any later version.
+ *
+ *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Affero General Public License included below for more details.
+ *
+ *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ -->
+ <resources>
+     
+  <string name="app_name">Akvo RSR Up</string>
+  <string name="app_subtitle">Le rapportage simplifié</string>
+  <string name="app_version">Version</string>
+  <string name="action_settings">Paramètres</string>
+  <string name="action_diagnostics">Diagnostics</string>
+  <string name="action_about">A propos de</string>
+  <string name="action_add_update">Ajouter une mise à jour</string>
+  <string name="action_delete_update">Effacer une mise à jour</string>
+  <string name="action_attach_photo">Joindre une photo</string>
+  <string name="action_logout">Déconnecter</string>
+  <string name="action_sendall">Envoyer tous les non-envoyés</string>
+  <string name="copyright">Copyright © 2012-2015 Stichting Akvo</string>
+  <string name="powered_by_akvo">Développé par Akvo</string>
+  <string name="title_activity_login">Akvo RSR Up</string>
+  <string name="title_activity_project_list">RSR Up</string>
+  <string name="title_activity_project_detail">RSR Up</string>
+  <string name="title_activity_update_list">RSR Up</string>
+  <string name="title_activity_update_edit">RSR Up</string>
+  <string name="title_activity_update_detail">RSR Up</string>
+  <string name="title_activity_settings">Paramètres RSR Up</string>
+  <string name="title_activity_diagnostics">Diagnostic RSR Up</string>
+  <string name="title_activity_about">A propos de RSR Up</string>
+  <string name="title_activity_license">Information sur la licence de RSR Up</string>
+  <string name="title_activity_messages">Messages RSR Up</string>
+  <string name="license">Information sur la licence</string>
+  <string name="label_update_title">Ajouter une mise à jour de projet</string>
+  <string name="hint_update_title">Titre</string>
+  <string name="hint_search">Rechercher</string>
+  <string name="label_update_description">Description de la mise à jour:</string>
+  <string name="label_send_progress">Publication de la mise à jour en cours </string>
+  <string name="label_project_location">Lieu/ Localisation:</string>
+  <string name="label_project_summary">Résumé:</string>
+  <string name="hint_update_description">Description</string>
+  <string name="hint_update_caption">Légende de la photo</string>
+  <string name="hint_update_credit">Auteur de la photo</string>
+  <string name="label_photo_credit">Photo: %s</string>
+  <string name="label_empty_proj_list">Rien à présenter avec ce filtre.</string>
+  <string name="label_first_proj_list">Aucune photo disponible. Utilisez le bouton de rafraichissement pour voir vos projets.\n\nAu cas ou vous utilisez une faible connexion internet, vous pouvez d\'abord aller dans les paramètres et sélectionner \" Charger les photos ultérieurement” .</string>
+  <string name="label_unemployed_proj_list">Vous êtes connecté à aucun projet.\n\n Vous devez d\'abord utiliser l\'interface internet pour vous connectez et faire la demande d\'être ajouté à un projet .</string>
+  <string name="label_proj_list">Vos projets:</string>
+  <string name="label_update_list">Mises à jour:</string>
+  <string name="label_refresh_progress">Progression de l\'actualisation</string>
+  <string name="label_progress_projects">Projets</string>
+  <string name="label_progress_updates">Mises à jour</string>
+  <string name="label_progress_pictures">Photos</string>
+  <string name="label_clearcache_freespace">%d MB libres. Vos photos sont sauvergadées.</string>
+  <string name="label_settings_general">Général</string>
+  <string name="label_settings_testing">En Test</string>
+  <string name="label_setting_delaypics">Charger les photos ultérieurement</string>
+  <string name="summary_setting_delaypics">Ne pas charger les photos jusqu\'au moment où elles sont sélectionnées par un clic. Le rafraichissement est rapide, mais les photos ne sont pas disponibles hors ligne.</string>
+  <string name="label_setting_clearcache">Effacer les photos mises en caches</string>
+  <string name="label_setting_host">Serveur de données</string>
+  <string name="label_setting_feedback">Donner une réaction</string>
+  <string name="label_setting_feedback_version">Donner une réaction sur la ver %s</string>
+  <string name="label_setting_debuginfo">Déboguer</string>
+  <string name="label_setting_removeloc">Supprimer localisation de photo</string>
+  <string name="summary_setting_feedback">Ouvrir un formulaire de réaction en ligne, pour partager votre opinion sur cet application.</string>
+  <string name="summary_setting_debuginfo">Présenter ids de projets et mises à jour, et autre information de débogages.</string>
+  <string name="summary_setting_removeloc">Information de géolocalisation dans les photos sera effacée avant de télécharger</string>
+  <string name="label_setting_messages">Montrer/ présenter les messages</string>
+  <string name="summary_setting_messages">Afficher une liste des erreurs et autres messages</string>
+  <string name="state_draft">Version préliminaire</string>
+  <string name="state_published">Publié</string>
+  <string name="state_synchronising">Synchronisation</string>
+  <string name="count_draft">&#160;Version préliminaire</string>
+  <string name="count_published">&#160;Publié</string>
+  <string name="count_zero">Pas de mises à jours/ aucune mise à jour</string>
+  <string name="count_unsynch">&#160;Non-synchronisé</string>
+  <string name="updates_txt">Statut de mises à jours</string>
+  <string name="username">Nom d\'utilisateur</string>
+  <string name="email_address">Adresse e-mail</string>
+  <string name="password">Mot de passe</string>
+  <string name="forgot_password_">Avez-vous oublié votre mot de passe?</string>
+  <string name="btncaption_sign_in">S\'ENREGISTRER</string>
+  <string name="btncaption_take_photo">Prenez une photo</string>
+  <string name="btncaption_attach_photo">Joindre une photo</string>
+  <string name="btncaption_rephoto">Remplacer une photo</string>
+  <string name="btncaption_dephoto">Effacer une photo</string>
+  <string name="btncaption_rotphoto">Tourner la photo</string>
+  <string name="btncaption_add_update">Ajouter une mise à jour</string>
+  <string name="btncaption_edit_update">Editer cette mise à jour</string>
+  <string name="btncaption_refresh">Rafraichir la liste des projets</string>
+  <string name="btncaption_viewupdates">Voir toutes les mises à jour</string>
+  <string name="btncaption_clear_data">Effacer toutes les données</string>
+  <string name="btncaption_send_update">Envoyer une mise à jour</string>
+  <string name="btncaption_save_draft">Sauvegarder la version préliminaire</string>
+  <string name="btncaption_gps_position">Veuillez prendre votre géolocalisation</string>
+  <string name="btncaption_gps_cancel">Annuler la prise de géolocalisation</string>
+  <string name="btncaption_photo_position">Utiliser la géolocalisation de photo</string>
+  <string name="btncaption_details">Détails</string>
+  <string name="host_dialog_title">Entrer le nouveau nom d\'hôte des données</string>
+  <string name="host_dialog_msg">Toutes les données locales seront effacées.\nExemple: rsr.akvo.org ou https://rsr.akvotest.org</string>
+  <string name="send_progress_title">En train de publier</string>
+  <string name="send_progress_msg">Envoi des mises à jour au serveur...</string>
+  <string name="error_dialog_title">Erreur</string>
+  <string name="nocard_dialog_title">Pas de stockage disponible</string>
+  <string name="nocard_dialog_msg">Akvo RSR exige une carte de stockage accessible et modifiable, pour les fichiers d\'images. Monter la carte et redémarrer l\'application</string>
+  <string name="noid_dialog_title">Pas d\'id de projets/mise à jour </string>
+  <string name="noid_dialog_msg">Le visiteur n\'a pas spécifié de projet ni de mise à jour</string>
+  <string name="noupd_dialog_title">Mise à jour manquante</string>
+  <string name="noupd_dialog_msg">Ne peut pas trouver de mise à jour à montrer</string>
+  <string name="noupd2_dialog_msg">Ne peut pas trouver la mise à jour pour éditer</string>
+  <string name="noproj_dialog_title">Pas d\'id de projet</string>
+  <string name="noproj_dialog_msg">Le visiteur n\'a pas spécifié de projet</string>
+  <string name="norot_dialog_title">Erreur IO en tournant le fichier de photo</string>
+  <string name="norot_dialog_title2">La photo est trop large pour tourner</string>
+  <string name="norot_dialog_msg">Essayer une photo de résolution plus basse</string>
+  <string name="warnbig_dialog_title">Fichier de photo est trop large</string>
+  <string name="warnbig_dialog_msg1">Régler votre caméra à une résolution plus basse</string>
+  <string name="warnbig_dialog_msg2">Choisir une photo plus petite</string>
+  <string name="shrinkbig_dialog_title">La photo n\'a pu être rétréci</string>
+  <string name="shrinkbig_dialog_msg">L\'original était trop large pour être traité</string>
+  <string name="nonet_dialog_title">Pas de réseau disponible</string>
+  <string name="nonet_dialog_msg">Il faut être connecté à l\'Internet </string>
+  <string name="login_progress_title">S\'enregistrer</string>
+  <string name="login_progress_msg">Envoi de l\'information d\'enregistrement</string>
+  <string name="cleared_dialog_title">Cache effacé</string>
+  <string name="cleared_dialog_msg">%1$d fichiers effacées (%2$d MB)</string>
+  <string name="detail_dialog_title">Détails des erreurs</string>
+  <string name="gpsdisabled_dialog_msg">Le GPS doit être activé pour exécuter cet action. Sélectionnez OK pour aller vers les paramètres. Sélectionnez \"utiliser satellites de GPS\" et appuyez sur le bouton de retour. Une fois le GPS activé, vous pouvez cliquer de nouveau sur \'vérifier géolocalisation\' pour enregistrer votre position</string>
+  <string name="label_gps_searching">En recherche</string>
+  <string name="label_gps_ready">Prêt</string>
+  <string name="label_accuracy">Précision</string>
+  <string name="label_latitude">Latitude</string>
+  <string name="label_longitude">Longitude</string>
+  <string name="label_elevation">Hauteur</string>
+  <string name="msg_update_published">Mise à jour publiée</string>
+  <string name="msg_update_success">Mise à jour bien envoyée au serveur</string>
+  <string name="msg_update_interrupted">Réseau de connexion absent durant l\'envoi de la mise à jour</string>
+  <string name="msg_update_duplicated">La mise à jour a été dupliqué sur le serveur. Veuillez informer les développeurs. </string>
+  <string name="msg_network_problem">Problème de connexion au réseau</string>
+  <string name="msg_synchronising">Synchronisation de mise à jour continue</string>
+  <string name="msg_update_drafted">Mise à jour sauvegardée comme version préliminaire</string>
+  <string name="msg_success_drafted">Version préliminaire bien sauvergardée</string>
+  <string name="msg_logged_in_as_template">Connecté comme %s</string>
+  <string name="msg_fetch_complete">Téléchargement complet</string>
+  <string name="msg_check_network">Veuillez vérifier votre connexion au réseau</string>
+  <string name="errmsg_empty_title">Une mise à jour nécessite d\'avoir un titre</string>
+  <string name="errmsg_bad_url">URL invalide!</string>
+  <string name="errmsg_not_found_on_server">Ne peut pas trouver:</string>
+  <string name="errmsg_com_failure">Erreur de communication avec le serveur</string>
+  <string name="errmsg_update_fetch_failed">Téléchargement des mises à jour a échoué</string>
+  <string name="errmsg_user_fetch_failed">Téléchargement d\'utilisateur a échoué</string>
+  <string name="errmsg_org_fetch_failed">Téléchargement des organisations a échoué</string>
+  <string name="errmsg_signin_denied">Mauvais mot de passe et/ou utilisateur</string>
+  <string name="errmsg_signin_failed">Pas capable d\'autoriser</string>
+  <string name="btncaption_ok">OK</string>
+  <string name="btncaption_cancel">Annuler</string>
+  <string name="authtitle">Autorisation exigée</string>
+  <string name="authtext">Veuillez entrer le mot de passe d\'admin</string>
+  <string name="authfailed">Autorisation a échouée</string>
+  <string name="invalidpassword">Mot de passe invalide</string>
+  <string name="dummy_project_title">Ici titre de projet</string>
+  <string name="dummy_update_title">Ici titre de mise à jour</string>
+  <string name="dummy_update_description">Une description de mise à jour se présente ici, et peut être de n\'importe quelle longueur. La mise à jour peut être défilée, mais le bouton reste fixé en bas de l\'écran.</string>
+  <string name="dummy_author">Nomen Nescio, Akvo</string>
+  <string name="dummy_count">17</string>
+  <string name="dummy_time">2014-04-23 17:18</string>
+  <string name="dummy_version">0.0</string>
+  <string name="lorem_ipsum">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent pharetra ultricies ante, imperdiet viverra nisi rutrum a. Integer consequat laoreet malesuada. Nam fermentum risus id aliquet pellentesque. Sed nec nisl in turpis sodales ultricies. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Interdum et malesuada fames ac ante ipsum primis in faucibus.</string>
+  <string-array name="types">
+    <item>Type 1</item>
+    <item>Type 2</item>
+    <item>Type 3</item>
+  </string-array>
+  <string-array name="types_values">
+    <item>1</item>
+    <item>2</item>
+    <item>3</item>
+  </string-array>
+</resources>
