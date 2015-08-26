@@ -90,6 +90,7 @@ public class SettingsActivity extends PreferenceActivity {
 													ConstantUtil.HOST_SETTING_KEY,
 													s);
 											//clear local database to prevent db mixups
+                                            SettingsUtil.WriteLong(SettingsActivity.this, ConstantUtil.FETCH_TIME_KEY, 0L); //forget time of last fetch
 											FileUtil.clearCache(SettingsActivity.this, false);
 											RsrDbAdapter mDb = new RsrDbAdapter(SettingsActivity.this);
 											mDb.open();
