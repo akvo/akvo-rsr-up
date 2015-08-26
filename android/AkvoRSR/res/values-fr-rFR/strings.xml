@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <!-- 
  *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
  *
@@ -14,8 +14,8 @@
  *
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  -->
- <resources>
-     
+ 
+<resources>
   <string name="app_name">Akvo RSR Up</string>
   <string name="app_subtitle">Le rapportage simplifié</string>
   <string name="app_version">Version</string>
@@ -63,7 +63,7 @@
   <string name="label_progress_pictures">Photos</string>
   <string name="label_clearcache_freespace">%d MB libres. Vos photos sont sauvergadées.</string>
   <string name="label_settings_general">Général</string>
-  <string name="label_settings_testing">En Test</string>
+  <string name="label_settings_testing">Test</string>
   <string name="label_setting_delaypics">Charger les photos ultérieurement</string>
   <string name="summary_setting_delaypics">Ne pas charger les photos jusqu\'au moment où elles sont sélectionnées par un clic. Le rafraichissement est rapide, mais les photos ne sont pas disponibles hors ligne.</string>
   <string name="label_setting_clearcache">Effacer les photos mises en caches</string>
@@ -71,20 +71,20 @@
   <string name="label_setting_feedback">Donner une réaction</string>
   <string name="label_setting_feedback_version">Donner une réaction sur la ver %s</string>
   <string name="label_setting_debuginfo">Déboguer</string>
-  <string name="label_setting_removeloc">Supprimer localisation de photo</string>
-  <string name="summary_setting_feedback">Ouvrir un formulaire de réaction en ligne, pour partager votre opinion sur cet application.</string>
+  <string name="label_setting_removeloc">Supprimer la localisation des photos</string>
+  <string name="summary_setting_feedback">Ouvrir un formulaire de réaction en ligne, pour partager votre opinion sur cette application.</string>
   <string name="summary_setting_debuginfo">Présenter ids de projets et mises à jour, et autre information de débogages.</string>
-  <string name="summary_setting_removeloc">Information de géolocalisation dans les photos sera effacée avant de télécharger</string>
+  <string name="summary_setting_removeloc">L\'information de géolocalisation dans les photos sera effacée avant de télécharger</string>
   <string name="label_setting_messages">Montrer/ présenter les messages</string>
   <string name="summary_setting_messages">Afficher une liste des erreurs et autres messages</string>
   <string name="state_draft">Version préliminaire</string>
   <string name="state_published">Publié</string>
   <string name="state_synchronising">Synchronisation</string>
-  <string name="count_draft">&#160;Version préliminaire</string>
-  <string name="count_published">&#160;Publié</string>
+  <string name="count_draft">Version préliminaire</string>
+  <string name="count_published">publiées</string>
   <string name="count_zero">Pas de mises à jours/ aucune mise à jour</string>
-  <string name="count_unsynch">&#160;Non-synchronisé</string>
-  <string name="updates_txt">Statut de mises à jours</string>
+  <string name="count_unsynch">Non-synchronisé</string>
+  <string name="updates_txt">Statut des mises à jour</string>
   <string name="username">Nom d\'utilisateur</string>
   <string name="email_address">Adresse e-mail</string>
   <string name="password">Mot de passe</string>
