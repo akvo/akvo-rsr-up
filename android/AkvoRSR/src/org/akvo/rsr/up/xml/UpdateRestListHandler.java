@@ -72,6 +72,10 @@ import org.xml.sax.helpers.DefaultHandler;
 </results>
 </root>
 
+
+In old entries <locations></locations> is an empty list and <primary_location></primary_location> is also empty
+
+
  */
 
 
@@ -266,8 +270,8 @@ public class UpdateRestListHandler extends DefaultHandler {
         } else if (localName.equals(LIST_ITEM)) { 
             if (in_location) {//we are done with this location
                 this.in_location = false;
-            } else { //we are done with an update
-                //TODO: verify that stored location is the primary one, otherwise raise an error
+            } else if (in_update && depth==2){  //we are done with an entire update
+                //TODO: verify that stored_location_id equals primary_location_id, otherwise raise an error
                 this.in_update = false;
                 if (currentUpd != null && currentUpd.getId() != null) {
                     updateCount++;
@@ -275,6 +279,8 @@ public class UpdateRestListHandler extends DefaultHandler {
                         dba.saveUpdate(currentUpd, false); //preserve name of any cached image
                         currentUpd = null;
                     }
+                } else {
+                    syntaxError = true; 
                 }
             }
         } else if (localName.equals("id")) {
@@ -351,6 +357,7 @@ public class UpdateRestListHandler extends DefaultHandler {
 			 || this.in_title
 			 || this.in_uuid
              || this.in_user_id
+             || this.in_primary_location
              || this.in_location_id
 			 || this.in_project_id
              || this.in_photo

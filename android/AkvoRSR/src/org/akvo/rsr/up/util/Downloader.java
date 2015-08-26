@@ -69,11 +69,10 @@ import android.util.Log;
  *  fetchcountryListRestApiPaged() NEW
  *  fetchNewThumbnails() OLD
  *  fetchOrg() OLD
- *  fetchProjectList() OLD
- *  fetchUpdateList() OLD - unused
  *  fetchUpdateListRestApi() NEW
  *  fetchUpdateListRestApiPaged() NEW
  *  fetchUser() OLD
+ *  fetchProject() NEW
  * 
  * New parser classes have names containing the word REST.
  * The old parsers should be removed once the migration is complete.
@@ -230,25 +229,34 @@ public class Downloader {
         Date serverDate = null;
         User user = SettingsUtil.getAuthUser(ctx);
         int total = 0;
+        int page = 0;
         //the fetch is called in a loop to get it page by page, otherwise it would take too long for server
         //and it would not scale beyond 1000 updates in any case
+        RsrDbAdapter dba = new RsrDbAdapter(ctx);
         while (url != null) {
             HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
             h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
             int code = h.code();//evaluation starts the exchange
             if (code == 200) {
+                page++;
                 String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
                 serverDate = new Date(h.date());
                 SAXParserFactory spf = SAXParserFactory.newInstance();
                 XMLReader xr = spf.newSAXParser().getXMLReader();
-                UpdateRestListHandler xmlHandler = new UpdateRestListHandler(new RsrDbAdapter(ctx), true, serverVersion);
+                UpdateRestListHandler xmlHandler = new UpdateRestListHandler(dba, true, serverVersion);
                 xr.setContentHandler(xmlHandler);
                 /* Parse the xml-data from our URL. */
                 xr.parse(new InputSource(h.stream()));
                 /* Parsing has finished. */
                 /* Check if anything went wrong. */
                 err = xmlHandler.getError();
+                Log.d(TAG, "URL " + url.toString());
                 Log.i(TAG, "Fetched " + xmlHandler.getCount() + " updates; target total = "+ xmlHandler.getTotalCount());
+
+                dba.open();
+                Log.d(TAG, "Updates in db: " + dba.listAllUpdates().getCount());
+                dba.close();
+                
                 total += xmlHandler.getCount();
                 if (xmlHandler.getNextUrl().length() == 0) { //string needs to be trimmed from whitespace
                     url = null;//we are done
@@ -270,7 +278,7 @@ public class Downloader {
                 throw new FailedFetchException("Unexpected server response " + code + ' ' + h.message());
             }
         }
-        Log.i(TAG, "Grand total of " + total + " updates");
+        Log.i(TAG, "Grand total of " + page + " pages, " + total + " updates");
         return serverDate;
     }
 

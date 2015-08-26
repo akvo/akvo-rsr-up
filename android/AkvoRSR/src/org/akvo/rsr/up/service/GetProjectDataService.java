@@ -105,7 +105,7 @@ public class GetProjectDataService extends IntentService {
                             new URL(host + String.format(ConstantUtil.FETCH_UPDATE_URL_PATTERN, projId, df1.format(lastFetch)))                                            
                         );
                         if (fetchdate == null) fetchdate = d; //grab the earliest server date
-                        broadcastProgress(1, ++j, projects);
+                        broadcastProgress(1, ++j, projects); //this is *very* uninformative for a user w one project and many updates!
                     }
                     //fetch completed; remember fetch date
                     if (fetchdate != null) {
