@@ -769,8 +769,10 @@ public class Downloader {
         final String imageCaptionTemplate = "<photo_caption>%s</photo_caption>";
         final String imageCreditTemplate = "<photo_credit>%s</photo_credit>";
         //Just long+lat for location. We do not currently do reverse geocoding in the app.
-        //Country used to be mandatory, but that was changed
+        //Location used to be mandatory, but that was changed in or before RSR 3.6
         final String locationTemplate = "<locations><list-item><longitude>%s</longitude><latitude>%s</latitude></list-item></locations>";
+//        final String noLocation = "<locations></locations>"; //This works in JSON but not in XML
+        final String noLocation = "";
         final boolean simulateUnresolvedPost = false;
         
         boolean allSent = false;
@@ -837,7 +839,7 @@ public class Downloader {
 			if (update.validLatLon()) {
                 h.send(String.format(locationTemplate, update.getLongitude(), update.getLatitude()));
             } else {
-                h.send(String.format(locationTemplate, "0", "0"));
+                h.send(noLocation);
             }
 			
 			h.send(bodyTemplate2);
