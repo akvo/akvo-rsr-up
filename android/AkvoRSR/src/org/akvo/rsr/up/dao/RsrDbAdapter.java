@@ -64,6 +64,7 @@ public class RsrDbAdapter {
     public static final String UUID_COL = "uuid";
     public static final String PHOTO_CREDIT_COL = "photo_credit";
     public static final String PHOTO_CAPTION_COL = "photo_caption";
+	public static final String LAST_FETCH_COL = "last_fetch";
 
 	public static final String LAT_COL = "latitude";
     public static final String LON_COL = "longitude";
@@ -101,7 +102,9 @@ public class RsrDbAdapter {
 			"create table project (_id integer primary key, "+
 			"title text not null, subtitle text, summary text, funds real, "+
 			"thumbnail_url text, thumbnail_fn text," +
-			"longitude text, latitude text, elevation text, country_id integer, state text, city text, hidden integer);";
+			"longitude text, latitude text, elevation text," +
+			"country_id integer, state text, city text, hidden integer," +
+			LAST_FETCH_COL + " integer);";
 	private static final String UPDATE_TABLE_CREATE =
 			"create table _update (_id integer primary key, project integer not null, userid integer not null, "+
 			"title text not null, _text text, location text, uuid text,"+
@@ -145,7 +148,8 @@ public class RsrDbAdapter {
 //  private static final int DATABASE_VERSION = 12; //uuid for updates
 //  private static final int DATABASE_VERSION = 13; //org table
 //  private static final int DATABASE_VERSION = 14; //update now has photo metadata and video
-    private static final int DATABASE_VERSION = 15; //update now has location
+//    private static final int DATABASE_VERSION = 15; //update now has location
+    private static final int DATABASE_VERSION = 16; //project gets a last_fetch datetime to optimize fetches
 
 	private final Context context;
 
@@ -211,6 +215,9 @@ public class RsrDbAdapter {
                     db.execSQL("alter table " + UPDATE_TABLE + " add column state text");
                     db.execSQL("alter table " + UPDATE_TABLE + " add column city text");
                     db.execSQL("alter table " + UPDATE_TABLE + " add column country_id integer");
+                }
+                if (oldVersion < 16) { //remember last fetch of a oproject
+                    db.execSQL("alter table " + PROJECT_TABLE + " add column " + LAST_FETCH_COL + " integer");
                 }
             }
 			/*
@@ -441,6 +448,16 @@ public class RsrDbAdapter {
 
 	
 	/*
+	 *  Update the last-fetch date for the updates in a project
+	 */
+	public void updateProjectLastFetch(String id, Date lastfetch) {
+		ContentValues updatedValues = new ContentValues();
+		updatedValues.put(LAST_FETCH_COL, lastfetch.getTime()/1000); //1-second precision only
+		int n = database.update(PROJECT_TABLE, updatedValues, PK_ID_COL + " = ?", new String[] { id });
+	}
+
+	
+	/*
 	 *  Clear the local filenames of all projects
 	 */
 	public void clearProjectThumbnailFiles() {
@@ -451,7 +468,7 @@ public class RsrDbAdapter {
 
 
 	/*
-	 *  Update the local filename of a cached image
+	 *  Set hidden attribute for all projects not visible to current user
 	 */
 	public void setVisibleProjects(Set<String> ids) {
 		//Hide all
@@ -900,7 +917,9 @@ public class RsrDbAdapter {
 				project.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(LAT_COL)));
 				project.setLongitude(cursor.getString(cursor.getColumnIndexOrThrow(LON_COL)));
 				project.setHidden(0 != cursor.getInt(cursor.getColumnIndexOrThrow(HIDDEN_COL)));
-				}
+				project.setLastFetch(new Date(1000L * cursor.getInt(cursor.getColumnIndexOrThrow(LAST_FETCH_COL))));
+				//Log.d(TAG, "Project "+_id+" last fetch (s)"+cursor.getInt(cursor.getColumnIndexOrThrow(LAST_FETCH_COL)));
+			}
 			cursor.close();
 			}
 
@@ -934,7 +953,7 @@ public class RsrDbAdapter {
                 update.setPhotoCredit(cursor.getString(cursor.getColumnIndexOrThrow(PHOTO_CREDIT_COL)));
 				update.setDraft(0 != cursor.getInt(cursor.getColumnIndexOrThrow(DRAFT_COL)));
 				update.setUnsent(0 != cursor.getInt(cursor.getColumnIndexOrThrow(UNSENT_COL)));
-				update.setDate(new Date(1000 * cursor.getLong(cursor.getColumnIndexOrThrow(CREATED_COL))));
+				update.setDate(new Date(1000L * cursor.getLong(cursor.getColumnIndexOrThrow(CREATED_COL))));
                 update.setCountry(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
                 update.getLocation().setCountryId(cursor.getString(cursor.getColumnIndexOrThrow(COUNTRY_COL)));
 				update.setState(cursor.getString(cursor.getColumnIndexOrThrow(STATE_COL)));

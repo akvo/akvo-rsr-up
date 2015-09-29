@@ -27,6 +27,7 @@ import java.util.TimeZone;
 
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
+import org.akvo.rsr.up.domain.Project;
 import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.Downloader;
@@ -94,22 +95,21 @@ public class GetProjectDataService extends IntentService {
                 broadcastProgress(0, 100, 100);
 
                 if (mFetchUpdates) {
-                	Date lastFetch = new Date(SettingsUtil.ReadLong(this, ConstantUtil.FETCH_TIME_KEY, 0L));
                 	SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
             		df1.setTimeZone(TimeZone.getTimeZone("UTC"));
                 	
                     int j = 0;
-                    Date fetchdate = null;
                     for (String projId : user.getPublishedProjIds()) {
-                        Date d = dl.fetchUpdateListRestApiPaged(this, //Could use _extra API for fewer fetches, as country and user data is included
-                            new URL(host + String.format(ConstantUtil.FETCH_UPDATE_URL_PATTERN, projId, df1.format(lastFetch)))                                            
-                        );
-                        if (fetchdate == null) fetchdate = d; //grab the earliest server date
+                    	Project p = ad.findProject(projId);
+                    	if (p != null) {
+                            Date d = dl.fetchUpdateListRestApiPaged(this,
+                                new URL(host + String.format(ConstantUtil.FETCH_UPDATE_URL_PATTERN, projId, df1.format(p.getLastFetch())))                                            
+                            );
+                            //fetch completed; remember fetch date of this project - other users of the app may have different project set
+                    	    ad.updateProjectLastFetch(projId, d);
+                    	}
+                    	//show progress
                         broadcastProgress(1, ++j, projects); //this is *very* uninformative for a user w one project and many updates!
-                    }
-                    //fetch completed; remember fetch date
-                    if (fetchdate != null) {
-                    	SettingsUtil.WriteLong(this, ConstantUtil.FETCH_TIME_KEY, fetchdate.getTime());
                     }
                 }
 

@@ -141,6 +141,8 @@ public class DiagnosticActivity extends ActionBarActivity {
         }
         Cursor b = mDb.listAllProjects();
         mTextView.append("\n\nProjects in db: " + String.valueOf(b.getCount()));
+//        while (b.moveToNext())
+//            mTextView.append("\n["+b.getString(b.getColumnIndex(RsrDbAdapter.PK_ID_COL))+"] " + b.getInt(b.getColumnIndex(RsrDbAdapter.LAST_FETCH_COL))+" ");
         b.close();
         Cursor b2 = mDb.listVisibleProjects();
         mTextView.append("\n\nVisible projects in db: " + String.valueOf(b2.getCount()));

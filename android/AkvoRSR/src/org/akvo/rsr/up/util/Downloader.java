@@ -253,9 +253,9 @@ public class Downloader {
                 Log.d(TAG, "URL " + url.toString());
                 Log.i(TAG, "Fetched " + xmlHandler.getCount() + " updates; target total = "+ xmlHandler.getTotalCount());
 
-                dba.open();
-                Log.d(TAG, "Updates in db: " + dba.listAllUpdates().getCount());
-                dba.close();
+//                dba.open();
+//                Log.d(TAG, "Updates in db: " + dba.listAllUpdates().getCount());
+//                dba.close();
                 
                 total += xmlHandler.getCount();
                 if (xmlHandler.getNextUrl().length() == 0) { //string needs to be trimmed from whitespace

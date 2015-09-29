@@ -155,7 +155,11 @@ public class ProjectListActivity extends ActionBarActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.project_list, menu);
+		if (SettingsUtil.ReadBoolean(this, "setting_debug", false)) {
+			getMenuInflater().inflate(R.menu.project_list_debug, menu); //with debug items
+		} else {
+			getMenuInflater().inflate(R.menu.project_list, menu); //vanilla version
+		}
 		return true;
 	}
 
@@ -169,6 +173,14 @@ public class ProjectListActivity extends ActionBarActivity {
         case R.id.menu_settings:
             Intent i = new Intent(this, SettingsActivity.class);
             startActivity(i);
+            return true;
+        case R.id.menu_messages:
+            Intent i2 = new Intent(this, MessageActivity.class);
+            startActivity(i2);
+            return true;
+        case R.id.menu_diagnostics:
+            Intent i3 = new Intent(this, DiagnosticActivity.class);
+            startActivity(i3);
             return true;
         case R.id.menu_logout:
         	SettingsUtil.signOut(this);
