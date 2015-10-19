@@ -11,4 +11,4 @@ The app has been published in the [Google Play store](https://play.google.com/st
 We have [user documentation](https://github.com/akvo/akvo-rsr-mobile/wiki/User-guide) as well as an [instructional video](http://youtu.be/NMuE2OI_trE) available.
 
 
-Copyright (C) 2012-2014, Stichting Akvo (Akvo Foundation)
+Copyright (C) 2012-2015, Stichting Akvo (Akvo Foundation)
