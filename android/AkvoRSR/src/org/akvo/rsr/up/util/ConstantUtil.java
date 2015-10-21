@@ -34,13 +34,11 @@ public class ConstantUtil {
 	public static final String AUTH_URL = "/auth/token/";
 	public static final String API_KEY_PATTERN = "&api_key=%s&username=%s";
     public static final String POST_UPDATE_URL = "/rest/v1/project_update/?format=xml";
-    public static final String FETCH_UPDATE_URL_PATTERN = "/rest/v1/project_update/?format=xml&limit=1000&project=%s";
+//    public static final String FETCH_UPDATE_URL_PATTERN = "/rest/v1/project_update/?format=xml&project=%s";//use default limit
+    public static final String FETCH_UPDATE_URL_PATTERN = "/rest/v1/project_update/?format=xml&project=%s&last_modified_at__gt=%s";//use default limit
     public static final String VERIFY_UPDATE_PATTERN = "/rest/v1/project_update/?format=xml&uuid=%s&limit=2";
-    public static final String FETCH_PROJ_URL_PATTERN = "/rest/v1/project_up/%s/?format=xml&image_thumb_name=up&width=100"; //ask for thumbnail size
-	public static final String FETCH_COUNTRIES_URL = "/api/v1/country/?format=xml&limit=0";
-	public static final String FETCH_PROJ_COUNT_URL = "/api/v1/project/?format=xml&limit=0&partnerships__organisation=%s";
-	public static final String PROJECT_PATH_PATTERN = "/api/v1/project/%s/";
-	public static final String USER_PATH_PATTERN= "/api/v1/user/%s/";
+    public static final String FETCH_PROJ_URL_PATTERN = "/rest/v1/project_up/%s/?format=xml&image_thumb_name=up&image_thumb_up_width=100"; //now asks for thumbnail size
+    public static final String FETCH_COUNTRIES_URL = "/rest/v1/country/?format=xml&limit=50"; //very small objects - get many at a time
     public static final String FETCH_USER_URL_PATTERN = "/api/v1/user/%s/?format=xml&depth=1";
     public static final String FETCH_ORG_URL_PATTERN = "/api/v1/organisation/%s/?format=xml&depth=0";
 	public static final int    MAX_IMAGE_UPLOAD_SIZE = 2000000; //Nginx POST limit is 3MB, B64 encoding expands 33% and there may be long text 
@@ -78,7 +76,8 @@ public class ConstantUtil {
 	 * keys for saved state and bundle extras
 	 */
 	public static final String PROJECT_ID_KEY = "org.akvo.rsr.up.PROJECT";
-	public static final String UPDATE_ID_KEY = "org.akvo.rsr.up.UPDATE";
+    public static final String UPDATE_ID_KEY = "org.akvo.rsr.up.UPDATE";
+    public static final String IMAGE_FILENAME_KEY = "org.akvo.rsr.up.IMAGE_FILENAME";
 
 	
 	/**
@@ -93,8 +92,9 @@ public class ConstantUtil {
 	public static final String AUTH_USERID_KEY = "authorized_userid";
     public static final String AUTH_ORGID_KEY = "authorized_orgid";
     public static final String AUTH_PROJID_KEY = "authorized_projid";
+    public static final String AUTH_APPVERSION_KEY = "authorized_app_version";
 	public static final String LOCAL_ID_KEY	= "next_local_id";
-
+	public static final String FETCH_TIME_KEY = "last_updates_fetch_time";
 	/**
 	 * intents
 	 */

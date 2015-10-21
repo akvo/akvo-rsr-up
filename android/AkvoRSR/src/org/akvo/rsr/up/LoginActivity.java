@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -22,6 +22,7 @@ import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.service.SignInService;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.DialogUtil;
+import org.akvo.rsr.up.util.Downloader;
 import org.akvo.rsr.up.util.FileUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
 
@@ -46,62 +47,61 @@ import android.widget.Toast;
 
 public class LoginActivity extends Activity {
 
-	private static final String TAG = "LoginActivity";
-	private EditText usernameEdit;
-	private EditText passwordEdit;
-	private	ProgressDialog progress = null;
-	private BroadcastReceiver rec;
+    private static final String TAG = "LoginActivity";
+    private EditText usernameEdit;
+    private EditText passwordEdit;
+    private ProgressDialog progress = null;
+    private BroadcastReceiver rec;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-			Log.i(TAG, "External storage: mounted ");
-			File f = FileUtil.getExternalCacheDir(this);
-			Log.i(TAG, "External cache folder: " + f.getAbsolutePath());
-			if (!f.isDirectory()) {
-				Log.w(TAG, " must create it");
-				if (!f.mkdirs()) {
-					Log.e(TAG, "Failed to create cache folder");
-				}	
-			}
-			f = FileUtil.getExternalPhotoDir(this);
-			Log.i(TAG, "External photo folder: " + f.getAbsolutePath());
-			if (!f.isDirectory()) {
-				Log.w(TAG, " must create it");
-				if (!f.mkdirs()) {
-					Log.e(TAG, "Failed to create photo folder");
-				}	
-			}
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            Log.i(TAG, "External storage: mounted ");
+            File f = FileUtil.getExternalCacheDir(this);
+            Log.i(TAG, "External cache folder: " + f.getAbsolutePath());
+            if (!f.isDirectory()) {
+                Log.w(TAG, " must create it");
+                if (!f.mkdirs()) {
+                    Log.e(TAG, "Failed to create cache folder");
+                }
+            }
+            f = FileUtil.getExternalPhotoDir(this);
+            Log.i(TAG, "External photo folder: " + f.getAbsolutePath());
+            if (!f.isDirectory()) {
+                Log.w(TAG, " must create it");
+                if (!f.mkdirs()) {
+                    Log.e(TAG, "Failed to create photo folder");
+                }
+            }
 
-		} else {
-			DialogUtil.errorAlert(this, R.string.nocard_dialog_title, R.string.nocard_dialog_msg);
-		}
-		
-		//temporary hack for testing used TEST_HOST
-		if (SettingsUtil.host(this).length() == 0) {//isEmpty() is too modern
-			SettingsUtil.Write(this, ConstantUtil.HOST_SETTING_KEY, ConstantUtil.LIVE_HOST);
-		}
-		
-		setContentView(R.layout.activity_login);
+        } else {
+            DialogUtil.errorAlert(this, R.string.nocard_dialog_title, R.string.nocard_dialog_msg);
+        }
 
-		usernameEdit = (EditText) findViewById(R.id.edit_username);
-		passwordEdit = (EditText) findViewById(R.id.edit_password);
+        // temporary hack for testing used TEST_HOST
+        if (SettingsUtil.host(this).length() == 0) {// isEmpty() is too modern
+            SettingsUtil.Write(this, ConstantUtil.HOST_SETTING_KEY, ConstantUtil.LIVE_HOST);
+        }
 
-		final Button button = (Button) findViewById(R.id.btn_login);
+        setContentView(R.layout.activity_login);
+
+        usernameEdit = (EditText) findViewById(R.id.edit_username);
+        passwordEdit = (EditText) findViewById(R.id.edit_password);
+
+        final Button button = (Button) findViewById(R.id.btn_login);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            	signIn(v);
+                signIn(v);
             }
         });
 
         final TextView forgot = (TextView) findViewById(R.id.link_to_forgot);
         forgot.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent myIntent = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse(SettingsUtil.host(LoginActivity.this) + ConstantUtil.PWD_URL));
-                startActivity(myIntent);                
+                Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(SettingsUtil.host(LoginActivity.this) + ConstantUtil.PWD_URL));
+                startActivity(myIntent);
             }
         });
 
@@ -111,129 +111,128 @@ public class LoginActivity extends Activity {
                 startActivity(new Intent(LoginActivity.this, SettingsActivity.class));
             }
         });
-        
+
         final TextView about = (TextView) findViewById(R.id.link_to_about);
         about.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 startActivity(new Intent(LoginActivity.this, AboutActivity.class));
             }
         });
-        
-		//register a listener for the completion intent
-		IntentFilter f = new IntentFilter(ConstantUtil.AUTHORIZATION_RESULT_ACTION);
-		rec = new ResponseReceiver();
+
+        // register a listener for the completion intent
+        IntentFilter f = new IntentFilter(ConstantUtil.AUTHORIZATION_RESULT_ACTION);
+        rec = new ResponseReceiver();
         LocalBroadcastManager.getInstance(this).registerReceiver(rec, f);
-	}
-	
-	
-	@Override
-	protected void onResume() {
-		super.onResume();
+    }
 
-		if (SettingsUtil.haveCredentials(this)) { //skip login
-		    Intent intent = new Intent(this, ProjectListActivity.class);
-		    startActivity(intent);
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (SettingsUtil.haveCredentials(this)) { // skip login
+            Intent intent = new Intent(this, ProjectListActivity.class);
+            startActivity(intent);
             finish();
-		} else {
-			passwordEdit.setText("");
-		}
-	}
-	
-	
-	@Override
-	protected void onDestroy() {
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(rec);
-		super.onDestroy();
-	}
+        } else {
+            passwordEdit.setText("");
+        }
+    }
 
-	
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.login, menu);
-		return true;
-	}
+    @Override
+    protected void onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(rec);
+        super.onDestroy();
+    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.login, menu);
+        return true;
+    }
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-	    switch (item.getItemId()) {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
         case R.id.action_settings:
-			startActivity(new Intent(this, SettingsActivity.class));
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         case R.id.action_about:
             startActivity(new Intent(this, AboutActivity.class));
             return true;
-	    default:
-	    	return super.onOptionsItemSelected(item);
-	    }
-	}
-	
-	
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
     /**
      * starts the sign in process
+     * 
      * @param view
      */
     public void signIn(View view) {
-		//start a "progress" animation
+        // We must have a connection
+        if (!Downloader.haveNetworkConnection(this, false)) {
+            // helpful error message, instead of a failure later
+            DialogUtil.errorAlert(this, R.string.nonet_dialog_title, R.string.nonet_dialog_msg);
+            return;
+        }
+        // start a "progress" animation
         progress = new ProgressDialog(this);
-		progress.setTitle(R.string.login_progress_title);
-		progress.setMessage(getResources().getString(R.string.login_progress_msg));
-		progress.show();
-    	
-    	//request API key from server		
-		Intent intent = new Intent(this, SignInService.class);
-		intent.putExtra(ConstantUtil.USERNAME_KEY, usernameEdit.getText().toString());
-		intent.putExtra(ConstantUtil.PASSWORD_KEY, passwordEdit.getText().toString());
-		getApplicationContext().startService(intent);
-		//now we wait for a broadcast...
+        progress.setTitle(R.string.login_progress_title);
+        progress.setMessage(getResources().getString(R.string.login_progress_msg));
+        progress.show();
+
+        // request API key from server
+        Intent intent = new Intent(this, SignInService.class);
+        intent.putExtra(ConstantUtil.USERNAME_KEY, usernameEdit.getText().toString());
+        intent.putExtra(ConstantUtil.PASSWORD_KEY, passwordEdit.getText().toString());
+        getApplicationContext().startService(intent);
+        // now we wait for a broadcast...
     }
 
-    
     /**
      * completes the sign-in process after network activity is done
+     * 
      * @param intent
      */
-	private void onAuthFinished(Intent intent) {
-		// Dismiss any in-progress dialog
-		if (progress != null) {
-			progress.dismiss();
-		}
+    private void onAuthFinished(Intent intent) {
+        // Dismiss any in-progress dialog
+        if (progress != null) {
+            progress.dismiss();
+        }
 
-		String err = intent.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
-		if (err == null) {
-		    String msg = getResources().getString(R.string.msg_logged_in_as_template,
-		            SettingsUtil.Read(this, "authorized_username"));
-			Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
-			//Go to main screen
-		    Intent mainIntent = new Intent(this, ProjectListActivity.class);
-		    startActivity(mainIntent);
-		    finish();
-		} else {
-			passwordEdit.setText("");
-			//Let user keep username
-			//stay on this page
-			DialogUtil.errorAlert(this, "Error", err);
-		}
-	}
+        String err = intent.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
+        if (err == null) {
+            String msg = getResources().getString(R.string.msg_logged_in_as_template, SettingsUtil.Read(this, "authorized_username"));
+            Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+            // Go to main screen
+            Intent mainIntent = new Intent(this, ProjectListActivity.class);
+            startActivity(mainIntent);
+            finish();
+        } else {
+            passwordEdit.setText("");
+            // Let user keep username
+            // stay on this page
+            DialogUtil.errorAlert(this, "Error", err);
+        }
+    }
 
-	
-	/**
-	 * Broadcast receiver for receiving status updates from the auth IntentService
-	 *
-	 */
-	private class ResponseReceiver extends BroadcastReceiver {
-		// Prevents instantiation
-		private ResponseReceiver() {
-		}
-		// Called when the BroadcastReceiver gets an Intent it's registered to receive
-		public void onReceive(Context context, Intent intent) {
-			if (intent.getAction() == ConstantUtil.AUTHORIZATION_RESULT_ACTION) {
-				onAuthFinished(intent);
-			}
-		}
-	}
+    /**
+     * Broadcast receiver for receiving status updates from the auth IntentService
+     *
+     */
+    private class ResponseReceiver extends BroadcastReceiver {
+        // Prevents instantiation
+        private ResponseReceiver() {
+        }
 
-	
+        // Called when the BroadcastReceiver gets an Intent it's registered to receive
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction() == ConstantUtil.AUTHORIZATION_RESULT_ACTION) {
+                onAuthFinished(intent);
+            }
+        }
+    }
 
 }

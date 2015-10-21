@@ -19,11 +19,15 @@ package org.akvo.rsr.up.service;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
+import org.akvo.rsr.up.domain.Project;
 import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.Downloader;
@@ -66,9 +70,10 @@ public class GetProjectDataService extends IntentService {
         RsrDbAdapter ad = new RsrDbAdapter(this);
         Downloader dl = new Downloader();
         String errMsg = null;
-        boolean noimages = SettingsUtil.ReadBoolean(this, "setting_delay_image_fetch", false);
+        boolean fetchImages = !SettingsUtil.ReadBoolean(this, "setting_delay_image_fetch", false);
         String host = SettingsUtil.host(this);
-
+        Long start = System.currentTimeMillis();
+        
         ad.open();
         User user = SettingsUtil.getAuthUser(this);
         try {
@@ -80,34 +85,45 @@ public class GetProjectDataService extends IntentService {
                     dl.fetchProject(this,
                                     ad, 
                                     new URL(SettingsUtil.host(this) +
-                                            String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN,id)));
-                    broadcastProgress(0, i++, projects);
+                                            String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN, id)));
+                    broadcastProgress(0, ++i, projects);
                 }
-                if (mFetchCountries) {
-                    // TODO: rarely changes, so only fetch countries if we never did that
-                    dl.fetchCountryList(this, new URL(SettingsUtil.host(this) +
+                if (mFetchCountries && ad.getCountryCount() == 0) { // rarely changes, so only fetch countries if we never did that
+                    dl.fetchCountryListRestApiPaged(this, new URL(SettingsUtil.host(this) +
                             String.format(ConstantUtil.FETCH_COUNTRIES_URL)));
                 }
                 broadcastProgress(0, 100, 100);
 
                 if (mFetchUpdates) {
+                	SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
+            		df1.setTimeZone(TimeZone.getTimeZone("UTC"));
+                	
                     int j = 0;
                     for (String projId : user.getPublishedProjIds()) {
-                        dl.fetchUpdateListRestApi(this, //TODO: use _extra for fewer fetches, as country and user data is included
-                            new URL(host + String.format(ConstantUtil.FETCH_UPDATE_URL_PATTERN, projId))                                            
-                        );
-                        broadcastProgress(1, j++, projects);
+                    	Project p = ad.findProject(projId);
+                    	if (p != null) {
+                            Date d = dl.fetchUpdateListRestApiPaged(this,
+                                new URL(host + String.format(ConstantUtil.FETCH_UPDATE_URL_PATTERN, projId, df1.format(p.getLastFetch())))                                            
+                            );
+                            //fetch completed; remember fetch date of this project - other users of the app may have different project set
+                    	    ad.updateProjectLastFetch(projId, d);
+                    	}
+                    	//show progress
+                        broadcastProgress(1, ++j, projects); //this is *very* uninformative for a user w one project and many updates!
                     }
                 }
 
             } catch (FileNotFoundException e) {
                 Log.e(TAG, "Cannot find:", e);
                 errMsg = getResources().getString(R.string.errmsg_not_found_on_server) + e.getMessage();
-            } catch (Exception e) {
+            } catch (Exception e) {//get e==null here!!!!
                 Log.e(TAG, "Bad updates fetch:", e);
-                errMsg = getResources().getString(R.string.errmsg_update_fetch_failed) + e.getMessage();
+                if (e != null) {
+                    errMsg = getResources().getString(R.string.errmsg_update_fetch_failed) + e.getMessage();
+                } else {
+                    errMsg = getResources().getString(R.string.errmsg_update_fetch_failed) + "NULL exception";
+                }
             }
-
             if (mFetchUsers) { //Remove this once we use the _extra update API
                 // Fetch missing user data for authors of the updates.
                 // This API requires authorization
@@ -165,7 +181,7 @@ public class GetProjectDataService extends IntentService {
 
             broadcastProgress(1, 100, 100);
 
-            if (!noimages) {
+            if (fetchImages) {
                 try {
                     dl.fetchNewThumbnails(this,
                             host,
@@ -191,7 +207,10 @@ public class GetProjectDataService extends IntentService {
             if (ad != null)
                 ad.close();
         }
-
+        
+        Long end = System.currentTimeMillis();
+        Log.i(TAG, "Fetch complete in: "+ (end-start)/1000.0);
+        
         mRunning = false;
 
         // broadcast completion

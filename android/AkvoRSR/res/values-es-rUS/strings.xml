@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
+ *
+ *  This file is part of Akvo RSR.
+ *
+ *  Akvo RSR is free software: you can redistribute it and modify it under the terms of
+ *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
+ *  either version 3 of the License or any later version.
+ *
+ *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Affero General Public License included below for more details.
+ *
+ *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
+ -->
+ 
+<resources>
+  <string name="app_name">Akvo RSR Up</string>
+  <string name="app_subtitle">Really Simple Reporting</string>
+  <string name="app_version">Versión</string>
+  <string name="action_settings">Configuración</string>
+  <string name="action_diagnostics">Diagnóstico</string>
+  <string name="action_about">Sobre</string>
+  <string name="action_add_update">Añadir actualización</string>
+  <string name="action_delete_update">Borrar actualización</string>
+  <string name="action_attach_photo">Añadir foto</string>
+  <string name="action_logout">Finalizar sesión</string>
+  <string name="action_sendall">Enviar lo no enviado</string>
+  <string name="powered_by_akvo">Desarrollado por Akvo</string>
+  <string name="title_activity_login">Akvo RSR Up</string>
+  <string name="title_activity_project_list">RSR Up</string>
+  <string name="title_activity_project_detail">RSR Up</string>
+  <string name="title_activity_update_list">RSR Up</string>
+  <string name="title_activity_update_edit">RSR Up</string>
+  <string name="title_activity_update_detail">RSR Up</string>
+  <string name="title_activity_settings">RSR Up Ajustes</string>
+  <string name="title_activity_diagnostics">RSR Up Diagnóstico</string>
+  <string name="title_activity_about">RSR Up Sobre</string>
+  <string name="title_activity_license">RSR Up Licencias</string>
+  <string name="title_activity_messages">RSR Up Mensajes</string>
+  <string name="license">Licencias</string>
+  <string name="label_update_title">Añadir una actualizaión</string>
+  <string name="hint_update_title">Título</string>
+  <string name="hint_search">Buscar</string>
+  <string name="label_update_description">Descripción de la actualicación</string>
+  <string name="label_send_progress">Fecha de publicación</string>
+  <string name="label_project_location">Ubicación</string>
+  <string name="label_project_summary">Resumen</string>
+  <string name="hint_update_description">Descripción</string>
+  <string name="hint_update_caption">Descripción de la fotografía</string>
+  <string name="hint_update_credit">Créditos de la fotografía</string>
+  <string name="label_photo_credit">Fotografías: %s</string>
+  <string name="label_empty_proj_list">Nada para mostrar con este filtro.</string>
+  <string name="label_first_proj_list">Todavía no se ha actualizado su lista de proyectos. Utilice el botón refrescar para ver sus proyectos.\n\nSi usted tiene una conexión con un bajo ancho de banda, active la opción de retrasar la captura de imágenes dentro de el area de ajustes. </string>
+  <string name="label_unemployed_proj_list">Usted no se encuentra conectado a ningún proyecto.\n\nPor favor acceda a la aplicación web y solicite ser agregado a un proyecto.</string>
+  <string name="label_proj_list">Sus proyectos:</string>
+  <string name="label_update_list">Actualizaciones:</string>
+  <string name="label_refresh_progress">Refrescar progreso</string>
+  <string name="label_progress_projects">Proyectos</string>
+  <string name="label_progress_updates">Actualizaciones</string>
+  <string name="label_progress_pictures">Fotografías</string>
+  <string name="label_clearcache_freespace">Megabytes libres: %d. Las imágenes son guardadas.</string>
+  <string name="label_settings_general">General</string>
+  <string name="label_settings_testing">Probando</string>
+  <string name="label_setting_delaypics">Retrasar captura de fotografías</string>
+  <string name="summary_setting_delaypics">No capturar imágenes hasta que se hayan seleccionado. La actualización es rápida, pero las imágenes son inaccesible sin conexión a internet.</string>
+  <string name="label_setting_clearcache">Borrar imágenes en caché.</string>
+  <string name="label_setting_host">Servidor</string>
+  <string name="label_setting_feedback">Envie su feedback</string>
+  <string name="label_setting_feedback_version">Envíe su feedback sobre ver %s</string>
+  <string name="label_setting_debuginfo">Debug</string>
+  <string name="label_setting_removeloc">Remover la ubicación de la imagen</string>
+  <string name="summary_setting_feedback">Que opina sobre esta aplicación? </string>
+  <string name="summary_setting_debuginfo">Mostrar los ID\'s del proyecto y las actualizaciones y otra información de debug</string>
+  <string name="summary_setting_removeloc">La información de geolocalización en las fotos será removida antes de subirlas al servidor</string>
+  <string name="label_setting_messages">Mostrar mensajes</string>
+  <string name="summary_setting_messages">Mostrar una lista de errores y otros mensajes</string>
+  <string name="state_draft">Borrador</string>
+  <string name="state_published">Publicado</string>
+  <string name="state_synchronising">Sincronizando</string>
+  <string name="count_draft">&#160;Borrador</string>
+  <string name="count_published">&#160;Publicado</string>
+  <string name="count_zero">Sin actualizaciones</string>
+  <string name="count_unsynch">&#160;Sin categorizar</string>
+  <string name="updates_txt">STATUS DE ACTUALIZACION</string>
+  <string name="username">Nombre de usuario</string>
+  <string name="email_address">Correo electrónico</string>
+  <string name="password">Contraseña</string>
+  <string name="forgot_password_">Olvidó su contraseña?</string>
+  <string name="btncaption_sign_in">Iniciar sesión</string>
+  <string name="btncaption_take_photo">Tomar imagen</string>
+  <string name="btncaption_attach_photo">Añadir imagen</string>
+  <string name="btncaption_rephoto">Reemplazar imagen</string>
+  <string name="btncaption_dephoto">Borrar imagen</string>
+  <string name="btncaption_rotphoto">Rotar imagen</string>
+  <string name="btncaption_add_update">Añadir actualización</string>
+  <string name="btncaption_edit_update">Editar esta actualización</string>
+  <string name="btncaption_refresh">Refrescar lista de proyectos</string>
+  <string name="btncaption_viewupdates">Visualizar todas las actualizaciones</string>
+  <string name="btncaption_clear_data">Borrar toda la información</string>
+  <string name="btncaption_send_update">Enviar actualización</string>
+  <string name="btncaption_save_draft">Guardar borrador</string>
+  <string name="btncaption_gps_position">Determinar localización GPS</string>
+  <string name="btncaption_gps_cancel">Cancelar localización GPS</string>
+  <string name="btncaption_photo_position">Usar ubicación de la imagen</string>
+  <string name="btncaption_details">Detalles</string>
+  <string name="host_dialog_title">Introducir nuevo Data Host Name</string>
+  <string name="host_dialog_msg">Toda la información local será eliminada. Ejemplo: rsr.akvo.org o https://rsr.akvotest.org</string>
+  <string name="send_progress_title">Publicando</string>
+  <string name="send_progress_msg">Enviando actualización al servidor</string>
+  <string name="error_dialog_title">Error</string>
+  <string name="nocard_dialog_title">Sin espacio disponible</string>
+  <string name="nocard_dialog_msg">Akvo RSR Up  requiere una tarjeta de almacenamiento grabable y  montada para archivos de imagen. Montar tarjeta y reiniciar aplicación.</string>
+  <string name="noid_dialog_title">Proyecto o id de actualización inexsitente</string>
+  <string name="noid_dialog_msg">No se ha especificado un proyecto o actualización</string>
+  <string name="noupd_dialog_title">Actualización extraviada</string>
+  <string name="noupd_dialog_msg">Sin actualizaciones para mostrar</string>
+  <string name="noupd2_dialog_msg">Sin actualizaciones para editar</string>
+  <string name="noproj_dialog_title">Sin ID de proyecto</string>
+  <string name="noproj_dialog_msg">No se ha especificado un proyecto</string>
+  <string name="norot_dialog_title">Error IO al rotar la imagen</string>
+  <string name="norot_dialog_title2">La imagen es muy grande para rotar</string>
+  <string name="norot_dialog_msg">Por favor intente con una foto de menor resolución</string>
+  <string name="warnbig_dialog_title">Tamaño de imagen demasiado grande</string>
+  <string name="warnbig_dialog_msg1">Ajuste su cámara a la resolución más baja</string>
+  <string name="warnbig_dialog_msg2">Selecione una imagen con menor tamaño</string>
+  <string name="shrinkbig_dialog_title">No se pudo reducir el tamaño de la imagen</string>
+  <string name="shrinkbig_dialog_msg">La imagen original es demasiado grande para procesar</string>
+  <string name="nonet_dialog_title">Sin red disponible</string>
+  <string name="nonet_dialog_msg">Debe estar conectado a internet</string>
+  <string name="login_progress_title">Iniciando sesión</string>
+  <string name="login_progress_msg">Enviado información de registro</string>
+  <string name="cleared_dialog_title">Caché borrado</string>
+  <string name="cleared_dialog_msg">%1$d archivos detectados (%2$d MB))</string>
+  <string name="detail_dialog_title">Detalles del error</string>
+  <string name="gpsdisabled_dialog_msg">Su GPS debe estar habilitado para realizar esta acción. Seleccione Aceptar para ir a la página de configuración. Seleccione Usar satélites GPS y luego presione el botón Atrás para volver. Una vez que el GPS está activado, puede hacer clic en Verificar Ubicación geográfica de nuevo para obtener su posición.</string>
+  <string name="label_gps_searching">Buscando</string>
+  <string name="label_gps_ready">Listo</string>
+  <string name="label_accuracy">Precisión</string>
+  <string name="label_latitude">Latitud:</string>
+  <string name="label_longitude">Longitud:</string>
+  <string name="label_elevation">Elevación:</string>
+  <string name="msg_update_published">Actualización publicada</string>
+  <string name="msg_update_success">La actualización ha sido enviada al servidor</string>
+  <string name="msg_update_interrupted">La conexión a la red fue perdida durante la actualización</string>
+  <string name="msg_update_duplicated">La actualización se encuentra duplicada en el servidor. Por favor avise a los desarrolladores!</string>
+  <string name="msg_network_problem">Problemas con la conexión a la red</string>
+  <string name="msg_synchronising">La actualización esta sincronizándose</string>
+  <string name="msg_update_drafted">La actualización fue guardada como borrador</string>
+  <string name="msg_success_drafted">El borrador ha sido guardado</string>
+  <string name="msg_logged_in_as_template">Conectado como %s</string>
+  <string name="msg_fetch_complete">Capturas completas</string>
+  <string name="msg_check_network">Compruebe su conexión a la red</string>
+  <string name="errmsg_empty_title">La actualización debe contener un título</string>
+  <string name="errmsg_bad_url">URL inválido</string>
+  <string name="errmsg_not_found_on_server">No se encuentra:</string>
+  <string name="errmsg_com_failure">Error en la comunicación con el servidor</string>
+  <string name="errmsg_update_fetch_failed">La captura de actualizaciones falló</string>
+  <string name="errmsg_user_fetch_failed">La captura de usuario falló</string>
+  <string name="errmsg_org_fetch_failed">La captura de organización falló</string>
+  <string name="errmsg_signin_denied">Dirección de correo electrónico o nombre de usuario inválidos</string>
+  <string name="errmsg_signin_failed">Incapaz de actualizar:</string>
+  <string name="btncaption_ok">OK</string>
+  <string name="btncaption_cancel">Cancelar</string>
+  <string name="authtitle">Autorización requerida</string>
+  <string name="authtext">Por favor introduzca la contraseña del administrador</string>
+  <string name="authfailed">La autorización falló</string>
+  <string name="invalidpassword">Contraseña inválida</string>
+  <string name="dummy_project_title">Título del projecto</string>
+  <string name="dummy_update_title">Título de la actualización </string>
+  <string name="dummy_update_description">Introduzca la descripción de la actualización. El largo de la descripción es ilimitado. Por favor note que el botón permanecerá al fondo de la pantalla.</string>
+</resources>
+ 

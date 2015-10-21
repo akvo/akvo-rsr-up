@@ -16,6 +16,8 @@
 
 package org.akvo.rsr.up.domain;
 
+import java.util.Date;
+
 //import java.util.Date;
 
 public class Project {
@@ -35,6 +37,7 @@ public class Project {
 	private String state;
 	private String city;
 	private boolean hidden;
+	private Date lastFetch;
 
     private boolean isEmpty(String s) {
         if ((s != null) && (s.length() > 0))
@@ -161,7 +164,16 @@ public class Project {
     }
     
 
-	/*
+	public Date getLastFetch() {
+		if (lastFetch != null) return lastFetch;
+		return new Date(0);
+	}
+
+	public void setLastFetch(Date lastFetch ) {
+		this.lastFetch = lastFetch;
+	}
+	
+/*
 	public String get() {
 		return ;
 	}

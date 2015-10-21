@@ -68,7 +68,7 @@ public class SignInService extends IntentService {
 		}
 		catch (Exception e) {
 			i2.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, getResources().getString(R.string.errmsg_signin_failed) + e.getMessage());
-			Log.e(TAG,"SignIn() error:",e);
+			Log.e(TAG,"SignInService() error:", e);
 		}
 
 		//broadcast completion

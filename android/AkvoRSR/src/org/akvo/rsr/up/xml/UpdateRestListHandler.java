@@ -72,6 +72,10 @@ import org.xml.sax.helpers.DefaultHandler;
 </results>
 </root>
 
+
+In old entries <locations></locations> is an empty list and <primary_location></primary_location> is also empty
+
+
  */
 
 
@@ -85,7 +89,10 @@ public class UpdateRestListHandler extends DefaultHandler {
 	// Fields
 	// ===========================================================
 	
-	private boolean in_update = false;
+    private boolean in_next = false;
+    private boolean in_count = false;
+
+    private boolean in_update = false;
 	private boolean in_id = false;
 	private boolean in_title = false;
 	private boolean in_project_id = false;
@@ -119,6 +126,8 @@ public class UpdateRestListHandler extends DefaultHandler {
 	private String buffer;
     private String stored_location_id;
     private String primary_location_id;
+    private String nextUrl = "";
+    private int totalCount = 0;
 	
 	//where to store results
 	private RsrDbAdapter dba;
@@ -126,7 +135,7 @@ public class UpdateRestListHandler extends DefaultHandler {
 	/*
 	 * constructor
 	 */
-	public UpdateRestListHandler(RsrDbAdapter aDba, boolean insert) {
+	public UpdateRestListHandler(RsrDbAdapter aDba, boolean insert, String serverVersion) {
 		super();
 		dba = aDba;
         this.insert = insert;
@@ -141,9 +150,17 @@ public class UpdateRestListHandler extends DefaultHandler {
 		return syntaxError;
 	}
 
-	public int getCount() {
-		return updateCount;
-	}
+    public int getCount() {
+        return updateCount;
+    }
+
+    public int getTotalCount() {
+        return totalCount;
+    }
+
+    public String getNextUrl() {
+        return nextUrl;
+    }
 
 	public Update getLastUpdate() {
 		return currentUpd; //only valid if insert==False
@@ -173,8 +190,12 @@ public class UpdateRestListHandler extends DefaultHandler {
 	public void startElement(String namespaceURI, String localName,
 			String qName, Attributes atts) throws SAXException {
 		buffer = "";
-        if (depth == 1 && localName.equals("results")) {
+		if (depth == 1 && localName.equals("results")) {
             this.in_results = true;
+        } else if (depth == 1 && localName.equals("count")) {
+            this.in_count = true;
+        } else if (depth == 1 && localName.equals("next")) {
+            this.in_next = true;
         } else if (depth == 2 && in_results && localName.equals(LIST_ITEM)) {
             this.in_update = true;
             currentUpd = new Update();
@@ -238,13 +259,19 @@ public class UpdateRestListHandler extends DefaultHandler {
 			throws SAXException {
 		depth--;
 
-        if (depth == 1 && localName.equals("results")) {
+		if (depth == 1 && localName.equals("results")) {
             this.in_results = false;
+        } else if (depth == 1 && localName.equals("next")) {
+            this.in_next = false;
+            nextUrl = buffer.trim(); //in case there are newlines
+        } else if (depth == 1 && localName.equals("count")) {
+            this.in_count = false;
+            totalCount = Integer.valueOf(buffer);
         } else if (localName.equals(LIST_ITEM)) { 
             if (in_location) {//we are done with this location
                 this.in_location = false;
-            } else { //we are done with an update
-                //TODO: verify that stored location is the primary one, otherwise raise an error
+            } else if (in_update && depth==2){  //we are done with an entire update
+                //TODO: verify that stored_location_id equals primary_location_id, otherwise raise an error
                 this.in_update = false;
                 if (currentUpd != null && currentUpd.getId() != null) {
                     updateCount++;
@@ -252,6 +279,8 @@ public class UpdateRestListHandler extends DefaultHandler {
                         dba.saveUpdate(currentUpd, false); //preserve name of any cached image
                         currentUpd = null;
                     }
+                } else {
+                    syntaxError = true; 
                 }
             }
         } else if (localName.equals("id")) {
@@ -328,6 +357,7 @@ public class UpdateRestListHandler extends DefaultHandler {
 			 || this.in_title
 			 || this.in_uuid
              || this.in_user_id
+             || this.in_primary_location
              || this.in_location_id
 			 || this.in_project_id
              || this.in_photo
@@ -340,7 +370,9 @@ public class UpdateRestListHandler extends DefaultHandler {
 			 || this.in_state
 			 || this.in_city
 			 || this.in_long
-			 || this.in_lat
+             || this.in_lat
+             || this.in_next
+             || this.in_count
 			 ) { //remember content
 				buffer += new String(ch, start, length);
 			}

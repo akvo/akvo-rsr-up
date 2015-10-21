@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -140,53 +140,52 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
         mUser = SettingsUtil.getAuthUser(this);
         nextLocalId = SettingsUtil.ReadInt(this, ConstantUtil.LOCAL_ID_KEY, -1);
 
-        // find which update we are editing
-        // null means create a new one
-        Bundle extras = getIntent().getExtras();
-        projectId = extras != null ? extras.getString(ConstantUtil.PROJECT_ID_KEY)
-                : null;
+        if (savedInstanceState != null) {  //being recreated, restore state 
+            updateId = savedInstanceState.getString(ConstantUtil.UPDATE_ID_KEY);
+            projectId = savedInstanceState.getString(ConstantUtil.PROJECT_ID_KEY);
+            captureFilename = savedInstanceState.getString(ConstantUtil.IMAGE_FILENAME_KEY);
+        } else {
+            Bundle extras = getIntent().getExtras();
+            if (extras != null) {
+                // find which update we are editing - null means create a new one
+                projectId = extras.getString(ConstantUtil.PROJECT_ID_KEY);
+                updateId = extras.getString(ConstantUtil.UPDATE_ID_KEY);
+            }
+        }
+        // Project id is a must
         if (projectId == null) {
             DialogUtil.errorAlert(this, R.string.noproj_dialog_title, R.string.noproj_dialog_msg);
         }
-        updateId = extras != null ? extras.getString(ConstantUtil.UPDATE_ID_KEY)
-                : null;
-        if (updateId == null) {
-            updateId = savedInstanceState != null ? savedInstanceState
-                    .getString(ConstantUtil.UPDATE_ID_KEY) : null;
-        }
 
-        //Limit what we can write 
+        //Limit what we can type 
         InputFilter postFilter = new InputFilter() {
  
             @Override
             public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-            boolean keepOriginal = true;
-            StringBuilder sb = new StringBuilder(end - start);
-            for (int i = start; i < end; i++) {
-                char c = source.charAt(i);
-                if (isCharAllowed(c)) // put your condition here
-                            sb.append(c);
-                        else
-                            keepOriginal = false;
-                    }
-                    if (keepOriginal)
-                        return null;
-                    else {
-                        if (source instanceof Spanned) {
-                            SpannableString sp = new SpannableString(sb);
-                            TextUtils.copySpansFrom((Spanned) source, start, sb.length(), null, sp, 0);
-                            return sp;
-                        } else {
-                            return sb;
-                        }           
-                    }
+                boolean keepOriginal = true;
+                StringBuilder sb = new StringBuilder(end - start);
+                for (int i = start; i < end; i++) {
+                    char c = source.charAt(i);
+                    if (isCharAllowed(c)) sb.append(c); else keepOriginal = false;
                 }
+                if (keepOriginal)
+                    return null;
+                else {
+                    if (source instanceof Spanned) {
+                        SpannableString sp = new SpannableString(sb);
+                        TextUtils.copySpansFrom((Spanned) source, start, sb.length(), null, sp, 0);
+                        return sp;
+                    } else {
+                        return sb;
+                    }           
+                }
+            }
 
-                private boolean isCharAllowed(char c) {
-//                    return !Character.isSurrogate(c); //From API 19
-                    return !(c >= 0xD800 && c <= 0xDFFF);
-                }
-          };
+            private boolean isCharAllowed(char c) {
+//              return !Character.isSurrogate(c); //From API 19
+                return !(c >= 0xD800 && c <= 0xDFFF);
+            }
+        };
         
         
         // get the look
@@ -677,10 +676,15 @@ public class UpdateEditorActivity extends ActionBarActivity implements LocationL
     /** saves update being worked on before we leave the activity */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        // pick up the saved draft if we get restarted
+        outState.putString(ConstantUtil.PROJECT_ID_KEY, projectId);
+        // store most state by saving the update as a draft until we get restarted
         saveAsDraft(false);
-        // in case this created the update in the DB
+        // In case that call created the update in the DB, there was no id before, but now we can store that
         outState.putString(ConstantUtil.UPDATE_ID_KEY, update.getId());
+        // In case we are being bumped to make room for the camera app: 
+        outState.putString(ConstantUtil.IMAGE_FILENAME_KEY, captureFilename);
+
+        // Always call the superclass so it can save the view hierarchy state
         super.onSaveInstanceState(outState);
     }
 
