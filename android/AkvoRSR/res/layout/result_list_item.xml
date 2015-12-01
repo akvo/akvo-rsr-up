@@ -1,0 +1,17 @@
+<!-- One project list item  -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:padding="5dip"
+    >
+    <TextView
+        android:id="@+id/result_item_test"  
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="fill_horizontal"
+        android:paddingBottom="5dip"
+        android:textColor="@color/rsr_purple"
+        android:typeface="sans" />
+</LinearLayout>

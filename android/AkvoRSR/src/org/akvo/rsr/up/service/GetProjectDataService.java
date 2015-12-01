@@ -48,6 +48,7 @@ public class GetProjectDataService extends IntentService {
     private static final boolean mFetchCountries = true;
     private static final boolean mFetchUpdates = true;
     private static final boolean mFetchOrgs = true;
+    private static final boolean mFetchResults = true;
 
     public GetProjectDataService() {
         super(TAG);
@@ -86,6 +87,10 @@ public class GetProjectDataService extends IntentService {
                                     ad, 
                                     new URL(SettingsUtil.host(this) +
                                             String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN, id)));
+                    if (mFetchResults) {
+                        dl.fetchProjectResultsPaged(this, ad,
+                                new URL(host + String.format(ConstantUtil.FETCH_RESULTS_URL_PATTERN, id)));                                            
+                    }
                     broadcastProgress(0, ++i, projects);
                 }
                 if (mFetchCountries && ad.getCountryCount() == 0) { // rarely changes, so only fetch countries if we never did that
@@ -98,7 +103,7 @@ public class GetProjectDataService extends IntentService {
                 	SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
             		df1.setTimeZone(TimeZone.getTimeZone("UTC"));
                 	
-                    int j = 0;
+                    int k = 0;
                     for (String projId : user.getPublishedProjIds()) {
                     	Project p = ad.findProject(projId);
                     	if (p != null) {
@@ -109,7 +114,7 @@ public class GetProjectDataService extends IntentService {
                     	    ad.updateProjectLastFetch(projId, d);
                     	}
                     	//show progress
-                        broadcastProgress(1, ++j, projects); //this is *very* uninformative for a user w one project and many updates!
+                        broadcastProgress(1, ++k, projects); //this is *very* uninformative for a user w one project and many updates!
                     }
                 }
 
@@ -127,19 +132,17 @@ public class GetProjectDataService extends IntentService {
             if (mFetchUsers) { //Remove this once we use the _extra update API
                 // Fetch missing user data for authors of the updates.
                 // This API requires authorization
-                String key = String.format(Locale.US, ConstantUtil.API_KEY_PATTERN,
-                        user.getApiKey(), user.getUsername());
 //                int k = 0;
                 List<String> orgIds = ad.getMissingUsersList();
                 for (String id : orgIds) {
                     try {
                         dl.fetchUser(
                                 this,
+                                ad,
                                 new URL(host
                                         +
                                         String.format(Locale.US,
-                                                ConstantUtil.FETCH_USER_URL_PATTERN, id) +
-                                        key),
+                                                ConstantUtil.FETCH_USER_URL_PATTERN, id)),
                                 id
                                 );
 //                        k++;
@@ -163,6 +166,7 @@ public class GetProjectDataService extends IntentService {
                     try {
                         dl.fetchOrg(
                                 this,
+                                ad,
                                 new URL(host
                                         + String.format(Locale.US,
                                                 ConstantUtil.FETCH_ORG_URL_PATTERN, id)),

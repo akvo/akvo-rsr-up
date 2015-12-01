@@ -58,6 +58,7 @@
     <string name="label_unemployed_proj_list">You are not connected to any projects.\n\nYou must use the web interface to log in and request to be added to one first.</string>
     <string name="label_proj_list">Your Projects:</string>
     <string name="label_update_list">Updates:</string>
+    <string name="label_result_list">Results, Indicators:</string>
     <string name="label_refresh_progress">Refresh progress</string>
     <string name="label_progress_projects">Projects</string>
     <string name="label_progress_updates">Updates</string>

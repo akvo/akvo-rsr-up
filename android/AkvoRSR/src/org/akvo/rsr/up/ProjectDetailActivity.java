@@ -95,7 +95,16 @@ public class ProjectDetailActivity extends ActionBarActivity {
 				startActivity(i);
 			}
 		});
- 
+		
+		//Results
+        btnUpdates = (Button) findViewById(R.id.btn_view_results);
+        btnUpdates.setOnClickListener( new View.OnClickListener() {
+            public void onClick(View view) {
+                Intent i = new Intent(view.getContext(), ResultListActivity.class);
+                i.putExtra(ConstantUtil.PROJECT_ID_KEY, projId);
+                startActivity(i);
+            }
+        });
 
 		
 		dba = new RsrDbAdapter(this);

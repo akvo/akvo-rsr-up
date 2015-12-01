@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.akvo.rsr.up"
-    android:versionCode="30"
-    android:versionName="1.5.0"
+    android:versionCode="31"
+    android:versionName="1.6.0"
     >
 
     <uses-sdk
@@ -40,6 +40,13 @@
         </activity>
         <activity
             android:name="org.akvo.rsr.up.UpdateListActivity"
+            android:label="@string/title_activity_update_list" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.akvo.rsr.up.ProjectDetailActivity" />
+        </activity>
+        <activity
+            android:name="org.akvo.rsr.up.ResultListActivity"
             android:label="@string/title_activity_update_list" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

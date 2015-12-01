@@ -166,12 +166,11 @@
 			        android:layout_width="0dp"
 			        android:layout_height="wrap_content"
 			        android:layout_weight="1"
-			        android:drawableTop="@drawable/ic_menu_view"
 			        android:text="@string/btncaption_viewupdates"
 				    android:textColor="@color/rsr_purple"
 				    android:background="@color/btn_face"
 			        android:padding="5dip"
-			        android:textSize="18sp"
+			        android:textSize="14sp"
 			        android:typeface="sans"				    
 		            />
 
@@ -181,15 +180,56 @@
 			        android:layout_width="0dp"
 			        android:layout_height="wrap_content"
 			        android:layout_weight="1"
-			        android:drawableTop="@drawable/ic_menu_add_dk"
 			        android:text="@string/btncaption_add_update"
 				    android:textColor="@color/rsr_purple"
 				    android:background="@color/btn_face"
 			        android:padding="5dip"
 			        android:layout_marginLeft="5dip"
-			        android:textSize="18sp"
+			        android:textSize="14sp"
 			        android:typeface="sans"				    
 		            />
 		    	    	
    			</LinearLayout>
+
+		    <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:background="@color/btn_border"
+                android:orientation="horizontal"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="10dp"
+                android:paddingTop="0dp"
+                 >
+    
+                <Button
+                    android:id="@+id/btn_view_results"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="VIEW RESULTS"
+                    android:textColor="@color/rsr_purple"
+                    android:background="@color/btn_face"
+                    android:padding="5dip"
+                    android:textSize="14sp"
+                    android:typeface="sans"                 
+                    />
+
+                <!-- Add update button -->
+                <Button
+                    android:id="@+id/btn_add_result"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="REPORT RESULT"
+                    android:textColor="@color/rsr_purple"
+                    android:background="@color/btn_face"
+                    android:padding="5dip"
+                    android:layout_marginLeft="5dip"
+                    android:textSize="14sp"
+                    android:typeface="sans"                 
+                    />
+                        
+            </LinearLayout>
 </LinearLayout>
