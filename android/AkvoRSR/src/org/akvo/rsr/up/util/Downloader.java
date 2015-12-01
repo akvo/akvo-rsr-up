@@ -39,11 +39,17 @@ import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.xml.AuthHandler;
 import org.akvo.rsr.up.xml.CountryListHandler;
 import org.akvo.rsr.up.xml.CountryRestListHandler;
+import org.akvo.rsr.up.xml.JsonParser;
+import org.akvo.rsr.up.xml.ListJsonParser;
+import org.akvo.rsr.up.xml.OrgJsonParser;
 import org.akvo.rsr.up.xml.OrganisationHandler;
 import org.akvo.rsr.up.xml.ProjectExtraRestHandler;
+import org.akvo.rsr.up.xml.ProjectResultListJsonParser;
 import org.akvo.rsr.up.xml.UpdateRestHandler;
 import org.akvo.rsr.up.xml.UpdateRestListHandler;
+import org.akvo.rsr.up.xml.UserJsonParser;
 import org.akvo.rsr.up.xml.UserListHandler;
+import org.json.JSONException;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -71,9 +77,10 @@ import android.util.Log;
  *  fetchOrg() OLD
  *  fetchUpdateListRestApi() NEW
  *  fetchUpdateListRestApiPaged() NEW
- *  fetchUser() OLD
+ *  fetchUser() NEW, JSON
  *  fetchProject() NEW
- * 
+ *  fetchProjectResultsPaged() NEW, JSON
+ *  
  * New parser classes have names containing the word REST.
  * The old parsers should be removed once the migration is complete.
  */
@@ -114,7 +121,75 @@ public class Downloader {
         }
 
     }
+    
 
+
+    /**
+     * populates the Results/Indicators/Periods tables for a single project
+     * URL should specify all results for a single project
+     * The returned results will typically fit on a single page, but we do it paged, just in case
+     *
+     * @param ctx
+     * @param dba
+     * @param url
+     * @return
+     * @throws FailedFetchException
+     */
+    public Date fetchProjectResultsPaged(Context ctx, RsrDbAdapter dba, URL url) throws FailedFetchException {
+        Date serverDate = null;
+        User user = SettingsUtil.getAuthUser(ctx);
+        int total = 0;
+        int page = 0;
+        //the fetch is called in a loop to get it page by page, otherwise it would take too long for server
+        //and it would not scale beyond 1000 items in any case
+        while (url != null) {
+            HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
+            h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
+            int code = h.code();//evaluation starts the exchange
+            if (code == 200) {
+                page++;
+                String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
+                serverDate = new Date(h.date());
+                String jsonBody = h.body();
+                ListJsonParser jp = new ProjectResultListJsonParser(dba, serverVersion);
+                /* Parse the JSON-data from our URL. */
+                try {
+                	jp.parse(jsonBody);
+                }
+                catch (JSONException e) {
+                    throw new FailedFetchException("Invalid server response: " + e.getMessage());
+                }
+                /* Parsing has finished. */
+                Log.d(TAG, "URL " + url.toString());
+                Log.i(TAG, "Fetched " + jp.getCount() + " updates; target total = "+ jp.getTotalCount());
+               
+                total += jp.getCount();
+                if (jp.getNextUrl().length() == 0) { //string needs to be trimmed from whitespace
+                    url = null;//we are done
+                } else {
+                    try {
+                        url = new URL(jp.getNextUrl());//TODO is this URL-escaped? xml-escaped?
+                    }
+                    catch (MalformedURLException e) {
+                    	//TODO tell user?
+                        url = null;
+                    }
+                }
+    
+            } else if (code == 404) {
+                url = null;//we are done
+            } else {
+                //Vanilla case is 403 forbidden on an auth failure
+                Log.e(TAG, "Fetch update list HTTP error code:" + code + ' ' + h.message());
+                Log.e(TAG, h.body());
+                throw new FailedFetchException("Unexpected server response: " + code + ' ' + h.message());
+            }
+        }
+        Log.i(TAG, "Grand total of " + page + " pages, " + total + " Results");
+        return serverDate;
+    	
+    }
+    
 
 	/**
 	 * populates the projects table in the db from a server URL
@@ -396,34 +471,6 @@ public class Downloader {
 	}
 			
 					
-	/**
-	 * populates the country table in the db from a server URL
-	 * 
-	 * @param ctx
-	 * @param url
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws IOException
-	 */
-	public void fetchCountryList(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
-
-		/* Get a SAXParser from the SAXPArserFactory. */
-		SAXParserFactory spf = SAXParserFactory.newInstance();
-		SAXParser sp = spf.newSAXParser();
-
-		/* Get the XMLReader of the SAXParser we created. */
-		XMLReader xr = sp.getXMLReader();
-		/* Create a new ContentHandler and apply it to the XML-Reader*/ 
-		CountryListHandler myCountryListHandler = new CountryListHandler(new RsrDbAdapter(ctx));
-		xr.setContentHandler(myCountryListHandler);
-		/* Parse the xml-data from our URL. */
-		xr.parse(new InputSource(url.openStream()));
-		/* Parsing has finished. */
-
-		/* Check if anything went wrong. */
-		err = myCountryListHandler.getError();
-		Log.i(TAG, "Fetched " + myCountryListHandler.getCount() + " countries");
-	}
 
     /**
      * populates the country table in the db from a server URL
@@ -497,7 +544,7 @@ public class Downloader {
      * @throws SAXException
      * @throws IOException
      */
-    public void fetchUser(Context ctx, URL url, String defaultId) throws ParserConfigurationException, SAXException, IOException {
+    public void fetchUserXml(Context ctx, URL url, String defaultId) throws ParserConfigurationException, SAXException, IOException {
 
         /* Get a SAXParser from the SAXPArserFactory. */
         SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -516,6 +563,64 @@ public class Downloader {
         err = myUserListHandler.getError();
     }
 
+    /**
+     * fetches one user to the db from a server URL
+     * 
+     * @param ctx
+     * @param url
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws FailedFetchException 
+     */
+    public void fetchUser(Context ctx, RsrDbAdapter ad, URL url, String defaultId) throws ParserConfigurationException, SAXException, IOException, FailedFetchException {
+        User user = SettingsUtil.getAuthUser(ctx);
+        HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
+        h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
+        int code = h.code();//evaluation starts the exchange
+        if (code == 200) {
+        	String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
+        	String jsonBody = h.body();
+        	JsonParser up = new UserJsonParser(ad, serverVersion);
+        	/* Parse the JSON-data from our URL. */
+        	try {
+        		up.parse(jsonBody);
+             	}
+        	catch (JSONException e) {
+        		throw new FailedFetchException("Invalid server response: " + e.getMessage());
+               	}
+        }
+    }
+
+    
+    /**
+     * fetches one organisation to the db from a server URL
+     * 
+     * @param ctx
+     * @param url
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws IOException
+     * @throws FailedFetchException 
+     */
+    public void fetchOrg(Context ctx, RsrDbAdapter ad, URL url, String defaultId) throws ParserConfigurationException, SAXException, IOException, FailedFetchException {
+        User user = SettingsUtil.getAuthUser(ctx);
+        HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
+        h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
+        int code = h.code();//evaluation starts the exchange
+        if (code == 200) {
+        	String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
+        	String jsonBody = h.body();
+        	JsonParser up = new OrgJsonParser(ad, serverVersion);
+        	/* Parse the JSON-data from our URL. */
+        	try {
+        		up.parse(jsonBody);
+             	}
+        	catch (JSONException e) {
+        		throw new FailedFetchException("Invalid server response: " + e.getMessage());
+               	}
+        }
+    }
 
     /**
      * populates the user table in the db from a server URL
@@ -526,7 +631,7 @@ public class Downloader {
      * @throws SAXException
      * @throws IOException
      */
-    public void fetchOrg(Context ctx, URL url, String defaultId) throws ParserConfigurationException, SAXException, IOException {
+    public void fetchOrgXml(Context ctx, URL url, String defaultId) throws ParserConfigurationException, SAXException, IOException {
 
         /* Get a SAXParser from the SAXPArserFactory. */
         SAXParserFactory spf = SAXParserFactory.newInstance();
