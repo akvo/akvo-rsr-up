@@ -187,7 +187,7 @@ public class GetProjectDataService extends IntentService {
 
             if (fetchImages) {
                 try {
-                    dl.fetchNewThumbnails(this,
+                    dl.fetchMissingThumbnails(this,
                             host,
                             FileUtil.getExternalCacheDir(this).toString(),
                             new Downloader.ProgressReporter() {

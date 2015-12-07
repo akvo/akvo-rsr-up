@@ -14,7 +14,7 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.rsr.up.xml;
+package org.akvo.rsr.up.json;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -23,7 +23,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.akvo.rsr.up.dao.RsrDbAdapter;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,8 +38,8 @@ public class JsonParser {
 	JSONObject mRoot;
 	protected boolean mSyntaxError = false;
     protected String mServerVersion = "";
-    protected SimpleDateFormat dateOnly;
-    protected SimpleDateFormat dateTime;
+    protected SimpleDateFormat mDateOnly;
+    protected SimpleDateFormat mDateTime;
 
     // where to store results
     protected RsrDbAdapter mDba;
@@ -54,15 +53,15 @@ public class JsonParser {
         mDba = aDba;
         mServerVersion = serverVersion;
     	//prepare for date parsing
-    	dateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
-    	dateTime.setTimeZone(TimeZone.getTimeZone("UTC"));
-    	dateOnly = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-    	dateOnly.setTimeZone(TimeZone.getTimeZone("UTC"));
+    	mDateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
+    	mDateTime.setTimeZone(TimeZone.getTimeZone("UTC"));
+    	mDateOnly = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+    	mDateOnly.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
     protected Date dateOrNull(String s) {
     	try {
-    		return dateOnly.parse(s);
+    		return mDateOnly.parse(s);
 		} catch (ParseException e) {
 	    	return null;
 		}
@@ -70,7 +69,7 @@ public class JsonParser {
     
     protected Date dateTimeOrNull(String s) {
     	try {
-    		return dateTime.parse(s);
+    		return mDateTime.parse(s);
 		} catch (ParseException e) {
 	    	return null;
 		}

@@ -363,7 +363,7 @@ public class DialogUtil {
 			DialogInterface.OnClickListener clickListener) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
 		LinearLayout main = new LinearLayout(parentContext);
-		main.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,	LayoutParams.WRAP_CONTENT));
+		main.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 		main.setOrientation(LinearLayout.VERTICAL);
 		main.setBackgroundColor(parentContext.getResources().getColor(R.color.rsr_blue));
 		TextView tipText = new TextView(parentContext);

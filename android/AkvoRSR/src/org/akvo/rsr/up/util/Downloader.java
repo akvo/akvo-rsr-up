@@ -36,19 +36,16 @@ import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Project;
 import org.akvo.rsr.up.domain.Update;
 import org.akvo.rsr.up.domain.User;
+import org.akvo.rsr.up.json.JsonParser;
+import org.akvo.rsr.up.json.ListJsonParser;
+import org.akvo.rsr.up.json.OrgJsonParser;
+import org.akvo.rsr.up.json.ProjectResultListJsonParser;
+import org.akvo.rsr.up.json.UserJsonParser;
 import org.akvo.rsr.up.xml.AuthHandler;
-import org.akvo.rsr.up.xml.CountryListHandler;
 import org.akvo.rsr.up.xml.CountryRestListHandler;
-import org.akvo.rsr.up.xml.JsonParser;
-import org.akvo.rsr.up.xml.ListJsonParser;
-import org.akvo.rsr.up.xml.OrgJsonParser;
-import org.akvo.rsr.up.xml.OrganisationHandler;
 import org.akvo.rsr.up.xml.ProjectExtraRestHandler;
-import org.akvo.rsr.up.xml.ProjectResultListJsonParser;
 import org.akvo.rsr.up.xml.UpdateRestHandler;
 import org.akvo.rsr.up.xml.UpdateRestListHandler;
-import org.akvo.rsr.up.xml.UserJsonParser;
-import org.akvo.rsr.up.xml.UserListHandler;
 import org.json.JSONException;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -65,24 +62,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
-/*
- * This class originally used only the API at //server/api/V1
- * but is being migrated to use the //server/rest/v1.
- * Method status (lowest level only):
- *  Authorize()  - Special API, updated for RSR V3
- *  postXmlUpdateStreaming() NEW (necessary for geolocated updates)
- *  verifyUpdate() NEW
- *  fetchcountryListRestApiPaged() NEW
- *  fetchNewThumbnails() OLD
- *  fetchOrg() OLD
- *  fetchUpdateListRestApi() NEW
- *  fetchUpdateListRestApiPaged() NEW
- *  fetchUser() NEW, JSON
- *  fetchProject() NEW
- *  fetchProjectResultsPaged() NEW, JSON
- *  
- * New parser classes have names containing the word REST.
- * The old parsers should be removed once the migration is complete.
+/**
+ * @author stellan
+ *
  */
 public class Downloader {
 
@@ -535,33 +517,6 @@ public class Downloader {
 
 
 
-    /**
-     * populates the user table in the db from a server URL
-     * 
-     * @param ctx
-     * @param url
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws IOException
-     */
-    public void fetchUserXml(Context ctx, URL url, String defaultId) throws ParserConfigurationException, SAXException, IOException {
-
-        /* Get a SAXParser from the SAXPArserFactory. */
-        SAXParserFactory spf = SAXParserFactory.newInstance();
-        SAXParser sp = spf.newSAXParser();
-
-        /* Get the XMLReader of the SAXParser we created. */
-        XMLReader xr = sp.getXMLReader();
-        /* Create a new ContentHandler and apply it to the XML-Reader*/ 
-        UserListHandler myUserListHandler = new UserListHandler(new RsrDbAdapter(ctx), defaultId);
-        xr.setContentHandler(myUserListHandler);
-        /* Parse the xml-data from our URL. */
-        xr.parse(new InputSource(url.openStream()));
-        /* Parsing has finished. */
-
-        /* Check if anything went wrong. */
-        err = myUserListHandler.getError();
-    }
 
     /**
      * fetches one user to the db from a server URL
@@ -622,34 +577,6 @@ public class Downloader {
         }
     }
 
-    /**
-     * populates the user table in the db from a server URL
-     * 
-     * @param ctx
-     * @param url
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws IOException
-     */
-    public void fetchOrgXml(Context ctx, URL url, String defaultId) throws ParserConfigurationException, SAXException, IOException {
-
-        /* Get a SAXParser from the SAXPArserFactory. */
-        SAXParserFactory spf = SAXParserFactory.newInstance();
-        SAXParser sp = spf.newSAXParser();
-
-        /* Get the XMLReader of the SAXParser we created. */
-        XMLReader xr = sp.getXMLReader();
-        /* Create a new ContentHandler and apply it to the XML-Reader*/ 
-        OrganisationHandler myOrgHandler = new OrganisationHandler(new RsrDbAdapter(ctx), defaultId);
-        xr.setContentHandler(myOrgHandler);
-        /* Parse the xml-data from our URL. */
-        xr.parse(new InputSource(url.openStream()));
-        /* Parsing has finished. */
-
-        /* Check if anything went wrong. */
-        err = myOrgHandler.getError();
-    }
-
 
 	/**
 	 * fetches one file from a URL
@@ -697,7 +624,7 @@ public class Downloader {
 	 * fetch could be lazy until display, and do it in view adapter
 
 	 */
-	public void fetchNewThumbnails(Context ctx, String contextUrl, String directory, ProgressReporter prog) throws MalformedURLException{
+	public void fetchMissingThumbnails(Context ctx, String contextUrl, String directory, ProgressReporter prog) throws MalformedURLException{
 		RsrDbAdapter dba = new RsrDbAdapter(ctx);
 		dba.open();
 		int count = 0, fetchCount = 0;

@@ -14,18 +14,11 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.rsr.up.xml;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+package org.akvo.rsr.up.json;
 
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 
 
