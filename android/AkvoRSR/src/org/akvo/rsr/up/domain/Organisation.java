@@ -16,52 +16,123 @@
 
 package org.akvo.rsr.up.domain;
 
+import java.util.Date;
+
 
 public class Organisation {
-	private String id;
-	private String name;
-    private String longName;
-    private String email;
-    private String url;
+	private String mId;
+	private String mName;
+    private String mLongName;
+    private String mEmail;
+    private String mUrl;
+    private String mOldType;//Type letter
+    private String mNewType;//IATI type integer code?
+    private String mPrimaryCountryId;
+    private Date mLastModifiedAt;
+//    private Set<String>mCountryIds;
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+        return mId;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public void setId(String id) {
+        mId = id;
+    }
+
+    public String getOldType() {
+        return mOldType;
+    }
+
+    public void setOldType(String t) {
+        mOldType = t;
+    }
+
+    public String getNewType() {
+        return mNewType;
+    }
+
+    public void setNewType(String t) {
+        mNewType = t;
+    }
 
 	public String getName() {
-		return name;
+		return mName;
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		mName = name;
 	}
 
 	public String getLongName() {
-		return longName;
+		return mLongName;
 	}
 
 	public void setLongName(String name) {
-		this.longName = name;
+		mLongName = name;
 	}
 
     public String getEmail() {
-        return email;
+        return mEmail;
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        mEmail = email;
     }
 
     public String getUrl() {
-        return url;
+        return mUrl;
     }
 
     public void setUrl(String url) {
-        this.url = url;
+        mUrl = url;
+    }
+
+    public Date getLastModifiedAt() {
+        if (mLastModifiedAt != null) return mLastModifiedAt;
+        return new Date(0);
+    }
+
+    public void setLastModifiedAt(Date lastMod ) {
+        mLastModifiedAt = lastMod;
+    }
+    
+    /*    
+    public Set<String> getCountryIds() {
+        return mCountryIds;
+    }
+
+    public String getCountryIdsString() {
+        String projlist = "";
+        for (String id : mCountryIds) {
+            projlist += id + ",";
+        }
+        if (projlist.length() > 0)
+            projlist = projlist.substring(0, projlist.length()-1);
+        return projlist;
+    }
+
+    public void setCountryIdsString(String ids) {
+        clearCountryIds();
+        for (String s:ids.split(",")) {
+            addCountryId(s.trim());
+        }
+    }
+
+    public void addCountryId(String id) {
+        mCountryIds.add(id);
+    }
+
+    public void clearCountryIds() {
+        mCountryIds.clear();
+    }
+    
+*/
+    public String getPrimaryCountryId() {
+        return mPrimaryCountryId;
+    }
+
+    public void setPrimaryCountryId(String id) {
+        mPrimaryCountryId=id;
     }
 
 }

@@ -18,7 +18,9 @@ package org.akvo.rsr.up.json;
 
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Organisation;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 /*
  * http://rsr.akvo.org/rest/v1/organisation/42/?format=json
@@ -101,8 +103,18 @@ public class OrgJsonParser extends JsonParser {
     		org.setName(mRoot.getString("name"));
     		org.setLongName(mRoot.getString("long_name"));
     		org.setEmail(mRoot.getString("contact_email"));
-//    		JSONObject loc = mRoot.getJSONObject("primary_location");
-//    		if (loc != null) org.setFoo(loc.getString("foo"));
+            org.setOldType(mRoot.getString("organisation_type"));
+            org.setNewType(mRoot.getString("new_organisation_type"));
+            int primaryLoc = mRoot.getInt("primary_location");
+            //Loop on nested locations
+            JSONArray locationsArray = mRoot.getJSONArray("locations"); 
+            for (int i = 0; i < locationsArray.length(); i++) {
+                JSONObject aLocation = locationsArray.getJSONObject(i);
+                //o.addCountryId(aLocation.getString("country"));
+                if (mRoot.getInt("id") == primaryLoc) {
+                    org.setPrimaryCountryId(aLocation.getString("country"));
+                }
+            }
     		
     		mDba.saveOrganisation(org);
     	}

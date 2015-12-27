@@ -89,6 +89,10 @@ public class RsrDbAdapter {
     public static final String LONG_NAME_COL = "long_name";
     public static final String URL_COL = "url";
     public static final String DESCRIPTION_COL = "description";
+    public static final String NEW_TYPE_COL = "new_type";
+    public static final String OLD_TYPE_COL = "old_type";
+    public static final String PRIMARY_COUNTRY_ID_COL = "primary_country_id";
+    public static final String MODIFIED_COL = "modified_date";
 
     public static final String RESULT_COL = "result";
     public static final String RESULT_ID_COL = "result_id";
@@ -114,6 +118,7 @@ public class RsrDbAdapter {
 	
     private static final String PROJECT_JOIN = "project LEFT OUTER JOIN country ON (project.country_id = country._id)";
     private static final String UPDATE_JOIN  = "_update LEFT OUTER JOIN country ON (_update.country_id = country._id)";
+    private static final String ORG_COUNTRY_JOIN  = "_organisation LEFT OUTER JOIN country ON (_organisation.primary_country_id = country._id)";
 
     // Table names
 	private static final String DATABASE_NAME = "rsrdata";
@@ -154,8 +159,14 @@ public class RsrDbAdapter {
             "username text, organisation integer, "+
             "first_name text, last_name text, email text);";
     private static final String ORG_TABLE_CREATE =
-            "create table _organisation (_id integer primary key, "+
-            "name text, long_name text, email text, url text)";
+            "create table _organisation (_id integer primary key, "
+            + "name text, long_name text, email text, url text,"
+            + DESCRIPTION_COL  + " string, "
+            + MODIFIED_COL  + " integer, "
+            + OLD_TYPE_COL  + " string, "
+            + NEW_TYPE_COL  + " string, "
+            + PRIMARY_COUNTRY_ID_COL  + " string, "
+            + ")";
     
     private static final String RESULT_TABLE_CREATE =
             "create table " + RESULT_TABLE
@@ -254,13 +265,18 @@ public class RsrDbAdapter {
                     db.execSQL("alter table " + UPDATE_TABLE + " add column city text");
                     db.execSQL("alter table " + UPDATE_TABLE + " add column country_id integer");
                 }
-                if (oldVersion < 16) { //remember last fetch of a oproject
+                if (oldVersion < 16) { //remember last fetch of a project
                     db.execSQL("alter table " + PROJECT_TABLE + " add column " + LAST_FETCH_COL + " integer");
                 }
-                if (oldVersion < 17) { //need results tables
+                if (oldVersion < 17) { //need results tables and more org columns
                     db.execSQL(RESULT_TABLE_CREATE);
                     db.execSQL(INDICATOR_TABLE_CREATE);
                     db.execSQL(PERIOD_TABLE_CREATE);
+                    db.execSQL("alter table " + ORG_TABLE + " add column " + DESCRIPTION_COL + " string");
+                    db.execSQL("alter table " + ORG_TABLE + " add column " + PRIMARY_COUNTRY_ID_COL + " string");
+                    db.execSQL("alter table " + ORG_TABLE + " add column " + OLD_TYPE_COL + " string");
+                    db.execSQL("alter table " + ORG_TABLE + " add column " + NEW_TYPE_COL + " string");
+                    db.execSQL("alter table " + ORG_TABLE + " add column " + MODIFIED_COL + " integer");
                 }           
             }
 		}
@@ -821,6 +837,22 @@ public class RsrDbAdapter {
 
 
     /**
+     * Gets all orgs, all columns
+     */
+    public Cursor listAllOrgsMatching(String search) {
+        //Match caseless, assume id, country or continent is present in entirety (or else "1" would match more than 10% of records) 
+        Cursor cursor = database.query(ORG_COUNTRY_JOIN,
+                new String[] { "_organisation._id", "_organisation.name", "_organisation.long_name", "country.name", "country.continent" },
+                "( name LIKE ? OR long_name LIKE ? OR country.name LIKE ? OR continent LIKE ? OR organisation._id = ?)",
+                new String[] { "%" + search + "%", "%" + search + "%", search, search, search },
+                null,
+                null,
+                null);
+        return cursor;
+    }
+
+
+    /**
      * gets orgs that are referenced by users but not loaded
      * 
      * query might crash with NullPointerException if user table is empty
@@ -1297,7 +1329,7 @@ public class RsrDbAdapter {
 		Cursor cursor = database.query(RESULT_TABLE, new String[] {"COUNT (*) as row_count"}, 
         								null, null, null, null, null);
         if (cursor != null) {
-        	if ( cursor.moveToFirst()) {
+        	if ( cursor.moveToFirst() ) {
         		c = cursor.getInt(0);
         	}
         	cursor.close();
@@ -1305,16 +1337,45 @@ public class RsrDbAdapter {
         return c;
     }
 
-
-	public int countIndicators() {
-		int c = -1;
-		Cursor cursor = database.query(INDICATOR_TABLE, new String[] {"COUNT (*) as row_count"}, 
-				null, null, null, null, null);
+    public int countResultsFor(String pid) {
+        int c = -1;
+        Cursor cursor = database.query(RESULT_TABLE, new String[] {"COUNT (*) as row_count"}, 
+                                        "project_id = "+pid, null, null, null, null);
         if (cursor != null) {
-        	if ( cursor.moveToFirst()) {
-        		c = cursor.getInt(0);
-        	}
-        	cursor.close();
+            if ( cursor.moveToFirst() ) {
+                c = cursor.getInt(0);
+            }
+            cursor.close();
+        }
+        return c;
+    }
+
+
+
+    public int countIndicators() {
+        int c = -1;
+        Cursor cursor = database.query(INDICATOR_TABLE, new String[] {"COUNT (*) as row_count"}, 
+                null, null, null, null, null);
+        if (cursor != null) {
+            if ( cursor.moveToFirst() ) {
+                c = cursor.getInt(0);
+            }
+            cursor.close();
+        }
+        return c;
+    }
+
+
+    public int countIndicatorsFor(String pid) {
+        int c = -1;
+        Cursor cursor = database.query(RESULT_TABLE + " LEFT JOIN " + INDICATOR_TABLE + " ON " + RESULT_TABLE + "._id = " + INDICATOR_TABLE + ".result_id" ,
+                                       new String[] {"COUNT (*) as row_count"}, 
+                                       RESULT_TABLE + ".project_id = " + pid, null, null, null, null);
+        if (cursor != null) {
+            if ( cursor.moveToFirst() ) {
+                c = cursor.getInt(0);
+            }
+            cursor.close();
         }
         return c;
     }
@@ -1325,7 +1386,7 @@ public class RsrDbAdapter {
 		Cursor cursor = database.query(PERIOD_TABLE, new String[] {"COUNT (*) as row_count"}, 
 				null, null, null, null, null);
         if (cursor != null) {
-        	if ( cursor.moveToFirst()) {
+        	if ( cursor.moveToFirst() ) {
         		c = cursor.getInt(0);
         	}
         	cursor.close();
