@@ -45,9 +45,11 @@ public class ProjectDetailActivity extends ActionBarActivity {
 	private TextView projSummaryText;
 	private TextView projLocationText;
 	private TextView publishedCountView;
-	private TextView draftCountView;
+    private TextView draftCountView;
+    private TextView resultCountView;
 	private ImageView projImage;
-	private Button btnUpdates;
+    private Button btnUpdates;
+    private Button btnResults;
 	private Button btnAddUpdate;
 	private boolean debug;
 
@@ -76,7 +78,8 @@ public class ProjectDetailActivity extends ActionBarActivity {
 		projSummaryText		= (TextView) findViewById(R.id.text_proj_summary);
 		projImage 			= (ImageView) findViewById(R.id.image_proj_detail);
 		publishedCountView 	= (TextView) findViewById(R.id.text_proj_detail_published_count);
-		draftCountView 		= (TextView) findViewById(R.id.text_proj_detail_draft_count);
+        draftCountView      = (TextView) findViewById(R.id.text_proj_detail_draft_count);
+        resultCountView     = (TextView) findViewById(R.id.text_proj_detail_result_count);
 
 		//Activate buttons
 		btnUpdates = (Button) findViewById(R.id.btn_view_updates);
@@ -97,8 +100,8 @@ public class ProjectDetailActivity extends ActionBarActivity {
 		});
 		
 		//Results
-        btnUpdates = (Button) findViewById(R.id.btn_view_results);
-        btnUpdates.setOnClickListener( new View.OnClickListener() {
+        btnResults = (Button) findViewById(R.id.btn_view_results);
+        btnResults.setOnClickListener( new View.OnClickListener() {
             public void onClick(View view) {
                 Intent i = new Intent(view.getContext(), ResultListActivity.class);
                 i.putExtra(ConstantUtil.PROJECT_ID_KEY, projId);
@@ -123,7 +126,7 @@ public class ProjectDetailActivity extends ActionBarActivity {
     		    return;
     		}
     		if (debug) {
-    			projTitleLabel.setText("["+ projId + "] "+project.getTitle());
+    			projTitleLabel.setText("[" + projId + "] " + project.getTitle());
     		} else {
     			projTitleLabel.setText(project.getTitle());
     		}
@@ -165,7 +168,14 @@ public class ProjectDetailActivity extends ActionBarActivity {
     		stateCounts = dba.countAllUpdatesFor(projId);
     		Resources res = getResources();
     		publishedCountView.setText(Integer.toString(stateCounts[2]) + res.getString(R.string.count_published));
-    		draftCountView.setText(Integer.toString(stateCounts[0]) + res.getString(R.string.count_draft));
+            draftCountView.setText(Integer.toString(stateCounts[0]) + res.getString(R.string.count_draft));
+            draftCountView.setVisibility(stateCounts[0] > 0 ? View.VISIBLE : View.GONE);
+
+            int rc = dba.countResultsFor(projId);
+            int ic = dba.countIndicatorsFor(projId);
+            resultCountView.setText(Integer.toString(rc) + res.getString(R.string.count_results) + ", " + Integer.toString(ic) + res.getString(R.string.count_indicators));
+            resultCountView.setVisibility(rc > 0 ? View.VISIBLE : View.GONE);
+            btnResults.setEnabled(rc > 0);
     
     		ThumbnailUtil.setPhotoFile(projImage,project.getThumbnailUrl(), project.getThumbnailFilename(), projId, null, true);
 

@@ -13,5 +13,7 @@
 	<color name="draft_text">#FAA31D</color>
 	<color name="btn_face"  >#DBDBE0</color>
 	<color name="btn_border">#E7E8E9</color>
-									
+    <color name="black"     >#000000</color>
+    <color name="white"     >#FFFFFF</color>
+    									
 </resources>
