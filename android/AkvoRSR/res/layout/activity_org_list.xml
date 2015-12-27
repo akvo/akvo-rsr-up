@@ -1,0 +1,163 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/orglistprogress"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/rsr_blue"
+        android:orientation="vertical"
+        android:padding="5dip"
+        android:visibility="gone" >
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/label_refresh_progress"
+            android:textColor="@color/rsr_purple"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="@string/label_progress_projects" />
+
+        <ProgressBar
+            android:id="@+id/progressBar1"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="false" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="@string/label_progress_updates" />
+
+        <ProgressBar
+            android:id="@+id/progressBar2"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="false" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="@string/label_progress_pictures" />
+
+        <ProgressBar
+            android:id="@+id/progressBar3"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="false" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" 
+        android:background="@color/pale_gray"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:background="@color/pale_gray"
+            android:padding="5dip"
+            android:text="@string/label_org_list"
+            android:textColor="@color/rsr_purple"
+            android:textSize="20sp"
+            android:typeface="sans" />
+
+        <TextView
+            android:id="@+id/orgcountlabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_weight="1"
+            android:background="@color/pale_gray"
+            android:padding="5dip"
+            android:text="@string/dummy_count"
+            android:textColor="@color/rsr_purple"
+            android:textSize="20sp"
+            android:typeface="sans"
+            />
+
+        <!-- The seach field splits unused space in the bar with label when visible -->
+        <EditText
+            android:id="@+id/txt_projsearch"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:background="@drawable/box"
+            android:hint="@string/hint_search"
+            android:imeOptions="actionSearch"
+            android:padding="5dip"
+            android:textColor="@color/rsr_purple"
+            android:textSize="20sp"
+            android:typeface="sans"
+            android:visibility="gone"
+            android:singleLine="true"
+            />
+        <Button
+            android:id="@+id/btn_projsearch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/pale_gray"
+            android:padding="5dip"
+            android:drawableLeft="@drawable/ic_menu_search"
+             />
+        </LinearLayout>
+
+    <!-- list of projects. if it is empty, the TextView will be shown instead -->
+
+    <ListView
+        android:id="@+id/list_projects"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@android:color/white"
+        android:drawSelectorOnTop="false" />
+
+    <TextView
+        android:id="@+id/list_empty_text"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/label_empty_proj_list"
+        android:visibility="gone"
+        />
+
+    <TextView
+        android:id="@+id/first_time_text"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/label_first_proj_list" 
+        android:visibility="gone"
+        />
+
+    <TextView
+        android:id="@+id/unemployed_text"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/label_unemployed_proj_list" 
+        android:visibility="gone"
+        />
+
+</LinearLayout>

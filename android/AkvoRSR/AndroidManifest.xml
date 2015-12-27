@@ -39,6 +39,14 @@
             android:label="@string/title_activity_project_list" >
         </activity>
         <activity
+            android:name="org.akvo.rsr.up.OrgListActivity"
+            android:configChanges="orientation"
+            android:label="@string/title_activity_project_list" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.akvo.rsr.up.ProjectListActivity" />
+        </activity>
+        <activity
             android:name="org.akvo.rsr.up.UpdateListActivity"
             android:label="@string/title_activity_update_list" >
             <meta-data

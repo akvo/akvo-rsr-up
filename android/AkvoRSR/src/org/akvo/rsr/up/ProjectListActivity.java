@@ -167,7 +167,7 @@ public class ProjectListActivity extends ActionBarActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
-        case R.id.menu_refresh:
+	    case R.id.menu_refresh:
             startGetProjectsService();
             return true;
         case R.id.menu_settings:
@@ -177,6 +177,10 @@ public class ProjectListActivity extends ActionBarActivity {
         case R.id.menu_messages:
             Intent i2 = new Intent(this, MessageActivity.class);
             startActivity(i2);
+            return true;
+        case R.id.menu_organisations:
+            Intent i4 = new Intent(this, OrgListActivity.class);
+            startActivity(i4);
             return true;
         case R.id.menu_diagnostics:
             Intent i3 = new Intent(this, DiagnosticActivity.class);

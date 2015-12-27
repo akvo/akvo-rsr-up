@@ -12,6 +12,10 @@
         android:title="@string/action_settings"
         android:icon="@drawable/ic_menu_settings_holo_light"        
          />
+    <item android:id="@+id/menu_organisations"
+        android:title="@string/action_organisations"
+        android:icon="@drawable/ic_menu_settings_holo_light"        
+         />
     <item android:id="@+id/menu_messages"
         android:title="@string/action_messages"
         android:icon="@drawable/ic_menu_close_clear_cancel"        

@@ -521,14 +521,14 @@ public class Downloader {
     /**
      * populates the organisation table in the db from a server URL
      * in the REST API
-     * Typically the url will specify all orgnisations.
+     * Typically the url will specify all organisations.
      * 
      * @param ctx
+     * @param dba
      * @param url
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws IOException
-     * @throws FailedFetchException 
+     * @param prog
+     * @return
+     * @throws FailedFetchException
      */
     public Date fetchOrgListRestApiPaged(Context ctx, RsrDbAdapter dba, URL url, ProgressReporter prog) throws FailedFetchException {
         Date serverDate = null;
