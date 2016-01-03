@@ -29,6 +29,7 @@ public class Organisation {
     private String mNewType;//IATI type integer code?
     private String mPrimaryCountryId;
     private Date mLastModifiedAt;
+    private String mLogo;
 //    private Set<String>mCountryIds;
 
     public String getId() {
@@ -133,6 +134,14 @@ public class Organisation {
 
     public void setPrimaryCountryId(String id) {
         mPrimaryCountryId=id;
+    }
+
+    public String getLogo() {
+        return mLogo;
+    }
+
+    public void setLogo(String logo) {
+        mLogo = logo;
     }
 
 }

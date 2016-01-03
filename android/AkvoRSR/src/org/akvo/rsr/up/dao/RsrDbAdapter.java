@@ -93,6 +93,8 @@ public class RsrDbAdapter {
     public static final String OLD_TYPE_COL = "old_type";
     public static final String PRIMARY_COUNTRY_ID_COL = "primary_country_id";
     public static final String MODIFIED_COL = "modified_date";
+    public static final String LOGO_URL_COL = "logo_url";
+    public static final String LOGO_FN_COL = "logo_fn";
 
     public static final String RESULT_COL = "result";
     public static final String RESULT_ID_COL = "result_id";
@@ -116,8 +118,8 @@ public class RsrDbAdapter {
 	private DatabaseHelper databaseHelper;
 	private SQLiteDatabase database;
 	
-    private static final String PROJECT_JOIN = "project LEFT OUTER JOIN country ON (project.country_id = country._id)";
-    private static final String UPDATE_JOIN  = "_update LEFT OUTER JOIN country ON (_update.country_id = country._id)";
+    private static final String PROJECT_COUNTRY_JOIN = "project LEFT OUTER JOIN country ON (project.country_id = country._id)";
+    private static final String UPDATE_COUNTRY_JOIN  = "_update LEFT OUTER JOIN country ON (_update.country_id = country._id)";
     private static final String ORG_COUNTRY_JOIN  = "_organisation LEFT OUTER JOIN country ON (_organisation.primary_country_id = country._id)";
 
     // Table names
@@ -165,7 +167,9 @@ public class RsrDbAdapter {
             + MODIFIED_COL  + " integer, "
             + OLD_TYPE_COL  + " string, "
             + NEW_TYPE_COL  + " string, "
-            + PRIMARY_COUNTRY_ID_COL  + " string, "
+            + LOGO_URL_COL  + " string, "
+            + LOGO_FN_COL  + " string, "
+            + PRIMARY_COUNTRY_ID_COL  + " string "
             + ")";
     
     private static final String RESULT_TABLE_CREATE =
@@ -198,7 +202,7 @@ public class RsrDbAdapter {
 //  private static final int DATABASE_VERSION = 14; //update now has photo metadata and video
 //  private static final int DATABASE_VERSION = 15; //update now has location
 //  private static final int DATABASE_VERSION = 16; //project gets a last_fetch datetime to optimize fetches
-    private static final int DATABASE_VERSION = 17; //results framework (added result, indicator and period tables)
+    private static final int DATABASE_VERSION = 17; //results framework (added result, indicator and period tables). New Org columns.
 
 	private final Context context;
 
@@ -276,6 +280,8 @@ public class RsrDbAdapter {
                     db.execSQL("alter table " + ORG_TABLE + " add column " + PRIMARY_COUNTRY_ID_COL + " string");
                     db.execSQL("alter table " + ORG_TABLE + " add column " + OLD_TYPE_COL + " string");
                     db.execSQL("alter table " + ORG_TABLE + " add column " + NEW_TYPE_COL + " string");
+                    db.execSQL("alter table " + ORG_TABLE + " add column " + LOGO_URL_COL + " string");
+                    db.execSQL("alter table " + ORG_TABLE + " add column " + LOGO_FN_COL + " string");
                     db.execSQL("alter table " + ORG_TABLE + " add column " + MODIFIED_COL + " integer");
                 }           
             }
@@ -633,7 +639,7 @@ public class RsrDbAdapter {
      * Gets all projects, all columns and country data
      */
     public Cursor listAllProjectsWithCountry() {
-        Cursor cursor = database.query(PROJECT_JOIN,
+        Cursor cursor = database.query(PROJECT_COUNTRY_JOIN,
                                         null,
                                         null,
                                         null,
@@ -648,7 +654,7 @@ public class RsrDbAdapter {
      * Gets visible projects, all columns and country data
      */
     public Cursor listVisibleProjectsWithCountry() {
-        Cursor cursor = database.query(PROJECT_JOIN,
+        Cursor cursor = database.query(PROJECT_COUNTRY_JOIN,
                 new String[] { "project._id", "project.title", "project.hidden", "project.thumbnail_url", "project.thumbnail_fn", "country.name", "country.continent" },
                 HIDDEN_COL + " = ?",
                 new String[] { "0" },
@@ -673,7 +679,7 @@ public class RsrDbAdapter {
         search = search.replaceAll(",", " ");
         */
         //Match caseless, assume country or continent is present in entirety
-        Cursor cursor = database.query(PROJECT_JOIN,
+        Cursor cursor = database.query(PROJECT_COUNTRY_JOIN,
                 new String[] { "project._id", "project.title", "project.hidden", "project.thumbnail_url", "project.thumbnail_fn", "country.name", "country.continent" },
                 HIDDEN_COL + " = ? AND ( title LIKE ? OR name LIKE ? OR continent LIKE ? OR project._id = ?)",
                 new String[] { "0", "%" + search + "%", search, search, search },
@@ -825,13 +831,16 @@ public class RsrDbAdapter {
      * Gets all orgs, all columns
      */
     public Cursor listAllOrgs() {
-        Cursor cursor = database.query(ORG_TABLE,
-                                        null,
-                                        null,
-                                        null,
-                                        null,
-                                        null,
-                                        null);
+        Cursor cursor = database.query(ORG_COUNTRY_JOIN,
+                new String[] {
+                    "_organisation._id", "_organisation.name", "_organisation.long_name", "_organisation.logo_url", "_organisation.logo_fn",
+                    "country.name AS country_name", "country.continent"
+                },
+                null,
+                null,
+                null,
+                null,
+               "_organisation.name");
         return cursor;
     }
 
@@ -842,12 +851,15 @@ public class RsrDbAdapter {
     public Cursor listAllOrgsMatching(String search) {
         //Match caseless, assume id, country or continent is present in entirety (or else "1" would match more than 10% of records) 
         Cursor cursor = database.query(ORG_COUNTRY_JOIN,
-                new String[] { "_organisation._id", "_organisation.name", "_organisation.long_name", "country.name", "country.continent" },
-                "( name LIKE ? OR long_name LIKE ? OR country.name LIKE ? OR continent LIKE ? OR organisation._id = ?)",
-                new String[] { "%" + search + "%", "%" + search + "%", search, search, search },
-                null,
-                null,
-                null);
+                new String[] {
+                "_organisation._id", "_organisation.name", "_organisation.long_name", "_organisation.logo_url", "_organisation.logo_fn",
+                "country.name AS country_name", "country.continent"
+            },
+            "( _organisation.name LIKE ? OR _organisation.long_name LIKE ? OR country_name LIKE ? OR continent LIKE ? OR _organisation._id = ?)",
+            new String[] { "%" + search + "%", "%" + search + "%", search, search, search },
+            null,
+            null,
+            "_organisation.name");
         return cursor;
     }
 
@@ -887,7 +899,7 @@ public class RsrDbAdapter {
 	 */
 	public Project findProject(String _id) {
 		Project project = null;
-		Cursor cursor = database.query(PROJECT_JOIN,
+		Cursor cursor = database.query(PROJECT_COUNTRY_JOIN,
 									   null,
 									   "project._id = ?",
 									   new String[] { _id }, null, null, null);
@@ -922,7 +934,7 @@ public class RsrDbAdapter {
 	 */
 	public Update findUpdate(String _id) {
 	    Update update = null;
-		Cursor cursor = database.query(UPDATE_JOIN,
+		Cursor cursor = database.query(UPDATE_COUNTRY_JOIN,
 										null, //all columns
 										"_update._id = ?",
 										new String[] { _id }, null, null, null);
@@ -1096,6 +1108,9 @@ public class RsrDbAdapter {
                 org.setLongName(cursor.getString(cursor.getColumnIndexOrThrow(LONG_NAME_COL)));
                 org.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(EMAIL_COL)));
                 org.setUrl(cursor.getString(cursor.getColumnIndexOrThrow(URL_COL)));
+                org.setLogo(cursor.getString(cursor.getColumnIndexOrThrow(LOGO_URL_COL)));
+                //org.setLogoFilename(cursor.getString(cursor.getColumnIndexOrThrow(LOGO_FN_COL)));
+                org.setPrimaryCountryId(cursor.getString(cursor.getColumnIndexOrThrow(PRIMARY_COUNTRY_ID_COL)));
                 }
             cursor.close();
             }
@@ -1117,6 +1132,9 @@ public class RsrDbAdapter {
         updatedValues.put(LONG_NAME_COL, org.getLongName());
         updatedValues.put(EMAIL_COL, org.getEmail());
         updatedValues.put(URL_COL, org.getUrl());
+        updatedValues.put(PRIMARY_COUNTRY_ID_COL, org.getPrimaryCountryId());
+        updatedValues.put(LOGO_URL_COL, org.getLogo());
+        //not logo filename, to preserve cache connection
         
         Cursor cursor = database.query(ORG_TABLE,
                                         new String[] { PK_ID_COL },

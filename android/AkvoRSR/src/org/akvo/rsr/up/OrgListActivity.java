@@ -22,6 +22,7 @@ import org.akvo.rsr.up.service.GetOrgDataService;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.DialogUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
+import org.akvo.rsr.up.viewadapter.OrgListCursorAdapter;
 import org.akvo.rsr.up.viewadapter.ProjectListCursorAdapter;
 
 import android.os.Bundle;
@@ -52,7 +53,7 @@ import android.database.Cursor;
 public class OrgListActivity extends ActionBarActivity {
 
 
-	private static final String TAG = "ProjectListActivity";
+	private static final String TAG = "OrgListActivity";
 
 	private RsrDbAdapter ad;
 	private Cursor dataCursor;
@@ -75,13 +76,13 @@ public class OrgListActivity extends ActionBarActivity {
 	    mEmployed = !SettingsUtil.getAuthUser(this).getOrgIds().isEmpty();
 	    
 	    super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_project_list);
+		setContentView(R.layout.activity_org_list);
 
-        projCountLabel = (TextView) findViewById(R.id.projcountlabel);
-		inProgress = (LinearLayout) findViewById(R.id.projlistprogress);
+        projCountLabel = (TextView) findViewById(R.id.orgcountlabel);
+		inProgress = (LinearLayout) findViewById(R.id.orglistprogress);
 		inProgress1 = (ProgressBar) findViewById(R.id.progressBar1);
 
-        mList = (ListView) findViewById(R.id.list_projects);
+        mList = (ListView) findViewById(R.id.list_orgs);
         mEmptyText = (TextView) findViewById(R.id.list_empty_text);
         mFirstTimeText = (TextView) findViewById(R.id.first_time_text);
         mUnemployedText = (TextView) findViewById(R.id.unemployed_text);
@@ -111,7 +112,7 @@ public class OrgListActivity extends ActionBarActivity {
                     //show X instead of magnifying glass
                     searchButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_close_normal,0,0,0);
                     searchField.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
-                    searchField.requestFocus();
+//                    searchField.requestFocus();
 //                    showSoftKeyBoard(searchField);
                     }
             }
@@ -134,8 +135,8 @@ public class OrgListActivity extends ActionBarActivity {
         ad.open();
 
 		//register a listener for completion broadcasts
-		IntentFilter f = new IntentFilter(ConstantUtil.PROJECTS_FETCHED_ACTION);
-		f.addAction(ConstantUtil.PROJECTS_PROGRESS_ACTION);
+		IntentFilter f = new IntentFilter(ConstantUtil.ORGS_FETCHED_ACTION);
+		f.addAction(ConstantUtil.ORGS_PROGRESS_ACTION);
 		broadRec = new ResponseReceiver();
         LocalBroadcastManager.getInstance(this).registerReceiver(broadRec, f);
         
@@ -255,7 +256,7 @@ public class OrgListActivity extends ActionBarActivity {
             mUnemployedText.setVisibility(View.GONE);
 		}
 		//Populate list view
-		ProjectListCursorAdapter projects = new ProjectListCursorAdapter(this, dataCursor);
+		OrgListCursorAdapter projects = new OrgListCursorAdapter(this, dataCursor);
 		mList.setAdapter(projects);
 	}
 

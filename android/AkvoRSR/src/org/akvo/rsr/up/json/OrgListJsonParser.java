@@ -116,17 +116,25 @@ public class OrgListJsonParser extends ListJsonParser {
                 o.setLongName(aResult.getString("long_name"));
                 o.setOldType(aResult.getString("organisation_type"));
                 o.setNewType(aResult.getString("new_organisation_type"));
-                int primaryLoc = aResult.getInt("primary_location");
+                o.setLogo(aResult.getString("logo"));
+                int primaryLoc = -1;
+                try {
+                    primaryLoc = aResult.getInt("primary_location");
+                }
+                catch (JSONException e) {
+                    //Eat it
+                }
     			//Loop on nested locations
     			JSONArray locationsArray = aResult.getJSONArray("locations"); 
         		for (int ii = 0; ii < locationsArray.length(); ii++) {
         			JSONObject aLocation = locationsArray.getJSONObject(ii);
         			//o.addCountryId(aLocation.getString("country"));
-                    if (aResult.getInt("id") == primaryLoc) {
+                    if (aLocation.getInt("id") == primaryLoc) {
                         o.setPrimaryCountryId(aLocation.getString("country"));
                     }
         		}
                 mDba.saveOrganisation(o);
+                mItemCount++;
     		}
     	}
     }

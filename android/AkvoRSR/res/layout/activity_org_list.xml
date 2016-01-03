@@ -25,7 +25,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:text="@string/label_progress_projects" />
+            android:text="@string/label_progress_orgs" />
 
         <ProgressBar
             android:id="@+id/progressBar1"
@@ -38,7 +38,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:text="@string/label_progress_updates" />
+            android:text="@string/label_progress_countries" />
 
         <ProgressBar
             android:id="@+id/progressBar2"
@@ -123,7 +123,7 @@
     <!-- list of projects. if it is empty, the TextView will be shown instead -->
 
     <ListView
-        android:id="@+id/list_projects"
+        android:id="@+id/list_orgs"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1"

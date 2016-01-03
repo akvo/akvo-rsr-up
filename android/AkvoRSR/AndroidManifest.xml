@@ -135,6 +135,11 @@
             android:enabled="true"
             android:exported="false" >
         </service>
+        <service
+            android:name="org.akvo.rsr.up.service.GetOrgDataService"
+            android:enabled="true"
+            android:exported="false" >
+        </service>
         
     </application>
 

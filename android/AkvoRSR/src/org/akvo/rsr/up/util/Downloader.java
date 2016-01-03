@@ -40,6 +40,7 @@ import org.akvo.rsr.up.json.JsonParser;
 import org.akvo.rsr.up.json.ListJsonParser;
 import org.akvo.rsr.up.json.OrgJsonParser;
 import org.akvo.rsr.up.json.OrgListJsonParser;
+import org.akvo.rsr.up.json.OrgTypeaheadJsonParser;
 import org.akvo.rsr.up.json.ProjectResultListJsonParser;
 import org.akvo.rsr.up.json.UserJsonParser;
 import org.akvo.rsr.up.xml.AuthHandler;
@@ -536,6 +537,7 @@ public class Downloader {
         int runningTotal = 0;
         int page = 0;
         while (url != null) { //one page at a time
+            Log.d(TAG, "URL " + url.toString());
             HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
             h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
             int code = h.code(); //evaluation starts the exchange
@@ -553,7 +555,6 @@ public class Downloader {
                     throw new FailedFetchException("Invalid server response: " + e.getMessage());
                 }
                 /* Parsing has finished. */
-                Log.d(TAG, "URL " + url.toString());
                 Log.i(TAG, "Fetched " + jp.getCount() + " organisations; target total = "+ jp.getTotalCount());
                 prog.sendUpdate(runningTotal, jp.getTotalCount());
 
@@ -582,6 +583,53 @@ public class Downloader {
         Log.i(TAG, "Grand total of " + page + " pages, " + runningTotal + " Results");
         return serverDate;
         
+    }
+
+
+    /**
+     * populates the organisation table in the db from a server typeahead URL
+     * in the REST API
+     * 
+     * @param ctx
+     * @param dba
+     * @param url
+     * @param prog
+     * @return
+     * @throws FailedFetchException
+     */
+    public Date fetchTypeaheadOrgList(Context ctx, RsrDbAdapter dba, URL url, ProgressReporter prog) throws FailedFetchException {
+        Date serverDate = null;
+        User user = SettingsUtil.getAuthUser(ctx);
+        int runningTotal = 0;
+        Log.d(TAG, "URL " + url.toString());
+        HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
+        h.header("Authorization", "Token " + user.getApiKey()); //This API actually needs no authorization
+        int code = h.code(); //evaluation starts the exchange
+        if (code == 200) {
+            String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
+            serverDate = new Date(h.date());
+            String jsonBody = h.body();
+            ListJsonParser jp = new OrgTypeaheadJsonParser(dba, serverVersion);
+            /* Parse the JSON-data from our URL. */
+            try {
+                jp.parse(jsonBody);//takes a long time
+            }
+            catch (JSONException e) {
+                throw new FailedFetchException("Invalid server response: " + e.getMessage());
+            }
+            /* Parsing has finished. */
+            Log.i(TAG, "Fetched " + jp.getCount() + " organisations; target total = "+ jp.getTotalCount());
+            prog.sendUpdate(runningTotal, jp.getTotalCount());
+
+        } else if (code == 404) {
+            url = null;//we are done
+        } else {
+            //Vanilla case is 403 forbidden on an auth failure
+            Log.e(TAG, "Fetch organisation list HTTP error code:" + code + ' ' + h.message());
+            Log.e(TAG, h.body());
+            throw new FailedFetchException("Unexpected server response: " + code + ' ' + h.message());
+        }
+        return serverDate;
     }
 
 

@@ -59,6 +59,7 @@ public class GetOrgDataService extends IntentService {
 
     /**
      * Fetch all organisations data from server.
+     * 
      */
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -66,42 +67,57 @@ public class GetOrgDataService extends IntentService {
         RsrDbAdapter ad = new RsrDbAdapter(this);
         Downloader dl = new Downloader();
         String errMsg = null;
-        boolean fetchImages = !SettingsUtil.ReadBoolean(this, "setting_delay_image_fetch", false);
-        String host = SettingsUtil.host(this);
-        Long start = System.currentTimeMillis();
+        final boolean fetchImages = !SettingsUtil.ReadBoolean(this, "setting_delay_image_fetch", false);
+        final boolean brief = true;//TODO put the brief/full flag in the intent
+        final String host = SettingsUtil.host(this);
+        final Long start = System.currentTimeMillis();
         
         ad.open();
-        User user = SettingsUtil.getAuthUser(this);
         try {
             if (mFetchOrgs) {
                 // Fetch org data.
-                int j = 0;
                 try {
-                    dl.fetchOrgListRestApiPaged(
-                            this,
-                            ad,
-                            new URL(host + ConstantUtil.FETCH_ORGS_URL),
-                            new Downloader.ProgressReporter() {
-                                public void sendUpdate(int sofar, int total) {
-                                    Intent intent = new Intent(ConstantUtil.PROJECTS_PROGRESS_ACTION);
-                                    intent.putExtra(ConstantUtil.PHASE_KEY, 0);
-                                    intent.putExtra(ConstantUtil.SOFAR_KEY, sofar);
-                                    intent.putExtra(ConstantUtil.TOTAL_KEY, total);
-                                    LocalBroadcastManager.getInstance(GetOrgDataService.this)
-                                            .sendBroadcast(intent);
+                    if (brief) {
+                        dl.fetchTypeaheadOrgList(
+                                this,
+                                ad,
+                                new URL(host + ConstantUtil.FETCH_ORGS_TYPEAHEAD_URL),
+                                new Downloader.ProgressReporter() {
+                                    public void sendUpdate(int sofar, int total) {
+                                        Intent intent = new Intent(ConstantUtil.ORGS_PROGRESS_ACTION);
+                                        intent.putExtra(ConstantUtil.PHASE_KEY, 0);
+                                        intent.putExtra(ConstantUtil.SOFAR_KEY, sofar);
+                                        intent.putExtra(ConstantUtil.TOTAL_KEY, total);
+                                        LocalBroadcastManager.getInstance(GetOrgDataService.this)
+                                                .sendBroadcast(intent);
+                                    }
                                 }
-                            }
- 
-                            );
-                    j++;
+                        );
+                    } else {
+                        dl.fetchOrgListRestApiPaged(
+                                this,
+                                ad,
+                                new URL(host + ConstantUtil.FETCH_ORGS_URL),
+                                new Downloader.ProgressReporter() {
+                                    public void sendUpdate(int sofar, int total) {
+                                        Intent intent = new Intent(ConstantUtil.ORGS_PROGRESS_ACTION);
+                                        intent.putExtra(ConstantUtil.PHASE_KEY, 0);
+                                        intent.putExtra(ConstantUtil.SOFAR_KEY, sofar);
+                                        intent.putExtra(ConstantUtil.TOTAL_KEY, total);
+                                        LocalBroadcastManager.getInstance(GetOrgDataService.this)
+                                                .sendBroadcast(intent);
+                                    }
+                                }
+                        );
+                    }
                     //TODO need a way to get this called by the paged fetch: broadcastProgress(0, j, dl.???);
                 } catch (Exception e) { // probably network reasons
                     Log.e(TAG, "Bad organisation fetch:", e);
                     errMsg = getResources().getString(R.string.errmsg_org_fetch_failed) + e.getMessage();
                 }
-                Log.i(TAG, "Fetched " + j + " orgs");
             }
 
+            broadcastProgress(0, 100, 100);
             try {
             if (mFetchCountries && ad.getCountryCount() == 0) { // rarely changes, so only fetch countries if we never did that
                 dl.fetchCountryListRestApiPaged(this, new URL(SettingsUtil.host(this) +
@@ -112,7 +128,7 @@ public class GetOrgDataService extends IntentService {
                 errMsg = getResources().getString(R.string.errmsg_org_fetch_failed) + e.getMessage();
             }
 
-            broadcastProgress(0, 100, 100);
+            broadcastProgress(1, 100, 100);
 
             //logos?
             if (fetchImages) {
@@ -122,7 +138,7 @@ public class GetOrgDataService extends IntentService {
                             FileUtil.getExternalCacheDir(this).toString(),
                             new Downloader.ProgressReporter() {
                                 public void sendUpdate(int sofar, int total) {
-                                    Intent intent = new Intent(ConstantUtil.PROJECTS_PROGRESS_ACTION);
+                                    Intent intent = new Intent(ConstantUtil.ORGS_PROGRESS_ACTION);
                                     intent.putExtra(ConstantUtil.PHASE_KEY, 2);
                                     intent.putExtra(ConstantUtil.SOFAR_KEY, sofar);
                                     intent.putExtra(ConstantUtil.TOTAL_KEY, total);

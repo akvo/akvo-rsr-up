@@ -39,7 +39,8 @@ public class ConstantUtil {
     public static final String FETCH_PROJ_URL_PATTERN = "/rest/v1/project_up/%s/?format=xml&image_thumb_name=up&image_thumb_up_width=100"; //now asks for thumbnail size
     public static final String FETCH_COUNTRIES_URL = "/rest/v1/country/?format=xml&limit=50"; //very small objects - get many at a time
     public static final String FETCH_USER_URL_PATTERN = "/rest/v1/user/%s/?format=json&depth=1";
-    public static final String FETCH_ORGS_URL = "/rest/v1/organisation/?format=json";
+    public static final String FETCH_ORGS_URL = "/rest/v1/organisation/?format=json&limit=10";//DEBUG
+    public static final String FETCH_ORGS_TYPEAHEAD_URL = "/rest/v1/typeaheads/organisations?format=json";
     public static final String FETCH_ORG_URL_PATTERN = "/rest/v1/organisation/%s/?format=json";
     public static final String FETCH_RESULTS_URL_PATTERN = "/rest/v1/result/?format=json&project=%s"; //also includes indicators and periods
 	public static final int    MAX_IMAGE_UPLOAD_SIZE = 2000000; //Nginx POST limit is 3MB, B64 encoding expands 33% and there may be long text 

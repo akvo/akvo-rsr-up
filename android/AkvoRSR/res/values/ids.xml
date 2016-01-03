@@ -18,5 +18,8 @@
     <item
         type="id"
         name="object_type_tag" />
+    <item
+        type="id"
+        name="org_id_tag" />
 </resources>
 

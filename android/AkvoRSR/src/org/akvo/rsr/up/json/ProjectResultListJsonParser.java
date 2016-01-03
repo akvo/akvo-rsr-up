@@ -207,6 +207,8 @@ public class ProjectResultListJsonParser extends ListJsonParser {
     			r.setTitle(aResult.getString("title"));
     			r.setDescription(aResult.getString("description"));
     			mDba.saveResult(r);
+                mItemCount++;
+                
     			//Loop on nested indicators
     			JSONArray indicatorsArray = aResult.getJSONArray("indicators"); 
         		for (int ii = 0; ii < indicatorsArray.length(); ii++) {

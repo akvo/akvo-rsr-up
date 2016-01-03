@@ -65,9 +65,13 @@ public class ListJsonParser extends JsonParser{
     public void parse(String body) throws JSONException {
     	super.parse(body);
     	mItemCount= 0;
-        
-        mNextUrl = mRoot.getString("next");
-        mItemTotalCount = mRoot.getInt("count");
+        try {
+            mNextUrl = mRoot.getString("next");
+            mItemTotalCount = mRoot.getInt("count");
+        }
+        catch (JSONException j) {
+            //optional; not present for a typeahead result
+        }
         mResultsArray = mRoot.getJSONArray("results");
     }
     
