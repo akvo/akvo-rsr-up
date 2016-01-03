@@ -120,7 +120,7 @@ public class GetOrgDataService extends IntentService {
             broadcastProgress(0, 100, 100);
             try {
             if (mFetchCountries && ad.getCountryCount() == 0) { // rarely changes, so only fetch countries if we never did that
-                dl.fetchCountryListRestApiPaged(this, new URL(SettingsUtil.host(this) +
+                dl.fetchCountryListRestApiPaged(this, ad, new URL(SettingsUtil.host(this) +
                         String.format(ConstantUtil.FETCH_COUNTRIES_URL)));
             }
             } catch (Exception e) { // probably network reasons

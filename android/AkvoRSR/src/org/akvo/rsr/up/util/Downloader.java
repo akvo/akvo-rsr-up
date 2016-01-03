@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -36,6 +36,7 @@ import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Project;
 import org.akvo.rsr.up.domain.Update;
 import org.akvo.rsr.up.domain.User;
+import org.akvo.rsr.up.json.CountryListJsonParser;
 import org.akvo.rsr.up.json.JsonParser;
 import org.akvo.rsr.up.json.ListJsonParser;
 import org.akvo.rsr.up.json.OrgJsonParser;
@@ -44,7 +45,6 @@ import org.akvo.rsr.up.json.OrgTypeaheadJsonParser;
 import org.akvo.rsr.up.json.ProjectResultListJsonParser;
 import org.akvo.rsr.up.json.UserJsonParser;
 import org.akvo.rsr.up.xml.AuthHandler;
-import org.akvo.rsr.up.xml.CountryRestListHandler;
 import org.akvo.rsr.up.xml.ProjectExtraRestHandler;
 import org.akvo.rsr.up.xml.UpdateRestHandler;
 import org.akvo.rsr.up.xml.UpdateRestListHandler;
@@ -456,6 +456,7 @@ public class Downloader {
 			
 					
 
+
     /**
      * populates the country table in the db from a server URL
      * in the REST API
@@ -463,12 +464,10 @@ public class Downloader {
      * 
      * @param ctx
      * @param url
-     * @throws ParserConfigurationException
-     * @throws SAXException
      * @throws IOException
      * @throws FailedFetchException 
      */
-    public Date fetchCountryListRestApiPaged(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException, FailedFetchException {
+    public Date fetchCountryListRestApiPaged(Context ctx, RsrDbAdapter dba, URL url) throws FailedFetchException {
         Date serverDate = null;
         User user = SettingsUtil.getAuthUser(ctx);
         int total = 0;
@@ -481,23 +480,24 @@ public class Downloader {
             if (code == 200) {
                 String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
                 serverDate = new Date(h.date());
-                SAXParserFactory spf = SAXParserFactory.newInstance();
-                XMLReader xr = spf.newSAXParser().getXMLReader();
-                CountryRestListHandler xmlHandler = new CountryRestListHandler(new RsrDbAdapter(ctx), serverVersion);
-                xr.setContentHandler(xmlHandler);
-                /* Parse the xml-data from our URL. */
-                xr.parse(new InputSource(h.stream()));
-                /* Parsing has finished. */
-                /* Check if anything went wrong. */
-                err = xmlHandler.getError();
-//                Log.i(TAG, "Fetched " + xmlHandler.getCount() + " updates; target total = "+ xmlHandler.getTotalCount());
-                Log.i(TAG, "Fetched " + xmlHandler.getCount() + " countries");
-                total += xmlHandler.getCount();
-                if (xmlHandler.getNextUrl().length() == 0) { //string must to be trimmed from whitespace
+
+                String jsonBody = h.body();
+                ListJsonParser jp = new CountryListJsonParser(dba, serverVersion);
+                /* Parse the JSON-data from our URL. */
+                try {
+                    jp.parse(jsonBody);
+                }
+                catch (JSONException e) {
+                    throw new FailedFetchException("Invalid server response: " + e.getMessage());
+                }
+
+                Log.i(TAG, "Fetched " + jp.getCount() + " countries");
+                total += jp.getCount();
+                if (jp.getNextUrl().length() == 0) { //string must to be trimmed from whitespace
                     url = null; //we are done
                 } else {
                     try {
-                        url = new URL(xmlHandler.getNextUrl());
+                        url = new URL(jp.getNextUrl());
                     }
                     catch (MalformedURLException e) {
                         url = null;

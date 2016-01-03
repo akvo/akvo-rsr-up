@@ -37,7 +37,7 @@ public class ConstantUtil {
     public static final String FETCH_UPDATE_URL_PATTERN = "/rest/v1/project_update/?format=xml&project=%s&last_modified_at__gt=%s";//use default limit
     public static final String VERIFY_UPDATE_PATTERN = "/rest/v1/project_update/?format=xml&uuid=%s&limit=2";
     public static final String FETCH_PROJ_URL_PATTERN = "/rest/v1/project_up/%s/?format=xml&image_thumb_name=up&image_thumb_up_width=100"; //now asks for thumbnail size
-    public static final String FETCH_COUNTRIES_URL = "/rest/v1/country/?format=xml&limit=50"; //very small objects - get many at a time
+    public static final String FETCH_COUNTRIES_URL = "/rest/v1/country/?format=json&limit=50"; //very small objects - get many at a time
     public static final String FETCH_USER_URL_PATTERN = "/rest/v1/user/%s/?format=json&depth=1";
     public static final String FETCH_ORGS_URL = "/rest/v1/organisation/?format=json&limit=10";//DEBUG
     public static final String FETCH_ORGS_TYPEAHEAD_URL = "/rest/v1/typeaheads/organisations?format=json";
