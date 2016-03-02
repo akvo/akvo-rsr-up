@@ -1422,7 +1422,7 @@ public class RsrDbAdapter {
         updatedValues.put(RELATIVE_DATA_COL, ipd.getRelativeData());
         updatedValues.put(DESCRIPTION_COL, ipd.getDescription());
         updatedValues.put(PERIOD_ID_COL, ipd.getPeriodId());
-        updatedValues.put(USER_COL, ipd.getPeriodId());
+        updatedValues.put(USER_ID_COL, ipd.getPeriodId());
         updatedValues.put(STATUS_COL, ipd.getStatus());
         updatedValues.put(PHOTO_URL_COL, ipd.getPhotoUrl());
         updatedValues.put(FILE_URL_COL, ipd.getFileUrl());
