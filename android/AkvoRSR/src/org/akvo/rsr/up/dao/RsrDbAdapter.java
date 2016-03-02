@@ -1312,7 +1312,7 @@ public class RsrDbAdapter {
                                             "_period.locked",
                                             "_ipd.data",
                                             "_ipd.description",
-                                            "_ipd.userid",
+                                            "_ipd.user_id",
                                             "_ipd.status"
 		                                    },
 										PROJECT_ID_COL + " = ?",
