@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Project;
@@ -30,10 +31,14 @@ import org.akvo.rsr.up.viewadapter.ResultNode;
 import org.akvo.rsr.up.viewadapter.ResultNode.NodeType;
 
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.content.Intent;
@@ -75,32 +80,26 @@ public class ResultListActivity extends ActionBarActivity {
 		mProjectTitleLabel = (TextView) findViewById(R.id.rlisttitlelabel);
 		mResultCountLabel = (TextView) findViewById(R.id.resultcountlabel);
         mList = (ListView) findViewById(R.id.list_results);
-/* TODO: so far no actions to perform on results
         mList.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent i = new Intent(view.getContext(), UpdateDetailActivity.class);
-                i.putExtra(ConstantUtil.UPDATE_ID_KEY, ((Long) view.getTag(R.id.update_id_tag)).toString());
-                i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(R.id.project_id_tag)).toString());
-                startActivity(i);
+                //see if it is a period
+                ResultNode rn = (ResultNode)parent.getItemAtPosition(position);
+                if (rn != null && rn.getNodeType() == ResultNode.NodeType.PERIOD
+//TODO                        && rn.getLocked() == false
+                        ) {
+                    Intent i = new Intent(view.getContext(), ResultEditorActivity.class);
+                    i.putExtra(ConstantUtil.PERIOD_KEY, rn.getId());
+                    i.putExtra(ConstantUtil.CURRENT_ACTUAL_VALUE_KEY, rn.getActualValue());
+                    startActivity(i);
+                }
             }
+
+
         });
         
-
-		View listFooter = getLayoutInflater().inflate(R.layout.update_list_footer, null, false);
-		//if the button were not the outermost view we would need to find it to set onClick
-		Button addButton = (Button) listFooter.findViewById(R.id.btn_add_update2);
-		addButton.setOnClickListener( new View.OnClickListener() {
-			public void onClick(View view) {
-				startEditorNew();
-			}
-		});
-		
-		mList.addFooterView(listFooter);
-  */      
-		
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		
         //Create db
 
@@ -108,11 +107,6 @@ public class ResultListActivity extends ActionBarActivity {
         mDba.open();
 	}
 
-	private void startEditorNew() {
-		Intent i3 = new Intent(this, UpdateEditorActivity.class);
-		i3.putExtra(ConstantUtil.PROJECT_ID_KEY, mProjId);
-		startActivity(i3);		
-	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -126,15 +120,12 @@ public class ResultListActivity extends ActionBarActivity {
 	    switch (item.getItemId()) {
 	        case android.R.id.home:
 	            finish();
-	            //NavUtils.navigateUpFromSameTask(this);
+//	            NavUtils.navigateUpFromSameTask(this);
 	            return true;
     	    case R.id.action_settings:
     			Intent intent = new Intent(this, SettingsActivity.class);
     			startActivity(intent);
                 return true;
-            case R.id.action_add_update:
-            	startEditorNew();
-            	return true;
     	    default:
     	        return super.onOptionsItemSelected(item);
 	    }
@@ -188,14 +179,19 @@ public class ResultListActivity extends ActionBarActivity {
         final int res_pk = dataCursor.getColumnIndex("result_id");
         final int ind_pk = dataCursor.getColumnIndex("indicator_id");
         final int per_pk = dataCursor.getColumnIndex("period_id");
+        final int ipd_pk = dataCursor.getColumnIndex("ipd_id");
         final int res_title = dataCursor.getColumnIndex("result_title");
         final int ind_title = dataCursor.getColumnIndex("indicator_title");
         final int per_start = dataCursor.getColumnIndex("period_start");
         final int per_end = dataCursor.getColumnIndex("period_end");
         final int actual_value = dataCursor.getColumnIndex("actual_value");
         final int target_value = dataCursor.getColumnIndex("target_value");
+        final int period_locked = dataCursor.getColumnIndex(RsrDbAdapter.LOCKED_COL);
+        final int ipd_data = dataCursor.getColumnIndex(RsrDbAdapter.DATA_COL);
+        final int ipd_text = dataCursor.getColumnIndex(RsrDbAdapter.DESCRIPTION_COL);
+        
 		ArrayList<ResultNode> list = new ArrayList<ResultNode>();
-		int last_res = -1, last_ind = -1, resultCounter = 0, indicatorCounter = 0;
+		int last_res = -1, last_ind = -1, last_per=-1, resultCounter = 0, indicatorCounter = 0, periodCounter=0;
 		
 	    final SimpleDateFormat dateOnly = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 		
@@ -204,6 +200,7 @@ public class ResultListActivity extends ActionBarActivity {
             int res = dataCursor.getInt(res_pk);
             int ind = dataCursor.getInt(ind_pk);
             int per = dataCursor.getInt(per_pk);
+            int ipd = dataCursor.getInt(ipd_pk);
             if (res != last_res) {
                 resultCounter++;
                 list.add(new ResultNode(NodeType.RESULT, res, dataCursor.getString(res_title)));
@@ -217,9 +214,10 @@ public class ResultListActivity extends ActionBarActivity {
                 last_ind = ind;
             }
             
-            if (per > 0) {  // ==0 if no periods
+            if (per != last_per && per > 0) {  // ==0 if no periods
                 String av = dataCursor.getString(actual_value);
                 String tv = dataCursor.getString(target_value);
+                boolean locked = dataCursor.getInt(period_locked) != 0;
                 String ps = "";
                 if (!dataCursor.isNull(per_start)) {
                     Date d = new Date(dataCursor.getInt(per_start)*1000L);
@@ -236,8 +234,16 @@ public class ResultListActivity extends ActionBarActivity {
                 if ( ps != "" || pe != "" ) period += ps + endash + pe + " : ";
                 if ( av != null && av.trim().length() > 0 ) period += av;
                 if ( tv != null && tv.trim().length() > 0 ) period += "/" + tv;
+                if ( locked ) period += " (Locked)";
 
-                list.add(new ResultNode(NodeType.PERIOD, per, period));
+                list.add(new ResultNode(NodeType.PERIOD, per, period, av));
+                last_per = per;
+            }
+
+            if (ipd > 0) {  // ==0 if no ipds
+                String data = dataCursor.getString(ipd_data);
+                String text = dataCursor.getString(ipd_text);
+               list.add(new ResultNode(NodeType.DATA, per, "Data: "+data+endash+text));
             }
 		}
 

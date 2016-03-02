@@ -55,7 +55,7 @@
         </activity>
         <activity
             android:name="org.akvo.rsr.up.ResultListActivity"
-            android:label="@string/title_activity_update_list" >
+            android:label="@string/title_activity_result_list" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.akvo.rsr.up.ProjectDetailActivity" />
@@ -114,9 +114,21 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.akvo.rsr.up.AboutActivity" />
         </activity>
+        <activity
+            android:name="org.akvo.rsr.up.ResultEditorActivity"
+            android:label="@string/title_activity_result_editor" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.akvo.rsr.up.ResultListActivity" />
+        </activity>
         
         <service
             android:name="org.akvo.rsr.up.service.SubmitProjectUpdateService"
+            android:enabled="true"
+            android:exported="false" >
+        </service>
+        <service
+            android:name="org.akvo.rsr.up.service.SubmitIpdService"
             android:enabled="true"
             android:exported="false" >
         </service>

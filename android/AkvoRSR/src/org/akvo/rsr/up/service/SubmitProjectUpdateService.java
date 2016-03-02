@@ -19,9 +19,8 @@ package org.akvo.rsr.up.service;
 import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.Downloader;
-import org.akvo.rsr.up.util.Downloader.UnresolvedPostException;
 import org.akvo.rsr.up.util.SettingsUtil;
-import org.akvo.rsr.up.util.Downloader.FailedPostException;
+import org.akvo.rsr.up.util.Uploader;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -48,7 +47,7 @@ public class SubmitProjectUpdateService extends IntentService {
 		Intent i = new Intent(ConstantUtil.UPDATES_SENT_ACTION);
 
 		try {
-			Downloader.sendUpdate(this,
+			Uploader.sendUpdate(this,
 					localUpdateId,
 					SettingsUtil.host(this) + ConstantUtil.POST_UPDATE_URL, //+ ConstantUtil.API_KEY_PATTERN,
 					SettingsUtil.host(this) + ConstantUtil.VERIFY_UPDATE_PATTERN,
@@ -61,10 +60,10 @@ public class SubmitProjectUpdateService extends IntentService {
                             broadcastProgress(0, sofar, total);
                         }
                     });
-		} catch (FailedPostException e) {
+		} catch (Uploader.FailedPostException e) {
 			i.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, e.getMessage());
 		}
-		catch (UnresolvedPostException e) {
+		catch (Uploader.UnresolvedPostException e) {
 			i.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, e.getMessage());
 			i.putExtra(ConstantUtil.SERVICE_UNRESOLVED_KEY, true);
 		} catch (Exception e) {//TODO: show to user

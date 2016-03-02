@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -22,8 +22,8 @@ import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.util.ConstantUtil;
-import org.akvo.rsr.up.util.Downloader;
 import org.akvo.rsr.up.util.SettingsUtil;
+import org.akvo.rsr.up.util.Uploader;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -47,7 +47,7 @@ public class SignInService extends IntentService {
 		Intent i2 = new Intent(ConstantUtil.AUTHORIZATION_RESULT_ACTION);
 
 		try {
-			User user = Downloader.authorize(new URL(SettingsUtil.host(this) + ConstantUtil.AUTH_URL),
+			User user = Uploader.authorize(new URL(SettingsUtil.host(this) + ConstantUtil.AUTH_URL),
 									 		 username,
 									 		 password);
 			if (user != null) {

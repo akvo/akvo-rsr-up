@@ -232,11 +232,11 @@
 
                 <!-- Add update button -->
                 <Button
-                    android:id="@+id/btn_add_result"
+                    android:id="@+id/btn_refresh_proj"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="REPORT RESULT"
+                    android:text="REFRESH PROJECT"
                     android:textColor="@color/rsr_purple"
                     android:background="@color/btn_face"
                     android:padding="5dip"

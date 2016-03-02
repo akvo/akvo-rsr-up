@@ -36,6 +36,8 @@
     <string name="title_activity_project_detail">RSR Up</string>
     <string name="title_activity_update_list">RSR Up</string>
     <string name="title_activity_update_edit">RSR Up</string>
+    <string name="title_activity_result_editor">RSR Up</string>
+    <string name="title_activity_result_list">RSR Up</string>
     <string name="title_activity_update_detail">RSR Up</string>
     <string name="title_activity_settings">RSR Up Settings</string>
     <string name="title_activity_diagnostics">RSR Up Diagnostics</string>
@@ -187,6 +189,7 @@
     <string name="errmsg_org_fetch_failed">Organisation fetch failed: </string>
     <string name="errmsg_signin_denied">Wrong password and/or username</string>
     <string name="errmsg_signin_failed">Unable to authorize: </string>
+    <string name="errmsg_resultpost_failed">Unable to post result: </string>
     
     <string name="btncaption_ok">OK</string>
     <string name="btncaption_cancel">Cancel</string>

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -41,7 +41,7 @@ public class ResultListArrayAdapter extends ArrayAdapter<ResultNode>{
 
 
 /**
- * This adapter formats Update list items using the update_list_item.xml template
+ * This adapter formats Reslt list items using the result_list_item.xml template
  * 
  * @author Stellan Lagerstroem
  * 
@@ -73,7 +73,7 @@ public class ResultListArrayAdapter extends ArrayAdapter<ResultNode>{
         TextView titleView = (TextView) v.findViewById(R.id.result_item_text);
         ImageView img = (ImageView) v.findViewById(R.id.result_item_icon);
 
-        switch (rn.mNodeType) {
+        switch (rn.getNodeType()) {
             case RESULT:
                 titleView.setTextColor(c.getResources().getColor(R.color.white));
                 titleView.setTypeface(Typeface.create(Typeface.SANS_SERIF,Typeface.BOLD));
@@ -94,10 +94,24 @@ public class ResultListArrayAdapter extends ArrayAdapter<ResultNode>{
                 img.setVisibility(View.INVISIBLE);
                 indent = "    ";
                 break;
+            case DATA:
+                titleView.setTextColor(c.getResources().getColor(R.color.blue));
+                titleView.setBackgroundColor(c.getResources().getColor(R.color.white));
+                titleView.setTypeface(Typeface.SANS_SERIF);
+                img.setVisibility(View.INVISIBLE);
+                indent = "      ";
+                break;
+            case COMMENT:
+                titleView.setTextColor(c.getResources().getColor(R.color.red));
+                titleView.setBackgroundColor(c.getResources().getColor(R.color.white));
+                titleView.setTypeface(Typeface.SANS_SERIF);
+                img.setVisibility(View.INVISIBLE);
+                indent = "        ";
+                break;
         }
         
 		if (mDebug) {
-			titleView.setText(indent+ "["+ rn.mId + "] " + rn.mText);
+			titleView.setText(indent+ "["+ rn.getId() + "] " + rn.mText);
 		} else {
 			titleView.setText(indent + rn.mText);
 		}

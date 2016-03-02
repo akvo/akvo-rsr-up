@@ -33,6 +33,8 @@ public class ConstantUtil {
 	public static final String PWD_URL = "/sign_in/";
 	public static final String AUTH_URL = "/auth/token/";
     public static final String POST_UPDATE_URL = "/rest/v1/project_update/?format=xml";
+    public static final String POST_RESULT_URL = "/rest/v1/indicator_period_data/?format=json";
+    public static final String IPD_ATTACHMENT_PATTERN = "/rest/v1/indicator_period_data/%d/?format=json";
 //    public static final String FETCH_UPDATE_URL_PATTERN = "/rest/v1/project_update/?format=xml&project=%s";//use default limit
     public static final String FETCH_UPDATE_URL_PATTERN = "/rest/v1/project_update/?format=xml&project=%s&last_modified_at__gt=%s";//use default limit
     public static final String VERIFY_UPDATE_PATTERN = "/rest/v1/project_update/?format=xml&uuid=%s&limit=2";
@@ -42,10 +44,14 @@ public class ConstantUtil {
     public static final String FETCH_ORGS_URL = "/rest/v1/organisation/?format=json&limit=10";//DEBUG
     public static final String FETCH_ORGS_TYPEAHEAD_URL = "/rest/v1/typeaheads/organisations?format=json";
     public static final String FETCH_ORG_URL_PATTERN = "/rest/v1/organisation/%s/?format=json";
-    public static final String FETCH_RESULTS_URL_PATTERN = "/rest/v1/result/?format=json&project=%s"; //also includes indicators and periods
+    public static final String FETCH_RESULTS_URL_PATTERN = "/rest/v1/results_framework/?format=json&project=%s"; //includes results, indicators, periods and data
 	public static final int    MAX_IMAGE_UPLOAD_SIZE = 2000000; //Nginx POST limit is 3MB, B64 encoding expands 33% and there may be long text 
 	public static final String SERVER_VERSION_HEADER = "X-RSR-Version";
-	/**
+    public static final String UPDATE_METHOD_MOBILE = "M";
+    public static final String xmlContent = "application/xml";
+    public static final String jsonContent = "application/json";
+
+    /**
 	 * file system constants
 	 */
 	public static final String XML_SUFFIX = ".xml";
@@ -106,6 +112,7 @@ public class ConstantUtil {
     public static final String UPDATES_SENDPROGRESS_ACTION = "org.akvo.rsr.up.UPDATES_PROGRESS";
     public static final String UPDATES_VERIFIED_ACTION = "org.akvo.rsr.up.UPDATES_VERIFIED";
     public static final String AUTHORIZATION_RESULT_ACTION = "org.akvo.rsr.up.AUTHORIZATION_RESULT";
+    public static final String RESULT_SENT_ACTION = "org.akvo.rsr.up.RESULT_SENT";
     public static final String ORGS_FETCHED_ACTION = "org.akvo.rsr.up.ORGS_FETCHED";
     public static final String ORGS_PROGRESS_ACTION = "org.akvo.rsr.up.ORGS_PROGRESS";
 
@@ -122,6 +129,14 @@ public class ConstantUtil {
 	public static final String SERVICE_UNRESOLVED_KEY = "org.akvo.rsr.up.UNRESOLVED";
 	public static final String USERNAME_KEY = "org.akvo.rsr.up.USERNAME";
 	public static final String PASSWORD_KEY = "org.akvo.rsr.up.PASSWORD";
+    public static final String PERIOD_KEY = "org.akvo.rsr.up.indicator_period_id";
+    public static final String DESCRIPTION_KEY = "org.akvo.rsr.up.DESCRIPTION";
+    public static final String COMMENT_KEY = "org.akvo.rsr.up.COMMENT";
+    public static final String DATA_KEY = "org.akvo.rsr.up.IPD_DATA";
+    public static final String CURRENT_ACTUAL_VALUE_KEY = "org.akvo.rsr.up.CURRENT_ACTUAL_VALUE";
+    public static final String RELATIVE_DATA_KEY = "org.akvo.rsr.up.RELATIVE_IPD_DATA";
+    public static final String PHOTO_FN_KEY = "org.akvo.rsr.up.photo_filename";
+    public static final String FILE_FN_KEY = "org.akvo.rsr.up.file_filename";
 
 	/**
 	 * posting outcomes

@@ -26,6 +26,7 @@ import org.akvo.rsr.up.util.ThumbnailUtil;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -49,8 +50,9 @@ public class ProjectDetailActivity extends ActionBarActivity {
     private TextView resultCountView;
 	private ImageView projImage;
     private Button btnUpdates;
-    private Button btnResults;
 	private Button btnAddUpdate;
+    private Button btnResults;
+    private Button btnRefresh;
 	private boolean debug;
 
 	private RsrDbAdapter dba;
@@ -99,7 +101,7 @@ public class ProjectDetailActivity extends ActionBarActivity {
 			}
 		});
 		
-		//Results
+        //Results
         btnResults = (Button) findViewById(R.id.btn_view_results);
         btnResults.setOnClickListener( new View.OnClickListener() {
             public void onClick(View view) {
@@ -109,11 +111,22 @@ public class ProjectDetailActivity extends ActionBarActivity {
             }
         });
 
+        //Refresh for this project only (speeds up things if very many projects)
+        btnRefresh = (Button) findViewById(R.id.btn_refresh_proj);
+        btnRefresh.setOnClickListener( new View.OnClickListener() {
+            public void onClick(View view) {
+                //TODO
+//                Intent i = new Intent(view.getContext(), ResultListActivity.class);
+//                i.putExtra(ConstantUtil.PROJECT_ID_KEY, projId);
+//                startActivity(i);
+            }
+        });
+
 		
 		dba = new RsrDbAdapter(this);
 		
 		// Show the Up button in the action bar.
-		//		setupActionBar();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
 	@Override
@@ -196,17 +209,14 @@ public class ProjectDetailActivity extends ActionBarActivity {
 		super.onDestroy();
 	}
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(ConstantUtil.PROJECT_ID_KEY, projId);
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(outState);
+    }
+
 	
-	/**
-	 * Set up the {@link android.app.ActionBar}, if the API is available.
-	 *
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	private void setupActionBar() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			getActionBar().setDisplayHomeAsUpEnabled(true);
-		}
-	}
-*/
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -217,6 +227,10 @@ public class ProjectDetailActivity extends ActionBarActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+//              NavUtils.navigateUpFromSameTask(this);
+                return true;
 	        case R.id.action_settings:
 				Intent intent = new Intent(this, SettingsActivity.class);
 				startActivity(intent);
@@ -224,8 +238,8 @@ public class ProjectDetailActivity extends ActionBarActivity {
 		    default:
 		        return super.onOptionsItemSelected(item);
 	    }
-
 	}
+
 	
 	private void launchLatLonIntent() {
 		if (project != null &&
@@ -235,9 +249,7 @@ public class ProjectDetailActivity extends ActionBarActivity {
 			"," + project.getLongitude()); //Possibly add "?zoom=z"
 			Intent intent = new Intent(Intent.ACTION_VIEW, uri);
 			startActivity(intent);
-			
 		}
-		
 	}
 
 }

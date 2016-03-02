@@ -24,6 +24,8 @@ import java.util.Set;
 
 import org.akvo.rsr.up.domain.Country;
 import org.akvo.rsr.up.domain.Indicator;
+import org.akvo.rsr.up.domain.IndicatorPeriodData;
+import org.akvo.rsr.up.domain.IndicatorPeriodDataComment;
 import org.akvo.rsr.up.domain.Organisation;
 import org.akvo.rsr.up.domain.Period;
 import org.akvo.rsr.up.domain.Project;
@@ -48,6 +50,24 @@ import android.util.Log;
  * 
  */
 public class RsrDbAdapter {
+
+    private static final String TAG = "RsrDbAdapter";
+    private static final boolean LOG = true;
+
+    // Table names
+    private static final String DATABASE_NAME = "rsrdata";
+    private static final String PROJECT_TABLE = "project";
+    private static final String UPDATE_TABLE  = "_update";
+    private static final String COUNTRY_TABLE = "country";
+    private static final String USER_TABLE    = "user";
+    private static final String ORG_TABLE     = "_organisation";
+    private static final String RESULT_TABLE  = "_result";
+    private static final String INDICATOR_TABLE  = "_indicator";
+    private static final String PERIOD_TABLE  = "_period";
+    private static final String IPD_TABLE     = "_ipd";
+    private static final String IPDC_TABLE     = "_ipdc";
+
+    //Column names
     public static final String PK_ID_COL = "_id";
     public static final String TITLE_COL = "title";
 	public static final String SUBTITLE_COL = "subtitle";
@@ -58,7 +78,8 @@ public class RsrDbAdapter {
     public static final String VIDEO_URL_COL = "video_url";
     public static final String VIDEO_FILENAME_COL = "video_fn";
 	public static final String PROJECT_COL = "project";
-	public static final String USER_COL = "userid";
+    public static final String USER_COL = "userid";//legacy
+    public static final String USER_ID_COL = "user_id";
 	public static final String TEXT_COL = "_text";
 	public static final String DRAFT_COL = "draft";
 	public static final String UNSENT_COL = "unsent";
@@ -98,8 +119,10 @@ public class RsrDbAdapter {
 
     public static final String RESULT_COL = "result";
     public static final String RESULT_ID_COL = "result_id";
-    public static final String PROJECT_ID_COL = "project_id";
     public static final String INDICATOR_ID_COL = "indicator_id";
+    public static final String PROJECT_ID_COL = "project_id";
+    public static final String PERIOD_ID_COL = "period_id";
+    public static final String IPD_ID_COL = "ipd_id";
 	public static final String MEASURE_COL = "measure";
 	public static final String BASELINE_YEAR_COL = "baseline_year";
 	public static final String BASELINE_VALUE_COL = "baseline_value";
@@ -110,11 +133,17 @@ public class RsrDbAdapter {
 	public static final String ACTUAL_VALUE_COL = "actual_value";
 	public static final String ACTUAL_COMMENT_COL = "actual_comment";
 	public static final String TARGET_VALUE_COL = "target_value";
-	public static final String TARGET_COMMENT_COL = "target_comment";
+    public static final String TARGET_COMMENT_COL = "target_comment";
+    public static final String LOCKED_COL = "locked";
+    public static final String DATA_COL = "data";
+    public static final String RELATIVE_DATA_COL = "relative_data";
+    public static final String PHOTO_URL_COL = "photo_url";
+    public static final String PHOTO_FN_COL = "photo_fn";
+    public static final String FILE_URL_COL = "file_url";
+    public static final String FILE_FN_COL = "file_fn";
+    public static final String COMMENT_COL = "comment";
+    public static final String STATUS_COL = "status";
 	
-	private static final String TAG = "RsrDbAdapter";
-	private static final boolean LOG = true;
-
 	private DatabaseHelper databaseHelper;
 	private SQLiteDatabase database;
 	
@@ -122,19 +151,9 @@ public class RsrDbAdapter {
     private static final String UPDATE_COUNTRY_JOIN  = "_update LEFT OUTER JOIN country ON (_update.country_id = country._id)";
     private static final String ORG_COUNTRY_JOIN  = "_organisation LEFT OUTER JOIN country ON (_organisation.primary_country_id = country._id)";
 
-    // Table names
-	private static final String DATABASE_NAME = "rsrdata";
-	private static final String PROJECT_TABLE = "project";
-	private static final String UPDATE_TABLE  = "_update";
-	private static final String COUNTRY_TABLE = "country";
-    private static final String USER_TABLE    = "user";
-    private static final String ORG_TABLE     = "_organisation";
-    private static final String RESULT_TABLE  = "_result";
-    private static final String INDICATOR_TABLE  = "_indicator";
-    private static final String PERIOD_TABLE  = "_period";
-
 	/**
 	 * Database creation sql statements
+	 * TODO: make them all use nn_COL constants
 	 */
 	private static final String PROJECT_TABLE_CREATE =
 			"create table project (_id integer primary key, "+
@@ -161,33 +180,68 @@ public class RsrDbAdapter {
             "username text, organisation integer, "+
             "first_name text, last_name text, email text);";
     private static final String ORG_TABLE_CREATE =
-            "create table _organisation (_id integer primary key, "
-            + "name text, long_name text, email text, url text,"
-            + DESCRIPTION_COL  + " string, "
-            + MODIFIED_COL  + " integer, "
-            + OLD_TYPE_COL  + " string, "
-            + NEW_TYPE_COL  + " string, "
-            + LOGO_URL_COL  + " string, "
-            + LOGO_FN_COL  + " string, "
-            + PRIMARY_COUNTRY_ID_COL  + " string "
-            + ")";
+            "create table " + ORG_TABLE
+                    + "("
+                    + PK_ID_COL + " integer primary key,"
+                    + "name text, long_name text, email text, url text,"
+                    + DESCRIPTION_COL  + " string, "
+                    + MODIFIED_COL  + " integer, "
+                    + OLD_TYPE_COL  + " string, "
+                    + NEW_TYPE_COL  + " string, "
+                    + LOGO_URL_COL  + " string, "
+                    + LOGO_FN_COL  + " string, "
+                    + PRIMARY_COUNTRY_ID_COL  + " string "
+                    + ")";
     
     private static final String RESULT_TABLE_CREATE =
             "create table " + RESULT_TABLE
-            		+ "(_id integer primary key, project_id integer not null, title text, description text, type text)";
+                    + "("
+                    + PK_ID_COL + " integer primary key,"
+            		+ " project_id integer not null, title text, description text, type text)";
     private static final String INDICATOR_TABLE_CREATE =
             "create table " + INDICATOR_TABLE
-            		+ "(_id integer primary key, result_id integer not null, title text, description text,"
+                    + "("
+                    + PK_ID_COL + " integer primary key,"
+            		+ RESULT_ID_COL + " integer not null,"
+            		+ TITLE_COL +" text,"
+            		+ DESCRIPTION_COL + " text,"
             		+ "baseline_year integer, baseline_value text, baseline_comment text, "
-            		+ "measure text"
+            		+ MEASURE_COL + " text"
             		+ ")";
     private static final String PERIOD_TABLE_CREATE =
             "create table " + PERIOD_TABLE
-            		+ "(_id integer primary key, indicator_id integer not null, title text,"
-            		+ " actual_value text, actual_comment text, "
-            		+ " target_value text, target_comment text, "
-            		+ " period_start integer, period_end integer "
-            		+ ")";
+                    + "("
+                    + PK_ID_COL + " integer primary key,"
+                    + INDICATOR_ID_COL + " integer not null,"
+                    + TITLE_COL + " text,"
+                    + LOCKED_COL + " boolean,"
+                    + "actual_value text, actual_comment text, "
+                    + "target_value text, target_comment text, "
+                    + "period_start integer, period_end integer "
+                    + ")";
+    private static final String IPD_TABLE_CREATE =
+            "create table " + IPD_TABLE
+                    + "("
+                    + PK_ID_COL + " integer primary key,"
+                    + PERIOD_ID_COL + " integer not null, "
+                    + DATA_COL + " text, "
+                    + DESCRIPTION_COL + " text, "
+                    + STATUS_COL + " text,"
+                    + RELATIVE_DATA_COL + " boolean, "
+                    + PHOTO_URL_COL + " text, "
+                    + PHOTO_FN_COL + " text, "
+                    + FILE_URL_COL + " text, "
+                    + FILE_FN_COL +" text, "
+                    + USER_ID_COL + " integer "
+                    + ")";
+    private static final String IPDC_TABLE_CREATE =
+            "create table " + IPDC_TABLE
+                    + "("
+                    + PK_ID_COL + " integer primary key,"
+                    + IPD_ID_COL + " integer not null,"
+                    + COMMENT_COL + " text,"
+                    + USER_ID_COL + " integer "
+                    + ")";
 
 
 //	private static final int DATABASE_VERSION = 5;
@@ -202,7 +256,7 @@ public class RsrDbAdapter {
 //  private static final int DATABASE_VERSION = 14; //update now has photo metadata and video
 //  private static final int DATABASE_VERSION = 15; //update now has location
 //  private static final int DATABASE_VERSION = 16; //project gets a last_fetch datetime to optimize fetches
-    private static final int DATABASE_VERSION = 17; //results framework (added result, indicator and period tables). New Org columns.
+    private static final int DATABASE_VERSION = 17; //results framework (added result, indicator, period, ipd and ipdc tables). New Org columns.
 
 	private final Context context;
 
@@ -235,6 +289,8 @@ public class RsrDbAdapter {
             db.execSQL(RESULT_TABLE_CREATE);
             db.execSQL(INDICATOR_TABLE_CREATE);
             db.execSQL(PERIOD_TABLE_CREATE);
+            db.execSQL(IPD_TABLE_CREATE);
+            db.execSQL(IPDC_TABLE_CREATE);
 		}
 
 		@Override
@@ -276,12 +332,14 @@ public class RsrDbAdapter {
                     db.execSQL(RESULT_TABLE_CREATE);
                     db.execSQL(INDICATOR_TABLE_CREATE);
                     db.execSQL(PERIOD_TABLE_CREATE);
+                    db.execSQL(IPD_TABLE_CREATE);
+                    db.execSQL(IPDC_TABLE_CREATE);
                     db.execSQL("alter table " + ORG_TABLE + " add column " + DESCRIPTION_COL + " string");
                     db.execSQL("alter table " + ORG_TABLE + " add column " + PRIMARY_COUNTRY_ID_COL + " string");
                     db.execSQL("alter table " + ORG_TABLE + " add column " + OLD_TYPE_COL + " string");
                     db.execSQL("alter table " + ORG_TABLE + " add column " + NEW_TYPE_COL + " string");
                     db.execSQL("alter table " + ORG_TABLE + " add column " + LOGO_URL_COL + " string");
-                    db.execSQL("alter table " + ORG_TABLE + " add column " + LOGO_FN_COL + " string");
+                    db.execSQL("alter table " + ORG_TABLE + " add column " + LOGO_FN_COL  + " string");
                     db.execSQL("alter table " + ORG_TABLE + " add column " + MODIFIED_COL + " integer");
                 }           
             }
@@ -1233,27 +1291,35 @@ public class RsrDbAdapter {
 	
 	/**
 	 * Gets updates for a specific project, all columns
+	 * TODO: ipd and ipdc
 	 */
 	public Cursor listResultsIndicatorsPeriodsFor(String _id) {
 		Cursor cursor = database.query(RESULT_TABLE + 
 										" LEFT JOIN " + INDICATOR_TABLE + " ON  " + RESULT_TABLE + "._id = " + INDICATOR_TABLE + ".result_id" +
-										" LEFT JOIN " + PERIOD_TABLE + " ON  " + INDICATOR_TABLE + "._id = " + PERIOD_TABLE + ".indicator_id",
+                                        " LEFT JOIN " + PERIOD_TABLE + " ON  " + INDICATOR_TABLE + "._id = " + PERIOD_TABLE + ".indicator_id" +
+                                        " LEFT JOIN " + IPD_TABLE + " ON  " + PERIOD_TABLE + "._id = " + IPD_TABLE + ".period_id",
 										new String[] {
 		                                    "_result._id as result_id",
 		                                    "_indicator._id as indicator_id",
-		                                    "_period._id as period_id",
+                                            "_period._id as period_id",
+                                            "_ipd._id as ipd_id",
 		                                    "_result.title as result_title",
 		                                    "_indicator.title as indicator_title",
                                             "_period.period_start",
                                             "_period.period_end",
                                             "_period.actual_value",
-                                            "_period.target_value"
+                                            "_period.target_value",
+                                            "_period.locked",
+                                            "_ipd.data",
+                                            "_ipd.description",
+                                            "_ipd.userid",
+                                            "_ipd.status"
 		                                    },
 										PROJECT_ID_COL + " = ?",
 										new String[] { _id },
-										"_result._id,_indicator._id", //group by
+										"_result._id,_indicator._id,_period._id", //group by
 										null,
-										"_result._id,_indicator._id,_period.period_start"); //order by
+										"_result._id,_indicator._id,_period._id, _ipd._id"); //order by
 
 		return cursor;
 	}
@@ -1321,6 +1387,7 @@ public class RsrDbAdapter {
         updatedValues.put(ACTUAL_COMMENT_COL, period.getActualComment());
         updatedValues.put(TARGET_VALUE_COL, period.getTargetValue());
         updatedValues.put(TARGET_COMMENT_COL, period.getTargetComment());
+        updatedValues.put(LOCKED_COL, period.getLocked());
         
         Cursor cursor = database.query(PERIOD_TABLE,
                                         new String[] { PK_ID_COL },
@@ -1334,6 +1401,111 @@ public class RsrDbAdapter {
                     new String[] { period.getId() });
         } else {
             database.insert(PERIOD_TABLE, null, updatedValues);
+        }
+        
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
+
+    
+    /**
+    * creates or updates an indicator period data record in the db
+    *
+    * @param ipd the indicator period data to be updated
+    * @return
+    */
+    public void saveIpd(IndicatorPeriodData ipd) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(PK_ID_COL, ipd.getId());
+        updatedValues.put(DATA_COL, ipd.getData());
+        updatedValues.put(RELATIVE_DATA_COL, ipd.getRelativeData());
+        updatedValues.put(DESCRIPTION_COL, ipd.getDescription());
+        updatedValues.put(PERIOD_ID_COL, ipd.getPeriodId());
+        updatedValues.put(USER_COL, ipd.getPeriodId());
+        updatedValues.put(STATUS_COL, ipd.getStatus());
+        updatedValues.put(PHOTO_URL_COL, ipd.getPhotoUrl());
+        updatedValues.put(FILE_URL_COL, ipd.getFileUrl());
+        //The filename fields are saved when images are fetched
+//        updatedValues.put(PHOTO_FN_COL, ipd.getPhotoFn());
+//        updatedValues.put(FILE_FN_COL, ipd.getFileFn());
+        
+        Cursor cursor = database.query(IPD_TABLE,
+                                        new String[] { PK_ID_COL },
+                                        PK_ID_COL + " = ?",
+                                        new String[] { ipd.getId(), },
+                                        null, null, null);
+        
+        if (cursor != null && cursor.getCount() > 0) {
+            // if we found an item, it's an update, otherwise, it's an insert
+            database.update(IPD_TABLE, updatedValues, PK_ID_COL + " = ?",
+                    new String[] { ipd.getId() });
+        } else {
+            database.insert(IPD_TABLE, null, updatedValues);
+        }
+        
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
+
+    
+    /*
+     *  Update the local filename of a cached photo
+     */
+    public void updateIpdcPhotoFile(String id, String filename) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(PHOTO_FN_COL, filename);
+        database.update(IPDC_TABLE, updatedValues, PK_ID_COL + " = ?", new String[] { id });
+    }
+
+
+    /*
+     *  Update the local filename of a cached attachment
+     */
+    public void updateIpdcAttachedFile(String id, String filename) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(FILE_FN_COL, filename);
+        database.update(IPDC_TABLE, updatedValues, PK_ID_COL + " = ?", new String[] { id });
+    }
+
+
+    /*
+     *  Clear the local filenames of all updates
+     */
+    public void clearIpdcMediaFiles() {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.putNull(PHOTO_FN_COL);
+        updatedValues.putNull(FILE_FN_COL);
+        database.update(IPDC_TABLE, updatedValues, null, null);
+    }
+
+
+    
+    /**
+    * creates or updates an indicator period data record in the db
+    *
+    * @param ipdc the indicator period data comment to be updated
+    * @return
+    */
+    public void saveIpdc(IndicatorPeriodDataComment ipdc) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(PK_ID_COL, ipdc.getId());
+        updatedValues.put(COMMENT_COL, ipdc.getComment());
+        updatedValues.put(USER_COL, ipdc.getUserId());
+        
+        Cursor cursor = database.query(IPDC_TABLE,
+                                        new String[] { PK_ID_COL },
+                                        PK_ID_COL + " = ?",
+                                        new String[] { ipdc.getId(), },
+                                        null, null, null);
+        
+        if (cursor != null && cursor.getCount() > 0) {
+            // if we found an item, it's an update, otherwise, it's an insert
+            database.update(IPDC_TABLE, updatedValues, PK_ID_COL + " = ?",
+                    new String[] { ipdc.getId() });
+        } else {
+            database.insert(IPDC_TABLE, null, updatedValues);
         }
         
         if (cursor != null) {
@@ -1357,8 +1529,10 @@ public class RsrDbAdapter {
 
     public int countResultsFor(String pid) {
         int c = -1;
-        Cursor cursor = database.query(RESULT_TABLE, new String[] {"COUNT (*) as row_count"}, 
-                                        "project_id = "+pid, null, null, null, null);
+        Cursor cursor = database.query( RESULT_TABLE, new String[] {"COUNT (*) as row_count"}, 
+                                        RESULT_TABLE + ".project_id = ?",
+                                        new String[] {pid},
+                                        null, null, null);
         if (cursor != null) {
             if ( cursor.moveToFirst() ) {
                 c = cursor.getInt(0);
@@ -1388,7 +1562,9 @@ public class RsrDbAdapter {
         int c = -1;
         Cursor cursor = database.query(RESULT_TABLE + " LEFT JOIN " + INDICATOR_TABLE + " ON " + RESULT_TABLE + "._id = " + INDICATOR_TABLE + ".result_id" ,
                                        new String[] {"COUNT (*) as row_count"}, 
-                                       RESULT_TABLE + ".project_id = " + pid, null, null, null, null);
+                                       RESULT_TABLE + ".project_id = ?",
+                                       new String[] {pid},
+                                       null, null, null);
         if (cursor != null) {
             if ( cursor.moveToFirst() ) {
                 c = cursor.getInt(0);

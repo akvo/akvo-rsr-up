@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -19,46 +19,47 @@ package org.akvo.rsr.up.domain;
 import java.util.Date;
 
 public class Period {
-	private String id;
-	private String indicatorId;
-	private String title;
-	private Date periodStart;
-	private Date periodEnd;
-	private String actualValue;
+	private String mId;
+	private String mIndicatorId;
+	private String mTitle;
+	private Date mPeriodStart;
+	private Date mPeriodEnd;
+	private String mActualValue;
 	private String actualComment;
 	private String targetValue;
-	private String targetComment;
+    private String targetComment;
+    private boolean mLocked;
    
-	public String getId() {
-		return id;
+    public String getId() {
+		return mId;
 	}
 
 	public void setId(String id) {
-		this.id = id;
+		this.mId = id;
 	}
 
 	public String getIndicatorId() {
-		return indicatorId;
+		return mIndicatorId;
 	}
 
 	public void setIndicatorId(String id) {
-		this.indicatorId = id;
+		this.mIndicatorId = id;
 	}
 
 	public String getTitle() {
-		return title;
+		return mTitle;
 	}
 
 	public void setTitle(String title) {
-		this.title = title;
+		this.mTitle = title;
 	}
 
 	public String getActualValue() {
-		return actualValue;
+		return mActualValue;
 	}
 
 	public void setActualValue(String actualValue) {
-		this.actualValue = actualValue;
+		this.mActualValue = actualValue;
 	}
 
 	public String getActualComment() {
@@ -86,22 +87,30 @@ public class Period {
 	}
 
 	public Date getPeriodStart() {
-		return periodStart;
+		return mPeriodStart;
 	}
 
 	public void setPeriodStart(Date d) {
-		this.periodStart= d;
+		this.mPeriodStart = d;
 	}
 
 	public Date getPeriodEnd() {
-		return periodEnd;
+		return mPeriodEnd;
 	}
 
 	public void setPeriodEnd(Date d) {
-		this.periodEnd= d;
+		this.mPeriodEnd = d;
 	}
 
 	
+    public boolean getLocked() {
+        return mLocked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.mLocked = locked;
+    }
+
 /*
 	public String get() {
 		return ;
