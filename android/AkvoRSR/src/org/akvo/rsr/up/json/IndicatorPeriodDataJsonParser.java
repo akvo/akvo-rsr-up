@@ -78,13 +78,15 @@ public class IndicatorPeriodDataJsonParser extends JsonParser {
     		ipd = new IndicatorPeriodData();
     		ipd.setId(mRoot.getString("id"));
             ipd.setData(mRoot.getString("data"));
+            ipd.setRelativeData(mRoot.getBoolean("relative_data"));
+            ipd.setStatus(mRoot.getString("status"));
             ipd.setDescription(mRoot.getString("text"));
             ipd.setUserId(mRoot.getString("user"));
             ipd.setPeriodId(mRoot.getString("period"));
             ipd.setPhotoUrl(mRoot.getString("photo_url"));
             ipd.setFileUrl(mRoot.getString("file_url"));
     		
-    		mDba.saveIpd(ipd); //NYI
+    		mDba.saveIpd(ipd);
     	}
     }
     

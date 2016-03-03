@@ -24,35 +24,37 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.akvo.rsr.up.R;
+import org.akvo.rsr.up.domain.IndicatorPeriodData;
 import org.akvo.rsr.up.service.SubmitIpdService;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.DialogUtil;
 import org.akvo.rsr.up.util.Downloader;
 import org.akvo.rsr.up.util.FileUtil;
-import org.akvo.rsr.up.util.SettingsUtil;
-import org.akvo.rsr.up.util.ThumbnailUtil;
 
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
-public class ResultEditorActivity extends ActionBarActivity {
+public class ResultEditorActivity extends BackActivity {
 
     private static final String TAG = "ResultEditorActivity";
-    private final int photoRequest = 887;
+    private static final int PHOTO_RESULT = 887;
     private final int photoPick = 889;
+    
+    private TextView periodTitleLabel;
     private EditText mDataEdit;
     private EditText mDescriptionEdit;
     private CheckBox mRelativeDataCheckbox;
@@ -60,19 +62,27 @@ public class ResultEditorActivity extends ActionBarActivity {
     private BroadcastReceiver rec;
     private int mPeriodId;
     private String mPeriodActualValue;
-    private String captureFilename;
+    private String mCaptureFilename;
+    private IndicatorPeriodData mIpd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         //find which period we will be updating
-        Bundle extras = getIntent().getExtras();
-        mPeriodId = extras != null ? extras.getInt(ConstantUtil.PERIOD_KEY,0) : 0;
-        mPeriodActualValue = extras != null ? extras.getString(ConstantUtil.CURRENT_ACTUAL_VALUE_KEY) : null;
-
+        if (savedInstanceState != null) {
+            mCaptureFilename = savedInstanceState.getString(ConstantUtil.IMAGE_FILENAME_KEY);
+            mPeriodId = savedInstanceState.getInt(ConstantUtil.PERIOD_KEY,0);
+            mPeriodActualValue = savedInstanceState.getString(ConstantUtil.CURRENT_ACTUAL_VALUE_KEY);
+        } else {
+            Bundle extras = getIntent().getExtras();
+            mPeriodId = extras != null ? extras.getInt(ConstantUtil.PERIOD_KEY,0) : 0;
+            mPeriodActualValue = extras != null ? extras.getString(ConstantUtil.CURRENT_ACTUAL_VALUE_KEY) : null;
+        }
         setContentView(R.layout.activity_result_editor);
 
+        periodTitleLabel = (TextView) findViewById(R.id.period_title);
+        periodTitleLabel.setText("Period #"+mPeriodId);//TODO dates instead
         mDataEdit = (EditText) findViewById(R.id.edit_data);
         mRelativeDataCheckbox = (CheckBox) findViewById(R.id.cb_relative_data);
         mDescriptionEdit = (EditText) findViewById(R.id.edit_comment);
@@ -83,6 +93,20 @@ public class ResultEditorActivity extends ActionBarActivity {
                 sendIt(v);
             }
         });
+
+        Button btnTakePhoto = (Button) findViewById(R.id.btn_take_photo);
+        btnTakePhoto.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                // generate unique filename
+                mCaptureFilename = FileUtil.getExternalPhotoDir(ResultEditorActivity.this)
+                        + File.separator + "capture" + System.nanoTime() + ".jpg";
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                        Uri.fromFile(new File(mCaptureFilename)));
+                startActivityForResult(takePictureIntent, PHOTO_RESULT);
+            }
+        });
+
 
         Button btnAttachPhoto = (Button) findViewById(R.id.btn_attach_photo);
         btnAttachPhoto.setOnClickListener(new View.OnClickListener() {
@@ -121,9 +145,9 @@ public class ResultEditorActivity extends ActionBarActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-        case android.R.id.home:
-            finish();
-            return true;
+//        case android.R.id.home:
+//            finish();
+//            return true;
         default:
             return super.onOptionsItemSelected(item);
         }
@@ -154,7 +178,7 @@ public class ResultEditorActivity extends ActionBarActivity {
         intent.putExtra(ConstantUtil.DESCRIPTION_KEY, mDescriptionEdit.getText().toString());
         intent.putExtra(ConstantUtil.PERIOD_KEY, mPeriodId);
         intent.putExtra(ConstantUtil.CURRENT_ACTUAL_VALUE_KEY, mPeriodActualValue);
-//        intent.putExtra(ConstantUtil.PHOTO_FN_KEY, "");
+        intent.putExtra(ConstantUtil.PHOTO_FN_KEY, mCaptureFilename);
 //        intent.putExtra(ConstantUtil.FILE_FN_KEY, "");
 
         getApplicationContext().startService(intent);
@@ -204,8 +228,9 @@ public class ResultEditorActivity extends ActionBarActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         // Handle photo taken by camera app
-        if (requestCode == photoRequest || requestCode == photoPick) {
+        if (requestCode == PHOTO_RESULT || requestCode == photoPick) {
             if (resultCode == RESULT_CANCELED) {
+                mCaptureFilename = null; //forget this ever happened
                 return;
             }
             boolean camera = true;
@@ -213,17 +238,15 @@ public class ResultEditorActivity extends ActionBarActivity {
             // Handle picked photo
             if (requestCode == photoPick) {
                 camera = false;
-                if (resultCode == RESULT_CANCELED) {
-                    return;
-                }
+            
                 // data.getData is a content: URI. Need to copy the content to a
                 // file, so we can resize and rotate in place
                 InputStream imageStream;
                 try {
                     imageStream = getContentResolver().openInputStream(data.getData());
-                    captureFilename = FileUtil.getExternalPhotoDir(this) + File.separator + "pick"
+                    mCaptureFilename = FileUtil.getExternalPhotoDir(this) + File.separator + "pick"
                             + System.nanoTime() + ".jpg";
-                    OutputStream os = new FileOutputStream(captureFilename);
+                    OutputStream os = new FileOutputStream(mCaptureFilename);
                     try {
                         copyStream(imageStream, os);
                     }
@@ -238,17 +261,14 @@ public class ResultEditorActivity extends ActionBarActivity {
                 }
                 //shrink or rotate here?
                 
-//                update.setThumbnailFilename(captureFilename);
-//                update.setThumbnailUrl("dummyUrl"); // absence will be interpreted
-                                                    // as unset thumbnail
-//                ThumbnailUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename, null, null, false);
-                // show result
-//                photoLocation = FileUtil.exifLocation(captureFilename);
-//                showPhoto(true);
             }
+//            mIpd.setPhotoFn(mCaptureFilename);
+//            mIpd.setPhotoUrl("dummyUrl"); // absence will be interpreted as unset thumbnail
+//          ThumbnailUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename, null, null, false);
+            // show result
+//          showPhoto(true);
         }
     }
-    
             /**
      * Broadcast receiver for receiving status updates from the SubmitIpdService IntentService
      *
@@ -264,6 +284,18 @@ public class ResultEditorActivity extends ActionBarActivity {
                 onSendFinished(intent);
             }
         }
+    }
+    
+    /** saves data being worked on before we leave the activity */
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt(ConstantUtil.PERIOD_KEY, mPeriodId);
+        // In case we are being bumped to make room for the camera app: 
+        outState.putString(ConstantUtil.IMAGE_FILENAME_KEY, mCaptureFilename);
+        outState.putString(ConstantUtil.CURRENT_ACTUAL_VALUE_KEY, mPeriodActualValue);
+
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(outState);
     }
 
 }

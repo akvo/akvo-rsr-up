@@ -34,7 +34,7 @@ public class ConstantUtil {
 	public static final String AUTH_URL = "/auth/token/";
     public static final String POST_UPDATE_URL = "/rest/v1/project_update/?format=xml";
     public static final String POST_RESULT_URL = "/rest/v1/indicator_period_data/?format=json";
-    public static final String IPD_ATTACHMENT_PATTERN = "/rest/v1/indicator_period_data/%d/?format=json";
+    public static final String IPD_ATTACHMENT_PATTERN = "/rest/v1/indicator_period_data/%d/upload_file/?format=json";
 //    public static final String FETCH_UPDATE_URL_PATTERN = "/rest/v1/project_update/?format=xml&project=%s";//use default limit
     public static final String FETCH_UPDATE_URL_PATTERN = "/rest/v1/project_update/?format=xml&project=%s&last_modified_at__gt=%s";//use default limit
     public static final String VERIFY_UPDATE_PATTERN = "/rest/v1/project_update/?format=xml&uuid=%s&limit=2";

@@ -28,6 +28,7 @@ import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -85,13 +86,15 @@ public class ResultListArrayAdapter extends ArrayAdapter<ResultNode>{
                 titleView.setTypeface(Typeface.create(Typeface.SANS_SERIF,Typeface.BOLD));
                 titleView.setBackgroundColor(c.getResources().getColor(R.color.white));
                 indent = "  ";
+                img.setImageResource(rn.getImageRes());    
                 img.setVisibility(View.VISIBLE);
                 break;
             case PERIOD:
                 titleView.setTextColor(c.getResources().getColor(R.color.black));
                 titleView.setBackgroundColor(c.getResources().getColor(R.color.white));
                 titleView.setTypeface(Typeface.SANS_SERIF);
-                img.setVisibility(View.INVISIBLE);
+                img.setImageResource(rn.getImageRes());    
+                img.setVisibility(View.VISIBLE);
                 indent = "    ";
                 break;
             case DATA:

@@ -239,8 +239,7 @@ public class ProjectResultListJsonParser extends ListJsonParser {
                         p.setLocked(aPeriod.getBoolean("locked"));
             			mDba.savePeriod(p);
             			
-            			//TODO: loop on nested IPDs
-                        //loop over IPDs 
+                        //loop over nested IPDs 
                         JSONArray ipdArray = aPeriod.getJSONArray("data");
                         for (int di = 0; di < ipdArray.length(); di++) {
                             JSONObject aIpd = ipdArray.getJSONObject(di);
@@ -252,7 +251,6 @@ public class ProjectResultListJsonParser extends ListJsonParser {
                             ipd.setPeriodId(aIpd.getString("period"));
                             ipd.setStatus(aIpd.getString("status"));
                             ipd.setRelativeData(aIpd.getBoolean("relative_data"));
-                            //TODO file/photo
                             ipd.setPhotoUrl(aIpd.getString("photo_url"));
                             ipd.setFileUrl(aIpd.getString("file_url"));
                             //user data

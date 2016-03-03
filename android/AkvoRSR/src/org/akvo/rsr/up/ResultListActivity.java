@@ -187,8 +187,12 @@ public class ResultListActivity extends ActionBarActivity {
         final int actual_value = dataCursor.getColumnIndex("actual_value");
         final int target_value = dataCursor.getColumnIndex("target_value");
         final int period_locked = dataCursor.getColumnIndex(RsrDbAdapter.LOCKED_COL);
-        final int ipd_data = dataCursor.getColumnIndex(RsrDbAdapter.DATA_COL);
+        final int data_col = dataCursor.getColumnIndex(RsrDbAdapter.DATA_COL);
+        final int status_col = dataCursor.getColumnIndex(RsrDbAdapter.STATUS_COL);
+        final int relative_data_col = dataCursor.getColumnIndex(RsrDbAdapter.RELATIVE_DATA_COL);
         final int ipd_text = dataCursor.getColumnIndex(RsrDbAdapter.DESCRIPTION_COL);
+        final int firstname_col = dataCursor.getColumnIndex(RsrDbAdapter.FIRST_NAME_COL);
+        final int lastname_col  = dataCursor.getColumnIndex(RsrDbAdapter.LAST_NAME_COL);
         
 		ArrayList<ResultNode> list = new ArrayList<ResultNode>();
 		int last_res = -1, last_ind = -1, last_per=-1, resultCounter = 0, indicatorCounter = 0, periodCounter=0;
@@ -203,18 +207,20 @@ public class ResultListActivity extends ActionBarActivity {
             int ipd = dataCursor.getInt(ipd_pk);
             if (res != last_res) {
                 resultCounter++;
-                list.add(new ResultNode(NodeType.RESULT, res, dataCursor.getString(res_title)));
+                list.add(new ResultNode(NodeType.RESULT, res, dataCursor.getString(res_title), 0));
                 last_res = res;
                 last_ind = -1;
             }
             
             if (ind != last_ind && ind > 0) { // ==0 if no indicators
                 indicatorCounter++;
-                list.add(new ResultNode(NodeType.INDICATOR, ind, dataCursor.getString(ind_title)));
+                list.add(new ResultNode(NodeType.INDICATOR, ind, dataCursor.getString(ind_title), R.drawable.tacho));
                 last_ind = ind;
+                last_per = -1;
             }
             
             if (per != last_per && per > 0) {  // ==0 if no periods
+                periodCounter++;
                 String av = dataCursor.getString(actual_value);
                 String tv = dataCursor.getString(target_value);
                 boolean locked = dataCursor.getInt(period_locked) != 0;
@@ -234,16 +240,25 @@ public class ResultListActivity extends ActionBarActivity {
                 if ( ps != "" || pe != "" ) period += ps + endash + pe + " : ";
                 if ( av != null && av.trim().length() > 0 ) period += av;
                 if ( tv != null && tv.trim().length() > 0 ) period += "/" + tv;
-                if ( locked ) period += " (Locked)";
+                if ( locked ) {
+                    list.add(new ResultNode(NodeType.PERIOD, per, period, R.drawable.ic_menu_lt_date, av));                    
+                } else {
+                    list.add(new ResultNode(NodeType.PERIOD, per, period, R.drawable.ic_menu_dk_date, av));                    
+                }
 
-                list.add(new ResultNode(NodeType.PERIOD, per, period, av));
                 last_per = per;
             }
 
             if (ipd > 0) {  // ==0 if no ipds
-                String data = dataCursor.getString(ipd_data);
+                String data = dataCursor.getString(data_col);
+                boolean delta = dataCursor.getInt(relative_data_col) != 0;
                 String text = dataCursor.getString(ipd_text);
-               list.add(new ResultNode(NodeType.DATA, per, "Data: "+data+endash+text));
+                String first = dataCursor.getString(firstname_col);
+                String last = dataCursor.getString(lastname_col);
+                String s = (delta?"+ ":"= ") + data+endash+text+"("+dataCursor.getString(status_col)+")";
+                if (first != null) s+=endash+first;
+                if (last != null) s+=" "+last;
+               list.add(new ResultNode(NodeType.DATA, ipd, s, 0));
             }
 		}
 

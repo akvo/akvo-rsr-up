@@ -1295,9 +1295,10 @@ public class RsrDbAdapter {
 	 */
 	public Cursor listResultsIndicatorsPeriodsFor(String _id) {
 		Cursor cursor = database.query(RESULT_TABLE + 
-										" LEFT JOIN " + INDICATOR_TABLE + " ON  " + RESULT_TABLE + "._id = " + INDICATOR_TABLE + ".result_id" +
+										" LEFT JOIN "+ INDICATOR_TABLE + " ON  " + RESULT_TABLE + "._id = " + INDICATOR_TABLE + ".result_id" +
                                         " LEFT JOIN " + PERIOD_TABLE + " ON  " + INDICATOR_TABLE + "._id = " + PERIOD_TABLE + ".indicator_id" +
-                                        " LEFT JOIN " + IPD_TABLE + " ON  " + PERIOD_TABLE + "._id = " + IPD_TABLE + ".period_id",
+                                        " LEFT JOIN " + IPD_TABLE + " ON  " + PERIOD_TABLE + "._id = " + IPD_TABLE + ".period_id" +
+                                        " LEFT JOIN " + USER_TABLE + " ON  " + USER_TABLE + "._id = " + IPD_TABLE + ".user_id",
 										new String[] {
 		                                    "_result._id as result_id",
 		                                    "_indicator._id as indicator_id",
@@ -1311,13 +1312,15 @@ public class RsrDbAdapter {
                                             "_period.target_value",
                                             "_period.locked",
                                             "_ipd.data",
+                                            "_ipd.relative_data",
                                             "_ipd.description",
-                                            "_ipd.user_id",
+                                            "user.first_name",
+                                            "user.last_name",
                                             "_ipd.status"
 		                                    },
 										PROJECT_ID_COL + " = ?",
 										new String[] { _id },
-										"_result._id,_indicator._id,_period._id", //group by
+										null, //group by
 										null,
 										"_result._id,_indicator._id,_period._id, _ipd._id"); //order by
 
@@ -1422,7 +1425,7 @@ public class RsrDbAdapter {
         updatedValues.put(RELATIVE_DATA_COL, ipd.getRelativeData());
         updatedValues.put(DESCRIPTION_COL, ipd.getDescription());
         updatedValues.put(PERIOD_ID_COL, ipd.getPeriodId());
-        updatedValues.put(USER_ID_COL, ipd.getPeriodId());
+        updatedValues.put(USER_ID_COL, ipd.getUserId());
         updatedValues.put(STATUS_COL, ipd.getStatus());
         updatedValues.put(PHOTO_URL_COL, ipd.getPhotoUrl());
         updatedValues.put(FILE_URL_COL, ipd.getFileUrl());
