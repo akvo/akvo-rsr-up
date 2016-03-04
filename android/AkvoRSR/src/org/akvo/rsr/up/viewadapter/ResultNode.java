@@ -10,6 +10,7 @@ public class ResultNode {
     private int mImageRes;
     String mText;
     String mActualValue;
+    boolean mLocked;
 
     /**
      * constructors
@@ -18,15 +19,16 @@ public class ResultNode {
         setNodeType(itemType);
         setId(id);
         setImageRes(ir);
-        mText = text;
+        setText(text);
     }
 
-    public ResultNode(NodeType itemType, int id, String text, int ir, String av) {
+    public ResultNode(NodeType itemType, int id, String text, int ir, String av, boolean locked) {
         setNodeType(itemType);
         setId(id);
         setImageRes(ir);
         setActualValue(av);
-        mText = text;
+        setText(text);
+        mLocked = locked;
     }
 
     public NodeType getNodeType() {
@@ -43,6 +45,14 @@ public class ResultNode {
 
     public void setId(int mId) {
         this.mId = mId;
+    }
+
+    public String getText() {
+        return mText;
+    }
+
+    public void setText(String text) {
+        mText = text;
     }
 
     public String getActualValue() {

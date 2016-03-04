@@ -137,6 +137,8 @@ public class ConstantUtil {
     public static final String RELATIVE_DATA_KEY = "org.akvo.rsr.up.RELATIVE_IPD_DATA";
     public static final String PHOTO_FN_KEY = "org.akvo.rsr.up.photo_filename";
     public static final String FILE_FN_KEY = "org.akvo.rsr.up.file_filename";
+    public static final String PERIOD_START_KEY = "org.akvo.rsr.up.INDICATOR_PERIOD_START";
+    public static final String PERIOD_END_KEY = "org.akvo.rsr.up.INDICATOR_PERIOD_END";
 
 	/**
 	 * posting outcomes

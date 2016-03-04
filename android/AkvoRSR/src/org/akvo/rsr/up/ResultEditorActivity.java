@@ -30,6 +30,7 @@ import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.DialogUtil;
 import org.akvo.rsr.up.util.Downloader;
 import org.akvo.rsr.up.util.FileUtil;
+import org.akvo.rsr.up.util.ThumbnailUtil;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -45,14 +46,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class ResultEditorActivity extends BackActivity {
 
     private static final String TAG = "ResultEditorActivity";
-    private static final int PHOTO_RESULT = 887;
-    private final int photoPick = 889;
+    private static final int PHOTO_RESULT = 1111;
+    private static final int PHOTO_PICK = 1112;
+    private static final int FILE_PICK = 1113;
+    private static final String emdash = "\u2014";
+    private static final String endash = "\u2013";
     
     private TextView periodTitleLabel;
     private EditText mDataEdit;
@@ -63,6 +68,11 @@ public class ResultEditorActivity extends BackActivity {
     private int mPeriodId;
     private String mPeriodActualValue;
     private String mCaptureFilename;
+    private ImageView mPhotoThumbnail;
+    private ImageView mFileIcon;
+    private String mPeriodStart;
+    private String mPeriodEnd;
+
     private IndicatorPeriodData mIpd;
 
     @Override
@@ -78,14 +88,18 @@ public class ResultEditorActivity extends BackActivity {
             Bundle extras = getIntent().getExtras();
             mPeriodId = extras != null ? extras.getInt(ConstantUtil.PERIOD_KEY,0) : 0;
             mPeriodActualValue = extras != null ? extras.getString(ConstantUtil.CURRENT_ACTUAL_VALUE_KEY) : null;
+            mPeriodStart = extras != null ? extras.getString(ConstantUtil.PERIOD_START_KEY) : "";
+            mPeriodEnd = extras != null ? extras.getString(ConstantUtil.PERIOD_END_KEY) : "";
         }
         setContentView(R.layout.activity_result_editor);
 
         periodTitleLabel = (TextView) findViewById(R.id.period_title);
-        periodTitleLabel.setText("Period #"+mPeriodId);//TODO dates instead
+        periodTitleLabel.setText("Period " + mPeriodStart + endash + mPeriodEnd);//TODO dates instead
         mDataEdit = (EditText) findViewById(R.id.edit_data);
         mRelativeDataCheckbox = (CheckBox) findViewById(R.id.cb_relative_data);
         mDescriptionEdit = (EditText) findViewById(R.id.edit_comment);
+        mPhotoThumbnail = (ImageView) findViewById(R.id.image_ipd);
+        mFileIcon = (ImageView) findViewById(R.id.file_ipd);
 
         final Button button = (Button) findViewById(R.id.btn_send_result);
         button.setOnClickListener(new View.OnClickListener() {
@@ -113,7 +127,7 @@ public class ResultEditorActivity extends BackActivity {
             public void onClick(View view) {
                 Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
                 photoPickerIntent.setType("image/*");
-                startActivityForResult(photoPickerIntent, photoPick);
+                startActivityForResult(photoPickerIntent, PHOTO_PICK);
             }
         });
 
@@ -228,7 +242,7 @@ public class ResultEditorActivity extends BackActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         // Handle photo taken by camera app
-        if (requestCode == PHOTO_RESULT || requestCode == photoPick) {
+        if (requestCode == PHOTO_RESULT || requestCode == PHOTO_PICK) {
             if (resultCode == RESULT_CANCELED) {
                 mCaptureFilename = null; //forget this ever happened
                 return;
@@ -236,7 +250,7 @@ public class ResultEditorActivity extends BackActivity {
             boolean camera = true;
             
             // Handle picked photo
-            if (requestCode == photoPick) {
+            if (requestCode == PHOTO_PICK) {
                 camera = false;
             
                 // data.getData is a content: URI. Need to copy the content to a
@@ -264,7 +278,7 @@ public class ResultEditorActivity extends BackActivity {
             }
 //            mIpd.setPhotoFn(mCaptureFilename);
 //            mIpd.setPhotoUrl("dummyUrl"); // absence will be interpreted as unset thumbnail
-//          ThumbnailUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename, null, null, false);
+          ThumbnailUtil.setPhotoFile(mPhotoThumbnail, "dummyUrl", mCaptureFilename, null, null, false);
             // show result
 //          showPhoto(true);
         }

@@ -1322,7 +1322,7 @@ public class RsrDbAdapter {
 										new String[] { _id },
 										null, //group by
 										null,
-										"_result._id,_indicator._id,_period._id, _ipd._id"); //order by
+										"_result._id,_indicator._id,_period._id, _ipd._id DESC"); //order by
 
 		return cursor;
 	}

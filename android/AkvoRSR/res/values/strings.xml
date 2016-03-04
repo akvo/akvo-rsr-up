@@ -102,6 +102,7 @@
     <string name="btncaption_sign_in">SIGN IN</string>
     <string name="btncaption_take_photo">Take photo</string>
     <string name="btncaption_attach_photo">Attach photo</string>
+    <string name="btncaption_attach_file">Attach file</string>
     <string name="btncaption_rephoto">Replace photo</string>
     <string name="btncaption_dephoto">Delete photo</string>
     <string name="btncaption_rotphoto">Rotate photo</string>

@@ -646,17 +646,23 @@ public class Uploader {
      * Adds a photo to an indicator period data; update the local ipd _if_ sucessful
      *  
      * @param url
-     * @param name
-     * @param fileData
+     * @param type
+     * @param filename
      * 
-     * @return id
-     * @throws FailedPostException ??
-     * 
-     * There are three outcomes:
-     *   true      Success, we got the server id back and updated the "update" object
-     *   exception Failure, we never got to send the whole thing
+     * @throws FailedPostException
      *   
      * What to submit:
+
+------WebKitFormBoundaryGxbP7rzSaR8xMRX5
+Content-Disposition: form-data; name="file"; filename="org logo.jpg"
+Content-Type: image/jpeg
+
+
+------WebKitFormBoundaryGxbP7rzSaR8xMRX5
+Content-Disposition: form-data; name="type"
+
+photo                                       or file
+------WebKitFormBoundaryGxbP7rzSaR8xMRX5--
 
     {
     "type":"photo", or
@@ -673,10 +679,9 @@ public class Uploader {
 
     public static void postIndicatorPeriodDataAttachment(RsrDbAdapter dba, String url, User user, String type, String filename, ProgressReporter prog) throws FailedPostException {
         //TODO: if big, a streamed approach would be better
-        
-        JSONObject ipd = new JSONObject();
         String body = "";
         try {
+            /*        
             File f = new File(filename);
             if (f.exists()) {
                 RandomAccessFile raf = new RandomAccessFile(f, "r");
@@ -685,6 +690,7 @@ public class Uploader {
                     //use origin buffer size divisible by 3 so no padding is inserted in the middle
                     final int fileSize = (int) raf.length(); //unlikely to be longer than 4GB
                     byte[] rawBuf = new byte[fileSize];
+                    raf.readFully(rawBuf);
                     body = Base64.encodeBytes(rawBuf, 0, fileSize);
                 } finally {
                     raf.close();
@@ -692,18 +698,17 @@ public class Uploader {
             } else {
                 throw new FailedPostException("IPD attachment file does not exist");
             }
-            ipd.put("type", type);
-            ipd.put("file", body);
-        
+*/
+            Map<String, String> data = new HashMap<String, String>();
+//            data.put("type", type);
+//            data.put("file", body);
             URL url1 = new URL(url);
-    
-            String requestBody = ipd.toString();
-    
-            HttpRequest h = HttpRequest.post(url1).contentType(ConstantUtil.jsonContent);
-            h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
 
+            HttpRequest h = HttpRequest.post(url1);
+            h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
             h.readTimeout(READ_TIMEOUT_MS);
-            h.send(requestBody);
+            h.part("type", type);
+            h.part("file", "image.jpg", "image/jpeg", new File(filename));            
     
             int code = h.code(); //closes output
             String msg = h.message();
@@ -723,16 +728,12 @@ public class Uploader {
             Log.e(TAG, "Bad URL", e);
             throw new FailedPostException(e.getMessage());
         }
-        catch (FileNotFoundException e) {
-            Log.e(TAG, "Cannot find image file", e);
-            throw new FailedPostException(e.getMessage());
-        }
+//        catch (FileNotFoundException e) {
+//            Log.e(TAG, "Cannot find image file", e);
+//            throw new FailedPostException(e.getMessage());
+//        }
         catch (IOException e) {
             Log.e(TAG, "Cannot read image file", e);
-            throw new FailedPostException(e.getMessage());
-        }
-        catch (JSONException e) {
-            Log.e(TAG, "JSON parsing error", e);
             throw new FailedPostException(e.getMessage());
         }
     }

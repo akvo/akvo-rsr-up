@@ -92,6 +92,7 @@ public class ResultListActivity extends ActionBarActivity {
                     Intent i = new Intent(view.getContext(), ResultEditorActivity.class);
                     i.putExtra(ConstantUtil.PERIOD_KEY, rn.getId());
                     i.putExtra(ConstantUtil.CURRENT_ACTUAL_VALUE_KEY, rn.getActualValue());
+                    i.putExtra(ConstantUtil.PERIOD_START_KEY, rn.getText());
                     startActivity(i);
                 }
             }
@@ -241,9 +242,9 @@ public class ResultListActivity extends ActionBarActivity {
                 if ( av != null && av.trim().length() > 0 ) period += av;
                 if ( tv != null && tv.trim().length() > 0 ) period += "/" + tv;
                 if ( locked ) {
-                    list.add(new ResultNode(NodeType.PERIOD, per, period, R.drawable.ic_menu_lt_date, av));                    
+                    list.add(new ResultNode(NodeType.PERIOD, per, period, R.drawable.ic_menu_lt_date, av, locked));                    
                 } else {
-                    list.add(new ResultNode(NodeType.PERIOD, per, period, R.drawable.ic_menu_dk_date, av));                    
+                    list.add(new ResultNode(NodeType.PERIOD, per, period, R.drawable.ic_menu_dk_date, av, locked));                    
                 }
 
                 last_per = per;
