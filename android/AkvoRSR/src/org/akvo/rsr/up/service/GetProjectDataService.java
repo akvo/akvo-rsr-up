@@ -21,8 +21,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
 
 import org.akvo.rsr.up.R;
@@ -68,6 +70,7 @@ public class GetProjectDataService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         mRunning = true;
+        String projectId = intent.getStringExtra(ConstantUtil.PROJECT_ID_KEY);
         RsrDbAdapter ad = new RsrDbAdapter(this);
         Downloader dl = new Downloader();
         String errMsg = null;
@@ -79,10 +82,18 @@ public class GetProjectDataService extends IntentService {
         User user = SettingsUtil.getAuthUser(this);
         try {
             try {
+                Set<String> projectSet;
+                if (projectId == null) {
+                    projectSet = user.getPublishedProjIds();
+                } else {
+                    projectSet = new HashSet<String>();
+                    projectSet.add(projectId);
+                }
+                
                 int i = 0;
-                int projects = user.getPublishedProjIds().size();
+                int projects = projectSet.size();
                 //Iterate over projects instead of using a complex query URL, since it can take so long that the proxy times out
-                for (String id : user.getPublishedProjIds()) {
+                for (String id : projectSet) {
                     dl.fetchProject(this,
                                     ad, 
                                     new URL(SettingsUtil.host(this) +
@@ -104,7 +115,7 @@ public class GetProjectDataService extends IntentService {
             		df1.setTimeZone(TimeZone.getTimeZone("UTC"));
                 	
                     int k = 0;
-                    for (String projId : user.getPublishedProjIds()) {
+                    for (String projId : projectSet) {
                     	Project p = ad.findProject(projId);
                     	if (p != null) {
                             Date d = dl.fetchUpdateListRestApiPaged(this,

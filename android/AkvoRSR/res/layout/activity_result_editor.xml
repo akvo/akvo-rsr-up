@@ -117,23 +117,30 @@
                     android:textSize="18sp" />
             </LinearLayout>
 
-            <ImageView
-                android:id="@+id/image_ipd"
-                android:layout_width="160dp"
-                android:layout_height="120dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_margin="5dp"
-                android:background="@drawable/box"
-                android:contentDescription="@string/app_name" />
-
-            <ImageView
-                android:id="@+id/file_ipd"
-                android:layout_width="160dp"
-                android:layout_height="120dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_margin="5dp"
-                android:background="@drawable/box"
-                android:contentDescription="@string/app_name" />
+            <LinearLayout
+                android:id="@+id/photo_thumbnails"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="visible" >
+                <ImageView
+                    android:id="@+id/image_ipd"
+                    android:layout_width="160dp"
+                    android:layout_height="120dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/box"
+                    android:contentDescription="@string/app_name" />
+    
+                <ImageView
+                    android:id="@+id/file_ipd"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/box"
+                    android:contentDescription="@string/app_name" />
+            </LinearLayout>
             
             <!-- some fudge to fill the viewport if necessary -->
 

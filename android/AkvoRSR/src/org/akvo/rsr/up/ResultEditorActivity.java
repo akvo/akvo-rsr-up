@@ -131,6 +131,16 @@ public class ResultEditorActivity extends BackActivity {
             }
         });
 
+        Button btnAttachFile = (Button) findViewById(R.id.btn_attach_file);
+        btnAttachFile.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Intent filePickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                filePickerIntent.addCategory(Intent.CATEGORY_OPENABLE);
+                filePickerIntent.setType("*/*");
+                startActivityForResult(filePickerIntent, FILE_PICK);
+            }
+        });
+
 
         // register a listener for the completion intent
         IntentFilter f = new IntentFilter(ConstantUtil.RESULT_SENT_ACTION);
@@ -281,6 +291,12 @@ public class ResultEditorActivity extends BackActivity {
           ThumbnailUtil.setPhotoFile(mPhotoThumbnail, "dummyUrl", mCaptureFilename, null, null, false);
             // show result
 //          showPhoto(true);
+        }
+        if (requestCode == FILE_PICK) {
+            if (resultCode == RESULT_CANCELED) {
+//                mCaptureFilename = null; //forget this ever happened
+                return;
+            }
         }
     }
             /**

@@ -4,6 +4,38 @@
     android:background="@android:color/white"
     android:orientation="vertical" >
 
+    <LinearLayout
+        android:id="@+id/proj_detail_progress"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/rsr_blue"
+        android:orientation="vertical"
+        android:padding="5dip"
+        android:visibility="gone" >
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/label_refresh_progress"
+            android:textColor="@color/rsr_purple"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/progress_title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="---" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="false" />
+    </LinearLayout>
+
     <TextView
         android:id="@+id/text_proj_detail_title"
         android:layout_width="fill_parent"
