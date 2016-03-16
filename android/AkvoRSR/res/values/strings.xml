@@ -38,6 +38,7 @@
     <string name="title_activity_update_edit">RSR Up</string>
     <string name="title_activity_result_editor">RSR Up</string>
     <string name="title_activity_result_list">RSR Up</string>
+    <string name="title_activity_period_detail">RSR Up</string>
     <string name="title_activity_update_detail">RSR Up</string>
     <string name="title_activity_settings">RSR Up Settings</string>
     <string name="title_activity_diagnostics">RSR Up Diagnostics</string>
@@ -107,6 +108,7 @@
     <string name="btncaption_dephoto">Delete photo</string>
     <string name="btncaption_rotphoto">Rotate photo</string>
     <string name="btncaption_add_update">Add update</string>
+    <string name="btncaption_add_data">Add period data</string>
     <string name="btncaption_edit_update">Edit this update</string>
     <string name="btncaption_refresh">Refresh project list</string>
     <string name="btncaption_viewupdates">View all updates</string>
@@ -182,10 +184,12 @@
     <string name="invalidpassword">Invalid password</string>
     <string name="dummy_project_title">Project title here</string>
     <string name="dummy_update_title">Update title here</string>
+    <string name="dummy_indicator_title">Indicator title here</string>
     <string name="dummy_update_description">Update description goes here, and can be any length. Update will scroll but button will stay at bottom of screen.</string>
     <string name="dummy_author">Nomen Nescio, Akvo</string>
     <string name="dummy_count">17</string>
     <string name="dummy_time">2014-04-23 17:18</string>
+    <string name="dummy_date">2016-01-01</string>
     <string name="dummy_version">0.0</string>
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent pharetra ultricies ante, imperdiet viverra nisi rutrum a. Integer consequat laoreet malesuada. Nam fermentum risus id aliquet pellentesque. Sed nec nisl in turpis sodales ultricies. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Interdum et malesuada fames ac ante ipsum primis in faucibus.</string>
 

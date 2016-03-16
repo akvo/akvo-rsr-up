@@ -1225,8 +1225,7 @@ public class RsrDbAdapter {
                                        "_id = ?",
                                        new String[] { _id }, null, null, null);
         if (cursor != null) {
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
+            if (cursor.moveToFirst()) {
                 res = new Result();
                 res.setId(_id);
                 res.setProjectId(cursor.getString(cursor.getColumnIndexOrThrow(PROJECT_COL)));
@@ -1329,6 +1328,28 @@ public class RsrDbAdapter {
 
 	
     /**
+     * Gets a single result from the db using its primary key
+     */
+    public Indicator findIndicator(String _id) {
+        Indicator ind = null;
+        Cursor cursor = database.query(INDICATOR_TABLE,
+                                       null,
+                                       "_id = ?",
+                                       new String[] { _id }, null, null, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                ind = new Indicator();
+                ind.setId(_id);
+                ind.setResultId(cursor.getString(cursor.getColumnIndexOrThrow(RESULT_ID_COL)));
+                ind.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(TITLE_COL)));
+
+                }
+            cursor.close();
+            }
+
+        return ind;
+    }
+    /**
     * creates or updates an indicator in the db
     *
     * @param ind the indicator data to be updated
@@ -1365,6 +1386,47 @@ public class RsrDbAdapter {
     }
 
     
+
+    /**
+     * Gets a single result from the db using its primary key
+     */
+    public Period findPeriod(String _id) {
+        Period per = null;
+        Cursor cursor = database.query(PERIOD_TABLE,
+                                       null,
+                                       "_id = ?",
+                                       new String[] { _id }, null, null, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                per = new Period();
+                per.setId(_id);
+                per.setIndicatorId(cursor.getString(cursor.getColumnIndexOrThrow(INDICATOR_ID_COL)));
+                per.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(TITLE_COL)));
+                per.setLocked(0 != cursor.getInt(cursor.getColumnIndexOrThrow(LOCKED_COL)));
+                per.setActualValue(cursor.getString(cursor.getColumnIndexOrThrow(ACTUAL_VALUE_COL)));
+                per.setTargetValue(cursor.getString(cursor.getColumnIndexOrThrow(TARGET_VALUE_COL)));
+                per.setActualComment(cursor.getString(cursor.getColumnIndexOrThrow(ACTUAL_COMMENT_COL)));
+                per.setTargetComment(cursor.getString(cursor.getColumnIndexOrThrow(TARGET_COMMENT_COL)));
+                //Dates that can be null
+                if (cursor.isNull(cursor.getColumnIndexOrThrow(PERIOD_START_COL))) {
+                    per.setPeriodStart(null);      
+                } else {
+                    per.setPeriodStart(new Date(1000L * cursor.getLong(cursor.getColumnIndexOrThrow(PERIOD_START_COL))));
+                }
+                if (cursor.isNull(cursor.getColumnIndexOrThrow(PERIOD_END_COL))) {
+                    per.setPeriodEnd(null);      
+                } else {
+                    per.setPeriodEnd(new Date(1000L * cursor.getLong(cursor.getColumnIndexOrThrow(PERIOD_END_COL))));
+                }
+
+                }
+            cursor.close();
+            }
+
+        return per;
+    }
+
+
     /**
     * creates or updates an indicator in the db
     *
@@ -1612,7 +1674,9 @@ public class RsrDbAdapter {
 	 * from the database
 	 */
 	public void clearAllData() {
-	    executeSql("delete from " + PERIOD_TABLE);
+        executeSql("delete from " + IPDC_TABLE);
+        executeSql("delete from " + IPD_TABLE);
+        executeSql("delete from " + PERIOD_TABLE);
 	    executeSql("delete from " + INDICATOR_TABLE);
 	    executeSql("delete from " + RESULT_TABLE);
 	    executeSql("delete from " + UPDATE_TABLE);

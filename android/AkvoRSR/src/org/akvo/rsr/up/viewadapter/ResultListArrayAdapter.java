@@ -97,14 +97,14 @@ public class ResultListArrayAdapter extends ArrayAdapter<ResultNode>{
                 img.setVisibility(View.VISIBLE);
                 indent = "    ";
                 break;
-            case DATA:
+            case DATA://Not currently used
                 titleView.setTextColor(c.getResources().getColor(R.color.blue));
                 titleView.setBackgroundColor(c.getResources().getColor(R.color.white));
                 titleView.setTypeface(Typeface.SANS_SERIF);
                 img.setVisibility(View.INVISIBLE);
                 indent = "      ";
                 break;
-            case COMMENT:
+            case COMMENT://Not currently used
                 titleView.setTextColor(c.getResources().getColor(R.color.red));
                 titleView.setBackgroundColor(c.getResources().getColor(R.color.white));
                 titleView.setTypeface(Typeface.SANS_SERIF);

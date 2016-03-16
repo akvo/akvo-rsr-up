@@ -22,9 +22,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import org.akvo.rsr.up.R;
+import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.IndicatorPeriodData;
+import org.akvo.rsr.up.domain.Period;
 import org.akvo.rsr.up.service.SubmitIpdService;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.DialogUtil;
@@ -65,16 +69,24 @@ public class ResultEditorActivity extends BackActivity {
     private CheckBox mRelativeDataCheckbox;
     private ProgressDialog mProgress = null;
     private BroadcastReceiver rec;
-    private int mPeriodId;
-    private String mPeriodActualValue;
-    private String mCaptureFilename;
+    private View mPhotoTools;
+    private View mFileTools;
+
     private ImageView mPhotoThumbnail;
     private ImageView mFileIcon;
-    private String mPeriodStart;
-    private String mPeriodEnd;
+    private TextView mPhotoInfo;
+    private TextView mFileInfo;
 
     private IndicatorPeriodData mIpd;
-
+    private String mPeriodId;
+    private String mPeriodStart;
+    private String mPeriodEnd;
+    private String mPeriodActualValue;
+    private String mCaptureFilename;
+    private String mAttachedFileFilename;
+    private Period period;
+    private RsrDbAdapter mDba;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,24 +94,38 @@ public class ResultEditorActivity extends BackActivity {
         //find which period we will be updating
         if (savedInstanceState != null) {
             mCaptureFilename = savedInstanceState.getString(ConstantUtil.IMAGE_FILENAME_KEY);
-            mPeriodId = savedInstanceState.getInt(ConstantUtil.PERIOD_KEY,0);
-            mPeriodActualValue = savedInstanceState.getString(ConstantUtil.CURRENT_ACTUAL_VALUE_KEY);
+            mPeriodId = savedInstanceState.getString(ConstantUtil.PERIOD_ID_KEY);
         } else {
             Bundle extras = getIntent().getExtras();
-            mPeriodId = extras != null ? extras.getInt(ConstantUtil.PERIOD_KEY,0) : 0;
-            mPeriodActualValue = extras != null ? extras.getString(ConstantUtil.CURRENT_ACTUAL_VALUE_KEY) : null;
-            mPeriodStart = extras != null ? extras.getString(ConstantUtil.PERIOD_START_KEY) : "";
-            mPeriodEnd = extras != null ? extras.getString(ConstantUtil.PERIOD_END_KEY) : "";
+            mPeriodId = extras != null ? extras.getString(ConstantUtil.PERIOD_ID_KEY) : null;
+        }
+        
+        final SimpleDateFormat dateOnly = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        
+        //Create db
+        mDba = new RsrDbAdapter(this);
+        mDba.open();
+        try {
+            period = mDba.findPeriod(mPeriodId);
+            mPeriodActualValue = period.getActualValue();
+            mPeriodStart = dateOnly.format(period.getPeriodStart());
+            mPeriodEnd = dateOnly.format(period.getPeriodEnd());
+        } finally {
+            mDba.close();
         }
         setContentView(R.layout.activity_result_editor);
 
         periodTitleLabel = (TextView) findViewById(R.id.period_title);
-        periodTitleLabel.setText("Period " + mPeriodStart + endash + mPeriodEnd);//TODO dates instead
+        periodTitleLabel.setText("Period " + mPeriodStart + endash + mPeriodEnd);//TODO: localisation
         mDataEdit = (EditText) findViewById(R.id.edit_data);
         mRelativeDataCheckbox = (CheckBox) findViewById(R.id.cb_relative_data);
         mDescriptionEdit = (EditText) findViewById(R.id.edit_comment);
+        mPhotoTools = (View) findViewById(R.id.photo_tools);
+        mFileTools = (View) findViewById(R.id.file_tools);
         mPhotoThumbnail = (ImageView) findViewById(R.id.image_ipd);
         mFileIcon = (ImageView) findViewById(R.id.file_ipd);
+        mPhotoInfo = (TextView) findViewById(R.id.photo_info);
+        mFileInfo = (TextView) findViewById(R.id.file_info);
 
         final Button button = (Button) findViewById(R.id.btn_send_result);
         button.setOnClickListener(new View.OnClickListener() {
@@ -200,7 +226,7 @@ public class ResultEditorActivity extends BackActivity {
         intent.putExtra(ConstantUtil.DATA_KEY, mDataEdit.getText().toString());
         intent.putExtra(ConstantUtil.RELATIVE_DATA_KEY, mRelativeDataCheckbox.isChecked());
         intent.putExtra(ConstantUtil.DESCRIPTION_KEY, mDescriptionEdit.getText().toString());
-        intent.putExtra(ConstantUtil.PERIOD_KEY, mPeriodId);
+        intent.putExtra(ConstantUtil.PERIOD_ID_KEY, mPeriodId);
         intent.putExtra(ConstantUtil.CURRENT_ACTUAL_VALUE_KEY, mPeriodActualValue);
         intent.putExtra(ConstantUtil.PHOTO_FN_KEY, mCaptureFilename);
 //        intent.putExtra(ConstantUtil.FILE_FN_KEY, "");
@@ -289,14 +315,29 @@ public class ResultEditorActivity extends BackActivity {
 //            mIpd.setPhotoFn(mCaptureFilename);
 //            mIpd.setPhotoUrl("dummyUrl"); // absence will be interpreted as unset thumbnail
           ThumbnailUtil.setPhotoFile(mPhotoThumbnail, "dummyUrl", mCaptureFilename, null, null, false);
-            // show result
-//          showPhoto(true);
+          // show result
+          mPhotoTools.setVisibility(View.VISIBLE);
+          //TODO: show size of photo file
+          File f = new File(mCaptureFilename);
+          if (f.exists() && f.isFile()) {
+              mPhotoInfo.setText(Long.toString(f.length()/1024)+" kB");
+          }
         }
         if (requestCode == FILE_PICK) {
             if (resultCode == RESULT_CANCELED) {
-//                mCaptureFilename = null; //forget this ever happened
+                mAttachedFileFilename = null; //forget this ever happened
                 return;
             }
+            Uri u = data.getData();
+            if (u.getScheme().equalsIgnoreCase("file")) {
+                File f = new File(u.getPath());
+                if (f.exists() && f.isFile()) {
+                    mAttachedFileFilename = f.getAbsolutePath();
+                    mFileInfo.setText(f.getName());
+                    mFileTools.setVisibility(View.VISIBLE);
+                }
+            }
+            //TODO: change button to remove-attachment
         }
     }
             /**
@@ -319,11 +360,9 @@ public class ResultEditorActivity extends BackActivity {
     /** saves data being worked on before we leave the activity */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putInt(ConstantUtil.PERIOD_KEY, mPeriodId);
+        outState.putString(ConstantUtil.PERIOD_ID_KEY, mPeriodId);
         // In case we are being bumped to make room for the camera app: 
         outState.putString(ConstantUtil.IMAGE_FILENAME_KEY, mCaptureFilename);
-        outState.putString(ConstantUtil.CURRENT_ACTUAL_VALUE_KEY, mPeriodActualValue);
-
         // Always call the superclass so it can save the view hierarchy state
         super.onSaveInstanceState(outState);
     }

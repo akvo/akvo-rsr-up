@@ -1,0 +1,248 @@
+<LinearLayout
+	  	xmlns:android="http://schemas.android.com/apk/res/android"
+  		android:layout_width="fill_parent"
+  		android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:background="@color/lt_gray"
+		>
+
+	<!-- The indicator title -->	
+ 	<TextView
+        android:id="@+id/perdet_indicator_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+		android:textColor="@color/rsr_purple"
+ 	    android:background="@color/pale_gray"
+        android:textSize="20sp"
+        android:padding="5dp"
+        android:typeface="sans"
+      	android:text="@string/dummy_indicator_title"
+      	/>
+ 	
+	<!-- The scrollview should fill all the space beween the project title and the button -->	
+ 	<ScrollView
+		android:layout_width="fill_parent"
+		android:layout_height="0dp"
+		android:layout_weight="1"
+		android:fillViewport="true"
+		>
+   
+		<!-- The scrolling part -->	
+ 	    <LinearLayout
+	  		android:layout_width="fill_parent"
+	  		android:layout_height="wrap_content"
+			android:background="@android:color/white"
+		    android:orientation="vertical"
+	   	    android:padding="5dp"	    
+			>
+			 	
+			<!-- separator -->
+			<TextView
+			    style="?android:attr/listSeparatorTextViewStyle"
+			    android:paddingTop="5dp"
+			    android:gravity="center_horizontal"
+			    android:layout_width="match_parent"
+			    android:layout_height="1dp" />
+
+
+			<!-- The period title, if any -->
+			<TextView
+		        android:id="@+id/perdet_period_title"
+		        android:layout_width="fill_parent"
+		       	android:layout_height="wrap_content"
+		        android:layout_gravity="left"
+              	android:text="Indicator title here"
+		        android:textColor="@color/rsr_purple"
+		        android:textSize="18sp"
+		        android:typeface="sans"
+				android:paddingTop="10dp"
+				android:paddingBottom="10dp"
+                android:visibility="gone"
+		        />
+
+			<!-- The period dates -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Period:"
+                    android:textColor="@color/rsr_purple"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/perdet_start"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="@string/dummy_date"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:text=" &#2013; "
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/perdet_end"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/dummy_date"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+            
+            <!-- Planned value items -->
+
+            <ImageView
+                android:id="@+id/perdet_locked_indicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_menu_red_x" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Target value: "
+                    android:textColor="@color/rsr_purple"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/perdet_target_value"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:text="55"
+                    android:textColor="@color/rsr_purple"
+                    android:textSize="18sp"
+                    android:typeface="sans" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/perdet_planned_value_comment"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:paddingBottom="10dp"
+                android:text="Target value comment comment comment comment"
+                android:typeface="sans" />
+            
+            <!-- Actual value items -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Actual value: "
+                    android:textColor="@color/rsr_purple"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/perdet_actual_value"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:text="63"
+                    android:textColor="@color/rsr_purple"
+                    android:textSize="18sp"
+                    android:typeface="sans" />
+
+            </LinearLayout>
+            <TextView
+	        android:id="@+id/perdet_actual_value_comment"
+	        android:layout_width="fill_parent"
+	       	android:layout_height="wrap_content"
+	        android:layout_gravity="left"
+          	android:text="Actual value comment comment comment comment"
+	        android:typeface="sans"
+			android:paddingBottom="10dp"
+	        />
+            			
+            
+            	
+	        <!-- The update description -->
+	        
+			<!-- The update author -->
+	        
+			<!-- The photo credit -->
+            
+            <!-- Location -->
+
+	        <TextView
+	            style="?android:attr/listSeparatorTextViewStyle"
+	            android:layout_width="match_parent"
+	            android:layout_height="1dp"
+	            android:layout_marginBottom="10dip"
+	            android:layout_marginTop="5dp"
+	            android:gravity="center_horizontal"
+                />
+                        
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:text="@string/label_project_location"
+                android:textColor="@color/rsr_purple"
+                android:textSize="18sp"
+                android:typeface="sans" />
+
+            <TextView
+                android:id="@+id/perdet_location"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:textColor="@color/dk_gray"
+                android:textSize="14sp"
+                android:typeface="sans" />
+
+            
+	        <!-- fudge to fill the viewport if necessary -->
+		    <View
+		        android:layout_width="fill_parent"
+        		android:layout_height="0dp"
+        		android:layout_weight="1"
+                />
+	        
+		    	    	
+		</LinearLayout>
+	</ScrollView>	    
+
+ 	<!-- The add data button -->
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/btn_border"
+	    android:padding="5dp"
+	    >
+
+	    <Button
+	        android:id="@+id/btn_add_data"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:background="@color/btn_face"
+	        android:drawableTop="@drawable/ic_menu_add_dk"
+	        android:padding="5dp"
+	        android:text="@string/btncaption_add_data"
+	        android:textColor="@color/rsr_purple"
+	        android:textSize="18sp"
+	        android:typeface="sans" />
+
+	    </RelativeLayout>
+</LinearLayout>

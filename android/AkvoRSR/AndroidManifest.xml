@@ -71,6 +71,13 @@
                 android:value="org.akvo.rsr.up.ProjectListActivity" />
         </activity>
         <activity
+            android:name=".PeriodDetailActivity"
+            android:label="@string/title_activity_period_detail" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.akvo.rsr.up.ResultListActivity" />
+        </activity>
+        <activity
             android:name=".DiagnosticActivity"
             android:label="@string/title_activity_diagnostics" >
             <meta-data

@@ -26,7 +26,7 @@ public class ResultNode {
         setNodeType(itemType);
         setId(id);
         setImageRes(ir);
-        setActualValue(av);
+        setActualValue(av); //Must accompany a data update
         setText(text);
         mLocked = locked;
     }

@@ -87,12 +87,10 @@ public class ResultListActivity extends ActionBarActivity {
                 //see if it is a period
                 ResultNode rn = (ResultNode)parent.getItemAtPosition(position);
                 if (rn != null && rn.getNodeType() == ResultNode.NodeType.PERIOD
-//TODO                        && rn.getLocked() == false
+//Not here anymore             && rn.getLocked() == false
                         ) {
-                    Intent i = new Intent(view.getContext(), ResultEditorActivity.class);
-                    i.putExtra(ConstantUtil.PERIOD_KEY, rn.getId());
-                    i.putExtra(ConstantUtil.CURRENT_ACTUAL_VALUE_KEY, rn.getActualValue());
-                    i.putExtra(ConstantUtil.PERIOD_START_KEY, rn.getText());
+                    Intent i = new Intent(view.getContext(), PeriodDetailActivity.class);
+                    i.putExtra(ConstantUtil.PERIOD_ID_KEY, Integer.toString(rn.getId()));
                     startActivity(i);
                 }
             }
@@ -249,7 +247,7 @@ public class ResultListActivity extends ActionBarActivity {
 
                 last_per = per;
             }
-
+/*
             if (ipd > 0) {  // ==0 if no ipds
                 String data = dataCursor.getString(data_col);
                 boolean delta = dataCursor.getInt(relative_data_col) != 0;
@@ -261,6 +259,7 @@ public class ResultListActivity extends ActionBarActivity {
                 if (last != null) s+=" "+last;
                list.add(new ResultNode(NodeType.DATA, ipd, s, 0));
             }
+            */
 		}
 
 		//Show count

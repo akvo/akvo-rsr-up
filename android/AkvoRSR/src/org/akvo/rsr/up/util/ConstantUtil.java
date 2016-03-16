@@ -129,7 +129,7 @@ public class ConstantUtil {
 	public static final String SERVICE_UNRESOLVED_KEY = "org.akvo.rsr.up.UNRESOLVED";
 	public static final String USERNAME_KEY = "org.akvo.rsr.up.USERNAME";
 	public static final String PASSWORD_KEY = "org.akvo.rsr.up.PASSWORD";
-    public static final String PERIOD_KEY = "org.akvo.rsr.up.indicator_period_id";
+    public static final String PERIOD_ID_KEY = "org.akvo.rsr.up.indicator_period_id";
     public static final String DESCRIPTION_KEY = "org.akvo.rsr.up.DESCRIPTION";
     public static final String COMMENT_KEY = "org.akvo.rsr.up.COMMENT";
     public static final String DATA_KEY = "org.akvo.rsr.up.IPD_DATA";

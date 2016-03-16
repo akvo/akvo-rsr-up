@@ -110,7 +110,7 @@
                     android:layout_margin="5dp"
                     android:layout_weight="1"
                     android:background="@android:color/black"
-                    android:drawableTop="@drawable/ic_menu_gallery"
+                    android:drawableTop="@drawable/ic_menu_attachment"
                     android:padding="5dp"
                     android:text="@string/btncaption_attach_file"
                     android:textColor="@android:color/white"
@@ -118,11 +118,11 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/photo_thumbnails"
+                android:id="@+id/photo_tools"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:visibility="visible" >
+                android:visibility="gone" >
                 <ImageView
                     android:id="@+id/image_ipd"
                     android:layout_width="160dp"
@@ -132,14 +132,43 @@
                     android:background="@drawable/box"
                     android:contentDescription="@string/app_name" />
     
+                <TextView
+                    android:id="@+id/photo_info"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:padding="10dp"
+                    android:text=""
+                    android:textColor="@color/dk_gray"
+                    android:textSize="20sp"
+                    android:typeface="sans" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/file_tools"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone" >
                 <ImageView
                     android:id="@+id/file_ipd"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:layout_gravity="center_horizontal"
                     android:layout_margin="5dp"
                     android:background="@drawable/box"
-                    android:contentDescription="@string/app_name" />
+                    android:contentDescription="@string/app_name"
+                    android:src="@drawable/generic_file_48" />
+                <TextView
+                    android:id="@+id/file_info"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:padding="10dp"
+                    android:text=""
+                    android:textColor="@color/dk_gray"
+                    android:textSize="20sp"
+                    android:typeface="sans" />
+
             </LinearLayout>
             
             <!-- some fudge to fill the viewport if necessary -->

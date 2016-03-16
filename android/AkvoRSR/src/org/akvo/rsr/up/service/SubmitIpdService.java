@@ -37,7 +37,7 @@ public class SubmitIpdService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		int period = intent.getIntExtra(ConstantUtil.PERIOD_KEY, 0);
+		int period = Integer.parseInt(intent.getStringExtra(ConstantUtil.PERIOD_ID_KEY));
         String data = intent.getStringExtra(ConstantUtil.DATA_KEY);
         String currentActualValue = intent.getStringExtra(ConstantUtil.CURRENT_ACTUAL_VALUE_KEY);
         boolean relative = intent.getBooleanExtra(ConstantUtil.RELATIVE_DATA_KEY, false);

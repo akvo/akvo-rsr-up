@@ -713,8 +713,8 @@ photo                                       or file
             int code = h.code(); //closes output
             String msg = h.message();
             String abody = h.body(); //simplifies debugging
-            if (code == 201) { //Created
-                return; // Yes!
+            if (code == 200) { //Saved
+                return; // Yes! 
             } else {
                 String e = "Server rejected IPD attachment, code " + code + " " + msg;
                 throw new FailedPostException(e);
