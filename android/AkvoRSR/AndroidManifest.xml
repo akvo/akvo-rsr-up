@@ -50,6 +50,14 @@
                 android:value="org.akvo.rsr.up.ProjectListActivity" />
         </activity>
         <activity
+            android:name=".EmploymentApplicationActivity"
+            android:configChanges="orientation"
+            android:label="@string/title_activity_project_list" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="org.akvo.rsr.up.ProjectListActivity" />
+        </activity>
+        <activity
             android:name=".UpdateListActivity"
             android:label="@string/title_activity_update_list" >
             <meta-data
@@ -139,6 +147,11 @@
         </service>
         <service
             android:name=".service.SubmitIpdService"
+            android:enabled="true"
+            android:exported="false" >
+        </service>
+        <service
+            android:name=".service.SubmitEmploymentService"
             android:enabled="true"
             android:exported="false" >
         </service>

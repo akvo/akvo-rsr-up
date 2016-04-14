@@ -145,7 +145,7 @@ import org.json.JSONObject;
 
  */
 
-public class UserJsonParser extends JsonParser {
+public class UserJsonParser extends BaseJsonParser {
 
     private final String ORG = "organisation";
     /*

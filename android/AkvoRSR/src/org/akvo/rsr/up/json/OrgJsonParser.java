@@ -83,7 +83,7 @@ import org.json.JSONObject;
 
  */
 
-public class OrgJsonParser extends JsonParser {
+public class OrgJsonParser extends BaseJsonParser {
 
     /*
      * constructor

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -18,7 +18,7 @@ package org.akvo.rsr.up.json;
 
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Organisation;
-import org.json.JSONArray;
+import org.akvo.rsr.up.util.Downloader.ProgressReporter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -52,11 +52,11 @@ public class OrgTypeaheadJsonParser extends ListJsonParser {
         super(aDba, serverVersion);
     }
 
-    @Override
-    public void parse(String body) throws JSONException {
+    public void parse(String body, ProgressReporter prog) throws JSONException {
 
     	super.parse(body);
 
+    	prog.sendUpdate(0, mItemTotalCount);
     	if (mResultsArray != null) {
 			//Loop on results
     		for (int ri = 0; ri < mResultsArray.length(); ri++) {
@@ -65,8 +65,9 @@ public class OrgTypeaheadJsonParser extends ListJsonParser {
     			o.setId(aResult.getString("id"));
                 o.setName(aResult.getString("name"));
                 o.setLongName(aResult.getString("long_name"));
-                mDba.saveOrganisation(o);
+                mDba.saveMinimalOrganisation(o);
                 mItemCount++;
+                prog.sendUpdate(mItemCount, mItemTotalCount);
     		}
     	}
     }

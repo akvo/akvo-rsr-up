@@ -950,8 +950,82 @@ public class RsrDbAdapter {
         }
         return idList;
     }
+    
+    /**
+     * gets org names
+     */
+    public List<String> getOrgNameList() {
+        List<String> nList = new ArrayList<String>();  
+        try {
+            Cursor cursor = database.query(ORG_TABLE,
+                    new String[] {
+                        NAME_COL
+                    },
+                    null,
+                    null,
+                    null,
+                    null,
+                    null);//unordered
+            int c = cursor.getColumnIndex(NAME_COL);
+            while (cursor.moveToNext()) {
+                nList.add(cursor.getString(c));
+            }
+            cursor.close();
+        }
+        catch (NullPointerException e) {
+        }
+        return nList;
+    }
 
+    /**
+     * Gets a single org from the db using its primary key
+     */
+    public Organisation findOrg(String _id) {
+        Organisation org = null;
+        Cursor cursor = database.query(ORG_TABLE,
+                                       null,
+                                       "_id = ?",
+                                       new String[] { _id }, null, null, null);
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                org = new Organisation();
+                org.setId(_id);
+                org.setName(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
+                org.setLongName(cursor.getString(cursor.getColumnIndexOrThrow(LONG_NAME_COL)));
+                org.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(EMAIL_COL)));
+                }
+            cursor.close();
+            }
 
+        return org;
+    }
+
+    /**
+     * Gets a single org from the db using its name (exact match)
+     */
+    public Organisation findOrgByName(String name) {
+        Organisation org = null;
+        Cursor cursor = database.query(ORG_TABLE,
+                                       null,
+                                       "name = ?",
+                                       new String[] { name }, null, null, null);
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                org = new Organisation();
+                org.setId(cursor.getString(cursor.getColumnIndexOrThrow(PK_ID_COL)));
+                org.setName(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
+                org.setLongName(cursor.getString(cursor.getColumnIndexOrThrow(LONG_NAME_COL)));
+                org.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(EMAIL_COL)));
+                }
+            cursor.close();
+            }
+
+        return org;
+    }
+
+    
 	/**
 	 * Gets a single project from the db using its primary key
 	 */
@@ -1205,6 +1279,40 @@ public class RsrDbAdapter {
             database.update(ORG_TABLE, updatedValues, PK_ID_COL + " = ?",
                     new String[] { org.getId() });
         } else {
+            database.insert(ORG_TABLE, null, updatedValues);
+        }
+        
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
+
+    /**
+    * creates or updates a user in the db
+    *
+    * @param org the org data to be updated
+    * @return
+    */
+    public void saveMinimalOrganisation(Organisation org) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(PK_ID_COL, org.getId());
+        updatedValues.put(NAME_COL, org.getName());
+        updatedValues.put(LONG_NAME_COL, org.getLongName());
+        
+        Cursor cursor = database.query(ORG_TABLE,
+                                       new String[] { NAME_COL, LONG_NAME_COL },
+                                       PK_ID_COL + " = ?",
+                                       new String[] { org.getId(), },
+                                       null, null, null);
+        
+        if (cursor != null && cursor.moveToNext() ) {
+            // we found an item, it's an update, if necessary!
+            if (!cursor.getString(0).equals(org.getName())
+                || !cursor.getString(1).equals(org.getLongName())) {
+            database.update(ORG_TABLE, updatedValues, PK_ID_COL + " = ?",
+                    new String[] { org.getId() });
+            }
+        } else { // it's an insert
             database.insert(ORG_TABLE, null, updatedValues);
         }
         
@@ -1712,7 +1820,59 @@ public class RsrDbAdapter {
 	    }
 	    return c;    
 	}
+
+	/**
+     * gets country names
+     */
+    public List<String> getCountryNameList() {
+        List<String> nList = new ArrayList<String>(260);  
+        try {
+            Cursor cursor = database.query(COUNTRY_TABLE,
+                    new String[] {
+                        NAME_COL
+                    },
+                    null,
+                    null,
+                    null,
+                    null,
+                    NAME_COL);//alphabetical
+            int col = cursor.getColumnIndex(NAME_COL);
+            while (cursor.moveToNext()) {
+                nList.add(cursor.getString(col));
+            }
+            cursor.close();
+        }
+        catch (NullPointerException e) {
+        }
+        return nList;
+    }
+
 	
+    /**
+     * Gets a single country from the db using its name (exact match)
+     */
+    public Country findCountryByName(String name) {
+        Country c = null;
+        Cursor cursor = database.query(COUNTRY_TABLE,
+                                       null,
+                                       "name = ?",
+                                       new String[] { name }, null, null, null);
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                c = new Country();
+                c.setId(cursor.getString(cursor.getColumnIndexOrThrow(PK_ID_COL)));
+                c.setName(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
+                c.setContinent(cursor.getString(cursor.getColumnIndexOrThrow(CONTINENT_COL)));
+                c.setIsoCode(cursor.getString(cursor.getColumnIndexOrThrow(ISO_CODE_COL)));
+                }
+            cursor.close();
+            }
+
+        return c;
+    }
+
+    
 
 	/**
 	 * saves or updates a Country in the db

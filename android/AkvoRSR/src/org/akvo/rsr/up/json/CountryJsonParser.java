@@ -35,7 +35,7 @@ import org.json.JSONException;
 
  */
 
-public class CountryJsonParser extends JsonParser {
+public class CountryJsonParser extends BaseJsonParser {
 
     /*
      * constructor

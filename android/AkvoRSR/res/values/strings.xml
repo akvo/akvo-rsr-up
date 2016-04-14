@@ -23,6 +23,7 @@
     <string name="action_diagnostics">Diagnostics</string>
     <string name="action_messages">Messages</string>
     <string name="action_organisations">Organisations</string>
+    <string name="action_connect">Connect</string>
     <string name="action_about">About</string>
     <string name="action_add_update">Add Update</string>
     <string name="action_delete_update">Delete Update</string>
@@ -56,6 +57,7 @@
     <string name="hint_update_description">Description</string>
     <string name="hint_update_caption">Photo caption</string>
     <string name="hint_update_credit">Photo credit</string>
+    <string name="hint_optional">(Optional)</string>
     <string name="label_photo_credit">Photo: %s</string>
     <string name="label_empty_proj_list">Nothing to show with this filter.</string>
     <string name="label_first_proj_list">Nothing fetched yet. Use the refresh button to see your projects.\n\nIf you have a low-bandwidth connection you should turn on delayed picture fetching in settings first.</string>
@@ -81,6 +83,9 @@
     <string name="label_setting_feedback_version">Give feedback on ver %s</string>
     <string name="label_setting_debuginfo">Debug</string>
     <string name="label_setting_removeloc">Remove photo location</string>
+    <string name="label_connect_title">Connect with:</string>
+    <string name="label_connect_instructions">Type all or part of the name. If you cannot find your organisation in the list, refresh it.</string>
+    
     <string name="summary_setting_feedback">Open a web feedback form where you can tell us what you think of this app.</string>
     <string name="summary_setting_debuginfo">Show project and update ids and other debug info.</string>
     <string name="summary_setting_removeloc">Geolocation info in photo files will be removed before upload.</string>
@@ -189,7 +194,7 @@
     <string name="dummy_author">Nomen Nescio, Akvo</string>
     <string name="dummy_count">17</string>
     <string name="dummy_time">2014-04-23 17:18</string>
-    <string name="dummy_date">2016-01-01</string>
+    <string name="dummy_date">2016-01-31</string>
     <string name="dummy_version">0.0</string>
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent pharetra ultricies ante, imperdiet viverra nisi rutrum a. Integer consequat laoreet malesuada. Nam fermentum risus id aliquet pellentesque. Sed nec nisl in turpis sodales ultricies. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Interdum et malesuada fames ac ante ipsum primis in faucibus.</string>
 

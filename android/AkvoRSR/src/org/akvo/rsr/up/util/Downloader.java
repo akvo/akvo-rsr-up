@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -31,10 +32,11 @@ import org.akvo.rsr.up.domain.Project;
 import org.akvo.rsr.up.domain.Update;
 import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.json.CountryListJsonParser;
-import org.akvo.rsr.up.json.JsonParser;
+import org.akvo.rsr.up.json.BaseJsonParser;
 import org.akvo.rsr.up.json.ListJsonParser;
 import org.akvo.rsr.up.json.OrgJsonParser;
 import org.akvo.rsr.up.json.OrgListJsonParser;
+import org.akvo.rsr.up.json.OrgStreamingJsonParser;
 import org.akvo.rsr.up.json.OrgTypeaheadJsonParser;
 import org.akvo.rsr.up.json.ProjectResultListJsonParser;
 import org.akvo.rsr.up.json.UserJsonParser;
@@ -45,7 +47,9 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.github.kevinsawicki.http.HttpRequest;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
@@ -454,7 +458,6 @@ public class Downloader {
     public Date fetchTypeaheadOrgList(Context ctx, RsrDbAdapter dba, URL url, ProgressReporter prog) throws FailedFetchException {
         Date serverDate = null;
         User user = SettingsUtil.getAuthUser(ctx);
-        int runningTotal = 0;
         Log.d(TAG, "URL " + url.toString());
         HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
         h.header("Authorization", "Token " + user.getApiKey()); //This API actually needs no authorization
@@ -462,18 +465,21 @@ public class Downloader {
         if (code == 200) {
             String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
             serverDate = new Date(h.date());
-            String jsonBody = h.body();
-            ListJsonParser jp = new OrgTypeaheadJsonParser(dba, serverVersion);
+            OrgTypeaheadJsonParser jp = new OrgTypeaheadJsonParser(dba, serverVersion);
+//            OrgStreamingJsonParser jp = new OrgStreamingJsonParser(dba, serverVersion); //tiny performance gain
             /* Parse the JSON-data from our URL. */
             try {
-                jp.parse(jsonBody);//takes a long time
+                jp.parse(h.body(), prog);//takes a long time
             }
             catch (JSONException e) {
+//            catch (JsonParseException e) {
                 throw new FailedFetchException("Invalid server response: " + e.getMessage());
             }
+//            catch (IOException e) {
+//                throw new FailedFetchException("IO error: " + e.getMessage());
+//            }
             /* Parsing has finished. */
             Log.i(TAG, "Fetched " + jp.getCount() + " organisations; target total = "+ jp.getTotalCount());
-            prog.sendUpdate(runningTotal, jp.getTotalCount());
 
         } else if (code == 404) {
             url = null;//we are done
@@ -506,7 +512,7 @@ public class Downloader {
         if (code == 200) {
         	String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
         	String jsonBody = h.body();
-        	JsonParser up = new UserJsonParser(ad, serverVersion);
+        	BaseJsonParser up = new UserJsonParser(ad, serverVersion);
         	/* Parse the JSON-data from our URL. */
         	try {
         		up.parse(jsonBody);
@@ -536,7 +542,7 @@ public class Downloader {
         if (code == 200) {
         	String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
         	String jsonBody = h.body();
-        	JsonParser up = new OrgJsonParser(ad, serverVersion);
+        	BaseJsonParser up = new OrgJsonParser(ad, serverVersion);
         	/* Parse the JSON-data from our URL. */
         	try {
         		up.parse(jsonBody);

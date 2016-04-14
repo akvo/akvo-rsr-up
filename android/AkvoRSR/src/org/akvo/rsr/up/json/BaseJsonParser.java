@@ -28,7 +28,7 @@ import org.json.JSONObject;
 
 
 
-public class JsonParser {
+public class BaseJsonParser {
 
     // ===========================================================
     // Fields
@@ -49,7 +49,7 @@ public class JsonParser {
      * aDba: an open database adapter
      * serverVersion: From http header, in case there ever needs to be version-specific parsing
      */
-    public JsonParser(RsrDbAdapter aDba, String serverVersion) {
+    public BaseJsonParser(RsrDbAdapter aDba, String serverVersion) {
         mDba = aDba;
         mServerVersion = serverVersion;
     	//prepare for date parsing

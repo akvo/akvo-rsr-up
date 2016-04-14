@@ -282,7 +282,7 @@ import org.json.JSONObject;
 
  */
 
-public class IndicatorPeriodFrameworkJsonParser extends JsonParser {
+public class IndicatorPeriodFrameworkJsonParser extends BaseJsonParser {
 
     Period period = null;
 

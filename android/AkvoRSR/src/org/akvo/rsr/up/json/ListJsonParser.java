@@ -22,7 +22,7 @@ import org.json.JSONException;
 
 
 
-public class ListJsonParser extends JsonParser{
+public class ListJsonParser extends BaseJsonParser{
 
     // ===========================================================
     // Fields
@@ -66,8 +66,8 @@ public class ListJsonParser extends JsonParser{
     	super.parse(body);
     	mItemCount= 0;
         try {
-            mNextUrl = mRoot.getString("next");
             mItemTotalCount = mRoot.getInt("count");
+            mNextUrl = mRoot.getString("next");
         }
         catch (JSONException j) {
             //optional; not present for a typeahead result

@@ -58,7 +58,7 @@ import org.json.JSONObject;
 
  */
 
-public class IndicatorPeriodDataJsonParser extends JsonParser {
+public class IndicatorPeriodDataJsonParser extends BaseJsonParser {
 
     IndicatorPeriodData ipd = null;
 

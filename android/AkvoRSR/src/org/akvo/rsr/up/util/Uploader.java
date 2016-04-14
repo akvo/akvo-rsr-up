@@ -478,16 +478,7 @@ public class Uploader {
 		dba.open();
 		try {
 			Update upd = dba.findUpdate(localId);
-			String userAgent;
-			try {
-			    //Not to be localized
-			    userAgent = "Akvo RSR Up v" + ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0).versionName +
-                        " on Android " + android.os.Build.VERSION.RELEASE +
-                        " device " + android.os.Build.MANUFACTURER + 
-                        " " + android.os.Build.MODEL;			
-            } catch (NameNotFoundException e) {
-                userAgent = "(not found)";
-            }
+            String userAgent = buildUserAgent(ctx);
 
 			boolean resolved;
 			try {
@@ -534,8 +525,8 @@ public class Uploader {
      * @return id
      * @throws FailedPostException ??
      * 
-     * There are three outcomes:
-     *   true      Success, we got the server id back and updated the "update" object
+     * There are two outcomes:
+     *   id        Success, we got the server id back and created a local ipd record
      *   exception Failure, we never got to send the whole thing
      *   
      * What to submit:
@@ -593,23 +584,16 @@ public class Uploader {
             ipd.put("relative_data", relativeData);
             ipd.put("period_actual_value", actualValue);
             ipd.put("update_method", ConstantUtil.UPDATE_METHOD_MOBILE);
-        
-            URL url1 = new URL(mainUrl);
-    
             String requestBody = ipd.toString();
     
-            HttpRequest h = HttpRequest.post(url1).contentType(ConstantUtil.jsonContent);
-//          h.connectTimeout(10000); //10 sec timeout
-            
+            HttpRequest h = HttpRequest.post(new URL(mainUrl)).contentType(ConstantUtil.jsonContent);
             h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
-
             h.readTimeout(READ_TIMEOUT_MS);
             h.send(requestBody);
-    
-
             int code = h.code(); //closes output
             String msg = h.message();
             String body = h.body(); //simplifies debugging
+
             if (code == 201) { //Created
                 String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
                 IndicatorPeriodDataJsonParser ipdp = new IndicatorPeriodDataJsonParser(dba, serverVersion);
@@ -678,33 +662,8 @@ photo                                       or file
      */
 
     public static void postIndicatorPeriodDataAttachment(RsrDbAdapter dba, String url, User user, String type, String filename, ProgressReporter prog) throws FailedPostException {
-        //TODO: if big, a streamed approach would be better
-        String body = "";
         try {
-            /*        
-            File f = new File(filename);
-            if (f.exists()) {
-                RandomAccessFile raf = new RandomAccessFile(f, "r");
-                try {
-                    //base64-convert the attachment
-                    //use origin buffer size divisible by 3 so no padding is inserted in the middle
-                    final int fileSize = (int) raf.length(); //unlikely to be longer than 4GB
-                    byte[] rawBuf = new byte[fileSize];
-                    raf.readFully(rawBuf);
-                    body = Base64.encodeBytes(rawBuf, 0, fileSize);
-                } finally {
-                    raf.close();
-                }
-            } else {
-                throw new FailedPostException("IPD attachment file does not exist");
-            }
-*/
-            Map<String, String> data = new HashMap<String, String>();
-//            data.put("type", type);
-//            data.put("file", body);
-            URL url1 = new URL(url);
-
-            HttpRequest h = HttpRequest.post(url1);
+            HttpRequest h = HttpRequest.post(new URL(url));
             h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
             h.readTimeout(READ_TIMEOUT_MS);
             h.part("type", type);
@@ -728,14 +687,6 @@ photo                                       or file
             Log.e(TAG, "Bad URL", e);
             throw new FailedPostException(e.getMessage());
         }
-//        catch (FileNotFoundException e) {
-//            Log.e(TAG, "Cannot find image file", e);
-//            throw new FailedPostException(e.getMessage());
-//        }
-        catch (IOException e) {
-            Log.e(TAG, "Cannot read image file", e);
-            throw new FailedPostException(e.getMessage());
-        }
     }
 
     
@@ -751,7 +702,6 @@ photo                                       or file
      * @param user
      * @param prog
      * @throws FailedPostException
-     * @throws UnresolvedPostException
      * @throws MalformedURLException
      * @throws ParserConfigurationException
      */
@@ -767,21 +717,12 @@ photo                                       or file
             String fileFn,
             User user,
             ProgressReporter prog)
-                    throws FailedPostException, UnresolvedPostException, MalformedURLException, ParserConfigurationException  {
+                    throws FailedPostException, MalformedURLException, ParserConfigurationException  {
         Log.v(TAG, "Sending indicator period data for " + periodId);
         RsrDbAdapter dba = new RsrDbAdapter(ctx);
         dba.open();
         try {
-            String userAgent;
-            try {
-                //Not to be localized
-                userAgent = "Akvo RSR Up v" + ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0).versionName +
-                        " on Android " + android.os.Build.VERSION.RELEASE +
-                        " device " + android.os.Build.MANUFACTURER + 
-                        " " + android.os.Build.MODEL;           
-            } catch (NameNotFoundException e) {
-                userAgent = "(not found)";
-            }
+            String userAgent = buildUserAgent(ctx);
 
             try {
                 int ipd_id = postIndicatorPeriodData(dba, SettingsUtil.host(ctx)+mainUrl, periodId, data, description, actualValue, relativeData, user, userAgent, null);
@@ -795,6 +736,82 @@ photo                                       or file
                 throw e; //and tell user about it
             }
     
+
+        } finally {
+            dba.close();
+        }
+    }
+    
+    
+    /**
+     * Sends an employment record. It has to be approved before it will affect project visibility.
+     *
+     * @param ctx
+     * @param urlTemplate
+     * @param orgId
+     * @param countryId
+     * @param jobTitle
+     * @param user
+     * @throws FailedPostException
+     * @throws MalformedURLException
+
+     * what to submit:
+      {
+            "organisation": 534, 
+            "user": 2139, 
+            "job_title": "Onomatopoet", --optional
+            "country": 44 --optional
+        }
+     */
+    static public void postEmployment(Context ctx,
+            String urlTemplate,
+            int orgId,
+            int countryId,
+            String jobTitle,
+            User user)
+                throws FailedPostException, MalformedURLException  {
+        Log.v(TAG, "Sending employment request for " + orgId);
+        RsrDbAdapter dba = new RsrDbAdapter(ctx);
+        dba.open();
+        try {
+            JSONObject ipd = new JSONObject();
+            try {
+                ipd.put("organisation", orgId);
+                if (countryId>0) ipd.put("country", countryId);
+                if (jobTitle != null) ipd.put("job_title", jobTitle);
+                String requestBody = ipd.toString();
+                URL url = new URL(String.format(Locale.US, urlTemplate, user.getId()));
+                HttpRequest h = HttpRequest.post(url).contentType(ConstantUtil.jsonContent);
+                h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
+                h.readTimeout(READ_TIMEOUT_MS);
+                h.send(requestBody);
+                int code = h.code(); //closes output
+                String msg = h.message();
+                String body = h.body(); //simplifies debugging
+
+                if (code == 201) { //Created(?)
+                    return;
+//                    String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
+//                    EmploymentJsonParser ipdp = new IndicatorPeriodDataJsonParser(dba, serverVersion);
+                } else if (code == 409) { //Exists
+                    throw new FailedPostException("Connection already exists (or is being applied for)."); //TODO: localize
+                } else {
+                    String e = "Server rejected employment request, code " + code + " " + msg; //TODO: localize
+                    throw new FailedPostException(e);
+                }
+            }
+            catch (HttpRequestException e) { //connection problem
+                Log.w(TAG, "Failed post", e);
+                throw new FailedPostException(e.getMessage());
+            }
+            catch (MalformedURLException e) { //server string is bad or coding error
+                Log.e(TAG, "Bad URL", e);
+                throw new FailedPostException(e.getMessage());
+            }
+            catch (JSONException e) {
+                Log.e(TAG, "JSON parsing error", e);
+                throw new FailedPostException(e.getMessage());
+            }    
 
         } finally {
             dba.close();
@@ -877,4 +894,15 @@ photo                                       or file
         return false;
     }
 
+    public static String buildUserAgent(Context ctx) {
+        try {
+            return  "Akvo RSR Up v" + ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0).versionName +
+                    " on Android " + android.os.Build.VERSION.RELEASE +
+                    " device " + android.os.Build.MANUFACTURER + 
+                    " " + android.os.Build.MODEL;
+        } catch (NameNotFoundException e) {
+            return "(not found)";
+        }           
+    }
+    
 }

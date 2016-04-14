@@ -34,6 +34,7 @@ public class ConstantUtil {
 	public static final String AUTH_URL = "/auth/token/";
     public static final String POST_UPDATE_URL = "/rest/v1/project_update/?format=xml";
     public static final String POST_RESULT_URL = "/rest/v1/indicator_period_data/?format=json";
+    public static final String POST_EMPLOYMENT_PATTERN = "/rest/v1/user/%s/request_organisation/?format=json";
     public static final String IPD_ATTACHMENT_PATTERN = "/rest/v1/indicator_period_data/%d/upload_file/?format=json";
 //    public static final String FETCH_UPDATE_URL_PATTERN = "/rest/v1/project_update/?format=xml&project=%s";//use default limit
     public static final String FETCH_UPDATE_URL_PATTERN = "/rest/v1/project_update/?format=xml&project=%s&last_modified_at__gt=%s";//use default limit
@@ -113,6 +114,7 @@ public class ConstantUtil {
     public static final String UPDATES_VERIFIED_ACTION = "org.akvo.rsr.up.UPDATES_VERIFIED";
     public static final String AUTHORIZATION_RESULT_ACTION = "org.akvo.rsr.up.AUTHORIZATION_RESULT";
     public static final String RESULT_SENT_ACTION = "org.akvo.rsr.up.RESULT_SENT";
+    public static final String EMPLOYMENT_SENT_ACTION = "org.akvo.rsr.up.EMPLOYMENT_SENT";
     public static final String ORGS_FETCHED_ACTION = "org.akvo.rsr.up.ORGS_FETCHED";
     public static final String ORGS_PROGRESS_ACTION = "org.akvo.rsr.up.ORGS_PROGRESS";
 
@@ -129,16 +131,19 @@ public class ConstantUtil {
 	public static final String SERVICE_UNRESOLVED_KEY = "org.akvo.rsr.up.UNRESOLVED";
 	public static final String USERNAME_KEY = "org.akvo.rsr.up.USERNAME";
 	public static final String PASSWORD_KEY = "org.akvo.rsr.up.PASSWORD";
-    public static final String PERIOD_ID_KEY = "org.akvo.rsr.up.indicator_period_id";
+    public static final String PERIOD_ID_KEY = "org.akvo.rsr.up.PERIOD_ID";
     public static final String DESCRIPTION_KEY = "org.akvo.rsr.up.DESCRIPTION";
     public static final String COMMENT_KEY = "org.akvo.rsr.up.COMMENT";
     public static final String DATA_KEY = "org.akvo.rsr.up.IPD_DATA";
     public static final String CURRENT_ACTUAL_VALUE_KEY = "org.akvo.rsr.up.CURRENT_ACTUAL_VALUE";
     public static final String RELATIVE_DATA_KEY = "org.akvo.rsr.up.RELATIVE_IPD_DATA";
-    public static final String PHOTO_FN_KEY = "org.akvo.rsr.up.photo_filename";
-    public static final String FILE_FN_KEY = "org.akvo.rsr.up.file_filename";
+    public static final String PHOTO_FN_KEY = "org.akvo.rsr.up.PHOTO_FILENAME";
+    public static final String FILE_FN_KEY = "org.akvo.rsr.up.FILE_FILENAME";
     public static final String PERIOD_START_KEY = "org.akvo.rsr.up.INDICATOR_PERIOD_START";
     public static final String PERIOD_END_KEY = "org.akvo.rsr.up.INDICATOR_PERIOD_END";
+    public static final String ORG_ID_KEY = "org.akvo.rsr.up.ORGANISATION_ID";
+    public static final String COUNTRY_ID_KEY = "org.akvo.rsr.up.COUNTRY_ID";
+    public static final String JOB_TITLE_KEY = "org.akvo.rsr.up.JOB_TITLE";
 
 	/**
 	 * posting outcomes
