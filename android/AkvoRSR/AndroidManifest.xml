@@ -52,7 +52,7 @@
         <activity
             android:name=".EmploymentApplicationActivity"
             android:configChanges="orientation"
-            android:label="@string/title_activity_project_list" >
+            android:label="@string/title_activity_employment_application" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="org.akvo.rsr.up.ProjectListActivity" />

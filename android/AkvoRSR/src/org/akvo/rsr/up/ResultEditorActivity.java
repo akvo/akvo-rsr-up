@@ -248,8 +248,7 @@ public class ResultEditorActivity extends BackActivity {
 
         String err = intent.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
         if (err == null) {
-            String msg = getResources().getString(R.string.msg_update_published);
-            Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+            DialogUtil.infoAlert(this, R.string.msg_send_success, R.string.msg_period_data_submitted);
             finish();//close editor
         } else {
             // stay on this page

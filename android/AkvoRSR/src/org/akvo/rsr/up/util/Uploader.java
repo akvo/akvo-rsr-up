@@ -35,6 +35,7 @@ import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Update;
 import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.domain.IndicatorPeriodData;
+import org.akvo.rsr.up.json.EmploymentListJsonParser;
 import org.akvo.rsr.up.json.IndicatorPeriodDataJsonParser;
 import org.akvo.rsr.up.util.Downloader.ProgressReporter;
 import org.akvo.rsr.up.xml.AuthHandler;
@@ -787,14 +788,14 @@ photo                                       or file
                 h.send(requestBody);
                 int code = h.code(); //closes output
                 String msg = h.message();
-                String body = h.body(); //simplifies debugging
+                String body = h.body(); //simplifies debugging to always fetch this
 
-                if (code == 201) { //Created(?)
-                    return;
-//                    String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
-//                    EmploymentJsonParser ipdp = new IndicatorPeriodDataJsonParser(dba, serverVersion);
+                if (code == 200) { //OK
+                    String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
+                    EmploymentListJsonParser ep = new EmploymentListJsonParser(dba, serverVersion);
+                    ep.parseOneItem(body);
                 } else if (code == 409) { //Exists
-                    throw new FailedPostException("Connection already exists (or is being applied for)."); //TODO: localize
+                    throw new FailedPostException(ctx.getResources().getString(R.string.errmsg_emp_exists));
                 } else {
                     String e = "Server rejected employment request, code " + code + " " + msg; //TODO: localize
                     throw new FailedPostException(e);

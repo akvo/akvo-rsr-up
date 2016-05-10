@@ -55,7 +55,7 @@ public class SubmitEmploymentService extends IntentService {
 
 		}
 		catch (Exception e) {
-			i2.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, getResources().getString(R.string.errmsg_resultpost_failed) + e.getMessage());
+			i2.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, getResources().getString(R.string.errmsg_emp_application_failed) + e.getMessage());
 			Log.e(TAG,"SubmitEmploymentService() error:", e);
 		}
 

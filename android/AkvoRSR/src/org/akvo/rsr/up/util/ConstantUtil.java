@@ -46,6 +46,7 @@ public class ConstantUtil {
     public static final String FETCH_ORGS_TYPEAHEAD_URL = "/rest/v1/typeaheads/organisations?format=json";
     public static final String FETCH_ORG_URL_PATTERN = "/rest/v1/organisation/%s/?format=json";
     public static final String FETCH_RESULTS_URL_PATTERN = "/rest/v1/results_framework/?format=json&project=%s"; //includes results, indicators, periods and data
+    public static final String FETCH_EMPLOYMENTS_URL_PATTERN = "/rest/v1/employment/?format=json&user=%s";
 	public static final int    MAX_IMAGE_UPLOAD_SIZE = 2000000; //Nginx POST limit is 3MB, B64 encoding expands 33% and there may be long text 
 	public static final String SERVER_VERSION_HEADER = "X-RSR-Version";
     public static final String UPDATE_METHOD_MOBILE = "M";

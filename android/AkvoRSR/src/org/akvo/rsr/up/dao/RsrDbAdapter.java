@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.akvo.rsr.up.domain.Country;
+import org.akvo.rsr.up.domain.Employment;
 import org.akvo.rsr.up.domain.Indicator;
 import org.akvo.rsr.up.domain.IndicatorPeriodData;
 import org.akvo.rsr.up.domain.IndicatorPeriodDataComment;
@@ -55,17 +56,18 @@ public class RsrDbAdapter {
     private static final boolean LOG = true;
 
     // Table names
-    private static final String DATABASE_NAME = "rsrdata";
-    private static final String PROJECT_TABLE = "project";
-    private static final String UPDATE_TABLE  = "_update";
-    private static final String COUNTRY_TABLE = "country";
-    private static final String USER_TABLE    = "user";
-    private static final String ORG_TABLE     = "_organisation";
-    private static final String RESULT_TABLE  = "_result";
+    private static final String DATABASE_NAME    = "rsrdata";
+    private static final String PROJECT_TABLE    = "project";
+    private static final String UPDATE_TABLE     = "_update";
+    private static final String COUNTRY_TABLE    = "country";
+    private static final String USER_TABLE       = "user";
+    private static final String ORG_TABLE        = "_organisation";
+    private static final String RESULT_TABLE     = "_result";
     private static final String INDICATOR_TABLE  = "_indicator";
-    private static final String PERIOD_TABLE  = "_period";
-    private static final String IPD_TABLE     = "_ipd";
-    private static final String IPDC_TABLE     = "_ipdc";
+    private static final String PERIOD_TABLE     = "_period";
+    private static final String IPD_TABLE        = "_ipd";
+    private static final String IPDC_TABLE       = "_ipdc";
+    private static final String EMPLOYMENT_TABLE = "_employment";
 
     //Column names
     public static final String PK_ID_COL = "_id";
@@ -93,7 +95,7 @@ public class RsrDbAdapter {
 	public static final String LAT_COL = "latitude";
     public static final String LON_COL = "longitude";
     public static final String ELE_COL = "elevation";
-	public static final String COUNTRY_COL = "country_id";
+	public static final String COUNTRY_ID_COL = "country_id";
 	public static final String STATE_COL = "state";
 	public static final String CITY_COL = "city";
 
@@ -143,7 +145,13 @@ public class RsrDbAdapter {
     public static final String FILE_FN_COL = "file_fn";
     public static final String COMMENT_COL = "comment";
     public static final String STATUS_COL = "status";
-	
+
+    public static final String APPROVED_COL = "approved";
+    public static final String JOB_TITLE_COL = "job_title";
+    public static final String ORG_ID_COL = "organisation_id";
+    public static final String GROUP_ID_COL = "group_id";
+    public static final String GROUP_NAME_COL = "group_name";
+
 	private DatabaseHelper databaseHelper;
 	private SQLiteDatabase database;
 	
@@ -237,10 +245,22 @@ public class RsrDbAdapter {
     private static final String IPDC_TABLE_CREATE =
             "create table " + IPDC_TABLE
                     + "("
-                    + PK_ID_COL + " integer primary key,"
-                    + IPD_ID_COL + " integer not null,"
+                    + PK_ID_COL   + " integer primary key,"
+                    + IPD_ID_COL  + " integer not null,"
                     + COMMENT_COL + " text,"
                     + USER_ID_COL + " integer "
+                    + ")";
+    private static final String EMPLOYMENT_TABLE_CREATE =
+            "create table " + EMPLOYMENT_TABLE
+                    + "("
+                    + PK_ID_COL + " integer primary key,"
+                    + USER_ID_COL + " integer not null,"
+                    + ORG_ID_COL + " integer not null,"
+                    + GROUP_ID_COL + " integer not null,"
+                    + COUNTRY_ID_COL + " integer,"
+                    + GROUP_NAME_COL + " text,"
+                    + JOB_TITLE_COL + " text,"
+                    + APPROVED_COL + " boolean"
                     + ")";
 
 
@@ -256,7 +276,7 @@ public class RsrDbAdapter {
 //  private static final int DATABASE_VERSION = 14; //update now has photo metadata and video
 //  private static final int DATABASE_VERSION = 15; //update now has location
 //  private static final int DATABASE_VERSION = 16; //project gets a last_fetch datetime to optimize fetches
-    private static final int DATABASE_VERSION = 17; //results framework (added result, indicator, period, ipd and ipdc tables). New Org columns.
+    private static final int DATABASE_VERSION = 17; //results framework (added result, indicator, period, ipd and ipdc tables). Employment table. New Org columns.
 
 	private final Context context;
 
@@ -291,6 +311,7 @@ public class RsrDbAdapter {
             db.execSQL(PERIOD_TABLE_CREATE);
             db.execSQL(IPD_TABLE_CREATE);
             db.execSQL(IPDC_TABLE_CREATE);
+            db.execSQL(EMPLOYMENT_TABLE_CREATE);
 		}
 
 		@Override
@@ -334,6 +355,7 @@ public class RsrDbAdapter {
                     db.execSQL(PERIOD_TABLE_CREATE);
                     db.execSQL(IPD_TABLE_CREATE);
                     db.execSQL(IPDC_TABLE_CREATE);
+                    db.execSQL(EMPLOYMENT_TABLE_CREATE);
                     db.execSQL("alter table " + ORG_TABLE + " add column " + DESCRIPTION_COL + " string");
                     db.execSQL("alter table " + ORG_TABLE + " add column " + PRIMARY_COUNTRY_ID_COL + " string");
                     db.execSQL("alter table " + ORG_TABLE + " add column " + OLD_TYPE_COL + " string");
@@ -447,7 +469,7 @@ public class RsrDbAdapter {
 		updatedValues.put(THUMBNAIL_URL_COL, project.getThumbnailUrl());
 		//not done here to preserve a cache connection
 //		updatedValues.put(THUMBNAIL_FILENAME_COL, project.getThumbnailFilename());
-		updatedValues.put(COUNTRY_COL, project.getCountry());
+		updatedValues.put(COUNTRY_ID_COL, project.getCountry());
 		updatedValues.put(STATE_COL, project.getState());
 		updatedValues.put(CITY_COL, project.getCity());
 		updatedValues.put(LAT_COL, project.getLatitude());
@@ -534,6 +556,17 @@ public class RsrDbAdapter {
 	 * 
 	 * @param survey
 	 * @return
+	 * 
+	 *TODO: optimise away unnecessary writes
+	  new String[] { NAME_COL, LONG_NAME_COL },
+        
+        if (cursor != null && cursor.moveToNext() ) {
+            // we found an item, it's an update, if necessary!
+            if (!cursor.getString(0).equals(org.getName())
+                || !cursor.getString(1).equals(org.getLongName())) {
+            database.update(ORG_TABLE, updatedValues, PK_ID_COL + " = ?",
+                    new String[] { org.getId() });
+  
 	 */
 	public void saveUpdate(Update update, boolean saveFn) {
 		ContentValues updatedValues = new ContentValues();
@@ -553,7 +586,7 @@ public class RsrDbAdapter {
         updatedValues.put(PHOTO_CAPTION_COL, update.getPhotoCaption());
         updatedValues.put(PHOTO_CREDIT_COL, update.getPhotoCredit());
 
-        updatedValues.put(COUNTRY_COL, update.getLocation().getCountryId());
+        updatedValues.put(COUNTRY_ID_COL, update.getLocation().getCountryId());
         updatedValues.put(STATE_COL, update.getState());
         updatedValues.put(CITY_COL, update.getCity());
         updatedValues.put(LAT_COL, update.getLatitude());
@@ -1089,7 +1122,7 @@ public class RsrDbAdapter {
 				update.setUnsent(0 != cursor.getInt(cursor.getColumnIndexOrThrow(UNSENT_COL)));
 				update.setDate(new Date(1000L * cursor.getLong(cursor.getColumnIndexOrThrow(CREATED_COL))));
                 update.setCountry(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
-                update.getLocation().setCountryId(cursor.getString(cursor.getColumnIndexOrThrow(COUNTRY_COL)));
+                update.getLocation().setCountryId(cursor.getString(cursor.getColumnIndexOrThrow(COUNTRY_ID_COL)));
 				update.setState(cursor.getString(cursor.getColumnIndexOrThrow(STATE_COL)));
 				update.setCity(cursor.getString(cursor.getColumnIndexOrThrow(CITY_COL)));
 				update.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(LAT_COL)));
@@ -1788,7 +1821,8 @@ public class RsrDbAdapter {
 	    executeSql("delete from " + INDICATOR_TABLE);
 	    executeSql("delete from " + RESULT_TABLE);
 	    executeSql("delete from " + UPDATE_TABLE);
-	    executeSql("delete from " + USER_TABLE);
+        executeSql("delete from " + EMPLOYMENT_TABLE);
+        executeSql("delete from " + USER_TABLE);
 	    executeSql("delete from " + ORG_TABLE);
 	    executeSql("delete from " + PROJECT_TABLE);
 	    executeSql("delete from " + COUNTRY_TABLE);
@@ -1799,29 +1833,29 @@ public class RsrDbAdapter {
      * 
      * @return a Cursor containing all countries
      */
-	public Cursor listAllCountries() {
-		Cursor cursor = database.query(COUNTRY_TABLE,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null);
-		return cursor;
-	}
-	
-	
-	public int getCountryCount() {
-	    Cursor cursor = listAllCountries();
-	    int c = 0;
-	    if (cursor != null) {
-	        c = cursor.getCount();
-	        cursor.close();
-	    }
-	    return c;    
-	}
+    public Cursor listAllCountries() {
+        Cursor cursor = database.query(COUNTRY_TABLE,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+        return cursor;
+    }
+    
+    
+    public int getCountryCount() {
+        Cursor cursor = listAllCountries();
+        int c = 0;
+        if (cursor != null) {
+            c = cursor.getCount();
+            cursor.close();
+        }
+        return c;    
+    }
 
-	/**
+    /**
      * gets country names
      */
     public List<String> getCountryNameList() {
@@ -1847,7 +1881,7 @@ public class RsrDbAdapter {
         return nList;
     }
 
-	
+    
     /**
      * Gets a single country from the db using its name (exact match)
      */
@@ -1874,37 +1908,127 @@ public class RsrDbAdapter {
 
     
 
-	/**
-	 * saves or updates a Country in the db
-	 * 
-	 * @param country
-	 * @return
-	 */
-	public void saveCountry(Country country) {
-		ContentValues updatedValues = new ContentValues();
-		updatedValues.put(PK_ID_COL, country.getId());
-		updatedValues.put(NAME_COL, country.getName());
-		updatedValues.put(CONTINENT_COL, country.getContinent());
-		updatedValues.put(ISO_CODE_COL, country.getIsoCode());
+    /**
+     * saves or updates a Country in the db
+     * 
+     * @param country
+     * @return
+     */
+    public void saveCountry(Country country) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(PK_ID_COL, country.getId());
+        updatedValues.put(NAME_COL, country.getName());
+        updatedValues.put(CONTINENT_COL, country.getContinent());
+        updatedValues.put(ISO_CODE_COL, country.getIsoCode());
 
-		Cursor cursor = database.query(COUNTRY_TABLE,
-				new String[] { PK_ID_COL },
-				PK_ID_COL + " = ?",
-				new String[] { country.getId(), },
-				null, null, null);
+        Cursor cursor = database.query(COUNTRY_TABLE,
+                new String[] { PK_ID_COL },
+                PK_ID_COL + " = ?",
+                new String[] { country.getId(), },
+                null, null, null);
 
-		if (cursor != null && cursor.getCount() > 0) {
-			// if we found an item, it's an update, otherwise, it's an insert
-			database.update(COUNTRY_TABLE, updatedValues, PK_ID_COL + " = ?",
-					new String[] { country.getId() });
-		} else {
-			database.insert(COUNTRY_TABLE, null, updatedValues);
-		}
+        if (cursor != null && cursor.getCount() > 0) {
+            // if we found an item, it's an update, otherwise, it's an insert
+            database.update(COUNTRY_TABLE, updatedValues, PK_ID_COL + " = ?",
+                    new String[] { country.getId() });
+        } else {
+            database.insert(COUNTRY_TABLE, null, updatedValues);
+        }
 
-		if (cursor != null) {
-			cursor.close();
-		}
-	}
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
+
+
+    /**
+     * lists all employments
+     * 
+     * @return a Cursor containing all employments, all columns
+     */
+    public Cursor listAllEmployments() {
+        Cursor cursor = database.query(EMPLOYMENT_TABLE + " left join " + ORG_TABLE + " on _employment.organisation_id = _organisation._id",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+        return cursor;
+    }
+    
+  
+    /**
+     * lists employments
+
+     * @param userId
+     * @return a Cursor containing all employments for user, just approval, group name and joined org name
+     */
+    public Cursor listAllEmploymentsForUser(String userId) {
+        Cursor cursor = database.query(EMPLOYMENT_TABLE + " left join " + ORG_TABLE + " on _employment.organisation_id = _organisation._id",
+                new String[] {
+                    ORG_TABLE + ".name",
+                    APPROVED_COL,
+                    GROUP_NAME_COL
+                },
+                USER_ID_COL + "=?",
+                new String[] {userId},
+                null,
+                null,
+                null);
+        return cursor;
+    }
+    
+  
+    /**
+     * @return count of employments
+     */
+    public int getEmploymentCountForUser(String userId) {
+        Cursor cursor = listAllEmploymentsForUser(userId);
+        int c = 0;
+        if (cursor != null) {
+            c = cursor.getCount();
+            cursor.close();
+        }
+        return c;    
+    }
+
+    
+    /**
+     * saves or updates an Employment in the db
+     * 
+     * @param em
+     * @return
+     */
+    public void saveEmployment(Employment em) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(PK_ID_COL, em.getId());
+        updatedValues.put(USER_ID_COL, em.getUserId());
+        updatedValues.put(ORG_ID_COL, em.getOrganisationId());
+        updatedValues.put(APPROVED_COL, em.getApproved()); 
+        updatedValues.put(COUNTRY_ID_COL, em.getGroupId());
+        updatedValues.put(JOB_TITLE_COL, em.getJobTitle());
+        updatedValues.put(GROUP_ID_COL, em.getGroupId());
+        updatedValues.put(GROUP_NAME_COL, em.getGroupName()); 
+
+        Cursor cursor = database.query(EMPLOYMENT_TABLE,
+                new String[] { PK_ID_COL },
+                PK_ID_COL + " = ?",
+                new String[] { em.getId(), },
+                null, null, null);
+
+        if (cursor != null && cursor.getCount() > 0) {
+            // if we found an item, it's an update, otherwise, it's an insert
+            database.update(EMPLOYMENT_TABLE, updatedValues, PK_ID_COL + " = ?",
+                    new String[] { em.getId() });
+        } else {
+            database.insert(EMPLOYMENT_TABLE, null, updatedValues);
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
 
 
 

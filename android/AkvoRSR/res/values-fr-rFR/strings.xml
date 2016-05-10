@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- 
- *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -27,7 +27,7 @@
   <string name="action_attach_photo">Joindre une photo</string>
   <string name="action_logout">Déconnecter</string>
   <string name="action_sendall">Envoyer tous les non-envoyés</string>
-  <string name="copyright">Copyright © 2012-2015 Stichting Akvo</string>
+  <string name="copyright">Copyright © 2012-2016 Stichting Akvo</string>
   <string name="powered_by_akvo">Développé par Akvo</string>
   <string name="title_activity_login">Akvo RSR Up</string>
   <string name="title_activity_project_list">RSR Up</string>
@@ -142,6 +142,7 @@
   <string name="label_latitude">Latitude</string>
   <string name="label_longitude">Longitude</string>
   <string name="label_elevation">Hauteur</string>
+  <string name="msg_emp_applied">Votre demande est en attente de validation.</string>
   <string name="msg_update_published">Mise à jour publiée</string>
   <string name="msg_update_success">Mise à jour bien envoyée au serveur</string>
   <string name="msg_update_interrupted">Réseau de connexion absent durant l\'envoi de la mise à jour</string>
@@ -176,6 +177,7 @@
   <string name="dummy_time">2014-04-23 17:18</string>
   <string name="dummy_version">0.0</string>
   <string name="lorem_ipsum">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent pharetra ultricies ante, imperdiet viverra nisi rutrum a. Integer consequat laoreet malesuada. Nam fermentum risus id aliquet pellentesque. Sed nec nisl in turpis sodales ultricies. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Interdum et malesuada fames ac ante ipsum primis in faucibus.</string>
+  <string name="connection_pending">- en attente</string>
   <string-array name="types">
     <item>Type 1</item>
     <item>Type 2</item>

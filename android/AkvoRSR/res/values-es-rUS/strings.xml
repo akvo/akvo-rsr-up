@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 
- *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -60,6 +60,7 @@
   <string name="label_progress_projects">Proyectos</string>
   <string name="label_progress_updates">Actualizaciones</string>
   <string name="label_progress_pictures">Fotografías</string>
+  <string name="label_progress_countries">Países</string>
   <string name="label_clearcache_freespace">Megabytes libres: %d. Las imágenes son guardadas.</string>
   <string name="label_settings_general">General</string>
   <string name="label_settings_testing">Probando</string>
@@ -141,6 +142,8 @@
   <string name="label_latitude">Latitud:</string>
   <string name="label_longitude">Longitud:</string>
   <string name="label_elevation">Elevación:</string>
+  <string name="label_country">País</string> 
+  <string name="msg_emp_applied">Su solicitud está ahora pendiente y deberá recibir aprobación.</string> 
   <string name="msg_update_published">Actualización publicada</string>
   <string name="msg_update_success">La actualización ha sido enviada al servidor</string>
   <string name="msg_update_interrupted">La conexión a la red fue perdida durante la actualización</string>
@@ -170,5 +173,6 @@
   <string name="dummy_project_title">Título del projecto</string>
   <string name="dummy_update_title">Título de la actualización </string>
   <string name="dummy_update_description">Introduzca la descripción de la actualización. El largo de la descripción es ilimitado. Por favor note que el botón permanecerá al fondo de la pantalla.</string>
+  <string name="connection_pending">- pendiente</string>
 </resources>
  

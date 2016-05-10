@@ -16,8 +16,6 @@
 
 package org.akvo.rsr.up;
 
-import java.nio.channels.SelectableChannel;
-
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Country;
@@ -27,12 +25,14 @@ import org.akvo.rsr.up.service.SubmitEmploymentService;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.DialogUtil;
 import org.akvo.rsr.up.util.Downloader;
+import org.akvo.rsr.up.util.SettingsUtil;
 
 import android.os.Bundle;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -45,14 +45,23 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemSelectedListener;
 
+/**
+ * @author stellan
+ *
+ * Displays a list of current employments ("connections"), approved and non-approved, and a form that lets user add more.
+ * Organisation and country input fields use completion.
+ */
 public class EmploymentApplicationActivity extends BackActivity implements OnItemSelectedListener,OnItemClickListener {
 
     private static final String TAG = "EmploymentApplicationActivity";
     
+    private ScrollView mScroll;
+    private TextView mList;
     private AutoCompleteTextView mOrganisationEdit;
     private AutoCompleteTextView mCountryEdit;
     private TextView mSelectedOrg;
@@ -65,7 +74,6 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
 
     private RsrDbAdapter mDba;
     private String mSelectedOrgId;
-    private String mSelectedCountryId;
 
     private static String[] orgNames = new String[1]; 
     private static String[] countryNames = new String[1]; 
@@ -77,6 +85,8 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
         setContentView(R.layout.activity_employment_application);
 
         //UI
+        mScroll = (ScrollView) findViewById(R.id.scroll);
+        mList = (TextView) findViewById(R.id.employment_list);
         mOrganisationEdit = (AutoCompleteTextView) findViewById(R.id.org_name);
         mOrganisationEdit.setThreshold(1);
         mOrganisationEdit.setOnItemSelectedListener(this);
@@ -84,8 +94,6 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
 
         mCountryEdit = (AutoCompleteTextView) findViewById(R.id.country_name);
         mCountryEdit.setThreshold(1);
-//        mCountryEdit.setOnItemSelectedListener(this);
-//        mCountryEdit.setOnItemClickListener(this);
 
         mSelectedOrg = (TextView) findViewById(R.id.selected_org);
         mJobTitle = (EditText) findViewById(R.id.job_title);
@@ -111,6 +119,7 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
         //Create db
         mDba = new RsrDbAdapter(this);
 
+        getData();
         getOrgs();
     }
 
@@ -168,6 +177,35 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
         }
     }
 
+
+    /**
+     * show list of all employments for this user
+     */
+    private void getData() {
+        //fetch data
+        mDba.open();
+        Cursor dataCursor = mDba.listAllEmploymentsForUser(SettingsUtil.getAuthUser(this).getId());
+        mDba.close();
+        String list = "";
+        if (dataCursor.getCount() > 0) {
+            final int org_name_col = dataCursor.getColumnIndex("name"); //from join
+            final int approved_col = dataCursor.getColumnIndex(RsrDbAdapter.APPROVED_COL);
+            final int groupname_col = dataCursor.getColumnIndex(RsrDbAdapter.GROUP_NAME_COL);
+            while (dataCursor.moveToNext()) {  //must be grouped on result and indicator
+                String org_name = dataCursor.getString(org_name_col);
+                if (dataCursor.getInt(approved_col)==0) {
+                    org_name += " - pending";//TODO localization
+                } else {
+                    org_name += " (" + dataCursor.getString(groupname_col) + ")";
+                }
+                list += org_name + "\n";
+            }
+        }
+        dataCursor.close();
+        mList.setText(list);
+    }   
+        
+    
     
     /**
      * starts the service fetching new project data
@@ -204,8 +242,9 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
             DialogUtil.errorAlertWithDetail(this, R.string.errmsg_com_failure, R.string.msg_check_network, err);
         }
 
-        //Refresh the list
+        //Refresh the lists
         getOrgs();
+        getData();
     }
 
 
@@ -266,9 +305,12 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
 
         String err = intent.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
         if (err == null) {
-            String msg = getResources().getString(R.string.msg_update_published);
-            Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
-            finish();//close editor
+            getData(); //show the new employment record
+            findViewById(R.id.mainLayout).requestFocus(); //clear focus from form fields
+            mScroll.scrollTo(0, 0); //Scroll up top to show new entry in list
+            String msg = getResources().getString(R.string.msg_emp_applied);
+            DialogUtil.infoAlert(this, R.string.msg_send_success, R.string.msg_emp_applied);
+//            Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
         } else {
             // stay on this page
             DialogUtil.errorAlert(this, "Error", err);

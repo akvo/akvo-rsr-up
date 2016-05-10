@@ -44,6 +44,7 @@ public class GetOrgDataService extends IntentService {
 
     private static final String TAG = "GetOrgDataService";
     private static boolean mRunning = false;
+    private static final boolean mFetchEmployments = true;
     private static final boolean mFetchOrgs = true;
     private static final boolean mFetchCountries = true;
 
@@ -117,7 +118,32 @@ public class GetOrgDataService extends IntentService {
                 }
             }
 
+            if (mFetchEmployments) {
+                // Fetch emp data.
+                try {
+                    dl.fetchEmploymentListPaged(
+                            this,
+                            ad,
+                            new URL(host + String.format(ConstantUtil.FETCH_EMPLOYMENTS_URL_PATTERN,SettingsUtil.getAuthUser(this).getId())),
+                            new Downloader.ProgressReporter() {
+                                public void sendUpdate(int sofar, int total) {
+                                    Intent intent = new Intent(ConstantUtil.ORGS_PROGRESS_ACTION);
+                                    intent.putExtra(ConstantUtil.PHASE_KEY, 0);
+                                    intent.putExtra(ConstantUtil.SOFAR_KEY, sofar);
+                                    intent.putExtra(ConstantUtil.TOTAL_KEY, total);
+                                    LocalBroadcastManager.getInstance(GetOrgDataService.this)
+                                            .sendBroadcast(intent);
+                                }
+                            }
+                    );
+                    //TODO need a way to get this called by the paged fetch: broadcastProgress(0, j, dl.???);
+                } catch (Exception e) { // probably network reasons
+                    Log.e(TAG, "Bad employment fetch:", e);
+                    errMsg = getResources().getString(R.string.errmsg_emp_fetch_failed) + e.getMessage();
+                }
+            }
             broadcastProgress(0, 100, 100);
+            
             try {
             if (mFetchCountries && ad.getCountryCount() == 0) { // rarely changes, so only fetch countries if we never did that
                 dl.fetchCountryListRestApiPaged(this, ad, new URL(SettingsUtil.host(this) +
