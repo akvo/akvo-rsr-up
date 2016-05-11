@@ -483,7 +483,7 @@ public class Downloader {
                 }
                 /* Parsing has finished. */
                 Log.i(TAG, "Fetched " + jp.getCount() + " employments; target total = "+ jp.getTotalCount());
-                prog.sendUpdate(runningTotal, jp.getTotalCount());
+                if (prog!=null) prog.sendUpdate(runningTotal, jp.getTotalCount());
 
                 runningTotal += jp.getCount();
                 if (jp.getNextUrl().length() == 0) { //string needs to be trimmed from whitespace

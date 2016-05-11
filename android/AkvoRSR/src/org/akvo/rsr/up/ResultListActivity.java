@@ -186,12 +186,12 @@ public class ResultListActivity extends ActionBarActivity {
         final int actual_value = dataCursor.getColumnIndex("actual_value");
         final int target_value = dataCursor.getColumnIndex("target_value");
         final int period_locked = dataCursor.getColumnIndex(RsrDbAdapter.LOCKED_COL);
-        final int data_col = dataCursor.getColumnIndex(RsrDbAdapter.DATA_COL);
-        final int status_col = dataCursor.getColumnIndex(RsrDbAdapter.STATUS_COL);
-        final int relative_data_col = dataCursor.getColumnIndex(RsrDbAdapter.RELATIVE_DATA_COL);
-        final int ipd_text = dataCursor.getColumnIndex(RsrDbAdapter.DESCRIPTION_COL);
-        final int firstname_col = dataCursor.getColumnIndex(RsrDbAdapter.FIRST_NAME_COL);
-        final int lastname_col  = dataCursor.getColumnIndex(RsrDbAdapter.LAST_NAME_COL);
+//        final int data_col = dataCursor.getColumnIndex(RsrDbAdapter.DATA_COL);
+//        final int status_col = dataCursor.getColumnIndex(RsrDbAdapter.STATUS_COL);
+//        final int relative_data_col = dataCursor.getColumnIndex(RsrDbAdapter.RELATIVE_DATA_COL);
+//        final int ipd_text = dataCursor.getColumnIndex(RsrDbAdapter.DESCRIPTION_COL);
+//        final int firstname_col = dataCursor.getColumnIndex(RsrDbAdapter.FIRST_NAME_COL);
+//        final int lastname_col  = dataCursor.getColumnIndex(RsrDbAdapter.LAST_NAME_COL);
         
 		ArrayList<ResultNode> list = new ArrayList<ResultNode>();
 		int last_res = -1, last_ind = -1, last_per=-1, resultCounter = 0, indicatorCounter = 0, periodCounter=0;
@@ -203,7 +203,7 @@ public class ResultListActivity extends ActionBarActivity {
             int res = dataCursor.getInt(res_pk);
             int ind = dataCursor.getInt(ind_pk);
             int per = dataCursor.getInt(per_pk);
-            int ipd = dataCursor.getInt(ipd_pk);
+//            int ipd = dataCursor.getInt(ipd_pk);
             if (res != last_res) {
                 resultCounter++;
                 list.add(new ResultNode(NodeType.RESULT, res, dataCursor.getString(res_title), 0));

@@ -1429,43 +1429,62 @@ public class RsrDbAdapter {
 	}
 
 	
-	/**
-	 * Gets updates for a specific project, all columns
-	 * TODO: ipd and ipdc
-	 */
-	public Cursor listResultsIndicatorsPeriodsFor(String _id) {
-		Cursor cursor = database.query(RESULT_TABLE + 
-										" LEFT JOIN "+ INDICATOR_TABLE + " ON  " + RESULT_TABLE + "._id = " + INDICATOR_TABLE + ".result_id" +
-                                        " LEFT JOIN " + PERIOD_TABLE + " ON  " + INDICATOR_TABLE + "._id = " + PERIOD_TABLE + ".indicator_id" +
-                                        " LEFT JOIN " + IPD_TABLE + " ON  " + PERIOD_TABLE + "._id = " + IPD_TABLE + ".period_id" +
-                                        " LEFT JOIN " + USER_TABLE + " ON  " + USER_TABLE + "._id = " + IPD_TABLE + ".user_id",
-										new String[] {
-		                                    "_result._id as result_id",
-		                                    "_indicator._id as indicator_id",
+    /**
+     * Gets results, indicators and periods for a specific project
+     */
+    public Cursor listResultsIndicatorsPeriodsFor(String _id) {
+        Cursor cursor = database.query(RESULT_TABLE + 
+                                        " LEFT JOIN "+ INDICATOR_TABLE + " ON  " + RESULT_TABLE + "._id = " + INDICATOR_TABLE + ".result_id" +
+                                        " LEFT JOIN " + PERIOD_TABLE + " ON  " + INDICATOR_TABLE + "._id = " + PERIOD_TABLE + ".indicator_id",
+                                        new String[] {
+                                            "_result._id as result_id",
+                                            "_indicator._id as indicator_id",
                                             "_period._id as period_id",
                                             "_ipd._id as ipd_id",
-		                                    "_result.title as result_title",
-		                                    "_indicator.title as indicator_title",
+                                            "_result.title as result_title",
+                                            "_indicator.title as indicator_title",
                                             "_period.period_start",
                                             "_period.period_end",
                                             "_period.actual_value",
                                             "_period.target_value",
-                                            "_period.locked",
+                                            "_period.locked"
+                                            },
+                                        PROJECT_ID_COL + " = ?",
+                                        new String[] { _id },
+                                        null, //group by
+                                        null,
+                                        "_result._id,_indicator._id,_period._id, _ipd._id DESC"); //order by
+
+        return cursor;
+    }
+    /**
+     * Gets data and comments for a specific period, all columns
+     */
+    public Cursor listDataAndCommentsForPeriod(String _id) {
+        Cursor cursor = database.query(IPD_TABLE + 
+                                        " LEFT JOIN " + IPDC_TABLE + " ON  " + IPD_TABLE + "._id = " + IPDC_TABLE + ".ipd_id" +
+                                        " LEFT JOIN " + USER_TABLE + " duser ON  duser._id = " + IPD_TABLE + ".user_id" +
+                                        " LEFT JOIN " + USER_TABLE + " cuser ON  cuser._id = " + IPDC_TABLE + ".user_id",
+                                        new String[] {
+                                            "_ipd._id as ipd_id",
                                             "_ipd.data",
                                             "_ipd.relative_data",
                                             "_ipd.description",
-                                            "user.first_name",
-                                            "user.last_name",
-                                            "_ipd.status"
-		                                    },
-										PROJECT_ID_COL + " = ?",
-										new String[] { _id },
-										null, //group by
-										null,
-										"_result._id,_indicator._id,_period._id, _ipd._id DESC"); //order by
+                                            "_ipd.status",
+                                            "duser.first_name AS data_first_name",
+                                            "duser.last_name AS data_last_name",
+                                            "cuser.first_name AS comment_first_name",
+                                            "cuser.last_name AS comment_last_name",
+                                            "_ipdc.comment"
+                                            },
+                                        PERIOD_ID_COL + " = ?",
+                                        new String[] { _id },
+                                        null, //group by
+                                        null,
+                                        "_ipd._id DESC"); //order by
 
-		return cursor;
-	}
+        return cursor;
+    }
 
 	
     /**
