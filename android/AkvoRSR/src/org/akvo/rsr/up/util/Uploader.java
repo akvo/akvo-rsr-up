@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -35,8 +36,11 @@ import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Update;
 import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.domain.IndicatorPeriodData;
+import org.akvo.rsr.up.json.AuthJsonParser;
 import org.akvo.rsr.up.json.EmploymentListJsonParser;
 import org.akvo.rsr.up.json.IndicatorPeriodDataJsonParser;
+import org.akvo.rsr.up.json.OrgTypeaheadJsonParser;
+import org.akvo.rsr.up.util.Downloader.FailedFetchException;
 import org.akvo.rsr.up.util.Downloader.ProgressReporter;
 import org.akvo.rsr.up.xml.AuthHandler;
 import org.akvo.rsr.up.xml.UpdateRestHandler;
@@ -820,49 +824,91 @@ photo                                       or file
     }
 
     
-	/**
-	 * logs in to server and fetches API key
-	 * @param url
-	 * @param username
-	 * @param password
-	 * @return user if success, null on simple authorization failure
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws HttpRequestException
-	 * @throws IOException
-	 */
-	static public User authorize(URL url, String username, String password) throws ParserConfigurationException, SAXException, HttpRequestException, IOException {
-		Map<String, String> data = new HashMap<String, String>();
-		data.put("username", username);
-		data.put("password", password);
-		data.put("handles_unemployed", "True");
-		
-		HttpRequest h = HttpRequest.post(url).form(data).connectTimeout(10000); //10 sec timeout
-		int code = h.code();
-		if (code == 200) {
-			/* Get a SAXParser from the SAXPArserFactory. */
-			SAXParserFactory spf = SAXParserFactory.newInstance();
-			SAXParser sp = spf.newSAXParser();
-			/* Get the XMLReader of the SAXParser we created. */
-			XMLReader xr = sp.getXMLReader();
-			/* Create a new ContentHandler and apply it to the XML-Reader*/ 
-			AuthHandler myAuthHandler = new AuthHandler();
-			xr.setContentHandler(myAuthHandler);
-			/* Parse the xml-data from our URL. */
-			xr.parse(new InputSource(h.stream()));
-			/* Parsing has finished. */
+    /**
+     * logs in to server and fetches API key
+     * @param url
+     * @param username
+     * @param password
+     * @return user if success, null on simple authorization failure
+     * @throws HttpRequestException
+     * @throws FailedFetchException 
+     */
+    static public User authorize(URL url, String username, String password) throws HttpRequestException, FailedFetchException {
+        Map<String, String> data = new HashMap<String, String>();
+        data.put("username", username);
+        data.put("password", password);
+        data.put("handles_unemployed", "True");
+        
+        HttpRequest h = HttpRequest.post(url).form(data).connectTimeout(10000); //10 sec timeout
+        int code = h.code();
+        if (code == 200) {
+            String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
+            AuthJsonParser jp = new AuthJsonParser(null, serverVersion);
+            try {
+                jp.parse(h.body());
+            }
+            catch (JSONException e) {
+                throw new FailedFetchException("Invalid server response: " + e.getMessage());
+            }
 
-			Log.i(TAG, "Fetched API key");
+            Log.i(TAG, "Fetched API key");
 
-			return myAuthHandler.getUser();
-		} else {
-			//Vanilla case is 403 forbidden on an auth failure
-			//TODO raise exception if we get a 500
-			Log.e(TAG, "Authorization HTTP error:" + code);
-			String why = h.body();
-			return null;
-		}
-	}
+            return jp.getUser();
+        } else
+        if (code == 403) {
+            //Vanilla case is 403 forbidden on an auth failure
+            Log.e(TAG, "Authorization failed:" + code);
+            return null;
+        } else {
+            Log.e(TAG, "Authorization HTTP error:" + code);
+            String why = h.body();
+            throw new FailedFetchException("Unexpected authorization result code: " + code);       
+        }
+    }
+
+    /**
+     * logs in to server and fetches API key
+     * @param url
+     * @param username
+     * @param password
+     * @return user if success, null on simple authorization failure
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws HttpRequestException
+     * @throws IOException
+     */
+    static public User authorizeXML(URL url, String username, String password) throws ParserConfigurationException, SAXException, HttpRequestException, IOException {
+        Map<String, String> data = new HashMap<String, String>();
+        data.put("username", username);
+        data.put("password", password);
+        data.put("handles_unemployed", "True");
+        
+        HttpRequest h = HttpRequest.post(url).form(data).connectTimeout(10000); //10 sec timeout
+        int code = h.code();
+        if (code == 200) {
+            /* Get a SAXParser from the SAXPArserFactory. */
+            SAXParserFactory spf = SAXParserFactory.newInstance();
+            SAXParser sp = spf.newSAXParser();
+            /* Get the XMLReader of the SAXParser we created. */
+            XMLReader xr = sp.getXMLReader();
+            /* Create a new ContentHandler and apply it to the XML-Reader*/ 
+            AuthHandler myAuthHandler = new AuthHandler();
+            xr.setContentHandler(myAuthHandler);
+            /* Parse the xml-data from our URL. */
+            xr.parse(new InputSource(h.stream()));
+            /* Parsing has finished. */
+
+            Log.i(TAG, "Fetched API key");
+
+            return myAuthHandler.getUser();
+        } else {
+            //Vanilla case is 403 forbidden on an auth failure
+            //TODO raise exception if we get a 500
+            Log.e(TAG, "Authorization HTTP error:" + code);
+            String why = h.body();
+            return null;
+        }
+    }
 
 	
     /**

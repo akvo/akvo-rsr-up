@@ -247,19 +247,7 @@ public class ResultListActivity extends ActionBarActivity {
 
                 last_per = per;
             }
-/*
-            if (ipd > 0) {  // ==0 if no ipds
-                String data = dataCursor.getString(data_col);
-                boolean delta = dataCursor.getInt(relative_data_col) != 0;
-                String text = dataCursor.getString(ipd_text);
-                String first = dataCursor.getString(firstname_col);
-                String last = dataCursor.getString(lastname_col);
-                String s = (delta?"+ ":"= ") + data+endash+text+"("+dataCursor.getString(status_col)+")";
-                if (first != null) s+=endash+first;
-                if (last != null) s+=" "+last;
-               list.add(new ResultNode(NodeType.DATA, ipd, s, 0));
-            }
-            */
+
 		}
 
 		//Show count

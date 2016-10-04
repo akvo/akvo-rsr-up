@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -96,6 +96,7 @@ public class SettingsUtil {
         SettingsUtil.Write(c, ConstantUtil.AUTH_USERID_KEY, user.getId());
         SettingsUtil.Write(c, ConstantUtil.AUTH_ORGID_KEY, user.getOrgIdsString());// comma-separated list, possibly empty, never null
         SettingsUtil.Write(c, ConstantUtil.AUTH_PROJID_KEY, user.getPublishedProjIdsString());// comma-separated list, possibly empty, never null
+        SettingsUtil.Write(c, ConstantUtil.AUTH_EDIT_PROJID_KEY, user.getEditProjIdsString());// comma-separated list, possibly empty, never null
         SettingsUtil.Write(c, ConstantUtil.AUTH_APIKEY_KEY, user.getApiKey());
         try {
             PackageInfo pInfo = c.getPackageManager().getPackageInfo(c.getPackageName(), 0);
@@ -112,6 +113,7 @@ public class SettingsUtil {
         String i = SettingsUtil.Read(c, ConstantUtil.AUTH_USERID_KEY);
         String o = SettingsUtil.Read(c, ConstantUtil.AUTH_ORGID_KEY);
         String p = SettingsUtil.Read(c, ConstantUtil.AUTH_PROJID_KEY);
+        String e = SettingsUtil.Read(c, ConstantUtil.AUTH_EDIT_PROJID_KEY);
         String k = SettingsUtil.Read(c, ConstantUtil.AUTH_APIKEY_KEY);
         int oldVersion = ReadInt(c, ConstantUtil.AUTH_APPVERSION_KEY,0);
         int version = -1;
@@ -120,11 +122,11 @@ public class SettingsUtil {
             version = pInfo.versionCode;
             SettingsUtil.WriteInt(c, ConstantUtil.AUTH_APPVERSION_KEY, version);
         }
-        catch (PackageManager.NameNotFoundException e) {
+        catch (PackageManager.NameNotFoundException ex) {
         }
         if (version != oldVersion) return false; //force new login when app was updated
         
-        return u != null && !u.equals("") && i != null && !i.equals("") && o != null && p != null && k != null && !k.equals("");
+        return u != null && !u.equals("") && i != null && !i.equals("") && o != null && p != null && e != null && k != null && !k.equals("");
     }
 
     public static User getAuthUser(Context c) {
@@ -144,6 +146,13 @@ public class SettingsUtil {
             for (String id : ids)
                 if (id.length() > 0)
                     user.addPublishedProjId(id);
+        }
+        String projstr2 = SettingsUtil.Read(c, ConstantUtil.AUTH_EDIT_PROJID_KEY);
+        if (projstr2 != null) {
+            String ids[] = projstr2.split(",");
+            for (String id : ids)
+                if (id.length() > 0)
+                    user.addEditProjId(id);
         }
         user.setApiKey(SettingsUtil.Read(c, ConstantUtil.AUTH_APIKEY_KEY));
         return user;

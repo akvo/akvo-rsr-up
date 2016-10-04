@@ -59,14 +59,14 @@ public class SignInService extends IntentService {
 				RsrDbAdapter dba = new RsrDbAdapter(this);
 				dba.open();
 				dba.setVisibleProjects(user.getPublishedProjIds());
-				//employment list is short and will be useful on early logins
+				//detailed employment list is short and will be useful on early logins
 				new Downloader().fetchEmploymentListPaged(
                             this,
                             dba,
                             new URL(SettingsUtil.host(this) + String.format(ConstantUtil.FETCH_EMPLOYMENTS_URL_PATTERN,SettingsUtil.getAuthUser(this).getId())),
                             null
                     );
-				//TODO maybe fetch countries and organisations too (if never done before?)
+				//TODO maybe fetch countries and (minimal)organisations too (if never done before)
                 dba.close();
 				
 			}
@@ -78,7 +78,7 @@ public class SignInService extends IntentService {
 		catch (Exception e) {
 			i2.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, getResources().getString(R.string.errmsg_signin_failed) + e.getMessage());
 			Log.e(TAG,"SignInService() error:", e);
-            SettingsUtil.signOut(this);
+            SettingsUtil.signOut(this); //all fetches have to succeed for a login, to avoid weird states
 		}
 
 		//broadcast completion

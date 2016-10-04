@@ -97,7 +97,7 @@ public class GetProjectDataService extends IntentService {
                     dl.fetchProject(this,
                                     ad, 
                                     new URL(SettingsUtil.host(this) +
-                                            String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN, id)));
+                                            String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN, id))); //TODO: JSON
                     if (mFetchResults) {
                         dl.fetchProjectResultsPaged(this, ad,
                                 new URL(host + String.format(ConstantUtil.FETCH_RESULTS_URL_PATTERN, id)));                                            

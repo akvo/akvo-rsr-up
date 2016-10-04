@@ -1785,7 +1785,7 @@ public class RsrDbAdapter {
 
     public int countIndicatorsFor(String pid) {
         int c = -1;
-        Cursor cursor = database.query(RESULT_TABLE + " LEFT JOIN " + INDICATOR_TABLE + " ON " + RESULT_TABLE + "._id = " + INDICATOR_TABLE + ".result_id" ,
+        Cursor cursor = database.query(INDICATOR_TABLE + " LEFT JOIN " + RESULT_TABLE + " ON " + RESULT_TABLE + "._id = " + INDICATOR_TABLE + ".result_id" ,
                                        new String[] {"COUNT (*) as row_count"}, 
                                        RESULT_TABLE + ".project_id = ?",
                                        new String[] {pid},

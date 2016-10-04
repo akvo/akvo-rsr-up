@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2016C Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -31,7 +31,8 @@ public class ConstantUtil {
 	public static final String TEST_HOST = "http://rsr.uat.akvo.org";
 	public static final String LIVE_HOST = "http://rsr.akvo.org";
 	public static final String PWD_URL = "/sign_in/";
-	public static final String AUTH_URL = "/auth/token/";
+//    public static final String AUTH_URL = "/auth/token/";
+    public static final String AUTH_URL = "/auth/token/?format=json";
     public static final String POST_UPDATE_URL = "/rest/v1/project_update/?format=xml";
     public static final String POST_RESULT_URL = "/rest/v1/indicator_period_data/?format=json";
     public static final String POST_EMPLOYMENT_PATTERN = "/rest/v1/user/%s/request_organisation/?format=json";
@@ -104,6 +105,7 @@ public class ConstantUtil {
 	public static final String AUTH_USERID_KEY = "authorized_userid";
     public static final String AUTH_ORGID_KEY = "authorized_orgid";
     public static final String AUTH_PROJID_KEY = "authorized_projid";
+    public static final String AUTH_EDIT_PROJID_KEY = "authorized_edit_projid";
     public static final String AUTH_APPVERSION_KEY = "authorized_app_version";
 	public static final String LOCAL_ID_KEY	= "next_local_id";
 	public static final String FETCH_TIME_KEY = "last_updates_fetch_time";

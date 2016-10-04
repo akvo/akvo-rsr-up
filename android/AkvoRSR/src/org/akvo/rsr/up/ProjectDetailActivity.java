@@ -322,10 +322,10 @@ public class ProjectDetailActivity extends ActionBarActivity {
         mInProgressBar.setMax(total);
         mInProgressBar.setProgress(done);
         switch (phase) {
-        case 0:mInProgressWhat.setText("Projects");break;
-        case 1:mInProgressWhat.setText("Updates");break;
-        case 2:mInProgressWhat.setText("Photos");break;
-        default:mInProgressWhat.setText("???");break;
+            case  0:mInProgressWhat.setText("Projects");break;
+            case  1:mInProgressWhat.setText("Updates");break;
+            case  2:mInProgressWhat.setText("Photos");break;
+            default:mInProgressWhat.setText("???");break;
         }
     }
     
