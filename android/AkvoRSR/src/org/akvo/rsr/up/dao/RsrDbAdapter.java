@@ -1440,7 +1440,6 @@ public class RsrDbAdapter {
                                             "_result._id as result_id",
                                             "_indicator._id as indicator_id",
                                             "_period._id as period_id",
-                                            "_ipd._id as ipd_id",
                                             "_result.title as result_title",
                                             "_indicator.title as indicator_title",
                                             "_period.period_start",
@@ -1453,7 +1452,7 @@ public class RsrDbAdapter {
                                         new String[] { _id },
                                         null, //group by
                                         null,
-                                        "_result._id,_indicator._id,_period._id, _ipd._id DESC"); //order by
+                                        "_result._id,_indicator._id,_period._id DESC"); //order by
 
         return cursor;
     }

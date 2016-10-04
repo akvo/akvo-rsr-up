@@ -178,7 +178,6 @@ public class ResultListActivity extends ActionBarActivity {
         final int res_pk = dataCursor.getColumnIndex("result_id");
         final int ind_pk = dataCursor.getColumnIndex("indicator_id");
         final int per_pk = dataCursor.getColumnIndex("period_id");
-        final int ipd_pk = dataCursor.getColumnIndex("ipd_id");
         final int res_title = dataCursor.getColumnIndex("result_title");
         final int ind_title = dataCursor.getColumnIndex("indicator_title");
         final int per_start = dataCursor.getColumnIndex("period_start");
