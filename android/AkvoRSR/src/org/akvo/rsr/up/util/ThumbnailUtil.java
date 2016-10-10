@@ -63,7 +63,7 @@ public class ThumbnailUtil {
             String updateId,
             boolean enableExpand) {
 
-        if (url == null) { // not set
+        if (url == null || url.length() == 0) { // not set
             imgView.setImageResource(R.drawable.thumbnail_noimage);
         } else if (fn == null) { // Not fetched
             imgView.setImageResource(R.drawable.thumbnail_load);
