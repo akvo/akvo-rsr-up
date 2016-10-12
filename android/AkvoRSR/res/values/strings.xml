@@ -133,6 +133,8 @@
     <string name="btncaption_add_data">Add period data</string>
     <string name="btncaption_edit_update">Edit this update</string>
     <string name="btncaption_refresh">Refresh project list</string>
+    <string name="btncaption_refresh_oneproj">Refresh project</string>
+    <string name="btncaption_view_results">View results</string>
     <string name="btncaption_viewupdates">View all updates</string>
     <string name="btncaption_clear_data">Clear all data</string>
     <string name="btncaption_send_update">Send update</string>
