@@ -80,7 +80,7 @@
     <string name="label_settings_general">General</string>
     <string name="label_settings_testing">Testing</string>
     <string name="label_setting_delaypics">Delay fetching pictures</string>
-    <string name="summary_setting_delaypics">Do not fetch pictures until they are clicked. Refresh is fast, but pictures are unavailable when offline.</string>
+    <string name="label_setting_fullsynch">Full refresh</string>
     <string name="label_setting_clearcache">Delete cached pictures</string>
     <string name="label_setting_host">Data server</string>
     <string name="label_setting_feedback">Give feedback</string>
@@ -97,6 +97,8 @@
     <string name="hint_data">Data</string>
     <string name="hint_text">Text</string>
     
+    <string name="summary_setting_delaypics">Do not fetch pictures until they are clicked. Refresh is fast, but pictures are unavailable when offline.</string>
+    <string name="summary_setting_fullsynch">Do full fetches that can detect deleted updates, but will take longer.</string>
     <string name="summary_setting_feedback">Open a web feedback form where you can tell us what you think of this app.</string>
     <string name="summary_setting_debuginfo">Show project and update ids and other debug info.</string>
     <string name="summary_setting_removeloc">Geolocation info in photo files will be removed before upload.</string>
@@ -131,6 +133,8 @@
     <string name="btncaption_add_data">Add period data</string>
     <string name="btncaption_edit_update">Edit this update</string>
     <string name="btncaption_refresh">Refresh project list</string>
+    <string name="btncaption_refresh_oneproj">Refresh project</string>
+    <string name="btncaption_view_results">View results</string>
     <string name="btncaption_viewupdates">View all updates</string>
     <string name="btncaption_clear_data">Clear all data</string>
     <string name="btncaption_send_update">Send update</string>

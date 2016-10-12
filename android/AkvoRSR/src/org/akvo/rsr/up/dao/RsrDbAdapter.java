@@ -811,20 +811,46 @@ public class RsrDbAdapter {
 		return cursor;
 	}
 
-	/**
-	 * Gets updates for a specific project, all columns
-	 */
-	public Cursor listAllUpdatesNewestFirstFor(String _id) {
-		Cursor cursor = database.query(UPDATE_TABLE,
-										null,
-										PROJECT_COL + " = ?",
-										new String[] { _id },
-										null,
-										null,
-										CREATED_COL + " DESC");
+    /**
+     * Gets updates for a specific project, all columns
+     */
+    public Cursor listAllUpdatesNewestFirstFor(String _id) {
+        Cursor cursor = database.query(UPDATE_TABLE,
+                                        null,
+                                        PROJECT_COL + " = ?",
+                                        new String[] { _id },
+                                        null,
+                                        null,
+                                        CREATED_COL + " DESC");
 
-		return cursor;
-	}
+        return cursor;
+    }
+
+    /**
+     * Gets list of ids of updates for a specific project
+     */
+    public List<String> getUpdatesForList(String projid) {
+        List<String> idList = new ArrayList<String>();  
+        try {
+            Cursor cursor = database.query(UPDATE_TABLE,
+                                            new String[] {
+                                                PK_ID_COL
+                                            },
+                                            PROJECT_COL + " = ?",
+                                            new String[] { projid },
+                                            null,
+                                            null,
+                                            null);
+            int c = cursor.getColumnIndex("_id");
+            while (cursor.moveToNext()) {
+                idList.add(cursor.getString(c));
+            }
+            cursor.close();
+        }
+        catch (NullPointerException e) {
+        }    
+        return idList;
+    }
 
 	/**
 	 * Gets unsent updates, all columns

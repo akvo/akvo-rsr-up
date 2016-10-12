@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -99,7 +100,6 @@ public class Downloader {
         int total = 0;
         int page = 0;
         //the fetch is called in a loop to get it page by page, otherwise it would take too long for server
-        //and it would not scale beyond 1000 items in any case
         while (url != null) {
             HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
             h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
@@ -259,23 +259,23 @@ public class Downloader {
      * @throws IOException
      * @throws FailedFetchException 
      */
-    public Date fetchUpdateListRestApiPaged(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException, FailedFetchException {
+    public Date fetchUpdateListRestApiPaged(Context ctx, URL url, ArrayList<String> fetchedIds) throws ParserConfigurationException, SAXException, IOException, FailedFetchException {
         Date serverDate = null;
         User user = SettingsUtil.getAuthUser(ctx);
         int total = 0;
         int page = 0;
-        //the fetch is called in a loop to get it page by page, otherwise it would take too long for server
-        //and it would not scale beyond 1000 updates in any case
         RsrDbAdapter dba = new RsrDbAdapter(ctx);
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+
+        //the fetch is called in a loop to get it page by page, otherwise it would take too long for server
         while (url != null) {
             HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
             h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
-            int code = h.code();//evaluation starts the exchange
+            int code = h.code(); //evaluation starts the exchange
             if (code == 200) {
                 page++;
                 String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
                 serverDate = new Date(h.date());
-                SAXParserFactory spf = SAXParserFactory.newInstance();
                 XMLReader xr = spf.newSAXParser().getXMLReader();
                 UpdateRestListHandler xmlHandler = new UpdateRestListHandler(dba, true, serverVersion);
                 xr.setContentHandler(xmlHandler);
@@ -287,11 +287,8 @@ public class Downloader {
                 Log.d(TAG, "URL " + url.toString());
                 Log.i(TAG, "Fetched " + xmlHandler.getCount() + " updates; target total = "+ xmlHandler.getTotalCount());
 
-//                dba.open();
-//                Log.d(TAG, "Updates in db: " + dba.listAllUpdates().getCount());
-//                dba.close();
-                
                 total += xmlHandler.getCount();
+                fetchedIds.addAll(xmlHandler.getFetchedIds());
                 if (xmlHandler.getNextUrl().length() == 0) { //string needs to be trimmed from whitespace
                     url = null;//we are done
                 } else {
@@ -332,7 +329,6 @@ public class Downloader {
         User user = SettingsUtil.getAuthUser(ctx);
         int total = 0;
         //the fetch is called in a loop to get it page by page, otherwise it would take too long for server
-        //and it would not scale beyond 1000 updates in any case
         while (url != null) {
             HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
             h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
