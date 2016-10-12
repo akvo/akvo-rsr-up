@@ -16,6 +16,8 @@
 
 package org.akvo.rsr.up;
 
+import java.util.Locale;
+
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Country;
@@ -286,9 +288,13 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
         // start the upload service
         Intent intent = new Intent(this, SubmitEmploymentService.class);
         intent.putExtra(ConstantUtil.ORG_ID_KEY, mSelectedOrgId);
-        if (c != null) intent.putExtra(ConstantUtil.COUNTRY_ID_KEY, c.getId());
+        if (c != null) {
+            intent.putExtra(ConstantUtil.COUNTRY_CODE_KEY, c.getIsoCode().toUpperCase(Locale.US)); //Safe even if device is set to Turkish
+        }
         String jt = mJobTitle.getText().toString();
-        if (jt != null) intent.putExtra(ConstantUtil.JOB_TITLE_KEY, jt);
+        if (jt != null) {
+            intent.putExtra(ConstantUtil.JOB_TITLE_KEY, jt);
+        }
         getApplicationContext().startService(intent);
         // now we wait for a broadcast...
     }

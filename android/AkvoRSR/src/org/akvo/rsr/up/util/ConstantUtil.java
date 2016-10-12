@@ -147,6 +147,7 @@ public class ConstantUtil {
     public static final String PERIOD_END_KEY = "org.akvo.rsr.up.INDICATOR_PERIOD_END";
     public static final String ORG_ID_KEY = "org.akvo.rsr.up.ORGANISATION_ID";
     public static final String COUNTRY_ID_KEY = "org.akvo.rsr.up.COUNTRY_ID";
+    public static final String COUNTRY_CODE_KEY = "org.akvo.rsr.up.COUNTRY_CODE";
     public static final String JOB_TITLE_KEY = "org.akvo.rsr.up.JOB_TITLE";
 
 	/**

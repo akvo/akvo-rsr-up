@@ -38,7 +38,7 @@ public class SubmitEmploymentService extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent intent) {
         int orgId = Integer.parseInt(intent.getStringExtra(ConstantUtil.ORG_ID_KEY));
-        int countryId = intent.getStringExtra(ConstantUtil.COUNTRY_ID_KEY)==null?-1:Integer.parseInt(intent.getStringExtra(ConstantUtil.COUNTRY_ID_KEY));
+        String countryCode = intent.getStringExtra(ConstantUtil.COUNTRY_CODE_KEY);
         String jobTitle = intent.getStringExtra(ConstantUtil.JOB_TITLE_KEY);
 		
 		Intent i2 = new Intent(ConstantUtil.EMPLOYMENT_SENT_ACTION);
@@ -48,7 +48,7 @@ public class SubmitEmploymentService extends IntentService {
 			        this,
 			        SettingsUtil.host(this)+ConstantUtil.POST_EMPLOYMENT_PATTERN,
                     orgId,
-                    countryId,
+                    countryCode,
                     jobTitle,
 			        SettingsUtil.getAuthUser(this)
 			        );

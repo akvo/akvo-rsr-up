@@ -59,14 +59,34 @@ public class SignInService extends IntentService {
 				RsrDbAdapter dba = new RsrDbAdapter(this);
 				dba.open();
 				dba.setVisibleProjects(user.getPublishedProjIds());
+				Downloader dl = new Downloader();
 				//detailed employment list is short and will be useful on early logins
-				new Downloader().fetchEmploymentListPaged(
+				dl.fetchEmploymentListPaged(
+				        this,
+				        dba,
+				        new URL(SettingsUtil.host(this) +
+				                String.format(ConstantUtil.FETCH_EMPLOYMENTS_URL_PATTERN, SettingsUtil.getAuthUser(this).getId())),
+				        null
+                    );
+				
+				//fetch countries and (minimal)organisations too (if never done before)
+                if (dba.getOrgNameList().size() == 0) {
+                    dl.fetchTypeaheadOrgList(
                             this,
                             dba,
-                            new URL(SettingsUtil.host(this) + String.format(ConstantUtil.FETCH_EMPLOYMENTS_URL_PATTERN,SettingsUtil.getAuthUser(this).getId())),
-                            null
+                            new URL(SettingsUtil.host(this) + ConstantUtil.FETCH_ORGS_TYPEAHEAD_URL),
+                            new Downloader.ProgressReporter() {
+                                public void sendUpdate(int sofar, int total) {
+                                    //just swallow progress updates
+                                }
+                            }
                     );
-				//TODO maybe fetch countries and (minimal)organisations too (if never done before)
+                }
+                if (dba.getCountryCount() == 0) { // rarely changes
+                    dl.fetchCountryListRestApiPaged(this, dba, new URL(SettingsUtil.host(this) +
+                            ConstantUtil.FETCH_COUNTRIES_URL));
+                }
+
                 dba.close();
 				
 			}

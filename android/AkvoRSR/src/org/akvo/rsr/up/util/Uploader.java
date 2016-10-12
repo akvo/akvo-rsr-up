@@ -771,7 +771,7 @@ photo                                       or file
     static public void postEmployment(Context ctx,
             String urlTemplate,
             int orgId,
-            int countryId,
+            String countryCode,
             String jobTitle,
             User user)
                 throws FailedPostException, MalformedURLException  {
@@ -782,7 +782,7 @@ photo                                       or file
             JSONObject ipd = new JSONObject();
             try {
                 ipd.put("organisation", orgId);
-                if (countryId>0) ipd.put("country", countryId);
+                if (countryCode != null) ipd.put("country", countryCode); //MUST be uppercase country code
                 if (jobTitle != null) ipd.put("job_title", jobTitle);
                 String requestBody = ipd.toString();
                 URL url = new URL(String.format(Locale.US, urlTemplate, user.getId()));

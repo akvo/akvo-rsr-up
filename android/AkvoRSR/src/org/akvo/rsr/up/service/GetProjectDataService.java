@@ -110,7 +110,7 @@ public class GetProjectDataService extends IntentService {
                 // country list rarely changes, so only fetch countries if we never did that
                 if (mFetchCountries && (fullSynch || ad.getCountryCount() == 0)) {
                     dl.fetchCountryListRestApiPaged(this, ad, new URL(SettingsUtil.host(this) +
-                            String.format(ConstantUtil.FETCH_COUNTRIES_URL)));
+                            ConstantUtil.FETCH_COUNTRIES_URL));
                 }
                 broadcastProgress(0, 100, 100);
 
