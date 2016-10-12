@@ -80,7 +80,7 @@
     <string name="label_settings_general">General</string>
     <string name="label_settings_testing">Testing</string>
     <string name="label_setting_delaypics">Delay fetching pictures</string>
-    <string name="label_setting_fullsynch">Full synchronisation</string>
+    <string name="label_setting_fullsynch">Full refresh</string>
     <string name="label_setting_clearcache">Delete cached pictures</string>
     <string name="label_setting_host">Data server</string>
     <string name="label_setting_feedback">Give feedback</string>
