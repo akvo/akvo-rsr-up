@@ -1,47 +1,41 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!-- 
- *  Copyright (C) 2012-2016 Stichting Akvo (Akvo Foundation)
- *
- *  This file is part of Akvo RSR.
- *
- *  Akvo RSR is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
- *
- *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
- *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
- -->
- 
 <resources>
-  <string name="app_name">Akvo RSR Up</string>
-  <string name="app_subtitle">Le rapportage simplifié</string>
-  <string name="app_version">Version</string>
   <string name="action_settings">Paramètres</string>
   <string name="action_diagnostics">Diagnostics</string>
+  <string name="action_messages">Messages</string>
+  <string name="action_organisations">Organisations</string>
+  <string name="action_connect">Connecter</string>
   <string name="action_about">A propos de</string>
   <string name="action_add_update">Ajouter une mise à jour</string>
   <string name="action_delete_update">Effacer une mise à jour</string>
   <string name="action_attach_photo">Joindre une photo</string>
   <string name="action_logout">Déconnecter</string>
   <string name="action_sendall">Envoyer tous les non-envoyés</string>
-  <string name="copyright">Copyright © 2012-2016 Stichting Akvo</string>
+  <string name="app_name">Akvo RSR Up</string>
+  <string name="app_subtitle">Le rapportage simplifié</string>
+  <string name="app_version">Version</string>
+  <string name="authtitle">Autorisation exigée</string>
+  <string name="authtext">Veuillez entrer le mot de passe d\'admin</string>
+  <string name="authfailed">Autorisation a échouée</string>
+  <string name="copyright">Droits d\'auteur © 2012-2016 Akvo Fondation</string>
   <string name="powered_by_akvo">Développé par Akvo</string>
   <string name="title_activity_login">Akvo RSR Up</string>
   <string name="title_activity_project_list">RSR Up</string>
   <string name="title_activity_project_detail">RSR Up</string>
   <string name="title_activity_update_list">RSR Up</string>
   <string name="title_activity_update_edit">RSR Up</string>
+  <string name="title_activity_result_editor">RSR Up</string>
+  <string name="title_activity_result_list">RSR Up</string>
+  <string name="title_activity_period_detail">RSR Up</string>
+  <string name="title_activity_employment_application">RSR Up</string>
   <string name="title_activity_update_detail">RSR Up</string>
   <string name="title_activity_settings">Paramètres RSR Up</string>
-  <string name="title_activity_diagnostics">Diagnostic RSR Up</string>
+  <string name="title_activity_diagnostics">Diagnostics de RSR Up</string>
   <string name="title_activity_about">A propos de RSR Up</string>
   <string name="title_activity_license">Information sur la licence de RSR Up</string>
-  <string name="title_activity_messages">Messages RSR Up</string>
+  <string name="title_activity_messages">Messages de RSR Up</string>
   <string name="license">Information sur la licence</string>
-  <string name="label_update_title">Ajouter une mise à jour de projet</string>
+  <string name="label_update_title">Ajouter une mise à jour du projet</string>
   <string name="hint_update_title">Titre</string>
   <string name="hint_search">Rechercher</string>
   <string name="label_update_description">Description de la mise à jour:</string>
@@ -51,27 +45,43 @@
   <string name="hint_update_description">Description</string>
   <string name="hint_update_caption">Légende de la photo</string>
   <string name="hint_update_credit">Auteur de la photo</string>
+  <string name="hint_optional">(Facultatif)</string>
   <string name="label_photo_credit">Photo: %s</string>
   <string name="label_empty_proj_list">Rien à présenter avec ce filtre.</string>
   <string name="label_first_proj_list">Aucune photo disponible. Utilisez le bouton de rafraichissement pour voir vos projets.\n\nAu cas ou vous utilisez une faible connexion internet, vous pouvez d\'abord aller dans les paramètres et sélectionner \" Charger les photos ultérieurement” .</string>
-  <string name="label_unemployed_proj_list">Vous êtes connecté à aucun projet.\n\n Vous devez d\'abord utiliser l\'interface internet pour vous connectez et faire la demande d\'être ajouté à un projet .</string>
+  <string name="label_unemployed_proj_list">Vous n\'êtes connectez à aucun projet.\n\nSélectionnez Connecter dans le menu pour envoyer une demande.</string>
   <string name="label_proj_list">Vos projets:</string>
+  <string name="label_org_list">Organisations:</string>
   <string name="label_update_list">Mises à jour:</string>
+  <string name="label_result_list">Résultats, Indicateurs</string>
   <string name="label_refresh_progress">Progression de l\'actualisation</string>
   <string name="label_progress_projects">Projets</string>
   <string name="label_progress_updates">Mises à jour</string>
   <string name="label_progress_pictures">Photos</string>
+  <string name="label_progress_orgs">Les organisations</string>
+  <string name="label_progress_countries">Les pays</string>
   <string name="label_clearcache_freespace">%d MB libres. Vos photos sont sauvergadées.</string>
   <string name="label_settings_general">Général</string>
   <string name="label_settings_testing">Test</string>
   <string name="label_setting_delaypics">Charger les photos ultérieurement</string>
-  <string name="summary_setting_delaypics">Ne pas charger les photos jusqu\'au moment où elles sont sélectionnées par un clic. Le rafraichissement est rapide, mais les photos ne sont pas disponibles hors ligne.</string>
+  <string name="label_setting_fullsynch">Actualisation complète</string>
   <string name="label_setting_clearcache">Effacer les photos mises en caches</string>
   <string name="label_setting_host">Serveur de données</string>
   <string name="label_setting_feedback">Donner une réaction</string>
   <string name="label_setting_feedback_version">Donner une réaction sur la ver %s</string>
   <string name="label_setting_debuginfo">Déboguer</string>
   <string name="label_setting_removeloc">Supprimer la localisation des photos</string>
+  <string name="label_connect_title">Se connecter avec</string>
+  <string name="label_connections_title">Vos connections</string>
+  <string name="label_connect_instructions">Saisissez tout ou une partie du nom. Si vous ne trouvez pas votre organisation dans la liste, utilisez l\'actualisation.</string>
+  <string name="label_country">Le pays</string>
+  <string name="label_job_title">Profession</string>
+  <string name="label_add_perioddata">Ajouter des données pour la période:</string>
+  <string name="label_relative_data">Les données relatives</string>
+  <string name="hint_data">Les données</string>
+  <string name="hint_text">Le texte</string>
+  <string name="summary_setting_delaypics">Ne pas charger les photos jusqu\'au moment où elles sont sélectionnées par un clic. Le rafraichissement est rapide, mais les photos ne sont pas disponibles hors ligne.</string>
+  <string name="summary_setting_fullsynch">Faire beaucoup de chargements peuvent détecter les mises à jour supprimées, mais cela prendra plus de temps.</string>
   <string name="summary_setting_feedback">Ouvrir un formulaire de réaction en ligne, pour partager votre opinion sur cette application.</string>
   <string name="summary_setting_debuginfo">Présenter ids de projets et mises à jour, et autre information de débogages.</string>
   <string name="summary_setting_removeloc">L\'information de géolocalisation dans les photos sera effacée avant de télécharger</string>
@@ -82,6 +92,8 @@
   <string name="state_synchronising">Synchronisation</string>
   <string name="count_draft">Version préliminaire</string>
   <string name="count_published">publiées</string>
+  <string name="count_results">Les résultats</string>
+  <string name="count_indicators">Les indicateurs</string>
   <string name="count_zero">Pas de mises à jours/ aucune mise à jour</string>
   <string name="count_unsynch">Non-synchronisé</string>
   <string name="updates_txt">Statut des mises à jour</string>
@@ -89,15 +101,23 @@
   <string name="email_address">Adresse e-mail</string>
   <string name="password">Mot de passe</string>
   <string name="forgot_password_">Avez-vous oublié votre mot de passe?</string>
-  <string name="btncaption_sign_in">S\'ENREGISTRER</string>
+  <string name="btncaption_ok">OK</string>
+  <string name="btncaption_cancel">Annuler</string>
+  <string name="btncaption_sign_in">SE CONNECTER</string>
+  <string name="btncaption_apply">APPLIQUER</string>
+  <string name="btncaption_send_data">ENVOYER DES DONNÉES</string>
   <string name="btncaption_take_photo">Prenez une photo</string>
   <string name="btncaption_attach_photo">Joindre une photo</string>
+  <string name="btncaption_attach_file">Joindre un fichier</string>
   <string name="btncaption_rephoto">Remplacer une photo</string>
-  <string name="btncaption_dephoto">Effacer une photo</string>
+  <string name="btncaption_dephoto">Supprimer une photo</string>
   <string name="btncaption_rotphoto">Tourner la photo</string>
   <string name="btncaption_add_update">Ajouter une mise à jour</string>
+  <string name="btncaption_add_data">Ajouter des données de la période </string>
   <string name="btncaption_edit_update">Editer cette mise à jour</string>
   <string name="btncaption_refresh">Rafraichir la liste des projets</string>
+  <string name="btncaption_refresh_oneproj">Actualiser le projet</string>
+  <string name="btncaption_view_results">Voir les résultats</string>
   <string name="btncaption_viewupdates">Voir toutes les mises à jour</string>
   <string name="btncaption_clear_data">Effacer toutes les données</string>
   <string name="btncaption_send_update">Envoyer une mise à jour</string>
@@ -123,18 +143,18 @@
   <string name="norot_dialog_title">Erreur IO en tournant le fichier de photo</string>
   <string name="norot_dialog_title2">La photo est trop large pour tourner</string>
   <string name="norot_dialog_msg">Essayer une photo de résolution plus basse</string>
-  <string name="warnbig_dialog_title">Fichier de photo est trop large</string>
+  <string name="warnbig_dialog_title">Fichier de photo trop grande</string>
   <string name="warnbig_dialog_msg1">Régler votre caméra à une résolution plus basse</string>
   <string name="warnbig_dialog_msg2">Choisir une photo plus petite</string>
   <string name="shrinkbig_dialog_title">La photo n\'a pu être rétréci</string>
-  <string name="shrinkbig_dialog_msg">L\'original était trop large pour être traité</string>
+  <string name="shrinkbig_dialog_msg">L\'originale était trop grande pour être traitée</string>
   <string name="nonet_dialog_title">Pas de réseau disponible</string>
-  <string name="nonet_dialog_msg">Il faut être connecté à l\'Internet </string>
-  <string name="login_progress_title">S\'enregistrer</string>
+  <string name="nonet_dialog_msg">Vous devez être connecté à Internet</string>
+  <string name="login_progress_title">Se connecter</string>
   <string name="login_progress_msg">Envoi de l\'information d\'enregistrement</string>
   <string name="cleared_dialog_title">Cache effacé</string>
-  <string name="cleared_dialog_msg">%1$d fichiers effacées (%2$d MB)</string>
-  <string name="detail_dialog_title">Détails des erreurs</string>
+  <string name="cleared_dialog_msg">%1$d fichiers supprimés (%2$d MB)</string>
+  <string name="detail_dialog_title">Détails de l\'erreur</string>
   <string name="gpsdisabled_dialog_msg">Le GPS doit être activé pour exécuter cet action. Sélectionnez OK pour aller vers les paramètres. Sélectionnez \"utiliser satellites de GPS\" et appuyez sur le bouton de retour. Une fois le GPS activé, vous pouvez cliquer de nouveau sur \'vérifier géolocalisation\' pour enregistrer votre position</string>
   <string name="label_gps_searching">En recherche</string>
   <string name="label_gps_ready">Prêt</string>
@@ -142,8 +162,10 @@
   <string name="label_latitude">Latitude</string>
   <string name="label_longitude">Longitude</string>
   <string name="label_elevation">Hauteur</string>
-  <string name="msg_emp_applied">Votre demande est en attente de validation.</string>
   <string name="msg_update_published">Mise à jour publiée</string>
+  <string name="msg_emp_applied">Votre demande est en cours de traitement et devra être approuvé</string>
+  <string name="msg_period_data_submitted">Mise à jour publiée</string>
+  <string name="msg_send_success">Envoyé au serveur avec succès</string>
   <string name="msg_update_success">Mise à jour bien envoyée au serveur</string>
   <string name="msg_update_interrupted">Réseau de connexion absent durant l\'envoi de la mise à jour</string>
   <string name="msg_update_duplicated">La mise à jour a été dupliqué sur le serveur. Veuillez informer les développeurs. </string>
@@ -154,30 +176,31 @@
   <string name="msg_logged_in_as_template">Connecté comme %s</string>
   <string name="msg_fetch_complete">Téléchargement complet</string>
   <string name="msg_check_network">Veuillez vérifier votre connexion au réseau</string>
-  <string name="errmsg_empty_title">Une mise à jour nécessite d\'avoir un titre</string>
   <string name="errmsg_bad_url">URL invalide!</string>
-  <string name="errmsg_not_found_on_server">Ne peut pas trouver:</string>
   <string name="errmsg_com_failure">Erreur de communication avec le serveur</string>
+  <string name="errmsg_emp_fetch_failed">Emploi du chargement échoué</string>
+  <string name="errmsg_emp_application_failed">Impossible de soumettre la demande:</string>
+  <string name="errmsg_emp_exists">La connexion existe déjà (ou est en train d\'être demandé)</string>
+  <string name="errmsg_empty_title">Une mise à jour nécessite d\'avoir un titre</string>
+  <string name="errmsg_not_found_on_server">Ne peut pas trouver:</string>
   <string name="errmsg_update_fetch_failed">Téléchargement des mises à jour a échoué</string>
   <string name="errmsg_user_fetch_failed">Téléchargement d\'utilisateur a échoué</string>
   <string name="errmsg_org_fetch_failed">Téléchargement des organisations a échoué</string>
-  <string name="errmsg_signin_denied">Mauvais mot de passe et/ou utilisateur</string>
-  <string name="errmsg_signin_failed">Pas capable d\'autoriser</string>
-  <string name="btncaption_ok">OK</string>
-  <string name="btncaption_cancel">Annuler</string>
-  <string name="authtitle">Autorisation exigée</string>
-  <string name="authtext">Veuillez entrer le mot de passe d\'admin</string>
-  <string name="authfailed">Autorisation a échouée</string>
+  <string name="errmsg_signin_denied">Mot de passe et/ou de nom d\'utilisateur incorrect</string>
+  <string name="errmsg_signin_failed">inpossible d\'autoriser</string>
+  <string name="errmsg_resultpost_failed">Impossible de publier le résultat</string>
   <string name="invalidpassword">Mot de passe invalide</string>
   <string name="dummy_project_title">Ici titre de projet</string>
   <string name="dummy_update_title">Ici titre de mise à jour</string>
+  <string name="dummy_indicator_title">Ici titre de l\'indicateur</string>
   <string name="dummy_update_description">Une description de mise à jour se présente ici, et peut être de n\'importe quelle longueur. La mise à jour peut être défilée, mais le bouton reste fixé en bas de l\'écran.</string>
   <string name="dummy_author">Nomen Nescio, Akvo</string>
   <string name="dummy_count">17</string>
   <string name="dummy_time">2014-04-23 17:18</string>
+  <string name="dummy_date">31-01-2016</string>
   <string name="dummy_version">0.0</string>
   <string name="lorem_ipsum">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent pharetra ultricies ante, imperdiet viverra nisi rutrum a. Integer consequat laoreet malesuada. Nam fermentum risus id aliquet pellentesque. Sed nec nisl in turpis sodales ultricies. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Interdum et malesuada fames ac ante ipsum primis in faucibus.</string>
-  <string name="connection_pending">- en attente</string>
+  <string name="connection_pending">En attente</string>
   <string-array name="types">
     <item>Type 1</item>
     <item>Type 2</item>
@@ -188,4 +211,6 @@
     <item>2</item>
     <item>3</item>
   </string-array>
+  <string name="title_activity_back">En arrière d\'activité</string>
+  <string name="hello_world">Bonjour le monde!</string>
 </resources>
