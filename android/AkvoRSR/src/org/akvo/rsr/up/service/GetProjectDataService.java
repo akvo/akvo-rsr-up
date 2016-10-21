@@ -51,7 +51,7 @@ public class GetProjectDataService extends IntentService {
     private static final boolean mFetchCountries = true;
     private static final boolean mFetchUpdates = true;
     private static final boolean mFetchOrgs = true;
-    private static final boolean mFetchResults = true;
+    private static final boolean mFetchResults = false; //TODO when we enable results updates
 
     public GetProjectDataService() {
         super(TAG);

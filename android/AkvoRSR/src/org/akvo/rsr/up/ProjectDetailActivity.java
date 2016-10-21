@@ -202,11 +202,11 @@ public class ProjectDetailActivity extends ActionBarActivity {
             draftCountView.setText(Integer.toString(stateCounts[0]) + res.getString(R.string.count_draft));
             draftCountView.setVisibility(stateCounts[0] > 0 ? View.VISIBLE : View.GONE);
 
-            int rc = mDba.countResultsFor(projId);
-            int ic = mDba.countIndicatorsFor(projId);
-            resultCountView.setText(Integer.toString(rc) + res.getString(R.string.count_results) + ", " + Integer.toString(ic) + res.getString(R.string.count_indicators));
-            resultCountView.setVisibility(rc > 0 ? View.VISIBLE : View.GONE);
-            btnResults.setEnabled(rc > 0);
+//TODO            int rc = mDba.countResultsFor(projId);
+//TODO            int ic = mDba.countIndicatorsFor(projId);
+//TODO            resultCountView.setText(Integer.toString(rc) + res.getString(R.string.count_results) + ", " + Integer.toString(ic) + res.getString(R.string.count_indicators));
+//TODO            resultCountView.setVisibility(rc > 0 ? View.VISIBLE : View.GONE);
+//TODO            btnResults.setEnabled(rc > 0);
     
     		ThumbnailUtil.setPhotoFile(projImage,project.getThumbnailUrl(), project.getThumbnailFilename(), projId, null, true);
 
