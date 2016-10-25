@@ -1,38 +1,33 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- 
- *  Copyright (C) 2012-2016 Stichting Akvo (Akvo Foundation)
- *
- *  This file is part of Akvo RSR.
- *
- *  Akvo RSR is free software: you can redistribute it and modify it under the terms of
- *  the GNU Affero General Public License (AGPL) as published by the Free Software Foundation,
- *  either version 3 of the License or any later version.
- *
- *  Akvo RSR is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- *  See the GNU Affero General Public License included below for more details.
- *
- *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
- -->
- 
+<?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name">Akvo RSR Up</string>
-  <string name="app_subtitle">Really Simple Reporting</string>
-  <string name="app_version">Versión</string>
   <string name="action_settings">Configuración</string>
   <string name="action_diagnostics">Diagnóstico</string>
+  <string name="action_messages">Mensajes</string>
+  <string name="action_organisations">Organizaciones</string>
+  <string name="action_connect">Conectar</string>
   <string name="action_about">Sobre</string>
   <string name="action_add_update">Añadir actualización</string>
   <string name="action_delete_update">Borrar actualización</string>
   <string name="action_attach_photo">Añadir foto</string>
   <string name="action_logout">Finalizar sesión</string>
   <string name="action_sendall">Enviar lo no enviado</string>
+  <string name="app_name">Akvo RSR Up</string>
+  <string name="app_subtitle">Really Simple Reporting</string>
+  <string name="app_version">Versión</string>
+  <string name="authtitle">Autorización requerida</string>
+  <string name="authtext">Por favor introduzca la contraseña del administrador</string>
+  <string name="authfailed">La autorización falló</string>
+  <string name="copyright">Derechos de autor © 2012-2016 Stichting Akvo</string>
   <string name="powered_by_akvo">Desarrollado por Akvo</string>
   <string name="title_activity_login">Akvo RSR Up</string>
   <string name="title_activity_project_list">RSR Up</string>
   <string name="title_activity_project_detail">RSR Up</string>
   <string name="title_activity_update_list">RSR Up</string>
   <string name="title_activity_update_edit">RSR Up</string>
+  <string name="title_activity_result_editor">RSR Up</string>
+  <string name="title_activity_result_list">RSR Up</string>
+  <string name="title_activity_period_detail">RSR Up</string>
+  <string name="title_activity_employment_application">RSR Up</string>
   <string name="title_activity_update_detail">RSR Up</string>
   <string name="title_activity_settings">RSR Up Ajustes</string>
   <string name="title_activity_diagnostics">RSR Up Diagnóstico</string>
@@ -50,28 +45,43 @@
   <string name="hint_update_description">Descripción</string>
   <string name="hint_update_caption">Descripción de la fotografía</string>
   <string name="hint_update_credit">Créditos de la fotografía</string>
+  <string name="hint_optional">(Opcional)</string>
   <string name="label_photo_credit">Fotografías: %s</string>
   <string name="label_empty_proj_list">Nada para mostrar con este filtro.</string>
-  <string name="label_first_proj_list">Todavía no se ha actualizado su lista de proyectos. Utilice el botón refrescar para ver sus proyectos.\n\nSi usted tiene una conexión con un bajo ancho de banda, active la opción de retrasar la captura de imágenes dentro de el area de ajustes. </string>
-  <string name="label_unemployed_proj_list">Usted no se encuentra conectado a ningún proyecto.\n\nPor favor acceda a la aplicación web y solicite ser agregado a un proyecto.</string>
+  <string name="label_first_proj_list">Todavía no se ha actualizado su lista de proyectos. Utilice el botón refrescar para ver sus proyectos. Si usted tiene una conexión con un bajo ancho de banda, active la opción de retrasar la captura de imágenes dentro de el area de ajustes. </string>
+  <string name="label_unemployed_proj_list">Usted no está conectado a proyectos. \n\n Seleccione Conectar en el menú para enviar una solicitud. </string>
   <string name="label_proj_list">Sus proyectos:</string>
+  <string name="label_org_list">Organizaciones: </string>
   <string name="label_update_list">Actualizaciones:</string>
-  <string name="label_refresh_progress">Refrescar progreso</string>
+  <string name="label_result_list">Resultados, indicadores:</string>
+  <string name="label_refresh_progress">Progreso</string>
   <string name="label_progress_projects">Proyectos</string>
   <string name="label_progress_updates">Actualizaciones</string>
   <string name="label_progress_pictures">Fotografías</string>
+  <string name="label_progress_orgs">Organizaciones</string>
   <string name="label_progress_countries">Países</string>
   <string name="label_clearcache_freespace">Megabytes libres: %d. Las imágenes son guardadas.</string>
   <string name="label_settings_general">General</string>
   <string name="label_settings_testing">Probando</string>
   <string name="label_setting_delaypics">Retrasar captura de fotografías</string>
-  <string name="summary_setting_delaypics">No capturar imágenes hasta que se hayan seleccionado. La actualización es rápida, pero las imágenes son inaccesible sin conexión a internet.</string>
+  <string name="label_setting_fullsynch">Actualización completa del navegador </string>
   <string name="label_setting_clearcache">Borrar imágenes en caché.</string>
   <string name="label_setting_host">Servidor</string>
   <string name="label_setting_feedback">Envie su feedback</string>
   <string name="label_setting_feedback_version">Envíe su feedback sobre ver %s</string>
   <string name="label_setting_debuginfo">Debug</string>
   <string name="label_setting_removeloc">Remover la ubicación de la imagen</string>
+  <string name="label_connect_title">Conectar con:</string>
+  <string name="label_connections_title">Sus conexiones: </string>
+  <string name="label_connect_instructions">Escriba el nombre parcial o totalmente. Si no encuentra su organización en la lista, actualice el navegador. </string>
+  <string name="label_country">País</string>
+  <string name="label_job_title">Cargo o profesión</string>
+  <string name="label_add_perioddata">Agregue datos del período</string>
+  <string name="label_relative_data">Datos relativo </string>
+  <string name="hint_data">Datos</string>
+  <string name="hint_text">Texto</string>
+  <string name="summary_setting_delaypics">No capturar imágenes hasta que se hayan seleccionado. La actualización es rápida, pero las imágenes son inaccesible sin conexión a internet.</string>
+  <string name="summary_setting_fullsynch">Recuperar datos completos, inclusive detectar actualizaciones borradas. Tomará mas tiempo</string>
   <string name="summary_setting_feedback">Que opina sobre esta aplicación? </string>
   <string name="summary_setting_debuginfo">Mostrar los ID\'s del proyecto y las actualizaciones y otra información de debug</string>
   <string name="summary_setting_removeloc">La información de geolocalización en las fotos será removida antes de subirlas al servidor</string>
@@ -80,24 +90,34 @@
   <string name="state_draft">Borrador</string>
   <string name="state_published">Publicado</string>
   <string name="state_synchronising">Sincronizando</string>
-  <string name="count_draft">&#160;Borrador</string>
-  <string name="count_published">&#160;Publicado</string>
+  <string name="count_draft">Borrador</string>
+  <string name="count_published">Publicado</string>
+  <string name="count_results">Resultados</string>
+  <string name="count_indicators">Indicadores</string>
   <string name="count_zero">Sin actualizaciones</string>
-  <string name="count_unsynch">&#160;Sin categorizar</string>
+  <string name="count_unsynch">Sin categorizar</string>
   <string name="updates_txt">STATUS DE ACTUALIZACION</string>
   <string name="username">Nombre de usuario</string>
   <string name="email_address">Correo electrónico</string>
   <string name="password">Contraseña</string>
   <string name="forgot_password_">Olvidó su contraseña?</string>
+  <string name="btncaption_ok">OK</string>
+  <string name="btncaption_cancel">Cancelar</string>
   <string name="btncaption_sign_in">Iniciar sesión</string>
+  <string name="btncaption_apply">APLICAR</string>
+  <string name="btncaption_send_data">ENVIAR DATOS</string>
   <string name="btncaption_take_photo">Tomar imagen</string>
   <string name="btncaption_attach_photo">Añadir imagen</string>
+  <string name="btncaption_attach_file">Adjuntar archivo</string>
   <string name="btncaption_rephoto">Reemplazar imagen</string>
   <string name="btncaption_dephoto">Borrar imagen</string>
   <string name="btncaption_rotphoto">Rotar imagen</string>
   <string name="btncaption_add_update">Añadir actualización</string>
+  <string name="btncaption_add_data">Agregue datos del período</string>
   <string name="btncaption_edit_update">Editar esta actualización</string>
   <string name="btncaption_refresh">Refrescar lista de proyectos</string>
+  <string name="btncaption_refresh_oneproj">Actualizar proyecto</string>
+  <string name="btncaption_view_results">Ver resultados</string>
   <string name="btncaption_viewupdates">Visualizar todas las actualizaciones</string>
   <string name="btncaption_clear_data">Borrar toda la información</string>
   <string name="btncaption_send_update">Enviar actualización</string>
@@ -142,9 +162,10 @@
   <string name="label_latitude">Latitud:</string>
   <string name="label_longitude">Longitud:</string>
   <string name="label_elevation">Elevación:</string>
-  <string name="label_country">País</string> 
-  <string name="msg_emp_applied">Su solicitud está ahora pendiente y deberá recibir aprobación.</string> 
   <string name="msg_update_published">Actualización publicada</string>
+  <string name="msg_emp_applied">Su solicitud está pendiente y necesitará ser aprobada. </string>
+  <string name="msg_period_data_submitted">Actualización publicada</string>
+  <string name="msg_send_success">Envío al servidor exitoso</string>
   <string name="msg_update_success">La actualización ha sido enviada al servidor</string>
   <string name="msg_update_interrupted">La conexión a la red fue perdida durante la actualización</string>
   <string name="msg_update_duplicated">La actualización se encuentra duplicada en el servidor. Por favor avise a los desarrolladores!</string>
@@ -155,24 +176,28 @@
   <string name="msg_logged_in_as_template">Conectado como %s</string>
   <string name="msg_fetch_complete">Capturas completas</string>
   <string name="msg_check_network">Compruebe su conexión a la red</string>
-  <string name="errmsg_empty_title">La actualización debe contener un título</string>
   <string name="errmsg_bad_url">URL inválido</string>
-  <string name="errmsg_not_found_on_server">No se encuentra:</string>
   <string name="errmsg_com_failure">Error en la comunicación con el servidor</string>
-  <string name="errmsg_update_fetch_failed">La captura de actualizaciones falló</string>
-  <string name="errmsg_user_fetch_failed">La captura de usuario falló</string>
-  <string name="errmsg_org_fetch_failed">La captura de organización falló</string>
-  <string name="errmsg_signin_denied">Dirección de correo electrónico o nombre de usuario inválidos</string>
+  <string name="errmsg_emp_fetch_failed">La descarga del empleos falló:</string>
+  <string name="errmsg_emp_application_failed">No se pudo enviar la solicitud </string>
+  <string name="errmsg_emp_exists">Conexión ya existe (o ha sido solicitada)</string>
+  <string name="errmsg_empty_title">La actualización debe contener un título</string>
+  <string name="errmsg_not_found_on_server">No se encuentra:</string>
+  <string name="errmsg_update_fetch_failed">La captura de actualizaciones falló:</string>
+  <string name="errmsg_user_fetch_failed">La captura de usuario falló:</string>
+  <string name="errmsg_org_fetch_failed">La captura de organizaciónes falló:</string>
+  <string name="errmsg_signin_denied">Dirección de correo electrónico o nombre de usuario inválidos:</string>
   <string name="errmsg_signin_failed">Incapaz de actualizar:</string>
-  <string name="btncaption_ok">OK</string>
-  <string name="btncaption_cancel">Cancelar</string>
-  <string name="authtitle">Autorización requerida</string>
-  <string name="authtext">Por favor introduzca la contraseña del administrador</string>
-  <string name="authfailed">La autorización falló</string>
+  <string name="errmsg_resultpost_failed">No se pudo publicar el resultado</string>
   <string name="invalidpassword">Contraseña inválida</string>
   <string name="dummy_project_title">Título del projecto</string>
   <string name="dummy_update_title">Título de la actualización </string>
+  <string name="dummy_indicator_title">Nombre del indicador aquí</string>
   <string name="dummy_update_description">Introduzca la descripción de la actualización. El largo de la descripción es ilimitado. Por favor note que el botón permanecerá al fondo de la pantalla.</string>
+  <string name="dummy_count">17</string>
+  <string name="dummy_time">2014-04-23 17:18</string>
+  <string name="dummy_date">2016-01-31</string>
+  <string name="dummy_version">0.0</string>
   <string name="connection_pending">- pendiente</string>
+  <string name="hello_world">Hola a todos! </string>
 </resources>
- 

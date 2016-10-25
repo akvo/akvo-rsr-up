@@ -170,7 +170,7 @@
   <string name="msg_check_network">Kolla nätverksanslutningen</string>
   <string name="errmsg_bad_url">Felaktig URL!</string>
   <string name="errmsg_com_failure">Kommunikationsfel mot servern</string>
-  <string name="errmsg_emp_fetch_failed">Kunde inte hämta kopplingar</string>
+  <string name="errmsg_emp_fetch_failed">Kopplingar kunde inte hämtas:</string>
   <string name="errmsg_emp_application_failed">Kunde inte skicka in ansökan:</string>
   <string name="errmsg_emp_exists">Kopplingen finss redan (eller ansökan för den)</string>
   <string name="errmsg_empty_title">En uppdatering måste ha en rubrik!</string>
