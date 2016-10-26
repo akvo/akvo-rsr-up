@@ -27,7 +27,7 @@
     <string name="action_attach_photo">Bifoga foto</string>
     <string name="action_logout">Logga ut</string>
     <string name="action_sendall">Skicka allt oskickat</string>
-    <string name="copyright">Copyright &#169; 2012-2014 Stichting Akvo</string>
+    <string name="copyright">Copyright &#169; 2012-2015 Stichting Akvo</string>
     <string name="powered_by_akvo">Powered by Akvo</string>
     <string name="title_activity_login">Akvo RSR Up</string>
     <string name="title_activity_project_list">RSR Up</string>
@@ -39,6 +39,7 @@
     <string name="title_activity_diagnostics">RSR Up Diagnostik</string>
     <string name="title_activity_about">RSR Up Om appen</string>
     <string name="title_activity_license">RSR Up Licensinformation</string>
+    <string name="title_activity_messages">RSR Up Meddelanden</string>
     <string name="license">Licensinformation</string>
     <string name="label_update_title">Skapa en uppdatering:</string>
     <string name="hint_update_title">Rubrik</string>
@@ -74,6 +75,9 @@
     <string name="summary_setting_feedback">Öppnar ett webbformulär där du kan berätta vad du tycker om denna app.</string>    
     <string name="summary_setting_debuginfo">Visa teknisk info som id-nummer etc.</string>    
     <string name="summary_setting_removeloc">Positionsinformation i bildfiler skickas inte vid publicering.</string>    
+    <string name="label_setting_messages">Visa meddelanden</string>    
+    <string name="summary_setting_messages">Visa en lista av fel och andra meddelanden.</string>    
+
     <string name="state_draft">Utkast</string>
     <string name="state_published">Publicerat</string>
     <string name="state_synchronising">Synkroniserar</string>
@@ -102,6 +106,7 @@
     <string name="btncaption_gps_position">GPS-position</string>
     <string name="btncaption_gps_cancel">Avbryt GPS-position</string>
     <string name="btncaption_photo_position">Använd bildposition</string>
+    <string name="btncaption_details">Se detaljer</string>
     
     <string name="host_dialog_title">Mata in server</string>
     <string name="host_dialog_msg">Exempel: rsr.akvo.org eller https://rsr.akvotest.org</string>
@@ -144,7 +149,19 @@
     <string name="cleared_dialog_title">Cachen tömd</string>
     <string name="cleared_dialog_msg">%1$d filer borttagna (%2$d MB)</string>
     
+    <string name="detail_dialog_title">Feldetaljer</string>
+    
+    <string name="gpsdisabled_dialog_msg">GPS måste vara påslaget. Välj OK för att gå till sidan för inställningar. Välj \'Använd GPS\' och sedan bakåt för att återgå hit. När GPS är på kan du trycka \'GPS-position\' igen.</string>
+    <string name="label_gps_searching">Söker</string>
+    <string name="label_gps_ready">Klar</string>
+    <string name="label_accuracy">Noggrannhet:</string>
+    <string name="label_latitude">Latitud:</string>
+    <string name="label_longitude">Longitud:</string>
+    <string name="label_elevation">Höjd:</string>
+    
     <string name="msg_update_published">Uppdatering publicerad</string>
+    <string name="msg_update_interrupted">Nätverksproblem under sändning av uppdatering</string>
+    <string name="msg_update_duplicated">Uppdateringen duplicerad på servern. Meddela utvecklarna!</string>
     <string name="msg_update_success">Uppdatering skickad</string>
     <string name="msg_network_problem">Nätverksproblem</string>
     <string name="msg_synchronising">Uppdatering synkroniseras fortfarande...</string>
@@ -152,10 +169,12 @@
     <string name="msg_success_drafted">Utkast sparat</string>
     <string name="msg_logged_in_as_template">Inloggad som %s</string>
     <string name="msg_fetch_complete">Hämtat</string>
+    <string name="msg_check_network">Kolla nätverksanslutningen</string>
     
     <string name="errmsg_empty_title">En uppdatering måste ha en rubrik!</string>
     <string name="errmsg_bad_url">Felaktig URL!</string>
     <string name="errmsg_not_found_on_server">Kan inte hitta: </string>
+    <string name="errmsg_com_failure">Kommunikationsfel mot servern</string>
     <string name="errmsg_update_fetch_failed">Uppdatering kunde inte hämtas: </string>
     <string name="errmsg_user_fetch_failed">Användare kunde inte hämtas: </string>
     <string name="errmsg_org_fetch_failed">Organisation kunde inte hämtas: </string>

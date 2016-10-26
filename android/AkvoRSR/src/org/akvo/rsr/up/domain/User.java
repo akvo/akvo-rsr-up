@@ -30,10 +30,12 @@ public class User {
 	private String mLegacyOrgId; //for other users, until we start handling them having more than one org
     private Set<String> mOrgIds; //for the logged-in user
     private Set<String> mPublishedProjIds;
+    private Set<String> mEditProjIds;
 
 	public User() {
         mOrgIds = new HashSet<String>(2);
         mPublishedProjIds = new HashSet<String>(10);
+        mEditProjIds = new HashSet<String>(10);
 	}
 	
 	public String getId() {
@@ -112,6 +114,28 @@ public class User {
 
     public void clearPublishedProjIds() {
         mPublishedProjIds.clear();
+    }
+    
+    public Set<String> getEditProjIds() {
+        return mEditProjIds;
+    }
+
+    public String getEditProjIdsString() {
+        String projlist = "";
+        for (String id : mEditProjIds) {
+            projlist += id + ",";
+        }
+        if (projlist.length() > 0)
+            projlist = projlist.substring(0, projlist.length()-1);
+        return projlist;
+    }
+
+    public void addEditProjId(String id) {
+        mEditProjIds.add(id);
+    }
+
+    public void clearEditProjIds() {
+        mEditProjIds.clear();
     }
     
     public Set<String> getOrgIds() {

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -19,20 +19,20 @@ package org.akvo.rsr.up;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.FileUtil;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.TextView;
 
-public class MessageActivity extends ActionBarActivity {
+public class MessageActivity extends BackActivity {
 
     public static String TAG = "MessageActivity";
 
@@ -51,7 +51,7 @@ public class MessageActivity extends ActionBarActivity {
 		//find the fields
 		mTextView = (TextView) findViewById(R.id.text_field);
 		//Activate buttons
-/*
+/* TODO: make buttons? for now they are menu choices
 		mBtnUpdates = (Button) findViewById(R.id.btn_diag_a);
 		mBtnUpdates.setOnClickListener( new View.OnClickListener() {
 			public void onClick(View view) {//delete image cache files
@@ -79,9 +79,8 @@ public class MessageActivity extends ActionBarActivity {
 
 	
     /**
-     * returns the error log
+     * Displays the error log
      * 
-     * @param record the string to append to the log
      */
     private void fetchLog() {
         try {
@@ -112,21 +111,20 @@ public class MessageActivity extends ActionBarActivity {
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.diagnostics, menu);
+        getMenuInflater().inflate(R.menu.messages, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-/*
-        case R.id.action_clear_diagnostics:
+        case R.id.action_clear_messages:
+	    //TODO
             return true;
-        case R.id.action_settings:
+        case R.id.action_mail_messages:
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
             return true;
-            */
         default:
             return super.onOptionsItemSelected(item);
         }

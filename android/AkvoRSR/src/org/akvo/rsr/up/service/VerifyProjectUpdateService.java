@@ -7,7 +7,7 @@ import org.akvo.rsr.up.LoginActivity;
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.Downloader;
-import org.akvo.rsr.up.util.Downloader.FailedPostException;
+import org.akvo.rsr.up.util.Uploader;
 import org.akvo.rsr.up.util.SettingsUtil;
 
 import android.app.Notification;
@@ -66,7 +66,7 @@ public class VerifyProjectUpdateService extends Service {
 
 				try {
                     Context context = VerifyProjectUpdateService.this;                      
-					int unresolveds = Downloader.verifyUpdates(context, SettingsUtil.host(VerifyProjectUpdateService.this) + ConstantUtil.VERIFY_UPDATE_PATTERN);
+					int unresolveds = Uploader.verifyUpdates(context, SettingsUtil.host(VerifyProjectUpdateService.this) + ConstantUtil.VERIFY_UPDATE_PATTERN);
 					if (unresolveds == 0) { //mission accomplished
 						Log.i(TAG, "Every update verified");
 						
@@ -90,7 +90,7 @@ public class VerifyProjectUpdateService extends Service {
 						Log.i(TAG, "Still unverified:" + unresolveds);
 					}
 
-                } catch (FailedPostException e) {
+                } catch (Uploader.FailedPostException e) {
                    
                 } catch (Exception e) {
                     i.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, e.getMessage());

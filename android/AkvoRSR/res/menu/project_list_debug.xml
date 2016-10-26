@@ -1,0 +1,32 @@
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:upapp="http://schemas.android.com/apk/res-auto"
+    >
+
+    <item android:id="@+id/menu_refresh"
+        android:title="@string/btncaption_refresh"
+        android:icon="@drawable/ic_menu_refresh"
+        upapp:showAsAction="ifRoom"        
+        />
+    <item android:id="@+id/menu_settings"
+        android:title="@string/action_settings"
+        android:icon="@drawable/ic_menu_settings_holo_light"        
+         />
+    <item android:id="@+id/menu_connect"
+        android:title="@string/action_connect"
+         />
+    <item android:id="@+id/menu_organisations"
+        android:title="@string/action_organisations"
+         />
+    <item android:id="@+id/menu_messages"
+        android:title="@string/action_messages"
+         />
+    <item android:id="@+id/menu_diagnostics"
+        android:title="@string/action_diagnostics"
+         />
+    <item android:id="@+id/menu_logout"
+        android:title="@string/action_logout"
+        android:icon="@drawable/ic_menu_close_clear_cancel"        
+         />
+    
+</menu>

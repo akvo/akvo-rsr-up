@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -16,15 +16,10 @@
 
 package org.akvo.rsr.up;
 
-import java.io.File;
 import java.util.List;
 
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
-import org.akvo.rsr.up.util.ConstantUtil;
-import org.akvo.rsr.up.util.DialogUtil;
-import org.akvo.rsr.up.util.FileUtil;
-
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StatFs;
@@ -33,8 +28,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
-import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 
 public class DiagnosticActivity extends ActionBarActivity {
@@ -72,43 +65,6 @@ public class DiagnosticActivity extends ActionBarActivity {
 		mDb.open();
 	}
 
-	/**
-	 * removes all files from the image cache
-	 */
-	private void clearCache(Context context ) {
-		FileUtil.clearCache(context, false);
-		//clearOldCache();
-	}
-
-	/**
-	 * removes all files from the old image cache
-	 */
-	private void clearOldCache() {
-		File f = new File(Environment.getExternalStorageDirectory() + ConstantUtil.IMAGECACHE_DIR);
-		File [] files = f.listFiles();
-		if (files != null) { //dir might not exist
-			for (int i = 0; i < files.length; i++) { 
-				files[i].delete();
-			}
-		}
-		f = new File(Environment.getExternalStorageDirectory() + ConstantUtil.PHOTO_DIR);
-		files = f.listFiles();
-		if (files != null) { //dir might not exist
-			for (int i = 0; i < files.length; i++) { 
-				files[i].delete();
-			}
-		}
-		
-	}
-
-	/*
-	 * clears the database
-	 * TODO: should we clear login credentials, too?
-	 */
-	private void clearData() {
-		mDb.clearAllData();
-		DialogUtil.infoAlert(this, "Data cleared", "All project and update info deleted");
-	}
 	
 	@Override
 	protected void onResume() {
@@ -141,6 +97,8 @@ public class DiagnosticActivity extends ActionBarActivity {
         }
         Cursor b = mDb.listAllProjects();
         mTextView.append("\n\nProjects in db: " + String.valueOf(b.getCount()));
+//        while (b.moveToNext())
+//            mTextView.append("\n["+b.getString(b.getColumnIndex(RsrDbAdapter.PK_ID_COL))+"] " + b.getInt(b.getColumnIndex(RsrDbAdapter.LAST_FETCH_COL))+" ");
         b.close();
         Cursor b2 = mDb.listVisibleProjects();
         mTextView.append("\n\nVisible projects in db: " + String.valueOf(b2.getCount()));
@@ -151,8 +109,14 @@ public class DiagnosticActivity extends ActionBarActivity {
         Cursor a = mDb.listAllCountries();
         mTextView.append("\n\nCountries in db: " + String.valueOf(a.getCount()));
         while (a.moveToNext())
-            mTextView.append("\n["+a.getString(a.getColumnIndex(RsrDbAdapter.PK_ID_COL))+"] "+a.getString(a.getColumnIndex(RsrDbAdapter.NAME_COL))+" ");
+            mTextView.append("\n[" + a.getString(a.getColumnIndex(RsrDbAdapter.PK_ID_COL))+"] " + a.getString(a.getColumnIndex(RsrDbAdapter.NAME_COL)) + " ");
         a.close();
+
+        mTextView.append("\n\nResults in db: " + String.valueOf(mDb.countResults()));
+
+        mTextView.append("\n\nIndicators in db: " + String.valueOf(mDb.countIndicators()));
+
+        mTextView.append("\n\nPeriods in db: " + String.valueOf(mDb.countPeriods()));
 
 //		Cursor d = mDb.listAllUpdatesFor("609");
 //		mTextView.append("\nUpdates in db for 609: " + String.valueOf(d.getCount())+"\n");
@@ -163,7 +127,7 @@ public class DiagnosticActivity extends ActionBarActivity {
 		                   * (double)stat.getBlockSize();
 		//One binary gigabyte equals 1,073,741,824 bytes.
 		double gigaAvailable = sdAvailSize / 1073741824;
-        mTextView.append("\n\n"+gigaAvailable + " GiB free on card\n");
+        mTextView.append("\n\n" + gigaAvailable + " GiB free on card\n");
 	}
 		
 

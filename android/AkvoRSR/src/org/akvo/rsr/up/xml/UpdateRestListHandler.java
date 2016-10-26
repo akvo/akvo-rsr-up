@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -18,6 +18,7 @@ package org.akvo.rsr.up.xml;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -72,6 +73,10 @@ import org.xml.sax.helpers.DefaultHandler;
 </results>
 </root>
 
+
+In old entries <locations></locations> is an empty list and <primary_location></primary_location> is also empty
+
+
  */
 
 
@@ -124,6 +129,7 @@ public class UpdateRestListHandler extends DefaultHandler {
     private String primary_location_id;
     private String nextUrl = "";
     private int totalCount = 0;
+    private ArrayList<String> fetchedIds = new ArrayList<String>(); 
 	
 	//where to store results
 	private RsrDbAdapter dba;
@@ -131,7 +137,7 @@ public class UpdateRestListHandler extends DefaultHandler {
 	/*
 	 * constructor
 	 */
-	public UpdateRestListHandler(RsrDbAdapter aDba, boolean insert) {
+	public UpdateRestListHandler(RsrDbAdapter aDba, boolean insert, String serverVersion) {
 		super();
 		dba = aDba;
         this.insert = insert;
@@ -148,6 +154,10 @@ public class UpdateRestListHandler extends DefaultHandler {
 
     public int getCount() {
         return updateCount;
+    }
+
+    public ArrayList<String> getFetchedIds() {
+        return fetchedIds;
     }
 
     public int getTotalCount() {
@@ -266,15 +276,18 @@ public class UpdateRestListHandler extends DefaultHandler {
         } else if (localName.equals(LIST_ITEM)) { 
             if (in_location) {//we are done with this location
                 this.in_location = false;
-            } else { //we are done with an update
-                //TODO: verify that stored location is the primary one, otherwise raise an error
+            } else if (in_update && depth==2){  //we are done with an entire update
+                //TODO: verify that stored_location_id equals primary_location_id, otherwise raise an error
                 this.in_update = false;
                 if (currentUpd != null && currentUpd.getId() != null) {
                     updateCount++;
+                    fetchedIds.add(currentUpd.getId());
                     if (insert) {
                         dba.saveUpdate(currentUpd, false); //preserve name of any cached image
                         currentUpd = null;
                     }
+                } else {
+                    syntaxError = true; 
                 }
             }
         } else if (localName.equals("id")) {
@@ -351,6 +364,7 @@ public class UpdateRestListHandler extends DefaultHandler {
 			 || this.in_title
 			 || this.in_uuid
              || this.in_user_id
+             || this.in_primary_location
              || this.in_location_id
 			 || this.in_project_id
              || this.in_photo

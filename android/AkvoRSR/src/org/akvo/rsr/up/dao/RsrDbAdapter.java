@@ -23,10 +23,16 @@ import java.util.List;
 import java.util.Set;
 
 import org.akvo.rsr.up.domain.Country;
+import org.akvo.rsr.up.domain.Employment;
+import org.akvo.rsr.up.domain.Indicator;
+import org.akvo.rsr.up.domain.IndicatorPeriodData;
+import org.akvo.rsr.up.domain.IndicatorPeriodDataComment;
 import org.akvo.rsr.up.domain.Organisation;
+import org.akvo.rsr.up.domain.Period;
 import org.akvo.rsr.up.domain.Project;
 import org.akvo.rsr.up.domain.Update;
 import org.akvo.rsr.up.domain.User;
+import org.akvo.rsr.up.domain.Result;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
@@ -45,6 +51,25 @@ import android.util.Log;
  * 
  */
 public class RsrDbAdapter {
+
+    private static final String TAG = "RsrDbAdapter";
+    private static final boolean LOG = true;
+
+    // Table names
+    private static final String DATABASE_NAME    = "rsrdata";
+    private static final String PROJECT_TABLE    = "project";
+    private static final String UPDATE_TABLE     = "_update";
+    private static final String COUNTRY_TABLE    = "country";
+    private static final String USER_TABLE       = "user";
+    private static final String ORG_TABLE        = "_organisation";
+    private static final String RESULT_TABLE     = "_result";
+    private static final String INDICATOR_TABLE  = "_indicator";
+    private static final String PERIOD_TABLE     = "_period";
+    private static final String IPD_TABLE        = "_ipd";
+    private static final String IPDC_TABLE       = "_ipdc";
+    private static final String EMPLOYMENT_TABLE = "_employment";
+
+    //Column names
     public static final String PK_ID_COL = "_id";
     public static final String TITLE_COL = "title";
 	public static final String SUBTITLE_COL = "subtitle";
@@ -55,7 +80,8 @@ public class RsrDbAdapter {
     public static final String VIDEO_URL_COL = "video_url";
     public static final String VIDEO_FILENAME_COL = "video_fn";
 	public static final String PROJECT_COL = "project";
-	public static final String USER_COL = "userid";
+    public static final String USER_COL = "userid";//legacy
+    public static final String USER_ID_COL = "user_id";
 	public static final String TEXT_COL = "_text";
 	public static final String DRAFT_COL = "draft";
 	public static final String UNSENT_COL = "unsent";
@@ -64,11 +90,12 @@ public class RsrDbAdapter {
     public static final String UUID_COL = "uuid";
     public static final String PHOTO_CREDIT_COL = "photo_credit";
     public static final String PHOTO_CAPTION_COL = "photo_caption";
+	public static final String LAST_FETCH_COL = "last_fetch";
 
 	public static final String LAT_COL = "latitude";
     public static final String LON_COL = "longitude";
     public static final String ELE_COL = "elevation";
-	public static final String COUNTRY_COL = "country_id";
+	public static final String COUNTRY_ID_COL = "country_id";
 	public static final String STATE_COL = "state";
 	public static final String CITY_COL = "city";
 
@@ -84,24 +111,65 @@ public class RsrDbAdapter {
 
     public static final String LONG_NAME_COL = "long_name";
     public static final String URL_COL = "url";
+    public static final String DESCRIPTION_COL = "description";
+    public static final String NEW_TYPE_COL = "new_type";
+    public static final String OLD_TYPE_COL = "old_type";
+    public static final String PRIMARY_COUNTRY_ID_COL = "primary_country_id";
+    public static final String MODIFIED_COL = "modified_date";
+    public static final String LOGO_URL_COL = "logo_url";
+    public static final String LOGO_FN_COL = "logo_fn";
 
-    private static final String TAG = "RsrDbAdapter";
-	private static final boolean LOG = true;
+    public static final String RESULT_COL = "result";
+    public static final String RESULT_ID_COL = "result_id";
+    public static final String INDICATOR_ID_COL = "indicator_id";
+    public static final String PROJECT_ID_COL = "project_id";
+    public static final String PERIOD_ID_COL = "period_id";
+    public static final String IPD_ID_COL = "ipd_id";
+	public static final String MEASURE_COL = "measure";
+	public static final String BASELINE_YEAR_COL = "baseline_year";
+	public static final String BASELINE_VALUE_COL = "baseline_value";
+	public static final String BASELINE_COMMENT_COL = "baseline_comment"; 
+	public static final String TYPE_COL = "type";
+	public static final String PERIOD_START_COL = "period_start";
+	public static final String PERIOD_END_COL = "period_end";
+	public static final String ACTUAL_VALUE_COL = "actual_value";
+	public static final String ACTUAL_COMMENT_COL = "actual_comment";
+	public static final String TARGET_VALUE_COL = "target_value";
+    public static final String TARGET_COMMENT_COL = "target_comment";
+    public static final String LOCKED_COL = "locked";
+    public static final String DATA_COL = "data";
+    public static final String RELATIVE_DATA_COL = "relative_data";
+    public static final String PHOTO_URL_COL = "photo_url";
+    public static final String PHOTO_FN_COL = "photo_fn";
+    public static final String FILE_URL_COL = "file_url";
+    public static final String FILE_FN_COL = "file_fn";
+    public static final String COMMENT_COL = "comment";
+    public static final String STATUS_COL = "status";
+
+    public static final String APPROVED_COL = "approved";
+    public static final String JOB_TITLE_COL = "job_title";
+    public static final String ORG_ID_COL = "organisation_id";
+    public static final String GROUP_ID_COL = "group_id";
+    public static final String GROUP_NAME_COL = "group_name";
 
 	private DatabaseHelper databaseHelper;
 	private SQLiteDatabase database;
 	
-    private static final String PROJECT_JOIN = "project LEFT OUTER JOIN country ON (project.country_id = country._id)";
-    private static final String UPDATE_JOIN  = "_update LEFT OUTER JOIN country ON (_update.country_id = country._id)";
+    private static final String PROJECT_COUNTRY_JOIN = "project LEFT OUTER JOIN country ON (project.country_id = country._id)";
+    private static final String UPDATE_COUNTRY_JOIN  = "_update LEFT OUTER JOIN country ON (_update.country_id = country._id)";
+    private static final String ORG_COUNTRY_JOIN  = "_organisation LEFT OUTER JOIN country ON (_organisation.primary_country_id = country._id)";
 
 	/**
 	 * Database creation sql statements
+	 * TODO: make them all use nn_COL constants
 	 */
 	private static final String PROJECT_TABLE_CREATE =
 			"create table project (_id integer primary key, "+
 			"title text not null, subtitle text, summary text, funds real, "+
 			"thumbnail_url text, thumbnail_fn text," +
-			"longitude text, latitude text, elevation text, country_id integer, state text, city text, hidden integer);";
+			"longitude text, latitude text, elevation text," +
+			"country_id integer, state text, city text, hidden integer," +
+			LAST_FETCH_COL + " integer);";
 	private static final String UPDATE_TABLE_CREATE =
 			"create table _update (_id integer primary key, project integer not null, userid integer not null, "+
 			"title text not null, _text text, location text, uuid text,"+
@@ -120,20 +188,81 @@ public class RsrDbAdapter {
             "username text, organisation integer, "+
             "first_name text, last_name text, email text);";
     private static final String ORG_TABLE_CREATE =
-            "create table _organisation (_id integer primary key, "+
-            "name text, long_name text, email text, url text)";
+            "create table " + ORG_TABLE
+                    + "("
+                    + PK_ID_COL + " integer primary key,"
+                    + "name text, long_name text, email text, url text,"
+                    + DESCRIPTION_COL  + " string, "
+                    + MODIFIED_COL  + " integer, "
+                    + OLD_TYPE_COL  + " string, "
+                    + NEW_TYPE_COL  + " string, "
+                    + LOGO_URL_COL  + " string, "
+                    + LOGO_FN_COL  + " string, "
+                    + PRIMARY_COUNTRY_ID_COL  + " string "
+                    + ")";
+    
+    private static final String RESULT_TABLE_CREATE =
+            "create table " + RESULT_TABLE
+                    + "("
+                    + PK_ID_COL + " integer primary key,"
+            		+ " project_id integer not null, title text, description text, type text)";
+    private static final String INDICATOR_TABLE_CREATE =
+            "create table " + INDICATOR_TABLE
+                    + "("
+                    + PK_ID_COL + " integer primary key,"
+            		+ RESULT_ID_COL + " integer not null,"
+            		+ TITLE_COL +" text,"
+            		+ DESCRIPTION_COL + " text,"
+            		+ "baseline_year integer, baseline_value text, baseline_comment text, "
+            		+ MEASURE_COL + " text"
+            		+ ")";
+    private static final String PERIOD_TABLE_CREATE =
+            "create table " + PERIOD_TABLE
+                    + "("
+                    + PK_ID_COL + " integer primary key,"
+                    + INDICATOR_ID_COL + " integer not null,"
+                    + TITLE_COL + " text,"
+                    + LOCKED_COL + " boolean,"
+                    + "actual_value text, actual_comment text, "
+                    + "target_value text, target_comment text, "
+                    + "period_start integer, period_end integer "
+                    + ")";
+    private static final String IPD_TABLE_CREATE =
+            "create table " + IPD_TABLE
+                    + "("
+                    + PK_ID_COL + " integer primary key,"
+                    + PERIOD_ID_COL + " integer not null, "
+                    + DATA_COL + " text, "
+                    + DESCRIPTION_COL + " text, "
+                    + STATUS_COL + " text,"
+                    + RELATIVE_DATA_COL + " boolean, "
+                    + PHOTO_URL_COL + " text, "
+                    + PHOTO_FN_COL + " text, "
+                    + FILE_URL_COL + " text, "
+                    + FILE_FN_COL +" text, "
+                    + USER_ID_COL + " integer "
+                    + ")";
+    private static final String IPDC_TABLE_CREATE =
+            "create table " + IPDC_TABLE
+                    + "("
+                    + PK_ID_COL   + " integer primary key,"
+                    + IPD_ID_COL  + " integer not null,"
+                    + COMMENT_COL + " text,"
+                    + USER_ID_COL + " integer "
+                    + ")";
+    private static final String EMPLOYMENT_TABLE_CREATE =
+            "create table " + EMPLOYMENT_TABLE
+                    + "("
+                    + PK_ID_COL + " integer primary key,"
+                    + USER_ID_COL + " integer not null,"
+                    + ORG_ID_COL + " integer not null,"
+                    + GROUP_ID_COL + " integer not null,"
+                    + COUNTRY_ID_COL + " integer,"
+                    + GROUP_NAME_COL + " text,"
+                    + JOB_TITLE_COL + " text,"
+                    + APPROVED_COL + " boolean"
+                    + ")";
 
-	private static final String[] DEFAULT_PROJECT_INSERTS = new String[] {
-//		"insert into project values(1,'Sample Proj1', 'Sample proj 1 subtitle', 'sum1', 4711.00, 'url1', 'fn1')",
-//		"insert into project values(2,'Sample Proj2', 'Sample proj 2 subtitle', 'sum2', 4712.00, 'url2', 'fn2')"
-		};
-
-	private static final String DATABASE_NAME = "rsrdata";
-	private static final String PROJECT_TABLE = "project";
-	private static final String UPDATE_TABLE  = "_update";
-	private static final String COUNTRY_TABLE = "country";
-    private static final String USER_TABLE    = "user";
-    private static final String ORG_TABLE     = "_organisation";
 
 //	private static final int DATABASE_VERSION = 5;
 //	private static final int DATABASE_VERSION = 6; //added project columns:long, lat, country, state, city
@@ -145,7 +274,9 @@ public class RsrDbAdapter {
 //  private static final int DATABASE_VERSION = 12; //uuid for updates
 //  private static final int DATABASE_VERSION = 13; //org table
 //  private static final int DATABASE_VERSION = 14; //update now has photo metadata and video
-    private static final int DATABASE_VERSION = 15; //update now has location
+//  private static final int DATABASE_VERSION = 15; //update now has location
+//  private static final int DATABASE_VERSION = 16; //project gets a last_fetch datetime to optimize fetches
+    private static final int DATABASE_VERSION = 17; //results framework (added result, indicator, period, ipd and ipdc tables). Employment table. New Org columns.
 
 	private final Context context;
 
@@ -175,9 +306,12 @@ public class RsrDbAdapter {
 			db.execSQL(COUNTRY_TABLE_CREATE);
             db.execSQL(USER_TABLE_CREATE);
             db.execSQL(ORG_TABLE_CREATE);
-			for (int i = 0; i < DEFAULT_PROJECT_INSERTS.length; i++) {
-				db.execSQL(DEFAULT_PROJECT_INSERTS[i]);
-			}			
+            db.execSQL(RESULT_TABLE_CREATE);
+            db.execSQL(INDICATOR_TABLE_CREATE);
+            db.execSQL(PERIOD_TABLE_CREATE);
+            db.execSQL(IPD_TABLE_CREATE);
+            db.execSQL(IPDC_TABLE_CREATE);
+            db.execSQL(EMPLOYMENT_TABLE_CREATE);
 		}
 
 		@Override
@@ -212,93 +346,25 @@ public class RsrDbAdapter {
                     db.execSQL("alter table " + UPDATE_TABLE + " add column city text");
                     db.execSQL("alter table " + UPDATE_TABLE + " add column country_id integer");
                 }
+                if (oldVersion < 16) { //remember last fetch of a project
+                    db.execSQL("alter table " + PROJECT_TABLE + " add column " + LAST_FETCH_COL + " integer");
+                }
+                if (oldVersion < 17) { //need results tables and more org columns
+                    db.execSQL(RESULT_TABLE_CREATE);
+                    db.execSQL(INDICATOR_TABLE_CREATE);
+                    db.execSQL(PERIOD_TABLE_CREATE);
+                    db.execSQL(IPD_TABLE_CREATE);
+                    db.execSQL(IPDC_TABLE_CREATE);
+                    db.execSQL(EMPLOYMENT_TABLE_CREATE);
+                    db.execSQL("alter table " + ORG_TABLE + " add column " + DESCRIPTION_COL + " string");
+                    db.execSQL("alter table " + ORG_TABLE + " add column " + PRIMARY_COUNTRY_ID_COL + " string");
+                    db.execSQL("alter table " + ORG_TABLE + " add column " + OLD_TYPE_COL + " string");
+                    db.execSQL("alter table " + ORG_TABLE + " add column " + NEW_TYPE_COL + " string");
+                    db.execSQL("alter table " + ORG_TABLE + " add column " + LOGO_URL_COL + " string");
+                    db.execSQL("alter table " + ORG_TABLE + " add column " + LOGO_FN_COL  + " string");
+                    db.execSQL("alter table " + ORG_TABLE + " add column " + MODIFIED_COL + " integer");
+                }           
             }
-			/*
-			if (oldVersion < 57) {
-				db.execSQL("DROP TABLE IF EXISTS " + RESPONSE_TABLE);
-				db.execSQL("DROP TABLE IF EXISTS " + RESPONDENT_TABLE);
-				db.execSQL("DROP TABLE IF EXISTS " + SURVEY_TABLE);
-				db.execSQL("DROP TABLE IF EXISTS " + PLOT_POINT_TABLE);
-				db.execSQL("DROP TABLE IF EXISTS " + PLOT_TABLE);
-				db.execSQL("DROP TABLE IF EXISTS " + USER_TABLE);
-				db.execSQL("DROP TABLE IF EXISTS " + PREFERENCES_TABLE);
-				db.execSQL("DROP TABLE IF EXISTS " + POINT_OF_INTEREST_TABLE);
-				db.execSQL("DROP TABLE IF EXISTS " + TRANSMISSION_HISTORY_TABLE);
-				onCreate(db);
-			} else if (oldVersion < 75) {
-
-				// changes made in version 57
-				runSQL(TRANSMISSION_HISTORY_TABLE_CREATE, db);
-
-				// changes made in version 58
-				try {
-					String value = null;
-					Cursor cursor = db.query(PREFERENCES_TABLE, new String[] {
-							KEY_COL, VALUE_COL }, KEY_COL + " = ?",
-							new String[] { "survey.textsize" }, null, null,
-							null);
-					if (cursor != null) {
-						if (cursor.getCount() > 0) {
-							cursor.moveToFirst();
-							value = cursor.getString(cursor
-									.getColumnIndexOrThrow(VALUE_COL));
-						}
-						cursor.close();
-					}
-					if (value == null) {
-						runSQL("insert into preferences values('survey.textsize','LARGE')",
-								db);
-					}
-				} catch (Exception e) {
-					// swallow
-				}
-
-				// changes in version 63
-				runSQL("alter table survey_respondent add column exported_flag text",
-						db);
-
-				// changes in version 68
-				try {
-					runSQL("alter table survey_respondent add column uuid text",
-							db);
-					// also generate a uuid for all in-flight responses
-					Cursor cursor = db.query(RESPONDENT_JOIN, new String[] {
-							RESPONDENT_TABLE + "." + PK_ID_COL, DISP_NAME_COL,
-							SAVED_DATE_COL, SURVEY_FK_COL, USER_FK_COL,
-							SUBMITTED_DATE_COL, DELIVERED_DATE_COL, UUID_COL },
-							null, null, null, null, null);
-					if (cursor != null) {
-						cursor.moveToFirst();
-						do {
-							String uuid = cursor.getString(cursor
-									.getColumnIndex(UUID_COL));
-							if (uuid == null || uuid.trim().length() == 0) {
-								db.execSQL("update " + RESPONDENT_TABLE
-										+ " set " + UUID_COL + "= '"
-										+ UUID.randomUUID().toString() + "'");
-							}
-						} while (cursor.moveToNext());
-						cursor.close();
-					}
-				} catch (Exception e) {
-					// swallow
-				}
-				// changes made in version 69
-				runSQL("alter table user add column deleted_flag text", db);
-				runSQL("update user set deleted_flag = 'N' where deleted_flag <> 'Y'",
-						db);
-
-				runSQL("update survey set language = 'en' where language = 'english' or language is null",
-						db);
-				if (oldVersion < 74) {
-					runSQL("insert into preferences values('survey.checkforupdates','0')",
-							db);
-					runSQL("insert into preferences values('remoteexception.upload','0')",
-							db);
-				}
-			}
-*/
-
 		}
 
 		
@@ -403,7 +469,7 @@ public class RsrDbAdapter {
 		updatedValues.put(THUMBNAIL_URL_COL, project.getThumbnailUrl());
 		//not done here to preserve a cache connection
 //		updatedValues.put(THUMBNAIL_FILENAME_COL, project.getThumbnailFilename());
-		updatedValues.put(COUNTRY_COL, project.getCountry());
+		updatedValues.put(COUNTRY_ID_COL, project.getCountry());
 		updatedValues.put(STATE_COL, project.getState());
 		updatedValues.put(CITY_COL, project.getCity());
 		updatedValues.put(LAT_COL, project.getLatitude());
@@ -441,6 +507,17 @@ public class RsrDbAdapter {
 
 	
 	/*
+	 *  Update the last-fetch date for the updates in a project
+	 */
+	public void updateProjectLastFetch(String id, Date lastfetch) {
+		ContentValues updatedValues = new ContentValues();
+		updatedValues.put(LAST_FETCH_COL, lastfetch.getTime()/1000); //1-second precision only
+		//int n = 
+		database.update(PROJECT_TABLE, updatedValues, PK_ID_COL + " = ?", new String[] { id });
+	}
+
+	
+	/*
 	 *  Clear the local filenames of all projects
 	 */
 	public void clearProjectThumbnailFiles() {
@@ -451,7 +528,7 @@ public class RsrDbAdapter {
 
 
 	/*
-	 *  Update the local filename of a cached image
+	 *  Set hidden attribute for all projects not visible to current user
 	 */
 	public void setVisibleProjects(Set<String> ids) {
 		//Hide all
@@ -479,6 +556,17 @@ public class RsrDbAdapter {
 	 * 
 	 * @param survey
 	 * @return
+	 * 
+	 *TODO: optimise away unnecessary writes
+	  new String[] { NAME_COL, LONG_NAME_COL },
+        
+        if (cursor != null && cursor.moveToNext() ) {
+            // we found an item, it's an update, if necessary!
+            if (!cursor.getString(0).equals(org.getName())
+                || !cursor.getString(1).equals(org.getLongName())) {
+            database.update(ORG_TABLE, updatedValues, PK_ID_COL + " = ?",
+                    new String[] { org.getId() });
+  
 	 */
 	public void saveUpdate(Update update, boolean saveFn) {
 		ContentValues updatedValues = new ContentValues();
@@ -498,7 +586,7 @@ public class RsrDbAdapter {
         updatedValues.put(PHOTO_CAPTION_COL, update.getPhotoCaption());
         updatedValues.put(PHOTO_CREDIT_COL, update.getPhotoCredit());
 
-        updatedValues.put(COUNTRY_COL, update.getLocation().getCountryId());
+        updatedValues.put(COUNTRY_ID_COL, update.getLocation().getCountryId());
         updatedValues.put(STATE_COL, update.getState());
         updatedValues.put(CITY_COL, update.getCity());
         updatedValues.put(LAT_COL, update.getLatitude());
@@ -642,7 +730,7 @@ public class RsrDbAdapter {
      * Gets all projects, all columns and country data
      */
     public Cursor listAllProjectsWithCountry() {
-        Cursor cursor = database.query(PROJECT_JOIN,
+        Cursor cursor = database.query(PROJECT_COUNTRY_JOIN,
                                         null,
                                         null,
                                         null,
@@ -657,7 +745,7 @@ public class RsrDbAdapter {
      * Gets visible projects, all columns and country data
      */
     public Cursor listVisibleProjectsWithCountry() {
-        Cursor cursor = database.query(PROJECT_JOIN,
+        Cursor cursor = database.query(PROJECT_COUNTRY_JOIN,
                 new String[] { "project._id", "project.title", "project.hidden", "project.thumbnail_url", "project.thumbnail_fn", "country.name", "country.continent" },
                 HIDDEN_COL + " = ?",
                 new String[] { "0" },
@@ -682,7 +770,7 @@ public class RsrDbAdapter {
         search = search.replaceAll(",", " ");
         */
         //Match caseless, assume country or continent is present in entirety
-        Cursor cursor = database.query(PROJECT_JOIN,
+        Cursor cursor = database.query(PROJECT_COUNTRY_JOIN,
                 new String[] { "project._id", "project.title", "project.hidden", "project.thumbnail_url", "project.thumbnail_fn", "country.name", "country.continent" },
                 HIDDEN_COL + " = ? AND ( title LIKE ? OR name LIKE ? OR continent LIKE ? OR project._id = ?)",
                 new String[] { "0", "%" + search + "%", search, search, search },
@@ -723,20 +811,46 @@ public class RsrDbAdapter {
 		return cursor;
 	}
 
-	/**
-	 * Gets updates for a specific project, all columns
-	 */
-	public Cursor listAllUpdatesNewestFirstFor(String _id) {
-		Cursor cursor = database.query(UPDATE_TABLE,
-										null,
-										PROJECT_COL + " = ?",
-										new String[] { _id },
-										null,
-										null,
-										CREATED_COL + " DESC");
+    /**
+     * Gets updates for a specific project, all columns
+     */
+    public Cursor listAllUpdatesNewestFirstFor(String _id) {
+        Cursor cursor = database.query(UPDATE_TABLE,
+                                        null,
+                                        PROJECT_COL + " = ?",
+                                        new String[] { _id },
+                                        null,
+                                        null,
+                                        CREATED_COL + " DESC");
 
-		return cursor;
-	}
+        return cursor;
+    }
+
+    /**
+     * Gets list of ids of updates for a specific project
+     */
+    public List<String> getUpdatesForList(String projid) {
+        List<String> idList = new ArrayList<String>();  
+        try {
+            Cursor cursor = database.query(UPDATE_TABLE,
+                                            new String[] {
+                                                PK_ID_COL
+                                            },
+                                            PROJECT_COL + " = ?",
+                                            new String[] { projid },
+                                            null,
+                                            null,
+                                            null);
+            int c = cursor.getColumnIndex("_id");
+            while (cursor.moveToNext()) {
+                idList.add(cursor.getString(c));
+            }
+            cursor.close();
+        }
+        catch (NullPointerException e) {
+        }    
+        return idList;
+    }
 
 	/**
 	 * Gets unsent updates, all columns
@@ -834,13 +948,35 @@ public class RsrDbAdapter {
      * Gets all orgs, all columns
      */
     public Cursor listAllOrgs() {
-        Cursor cursor = database.query(ORG_TABLE,
-                                        null,
-                                        null,
-                                        null,
-                                        null,
-                                        null,
-                                        null);
+        Cursor cursor = database.query(ORG_COUNTRY_JOIN,
+                new String[] {
+                    "_organisation._id", "_organisation.name", "_organisation.long_name", "_organisation.logo_url", "_organisation.logo_fn",
+                    "country.name AS country_name", "country.continent"
+                },
+                null,
+                null,
+                null,
+                null,
+               "_organisation.name");
+        return cursor;
+    }
+
+
+    /**
+     * Gets all orgs, all columns
+     */
+    public Cursor listAllOrgsMatching(String search) {
+        //Match caseless, assume id, country or continent is present in entirety (or else "1" would match more than 10% of records) 
+        Cursor cursor = database.query(ORG_COUNTRY_JOIN,
+                new String[] {
+                "_organisation._id", "_organisation.name", "_organisation.long_name", "_organisation.logo_url", "_organisation.logo_fn",
+                "country.name AS country_name", "country.continent"
+            },
+            "( _organisation.name LIKE ? OR _organisation.long_name LIKE ? OR country_name LIKE ? OR continent LIKE ? OR _organisation._id = ?)",
+            new String[] { "%" + search + "%", "%" + search + "%", search, search, search },
+            null,
+            null,
+            "_organisation.name");
         return cursor;
     }
 
@@ -873,14 +1009,88 @@ public class RsrDbAdapter {
         }
         return idList;
     }
+    
+    /**
+     * gets org names
+     */
+    public List<String> getOrgNameList() {
+        List<String> nList = new ArrayList<String>();  
+        try {
+            Cursor cursor = database.query(ORG_TABLE,
+                    new String[] {
+                        NAME_COL
+                    },
+                    null,
+                    null,
+                    null,
+                    null,
+                    null);//unordered
+            int c = cursor.getColumnIndex(NAME_COL);
+            while (cursor.moveToNext()) {
+                nList.add(cursor.getString(c));
+            }
+            cursor.close();
+        }
+        catch (NullPointerException e) {
+        }
+        return nList;
+    }
 
+    /**
+     * Gets a single org from the db using its primary key
+     */
+    public Organisation findOrg(String _id) {
+        Organisation org = null;
+        Cursor cursor = database.query(ORG_TABLE,
+                                       null,
+                                       "_id = ?",
+                                       new String[] { _id }, null, null, null);
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                org = new Organisation();
+                org.setId(_id);
+                org.setName(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
+                org.setLongName(cursor.getString(cursor.getColumnIndexOrThrow(LONG_NAME_COL)));
+                org.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(EMAIL_COL)));
+                }
+            cursor.close();
+            }
 
+        return org;
+    }
+
+    /**
+     * Gets a single org from the db using its name (exact match)
+     */
+    public Organisation findOrgByName(String name) {
+        Organisation org = null;
+        Cursor cursor = database.query(ORG_TABLE,
+                                       null,
+                                       "name = ?",
+                                       new String[] { name }, null, null, null);
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                org = new Organisation();
+                org.setId(cursor.getString(cursor.getColumnIndexOrThrow(PK_ID_COL)));
+                org.setName(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
+                org.setLongName(cursor.getString(cursor.getColumnIndexOrThrow(LONG_NAME_COL)));
+                org.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(EMAIL_COL)));
+                }
+            cursor.close();
+            }
+
+        return org;
+    }
+
+    
 	/**
 	 * Gets a single project from the db using its primary key
 	 */
 	public Project findProject(String _id) {
 		Project project = null;
-		Cursor cursor = database.query(PROJECT_JOIN,
+		Cursor cursor = database.query(PROJECT_COUNTRY_JOIN,
 									   null,
 									   "project._id = ?",
 									   new String[] { _id }, null, null, null);
@@ -900,7 +1110,9 @@ public class RsrDbAdapter {
 				project.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(LAT_COL)));
 				project.setLongitude(cursor.getString(cursor.getColumnIndexOrThrow(LON_COL)));
 				project.setHidden(0 != cursor.getInt(cursor.getColumnIndexOrThrow(HIDDEN_COL)));
-				}
+				project.setLastFetch(new Date(1000L * cursor.getInt(cursor.getColumnIndexOrThrow(LAST_FETCH_COL))));
+				//Log.d(TAG, "Project "+_id+" last fetch (s)"+cursor.getInt(cursor.getColumnIndexOrThrow(LAST_FETCH_COL)));
+			}
 			cursor.close();
 			}
 
@@ -913,7 +1125,7 @@ public class RsrDbAdapter {
 	 */
 	public Update findUpdate(String _id) {
 	    Update update = null;
-		Cursor cursor = database.query(UPDATE_JOIN,
+		Cursor cursor = database.query(UPDATE_COUNTRY_JOIN,
 										null, //all columns
 										"_update._id = ?",
 										new String[] { _id }, null, null, null);
@@ -934,9 +1146,9 @@ public class RsrDbAdapter {
                 update.setPhotoCredit(cursor.getString(cursor.getColumnIndexOrThrow(PHOTO_CREDIT_COL)));
 				update.setDraft(0 != cursor.getInt(cursor.getColumnIndexOrThrow(DRAFT_COL)));
 				update.setUnsent(0 != cursor.getInt(cursor.getColumnIndexOrThrow(UNSENT_COL)));
-				update.setDate(new Date(1000 * cursor.getLong(cursor.getColumnIndexOrThrow(CREATED_COL))));
+				update.setDate(new Date(1000L * cursor.getLong(cursor.getColumnIndexOrThrow(CREATED_COL))));
                 update.setCountry(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
-                update.getLocation().setCountryId(cursor.getString(cursor.getColumnIndexOrThrow(COUNTRY_COL)));
+                update.getLocation().setCountryId(cursor.getString(cursor.getColumnIndexOrThrow(COUNTRY_ID_COL)));
 				update.setState(cursor.getString(cursor.getColumnIndexOrThrow(STATE_COL)));
 				update.setCity(cursor.getString(cursor.getColumnIndexOrThrow(CITY_COL)));
 				update.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(LAT_COL)));
@@ -1087,6 +1299,9 @@ public class RsrDbAdapter {
                 org.setLongName(cursor.getString(cursor.getColumnIndexOrThrow(LONG_NAME_COL)));
                 org.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(EMAIL_COL)));
                 org.setUrl(cursor.getString(cursor.getColumnIndexOrThrow(URL_COL)));
+                org.setLogo(cursor.getString(cursor.getColumnIndexOrThrow(LOGO_URL_COL)));
+                //org.setLogoFilename(cursor.getString(cursor.getColumnIndexOrThrow(LOGO_FN_COL)));
+                org.setPrimaryCountryId(cursor.getString(cursor.getColumnIndexOrThrow(PRIMARY_COUNTRY_ID_COL)));
                 }
             cursor.close();
             }
@@ -1108,6 +1323,9 @@ public class RsrDbAdapter {
         updatedValues.put(LONG_NAME_COL, org.getLongName());
         updatedValues.put(EMAIL_COL, org.getEmail());
         updatedValues.put(URL_COL, org.getUrl());
+        updatedValues.put(PRIMARY_COUNTRY_ID_COL, org.getPrimaryCountryId());
+        updatedValues.put(LOGO_URL_COL, org.getLogo());
+        //not logo filename, to preserve cache connection
         
         Cursor cursor = database.query(ORG_TABLE,
                                         new String[] { PK_ID_COL },
@@ -1128,7 +1346,498 @@ public class RsrDbAdapter {
         }
     }
 
+    /**
+    * creates or updates a user in the db
+    *
+    * @param org the org data to be updated
+    * @return
+    */
+    public void saveMinimalOrganisation(Organisation org) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(PK_ID_COL, org.getId());
+        updatedValues.put(NAME_COL, org.getName());
+        updatedValues.put(LONG_NAME_COL, org.getLongName());
+        
+        Cursor cursor = database.query(ORG_TABLE,
+                                       new String[] { NAME_COL, LONG_NAME_COL },
+                                       PK_ID_COL + " = ?",
+                                       new String[] { org.getId(), },
+                                       null, null, null);
+        
+        if (cursor != null && cursor.moveToNext() ) {
+            // we found an item, it's an update, if necessary!
+            if (!cursor.getString(0).equals(org.getName())
+                || !cursor.getString(1).equals(org.getLongName())) {
+            database.update(ORG_TABLE, updatedValues, PK_ID_COL + " = ?",
+                    new String[] { org.getId() });
+            }
+        } else { // it's an insert
+            database.insert(ORG_TABLE, null, updatedValues);
+        }
+        
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
+
     
+
+    /**
+     * Gets a single result from the db using its primary key
+     */
+    public Result findResult(String _id) {
+        Result res = null;
+        Cursor cursor = database.query(RESULT_TABLE,
+                                       null,
+                                       "_id = ?",
+                                       new String[] { _id }, null, null, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                res = new Result();
+                res.setId(_id);
+                res.setProjectId(cursor.getString(cursor.getColumnIndexOrThrow(PROJECT_COL)));
+                res.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(TITLE_COL)));
+                res.setDescription(cursor.getString(cursor.getColumnIndexOrThrow(DESCRIPTION_COL)));
+                }
+            cursor.close();
+            }
+
+        return res;
+    }
+
+
+    /**
+    * creates or updates a result in the db
+    *
+    * @param res the result data to be updated
+    * @return
+    */
+    public void saveResult(Result res) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(PK_ID_COL, res.getId());
+        updatedValues.put(TITLE_COL, res.getTitle());
+        updatedValues.put(DESCRIPTION_COL, res.getDescription());
+        updatedValues.put(PROJECT_ID_COL, res.getProjectId());
+        updatedValues.put(TYPE_COL, res.getType());
+        
+        Cursor cursor = database.query(RESULT_TABLE,
+                                        new String[] { PK_ID_COL },
+                                        PK_ID_COL + " = ?",
+                                        new String[] { res.getId(), },
+                                        null, null, null);
+        
+        if (cursor != null && cursor.getCount() > 0) {
+            // if we found an item, it's an update, otherwise, it's an insert
+            database.update(RESULT_TABLE, updatedValues, PK_ID_COL + " = ?",
+                    new String[] { res.getId() });
+        } else {
+            database.insert(RESULT_TABLE, null, updatedValues);
+        }
+        
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
+
+	/**
+	 * Gets updates for a specific project, all columns
+	 */
+	public Cursor listResultsFor(String _id) {
+		Cursor cursor = database.query(RESULT_TABLE,
+										null,
+										PROJECT_ID_COL + " = ?",
+										new String[] { _id },
+										null,
+										null,
+										null);
+
+		return cursor;
+	}
+
+	
+    /**
+     * Gets results, indicators and periods for a specific project
+     */
+    public Cursor listResultsIndicatorsPeriodsFor(String _id) {
+        Cursor cursor = database.query(RESULT_TABLE + 
+                                        " LEFT JOIN "+ INDICATOR_TABLE + " ON  " + RESULT_TABLE + "._id = " + INDICATOR_TABLE + ".result_id" +
+                                        " LEFT JOIN " + PERIOD_TABLE + " ON  " + INDICATOR_TABLE + "._id = " + PERIOD_TABLE + ".indicator_id",
+                                        new String[] {
+                                            "_result._id as result_id",
+                                            "_indicator._id as indicator_id",
+                                            "_period._id as period_id",
+                                            "_result.title as result_title",
+                                            "_indicator.title as indicator_title",
+                                            "_period.period_start",
+                                            "_period.period_end",
+                                            "_period.actual_value",
+                                            "_period.target_value",
+                                            "_period.locked"
+                                            },
+                                        PROJECT_ID_COL + " = ?",
+                                        new String[] { _id },
+                                        null, //group by
+                                        null,
+                                        "_result._id,_indicator._id,_period._id DESC"); //order by
+
+        return cursor;
+    }
+    /**
+     * Gets data and comments for a specific period, all columns
+     */
+    public Cursor listDataAndCommentsForPeriod(String _id) {
+        Cursor cursor = database.query(IPD_TABLE + 
+                                        " LEFT JOIN " + IPDC_TABLE + " ON  " + IPD_TABLE + "._id = " + IPDC_TABLE + ".ipd_id" +
+                                        " LEFT JOIN " + USER_TABLE + " duser ON  duser._id = " + IPD_TABLE + ".user_id" +
+                                        " LEFT JOIN " + USER_TABLE + " cuser ON  cuser._id = " + IPDC_TABLE + ".user_id",
+                                        new String[] {
+                                            "_ipd._id as ipd_id",
+                                            "_ipd.data",
+                                            "_ipd.relative_data",
+                                            "_ipd.description",
+                                            "_ipd.status",
+                                            "duser.first_name AS data_first_name",
+                                            "duser.last_name AS data_last_name",
+                                            "cuser.first_name AS comment_first_name",
+                                            "cuser.last_name AS comment_last_name",
+                                            "_ipdc.comment"
+                                            },
+                                        PERIOD_ID_COL + " = ?",
+                                        new String[] { _id },
+                                        null, //group by
+                                        null,
+                                        "_ipd._id DESC"); //order by
+
+        return cursor;
+    }
+
+	
+    /**
+     * Gets a single result from the db using its primary key
+     */
+    public Indicator findIndicator(String _id) {
+        Indicator ind = null;
+        Cursor cursor = database.query(INDICATOR_TABLE,
+                                       null,
+                                       "_id = ?",
+                                       new String[] { _id }, null, null, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                ind = new Indicator();
+                ind.setId(_id);
+                ind.setResultId(cursor.getString(cursor.getColumnIndexOrThrow(RESULT_ID_COL)));
+                ind.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(TITLE_COL)));
+
+                }
+            cursor.close();
+            }
+
+        return ind;
+    }
+    /**
+    * creates or updates an indicator in the db
+    *
+    * @param ind the indicator data to be updated
+    * @return
+    */
+    public void saveIndicator(Indicator ind) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(PK_ID_COL, ind.getId());
+        updatedValues.put(TITLE_COL, ind.getTitle());
+        updatedValues.put(DESCRIPTION_COL, ind.getDescription());
+        updatedValues.put(RESULT_ID_COL, ind.getResultId());
+        updatedValues.put(MEASURE_COL, ind.getMeasure());
+        updatedValues.put(BASELINE_YEAR_COL, ind.getBaselineYear());
+        updatedValues.put(BASELINE_VALUE_COL, ind.getBaselineValue());
+        updatedValues.put(BASELINE_COMMENT_COL, ind.getBaselineComment());
+        
+        Cursor cursor = database.query(INDICATOR_TABLE,
+                                        new String[] { PK_ID_COL },
+                                        PK_ID_COL + " = ?",
+                                        new String[] { ind.getId(), },
+                                        null, null, null);
+        
+        if (cursor != null && cursor.getCount() > 0) {
+            // if we found an item, it's an update, otherwise, it's an insert
+            database.update(INDICATOR_TABLE, updatedValues, PK_ID_COL + " = ?",
+                    new String[] { ind.getId() });
+        } else {
+            database.insert(INDICATOR_TABLE, null, updatedValues);
+        }
+        
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
+
+    
+
+    /**
+     * Gets a single result from the db using its primary key
+     */
+    public Period findPeriod(String _id) {
+        Period per = null;
+        Cursor cursor = database.query(PERIOD_TABLE,
+                                       null,
+                                       "_id = ?",
+                                       new String[] { _id }, null, null, null);
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                per = new Period();
+                per.setId(_id);
+                per.setIndicatorId(cursor.getString(cursor.getColumnIndexOrThrow(INDICATOR_ID_COL)));
+                per.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(TITLE_COL)));
+                per.setLocked(0 != cursor.getInt(cursor.getColumnIndexOrThrow(LOCKED_COL)));
+                per.setActualValue(cursor.getString(cursor.getColumnIndexOrThrow(ACTUAL_VALUE_COL)));
+                per.setTargetValue(cursor.getString(cursor.getColumnIndexOrThrow(TARGET_VALUE_COL)));
+                per.setActualComment(cursor.getString(cursor.getColumnIndexOrThrow(ACTUAL_COMMENT_COL)));
+                per.setTargetComment(cursor.getString(cursor.getColumnIndexOrThrow(TARGET_COMMENT_COL)));
+                //Dates that can be null
+                if (cursor.isNull(cursor.getColumnIndexOrThrow(PERIOD_START_COL))) {
+                    per.setPeriodStart(null);      
+                } else {
+                    per.setPeriodStart(new Date(1000L * cursor.getLong(cursor.getColumnIndexOrThrow(PERIOD_START_COL))));
+                }
+                if (cursor.isNull(cursor.getColumnIndexOrThrow(PERIOD_END_COL))) {
+                    per.setPeriodEnd(null);      
+                } else {
+                    per.setPeriodEnd(new Date(1000L * cursor.getLong(cursor.getColumnIndexOrThrow(PERIOD_END_COL))));
+                }
+
+                }
+            cursor.close();
+            }
+
+        return per;
+    }
+
+
+    /**
+    * creates or updates an indicator in the db
+    *
+    * @param period the indicator data to be updated
+    * @return
+    */
+    public void savePeriod(Period period) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(PK_ID_COL, period.getId());
+        updatedValues.put(TITLE_COL, period.getTitle());
+        updatedValues.put(INDICATOR_ID_COL, period.getIndicatorId());
+        if (period.getPeriodStart() != null) {
+            updatedValues.put(PERIOD_START_COL, period.getPeriodStart().getTime()/1000);
+        } else {
+            updatedValues.putNull(PERIOD_START_COL);
+        }
+        if (period.getPeriodEnd() != null) {
+            updatedValues.put(PERIOD_END_COL, period.getPeriodEnd().getTime()/1000);
+        } else {
+            updatedValues.putNull(PERIOD_END_COL);
+        }
+        updatedValues.put(ACTUAL_VALUE_COL, period.getActualValue());
+        updatedValues.put(ACTUAL_COMMENT_COL, period.getActualComment());
+        updatedValues.put(TARGET_VALUE_COL, period.getTargetValue());
+        updatedValues.put(TARGET_COMMENT_COL, period.getTargetComment());
+        updatedValues.put(LOCKED_COL, period.getLocked());
+        
+        Cursor cursor = database.query(PERIOD_TABLE,
+                                        new String[] { PK_ID_COL },
+                                        PK_ID_COL + " = ?",
+                                        new String[] { period.getId(), },
+                                        null, null, null);
+        
+        if (cursor != null && cursor.getCount() > 0) {
+            // if we found an item, it's an update, otherwise, it's an insert
+            database.update(PERIOD_TABLE, updatedValues, PK_ID_COL + " = ?",
+                    new String[] { period.getId() });
+        } else {
+            database.insert(PERIOD_TABLE, null, updatedValues);
+        }
+        
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
+
+    
+    /**
+    * creates or updates an indicator period data record in the db
+    *
+    * @param ipd the indicator period data to be updated
+    * @return
+    */
+    public void saveIpd(IndicatorPeriodData ipd) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(PK_ID_COL, ipd.getId());
+        updatedValues.put(DATA_COL, ipd.getData());
+        updatedValues.put(RELATIVE_DATA_COL, ipd.getRelativeData());
+        updatedValues.put(DESCRIPTION_COL, ipd.getDescription());
+        updatedValues.put(PERIOD_ID_COL, ipd.getPeriodId());
+        updatedValues.put(USER_ID_COL, ipd.getUserId());
+        updatedValues.put(STATUS_COL, ipd.getStatus());
+        updatedValues.put(PHOTO_URL_COL, ipd.getPhotoUrl());
+        updatedValues.put(FILE_URL_COL, ipd.getFileUrl());
+        //The filename fields are saved when images are fetched
+//        updatedValues.put(PHOTO_FN_COL, ipd.getPhotoFn());
+//        updatedValues.put(FILE_FN_COL, ipd.getFileFn());
+        
+        Cursor cursor = database.query(IPD_TABLE,
+                                        new String[] { PK_ID_COL },
+                                        PK_ID_COL + " = ?",
+                                        new String[] { ipd.getId(), },
+                                        null, null, null);
+        
+        if (cursor != null && cursor.getCount() > 0) {
+            // if we found an item, it's an update, otherwise, it's an insert
+            database.update(IPD_TABLE, updatedValues, PK_ID_COL + " = ?",
+                    new String[] { ipd.getId() });
+        } else {
+            database.insert(IPD_TABLE, null, updatedValues);
+        }
+        
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
+
+    
+    /*
+     *  Update the local filename of a cached photo
+     */
+    public void updateIpdcPhotoFile(String id, String filename) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(PHOTO_FN_COL, filename);
+        database.update(IPDC_TABLE, updatedValues, PK_ID_COL + " = ?", new String[] { id });
+    }
+
+
+    /*
+     *  Update the local filename of a cached attachment
+     */
+    public void updateIpdcAttachedFile(String id, String filename) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(FILE_FN_COL, filename);
+        database.update(IPDC_TABLE, updatedValues, PK_ID_COL + " = ?", new String[] { id });
+    }
+
+
+    /*
+     *  Clear the local filenames of all updates
+     */
+    public void clearIpdcMediaFiles() {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.putNull(PHOTO_FN_COL);
+        updatedValues.putNull(FILE_FN_COL);
+        database.update(IPDC_TABLE, updatedValues, null, null);
+    }
+
+
+    
+    /**
+    * creates or updates an indicator period data record in the db
+    *
+    * @param ipdc the indicator period data comment to be updated
+    * @return
+    */
+    public void saveIpdc(IndicatorPeriodDataComment ipdc) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(PK_ID_COL, ipdc.getId());
+        updatedValues.put(COMMENT_COL, ipdc.getComment());
+        updatedValues.put(USER_COL, ipdc.getUserId());
+        
+        Cursor cursor = database.query(IPDC_TABLE,
+                                        new String[] { PK_ID_COL },
+                                        PK_ID_COL + " = ?",
+                                        new String[] { ipdc.getId(), },
+                                        null, null, null);
+        
+        if (cursor != null && cursor.getCount() > 0) {
+            // if we found an item, it's an update, otherwise, it's an insert
+            database.update(IPDC_TABLE, updatedValues, PK_ID_COL + " = ?",
+                    new String[] { ipdc.getId() });
+        } else {
+            database.insert(IPDC_TABLE, null, updatedValues);
+        }
+        
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
+
+    
+	public int countResults() {
+		int c = -1;
+		Cursor cursor = database.query(RESULT_TABLE, new String[] {"COUNT (*) as row_count"}, 
+        								null, null, null, null, null);
+        if (cursor != null) {
+        	if ( cursor.moveToFirst() ) {
+        		c = cursor.getInt(0);
+        	}
+        	cursor.close();
+        }
+        return c;
+    }
+
+    public int countResultsFor(String pid) {
+        int c = -1;
+        Cursor cursor = database.query( RESULT_TABLE, new String[] {"COUNT (*) as row_count"}, 
+                                        RESULT_TABLE + ".project_id = ?",
+                                        new String[] {pid},
+                                        null, null, null);
+        if (cursor != null) {
+            if ( cursor.moveToFirst() ) {
+                c = cursor.getInt(0);
+            }
+            cursor.close();
+        }
+        return c;
+    }
+
+
+
+    public int countIndicators() {
+        int c = -1;
+        Cursor cursor = database.query(INDICATOR_TABLE, new String[] {"COUNT (*) as row_count"}, 
+                null, null, null, null, null);
+        if (cursor != null) {
+            if ( cursor.moveToFirst() ) {
+                c = cursor.getInt(0);
+            }
+            cursor.close();
+        }
+        return c;
+    }
+
+
+    public int countIndicatorsFor(String pid) {
+        int c = -1;
+        Cursor cursor = database.query(INDICATOR_TABLE + " LEFT JOIN " + RESULT_TABLE + " ON " + RESULT_TABLE + "._id = " + INDICATOR_TABLE + ".result_id" ,
+                                       new String[] {"COUNT (*) as row_count"}, 
+                                       RESULT_TABLE + ".project_id = ?",
+                                       new String[] {pid},
+                                       null, null, null);
+        if (cursor != null) {
+            if ( cursor.moveToFirst() ) {
+                c = cursor.getInt(0);
+            }
+            cursor.close();
+        }
+        return c;
+    }
+
+
+	public int countPeriods() {
+		int c = -1;
+		Cursor cursor = database.query(PERIOD_TABLE, new String[] {"COUNT (*) as row_count"}, 
+				null, null, null, null, null);
+        if (cursor != null) {
+        	if ( cursor.moveToFirst() ) {
+        		c = cursor.getInt(0);
+        	}
+        	cursor.close();
+        }
+        return c;
+    }
+
 
 	
 	
@@ -1150,8 +1859,14 @@ public class RsrDbAdapter {
 	 * from the database
 	 */
 	public void clearAllData() {
+        executeSql("delete from " + IPDC_TABLE);
+        executeSql("delete from " + IPD_TABLE);
+        executeSql("delete from " + PERIOD_TABLE);
+	    executeSql("delete from " + INDICATOR_TABLE);
+	    executeSql("delete from " + RESULT_TABLE);
 	    executeSql("delete from " + UPDATE_TABLE);
-	    executeSql("delete from " + USER_TABLE);
+        executeSql("delete from " + EMPLOYMENT_TABLE);
+        executeSql("delete from " + USER_TABLE);
 	    executeSql("delete from " + ORG_TABLE);
 	    executeSql("delete from " + PROJECT_TABLE);
 	    executeSql("delete from " + COUNTRY_TABLE);
@@ -1162,60 +1877,202 @@ public class RsrDbAdapter {
      * 
      * @return a Cursor containing all countries
      */
-	public Cursor listAllCountries() {
-		Cursor cursor = database.query(COUNTRY_TABLE,
-				null,
-				null,
-				null,
-				null,
-				null,
-				null);
-		return cursor;
-	}
-	
-	
-	public int getCountryCount() {
-	    Cursor cursor = listAllCountries();
-	    int c = 0;
-	    if (cursor != null) {
-	        c = cursor.getCount();
-	        cursor.close();
-	    }
-	    return c;    
-	}
-	
+    public Cursor listAllCountries() {
+        Cursor cursor = database.query(COUNTRY_TABLE,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+        return cursor;
+    }
+    
+    
+    public int getCountryCount() {
+        Cursor cursor = listAllCountries();
+        int c = 0;
+        if (cursor != null) {
+            c = cursor.getCount();
+            cursor.close();
+        }
+        return c;    
+    }
 
-	/**
-	 * saves or updates a Country in the db
-	 * 
-	 * @param country
-	 * @return
-	 */
-	public void saveCountry(Country country) {
-		ContentValues updatedValues = new ContentValues();
-		updatedValues.put(PK_ID_COL, country.getId());
-		updatedValues.put(NAME_COL, country.getName());
-		updatedValues.put(CONTINENT_COL, country.getContinent());
-		updatedValues.put(ISO_CODE_COL, country.getIsoCode());
+    /**
+     * gets country names
+     */
+    public List<String> getCountryNameList() {
+        List<String> nList = new ArrayList<String>(260);  
+        try {
+            Cursor cursor = database.query(COUNTRY_TABLE,
+                    new String[] {
+                        NAME_COL
+                    },
+                    null,
+                    null,
+                    null,
+                    null,
+                    NAME_COL);//alphabetical
+            int col = cursor.getColumnIndex(NAME_COL);
+            while (cursor.moveToNext()) {
+                nList.add(cursor.getString(col));
+            }
+            cursor.close();
+        }
+        catch (NullPointerException e) {
+        }
+        return nList;
+    }
 
-		Cursor cursor = database.query(COUNTRY_TABLE,
-				new String[] { PK_ID_COL },
-				PK_ID_COL + " = ?",
-				new String[] { country.getId(), },
-				null, null, null);
+    
+    /**
+     * Gets a single country from the db using its name (exact match)
+     */
+    public Country findCountryByName(String name) {
+        Country c = null;
+        Cursor cursor = database.query(COUNTRY_TABLE,
+                                       null,
+                                       "name = ?",
+                                       new String[] { name }, null, null, null);
+        if (cursor != null) {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                c = new Country();
+                c.setId(cursor.getString(cursor.getColumnIndexOrThrow(PK_ID_COL)));
+                c.setName(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
+                c.setContinent(cursor.getString(cursor.getColumnIndexOrThrow(CONTINENT_COL)));
+                c.setIsoCode(cursor.getString(cursor.getColumnIndexOrThrow(ISO_CODE_COL)));
+                }
+            cursor.close();
+            }
 
-		if (cursor != null && cursor.getCount() > 0) {
-			// if we found an item, it's an update, otherwise, it's an insert
-			database.update(COUNTRY_TABLE, updatedValues, PK_ID_COL + " = ?",
-					new String[] { country.getId() });
-		} else {
-			database.insert(COUNTRY_TABLE, null, updatedValues);
-		}
+        return c;
+    }
 
-		if (cursor != null) {
-			cursor.close();
-		}
-	}
+    
+
+    /**
+     * saves or updates a Country in the db
+     * 
+     * @param country
+     * @return
+     */
+    public void saveCountry(Country country) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(PK_ID_COL, country.getId());
+        updatedValues.put(NAME_COL, country.getName());
+        updatedValues.put(CONTINENT_COL, country.getContinent());
+        updatedValues.put(ISO_CODE_COL, country.getIsoCode());
+
+        Cursor cursor = database.query(COUNTRY_TABLE,
+                new String[] { PK_ID_COL },
+                PK_ID_COL + " = ?",
+                new String[] { country.getId(), },
+                null, null, null);
+
+        if (cursor != null && cursor.getCount() > 0) {
+            // if we found an item, it's an update, otherwise, it's an insert
+            database.update(COUNTRY_TABLE, updatedValues, PK_ID_COL + " = ?",
+                    new String[] { country.getId() });
+        } else {
+            database.insert(COUNTRY_TABLE, null, updatedValues);
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
+
+
+    /**
+     * lists all employments
+     * 
+     * @return a Cursor containing all employments, all columns
+     */
+    public Cursor listAllEmployments() {
+        Cursor cursor = database.query(EMPLOYMENT_TABLE + " left join " + ORG_TABLE + " on _employment.organisation_id = _organisation._id",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
+        return cursor;
+    }
+    
+  
+    /**
+     * lists employments
+
+     * @param userId
+     * @return a Cursor containing all employments for user, just approval, group name and joined org name
+     */
+    public Cursor listAllEmploymentsForUser(String userId) {
+        Cursor cursor = database.query(EMPLOYMENT_TABLE + " left join " + ORG_TABLE + " on _employment.organisation_id = _organisation._id",
+                new String[] {
+                    ORG_TABLE + ".name",
+                    APPROVED_COL,
+                    GROUP_NAME_COL
+                },
+                USER_ID_COL + "=?",
+                new String[] {userId},
+                null,
+                null,
+                null);
+        return cursor;
+    }
+    
+  
+    /**
+     * @return count of employments
+     */
+    public int getEmploymentCountForUser(String userId) {
+        Cursor cursor = listAllEmploymentsForUser(userId);
+        int c = 0;
+        if (cursor != null) {
+            c = cursor.getCount();
+            cursor.close();
+        }
+        return c;    
+    }
+
+    
+    /**
+     * saves or updates an Employment in the db
+     * 
+     * @param em
+     * @return
+     */
+    public void saveEmployment(Employment em) {
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(PK_ID_COL, em.getId());
+        updatedValues.put(USER_ID_COL, em.getUserId());
+        updatedValues.put(ORG_ID_COL, em.getOrganisationId());
+        updatedValues.put(APPROVED_COL, em.getApproved()); 
+        updatedValues.put(COUNTRY_ID_COL, em.getGroupId());
+        updatedValues.put(JOB_TITLE_COL, em.getJobTitle());
+        updatedValues.put(GROUP_ID_COL, em.getGroupId());
+        updatedValues.put(GROUP_NAME_COL, em.getGroupName()); 
+
+        Cursor cursor = database.query(EMPLOYMENT_TABLE,
+                new String[] { PK_ID_COL },
+                PK_ID_COL + " = ?",
+                new String[] { em.getId(), },
+                null, null, null);
+
+        if (cursor != null && cursor.getCount() > 0) {
+            // if we found an item, it's an update, otherwise, it's an insert
+            database.update(EMPLOYMENT_TABLE, updatedValues, PK_ID_COL + " = ?",
+                    new String[] { em.getId() });
+        } else {
+            database.insert(EMPLOYMENT_TABLE, null, updatedValues);
+        }
+
+        if (cursor != null) {
+            cursor.close();
+        }
+    }
 
 
 

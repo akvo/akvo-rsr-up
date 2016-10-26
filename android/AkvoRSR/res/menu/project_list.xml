@@ -12,9 +12,12 @@
         android:title="@string/action_settings"
         android:icon="@drawable/ic_menu_settings_holo_light"        
          />
+    <item android:id="@+id/menu_connect"
+        android:title="@string/action_connect"
+         />
     <item android:id="@+id/menu_logout"
         android:title="@string/action_logout"
         android:icon="@drawable/ic_menu_close_clear_cancel"        
          />
-
+    
 </menu>

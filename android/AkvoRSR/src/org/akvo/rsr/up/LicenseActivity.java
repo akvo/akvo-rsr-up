@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2014 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -35,7 +35,7 @@ public class LicenseActivity extends ActionBarActivity {
 		
 		// OR, you can also load from an HTML string:
 		String summary = "<html><body>" +
-                "<H2>Akvo RSR Up</H2><H3>Android app</H3><P>Copyright &#169 2012-2014 Stichting Akvo</P>" +
+                "<H2>Akvo RSR Up</H2><H3>Android app</H3><P>Copyright &#169 2012-2015 Stichting Akvo</P>" +
 		        "<P>Akvo RSR is free software: you can redistribute it and modify it under the terms of the "+
                     "GNU Affero General Public License (AGPL) as published by the Free Software Foundation,"+
                     " either version 3 of the License or any later version.</P>"+
@@ -43,7 +43,7 @@ public class LicenseActivity extends ActionBarActivity {
                     " without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."+
                     " See the GNU Affero General Public License at the link below for more details.</P>"+
                 "<P>The full license can be seen at <A HREF=\"http://www.gnu.org/licenses/agpl.html\">http://www.gnu.org/licenses/agpl.html</A></P>" +
-                "<H2>App dependencies</H2><H3>HTTP Request library</H3><P>Copyright &#169 2011 Kevin Sawicki &lt;kevinsawicki@gmail.com&gt;</P>" +
+                "<H2>App dependencies</H2><H3>HTTP Request library</H3><P>Copyright &#169 2014 Kevin Sawicki &lt;kevinsawicki@gmail.com&gt;</P>" +
                 "<P>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), "+
                 "to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or"+
                 "sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</P>"+
