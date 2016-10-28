@@ -1,0 +1,195 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true" 
+    android:id="@+id/mainLayout"
+    >
+
+    <LinearLayout
+        android:id="@+id/application_progress"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/rsr_blue"
+        android:orientation="vertical"
+        android:padding="5dip"
+        android:visibility="gone" >
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/label_refresh_progress"
+            android:textColor="@color/rsr_purple"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/progress_title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="---" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="false" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/scroll"
+         >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:background="@color/pale_gray"
+                android:padding="5dip"
+                android:text="@string/label_connections_title"
+                android:textColor="@color/rsr_purple"
+                android:textSize="20sp"
+                android:typeface="sans" />
+
+            <TextView
+                android:id="@+id/employment_list"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dip" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:background="@color/pale_gray"
+                android:padding="5dip"
+                android:text="@string/label_connect_title"
+                android:textColor="@color/rsr_purple"
+                android:textSize="20sp"
+                android:typeface="sans" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:padding="5dip"
+                android:text="@string/label_connect_instructions"
+                android:textSize="14sp"
+                android:typeface="sans" />
+
+            <AutoCompleteTextView
+                android:id="@+id/org_name"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/box"
+                android:hint="Organisation"
+                android:inputType="textCapSentences"
+                android:maxLength="50"
+                android:padding="5dip"
+                android:singleLine="true" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="5dp"
+                android:text="Full name"
+                android:textSize="14sp"
+                android:typeface="sans" />
+
+            <TextView
+                android:id="@+id/selected_org"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:padding="5dip"
+                android:text=""
+                android:textSize="20sp"
+                android:typeface="sans" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_marginBottom="0dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="5dp"
+                android:text="@string/label_country"
+                android:textSize="14sp"
+                android:typeface="sans" />
+
+            <AutoCompleteTextView
+                android:id="@+id/country_name"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/box"
+                android:hint="@string/hint_optional"
+                android:inputType="textCapSentences"
+                android:padding="5dip"
+                android:singleLine="true" />
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:paddingLeft="5dip"
+                android:paddingRight="5dp"
+                android:paddingTop="5dip"
+                android:text="@string/label_job_title"
+                android:textSize="14sp"
+                android:typeface="sans" />
+
+            <EditText
+                android:id="@+id/job_title"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/box"
+                android:hint="@string/hint_optional"
+                android:inputType="textCapSentences"
+                android:padding="5dip"
+                android:paddingTop="0dp"
+                android:singleLine="true" />
+
+            <!-- The save button -->
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/btn_border"
+                android:orientation="horizontal"
+                android:padding="10dp" >
+
+                <Button
+                    android:id="@+id/btn_send_result"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dip"
+                    android:background="@color/btn_face"
+                    android:drawableTop="@drawable/ic_menu_upload_dk"
+                    android:padding="5dp"
+                    android:text="@string/btncaption_apply"
+                    android:textColor="@color/rsr_purple"
+                    android:textSize="18sp"
+                    android:typeface="sans" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

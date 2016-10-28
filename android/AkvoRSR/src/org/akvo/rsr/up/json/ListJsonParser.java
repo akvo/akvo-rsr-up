@@ -14,82 +14,65 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.rsr.up.xml;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+package org.akvo.rsr.up.json;
 
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 
 
-public class JsonParser {
+public class ListJsonParser extends BaseJsonParser{
 
     // ===========================================================
     // Fields
     // ===========================================================
 
 
-	JSONObject mRoot;
-	protected boolean mSyntaxError = false;
-    protected String mServerVersion = "";
-    protected SimpleDateFormat dateOnly;
-    protected SimpleDateFormat dateTime;
-
-    // where to store results
-    protected RsrDbAdapter mDba;
+	int mItemCount = 0;
+	int mItemTotalCount = 0;
+    private String mNextUrl = "";
+    protected JSONArray mResultsArray;
 
     /**
      * constructor
      * aDba: an open database adapter
-     * serverVersion: From http header, in case there ever needs to be version-specific parsing
+     * serverVersion: From http header, in case there is ever a need for version-specific parsing
      */
-    public JsonParser(RsrDbAdapter aDba, String serverVersion) {
-        mDba = aDba;
-        mServerVersion = serverVersion;
-    	//prepare for date parsing
-    	dateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
-    	dateTime.setTimeZone(TimeZone.getTimeZone("UTC"));
-    	dateOnly = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-    	dateOnly.setTimeZone(TimeZone.getTimeZone("UTC"));
+    public ListJsonParser(RsrDbAdapter aDba, String serverVersion) {
+    	super(aDba, serverVersion);
     }
 
-    protected Date dateOrNull(String s) {
-    	try {
-    		return dateOnly.parse(s);
-		} catch (ParseException e) {
-	    	return null;
-		}
-    }
-    
-    protected Date dateTimeOrNull(String s) {
-    	try {
-    		return dateTime.parse(s);
-		} catch (ParseException e) {
-	    	return null;
-		}
-    }
-    
     // ===========================================================
     // Getter & Setter
     // ===========================================================
 
-    public boolean getError() {
-        return mSyntaxError;
+    public int getCount() {
+        return mItemCount;
+    }
+
+    public int getTotalCount() {
+        return mItemTotalCount;
+    }
+
+    public String getNextUrl() {
+        return mNextUrl;
     }
 
     // ===========================================================
     // Methods
     // ===========================================================
     public void parse(String body) throws JSONException {
-
-    	mRoot = new JSONObject(body);
+    	super.parse(body);
+    	mItemCount= 0;
+        try {
+            mItemTotalCount = mRoot.getInt("count");
+            mNextUrl = mRoot.getString("next");
+        }
+        catch (JSONException j) {
+            //optional; not present for a typeahead result
+        }
+        mResultsArray = mRoot.getJSONArray("results");
     }
     
     

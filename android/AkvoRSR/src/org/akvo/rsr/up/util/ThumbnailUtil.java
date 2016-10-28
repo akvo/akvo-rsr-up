@@ -18,10 +18,7 @@ package org.akvo.rsr.up.util;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.List;
-
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 
@@ -38,11 +35,11 @@ public class ThumbnailUtil {
 
     public static String TAG = "ThumbnailUtil";
 
-    private static Hashtable<String, Bitmap> cache;
+//    private static Hashtable<String, Bitmap> cache;
 
-    public void initCache() {
-        cache = new Hashtable<String, Bitmap>(10);
-    }
+//    public void initCache() {
+//        cache = new Hashtable<String, Bitmap>(10);
+//    }
 
     /**
      * Shows a thumbnail from a URL and a filename

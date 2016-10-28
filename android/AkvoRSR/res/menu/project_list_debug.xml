@@ -12,13 +12,17 @@
         android:title="@string/action_settings"
         android:icon="@drawable/ic_menu_settings_holo_light"        
          />
+    <item android:id="@+id/menu_connect"
+        android:title="@string/action_connect"
+         />
+    <item android:id="@+id/menu_organisations"
+        android:title="@string/action_organisations"
+         />
     <item android:id="@+id/menu_messages"
         android:title="@string/action_messages"
-        android:icon="@drawable/ic_menu_close_clear_cancel"        
          />
     <item android:id="@+id/menu_diagnostics"
         android:title="@string/action_diagnostics"
-        android:icon="@drawable/ic_menu_close_clear_cancel"        
          />
     <item android:id="@+id/menu_logout"
         android:title="@string/action_logout"

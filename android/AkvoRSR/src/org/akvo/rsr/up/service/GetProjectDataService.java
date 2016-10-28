@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -20,9 +20,12 @@ import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
 
 import org.akvo.rsr.up.R;
@@ -68,10 +71,12 @@ public class GetProjectDataService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         mRunning = true;
+        String projectId = intent.getStringExtra(ConstantUtil.PROJECT_ID_KEY); //just this project?
         RsrDbAdapter ad = new RsrDbAdapter(this);
         Downloader dl = new Downloader();
         String errMsg = null;
         boolean fetchImages = !SettingsUtil.ReadBoolean(this, "setting_delay_image_fetch", false);
+        boolean fullSynch = SettingsUtil.ReadBoolean(this, "setting_fullsynch", false);
         String host = SettingsUtil.host(this);
         Long start = System.currentTimeMillis();
         
@@ -79,22 +84,32 @@ public class GetProjectDataService extends IntentService {
         User user = SettingsUtil.getAuthUser(this);
         try {
             try {
+                // Make the list of projects to update
+                Set<String> projectSet;
+                if (projectId == null) {
+                    projectSet = user.getPublishedProjIds();
+                } else {
+                    projectSet = new HashSet<String>();
+                    projectSet.add(projectId);
+                }
+                
                 int i = 0;
-                int projects = user.getPublishedProjIds().size();
+                int projects = projectSet.size();
                 //Iterate over projects instead of using a complex query URL, since it can take so long that the proxy times out
-                for (String id : user.getPublishedProjIds()) {
+                for (String id : projectSet) {
                     dl.fetchProject(this,
                                     ad, 
                                     new URL(SettingsUtil.host(this) +
-                                            String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN, id)));
+                                            String.format(ConstantUtil.FETCH_PROJ_URL_PATTERN, id))); //TODO: JSON
                     if (mFetchResults) {
                         dl.fetchProjectResultsPaged(this, ad,
                                 new URL(host + String.format(ConstantUtil.FETCH_RESULTS_URL_PATTERN, id)));                                            
                     }
                     broadcastProgress(0, ++i, projects);
                 }
-                if (mFetchCountries && ad.getCountryCount() == 0) { // rarely changes, so only fetch countries if we never did that
-                    dl.fetchCountryListRestApiPaged(this, new URL(SettingsUtil.host(this) +
+                // country list rarely changes, so only fetch countries if we never did that
+                if (mFetchCountries && (fullSynch || ad.getCountryCount() == 0)) {
+                    dl.fetchCountryListRestApiPaged(this, ad, new URL(SettingsUtil.host(this) +
                             String.format(ConstantUtil.FETCH_COUNTRIES_URL)));
                 }
                 broadcastProgress(0, 100, 100);
@@ -102,22 +117,31 @@ public class GetProjectDataService extends IntentService {
                 if (mFetchUpdates) {
                 	SimpleDateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
             		df1.setTimeZone(TimeZone.getTimeZone("UTC"));
-                	
+            		ArrayList<String> fetchedIds = new  ArrayList<String>();
+            		 
                     int k = 0;
-                    for (String projId : user.getPublishedProjIds()) {
+                    for (String projId : projectSet) {
                     	Project p = ad.findProject(projId);
                     	if (p != null) {
-                            Date d = dl.fetchUpdateListRestApiPaged(this,
-                                new URL(host + String.format(ConstantUtil.FETCH_UPDATE_URL_PATTERN, projId, df1.format(p.getLastFetch())))                                            
-                            );
+                    	    //since last fetch or forever?
+                    	    String u = String.format(ConstantUtil.FETCH_UPDATE_URL_PATTERN, projId, df1.format(fullSynch?0:p.getLastFetch()));
+                            Date d = dl.fetchUpdateListRestApiPaged(this, new URL(host + u), fetchedIds);
                             //fetch completed; remember fetch date of this project - other users of the app may have different project set
                     	    ad.updateProjectLastFetch(projId, d);
+                            if (fullSynch) { //now delete those that went away
+                                List<String> removeIds = ad.getUpdatesForList(projId);
+                                removeIds.removeAll(fetchedIds);
+                                for (String id : removeIds) {
+                                    Log.i(TAG, "Deleting update " + id);
+                                    ad.deleteUpdate(id.toString());
+                                }
+                            }                    	    
                     	}
                     	//show progress
-                        broadcastProgress(1, ++k, projects); //this is *very* uninformative for a user w one project and many updates!
+                    	 //TODO this is *very* uninformative for a user with one project and many updates!
+                        broadcastProgress(1, ++k, projects);
                     }
                 }
-
             } catch (FileNotFoundException e) {
                 Log.e(TAG, "Cannot find:", e);
                 errMsg = getResources().getString(R.string.errmsg_not_found_on_server) + e.getMessage();
@@ -187,7 +211,7 @@ public class GetProjectDataService extends IntentService {
 
             if (fetchImages) {
                 try {
-                    dl.fetchNewThumbnails(this,
+                    dl.fetchMissingThumbnails(this,
                             host,
                             FileUtil.getExternalCacheDir(this).toString(),
                             new Downloader.ProgressReporter() {

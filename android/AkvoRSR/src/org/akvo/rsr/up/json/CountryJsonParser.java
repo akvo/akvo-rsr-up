@@ -14,7 +14,7 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.rsr.up.xml;
+package org.akvo.rsr.up.json;
 
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Country;
@@ -35,7 +35,7 @@ import org.json.JSONException;
 
  */
 
-public class CountryJsonParser extends JsonParser {
+public class CountryJsonParser extends BaseJsonParser {
 
     /*
      * constructor

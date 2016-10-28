@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -24,6 +24,7 @@ import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.Downloader;
 import org.akvo.rsr.up.util.SettingsUtil;
+import org.akvo.rsr.up.util.Uploader;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -47,7 +48,7 @@ public class SignInService extends IntentService {
 		Intent i2 = new Intent(ConstantUtil.AUTHORIZATION_RESULT_ACTION);
 
 		try {
-			User user = Downloader.authorize(new URL(SettingsUtil.host(this) + ConstantUtil.AUTH_URL),
+			User user = Uploader.authorize(new URL(SettingsUtil.host(this) + ConstantUtil.AUTH_URL),
 									 		 username,
 									 		 password);
 			if (user != null) {
@@ -58,8 +59,16 @@ public class SignInService extends IntentService {
 				RsrDbAdapter dba = new RsrDbAdapter(this);
 				dba.open();
 				dba.setVisibleProjects(user.getPublishedProjIds());
-				dba.close();
-
+				//detailed employment list is short and will be useful on early logins
+				new Downloader().fetchEmploymentListPaged(
+                            this,
+                            dba,
+                            new URL(SettingsUtil.host(this) + String.format(ConstantUtil.FETCH_EMPLOYMENTS_URL_PATTERN,SettingsUtil.getAuthUser(this).getId())),
+                            null
+                    );
+				//TODO maybe fetch countries and (minimal)organisations too (if never done before)
+                dba.close();
+				
 			}
 			else {
 				i2.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, getResources().getString(R.string.errmsg_signin_denied));
@@ -69,6 +78,7 @@ public class SignInService extends IntentService {
 		catch (Exception e) {
 			i2.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, getResources().getString(R.string.errmsg_signin_failed) + e.getMessage());
 			Log.e(TAG,"SignInService() error:", e);
+            SettingsUtil.signOut(this); //all fetches have to succeed for a login, to avoid weird states
 		}
 
 		//broadcast completion

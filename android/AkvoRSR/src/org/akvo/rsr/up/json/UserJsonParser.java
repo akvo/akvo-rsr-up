@@ -14,7 +14,7 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.rsr.up.xml;
+package org.akvo.rsr.up.json;
 
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.User;
@@ -145,7 +145,7 @@ import org.json.JSONObject;
 
  */
 
-public class UserJsonParser extends JsonParser {
+public class UserJsonParser extends BaseJsonParser {
 
     private final String ORG = "organisation";
     /*

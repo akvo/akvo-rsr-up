@@ -4,6 +4,38 @@
     android:background="@android:color/white"
     android:orientation="vertical" >
 
+    <LinearLayout
+        android:id="@+id/proj_detail_progress"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/rsr_blue"
+        android:orientation="vertical"
+        android:padding="5dip"
+        android:visibility="gone" >
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/label_refresh_progress"
+            android:textColor="@color/rsr_purple"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/progress_title"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:text="---" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="false" />
+    </LinearLayout>
+
     <TextView
         android:id="@+id/text_proj_detail_title"
         android:layout_width="fill_parent"
@@ -46,9 +78,10 @@
                 android:src="@drawable/thumbnail_noimage" />
 
             <LinearLayout
-		        android:layout_width="fill_parent"
-		        android:layout_height="wrap_content"
-		        android:orientation="vertical" >
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingLeft="5dp" >
 
         	<TextView
         	    android:id="@+id/text_proj_detail_published_count"
@@ -61,7 +94,7 @@
         	    android:textColor="@color/blue"
         	    android:textSize="12sp"
         	    android:typeface="sans"
-        	    android:visibility="invisible" />
+        	    android:visibility="visible" />
 
         	<!-- TextView
 	     		android:id="@+id/text_proj_detail_unsynchronized_count"
@@ -87,9 +120,22 @@
         	    android:textColor="@color/red"
         	    android:textSize="12sp"
         	    android:typeface="sans"
+        	    android:visibility="visible" />
+
+        	<TextView
+        	    android:id="@+id/text_proj_detail_result_count"
+        	    android:layout_width="wrap_content"
+        	    android:layout_height="wrap_content"
+        	    android:layout_gravity="left"
+        	    android:paddingLeft="5dp"
+        	    android:paddingRight="5dp"
+        	    android:text="@string/count_results"
+        	    android:textColor="@color/green"
+        	    android:textSize="12sp"
+        	    android:typeface="sans"
         	    android:visibility="invisible" />
 
-    	</LinearLayout>
+        		</LinearLayout>
 
            </LinearLayout>	        
 
@@ -208,28 +254,28 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="VIEW RESULTS"
-                    android:textColor="@color/rsr_purple"
                     android:background="@color/btn_face"
                     android:padding="5dip"
+                    android:text="@string/btncaption_view_results"
+                    android:textColor="@color/rsr_purple"
                     android:textSize="14sp"
-                    android:typeface="sans"                 
-                    />
+                    android:typeface="sans"
+                    android:visibility="invisible" />
 
                 <!-- Add update button -->
+
                 <Button
-                    android:id="@+id/btn_add_result"
+                    android:id="@+id/btn_refresh_proj"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dip"
                     android:layout_weight="1"
-                    android:text="REPORT RESULT"
-                    android:textColor="@color/rsr_purple"
                     android:background="@color/btn_face"
                     android:padding="5dip"
-                    android:layout_marginLeft="5dip"
+                    android:text="@string/btncaption_refresh_oneproj"
+                    android:textColor="@color/rsr_purple"
                     android:textSize="14sp"
-                    android:typeface="sans"                 
-                    />
+                    android:typeface="sans" />
                         
             </LinearLayout>
 </LinearLayout>

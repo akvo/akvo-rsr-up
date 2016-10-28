@@ -167,20 +167,23 @@ public class ProjectListActivity extends ActionBarActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
-        case R.id.menu_refresh:
+	    case R.id.menu_refresh:
             startGetProjectsService();
             return true;
         case R.id.menu_settings:
-            Intent i = new Intent(this, SettingsActivity.class);
-            startActivity(i);
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         case R.id.menu_messages:
-            Intent i2 = new Intent(this, MessageActivity.class);
-            startActivity(i2);
+            startActivity(new Intent(this, MessageActivity.class));
+            return true;
+        case R.id.menu_connect:
+            startActivity(new Intent(this, EmploymentApplicationActivity.class));
+            return true;
+        case R.id.menu_organisations:
+            startActivity(new Intent(this, OrgListActivity.class));
             return true;
         case R.id.menu_diagnostics:
-            Intent i3 = new Intent(this, DiagnosticActivity.class);
-            startActivity(i3);
+            startActivity(new Intent(this, DiagnosticActivity.class));
             return true;
         case R.id.menu_logout:
         	SettingsUtil.signOut(this);

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2016 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -14,19 +14,21 @@
  *  The full license text can also be seen at <http://www.gnu.org/licenses/agpl.html>.
  */
 
-package org.akvo.rsr.up.xml;
+package org.akvo.rsr.up.json;
 
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Indicator;
+import org.akvo.rsr.up.domain.IndicatorPeriodData;
 import org.akvo.rsr.up.domain.Period;
 import org.akvo.rsr.up.domain.Result;
+import org.akvo.rsr.up.domain.User;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /*
- * http://rsr.akvo.org/rest/v1/country/?format=xml
- * Example input:
+ * /rest/v1/result/?format=json&project=%s
+ * Example input for project 2849:
  * 
 {
     "count": 4,
@@ -207,6 +209,8 @@ public class ProjectResultListJsonParser extends ListJsonParser {
     			r.setTitle(aResult.getString("title"));
     			r.setDescription(aResult.getString("description"));
     			mDba.saveResult(r);
+                mItemCount++;
+                
     			//Loop on nested indicators
     			JSONArray indicatorsArray = aResult.getJSONArray("indicators"); 
         		for (int ii = 0; ii < indicatorsArray.length(); ii++) {
@@ -232,7 +236,47 @@ public class ProjectResultListJsonParser extends ListJsonParser {
             			p.setTargetComment(aPeriod.getString("target_comment"));
             			p.setPeriodStart(dateOrNull(aPeriod.getString("period_start")));
             			p.setPeriodEnd(dateOrNull(aPeriod.getString("period_end")));
+                        p.setLocked(aPeriod.getBoolean("locked"));
             			mDba.savePeriod(p);
+            			
+                        //loop over nested IPDs 
+                        JSONArray ipdArray = aPeriod.getJSONArray("data");
+                        for (int di = 0; di < ipdArray.length(); di++) {
+                            JSONObject aIpd = ipdArray.getJSONObject(di);
+                            IndicatorPeriodData ipd = new IndicatorPeriodData();
+                            ipd.setId(aIpd.getString("id"));
+                            ipd.setUserId(aIpd.getString("user"));
+                            ipd.setData(aIpd.getString("data"));
+                            ipd.setDescription(aIpd.getString("text"));
+                            ipd.setPeriodId(aIpd.getString("period"));
+                            ipd.setStatus(aIpd.getString("status"));
+                            ipd.setRelativeData(aIpd.getBoolean("relative_data"));
+                            ipd.setPhotoUrl(aIpd.getString("photo_url"));
+                            ipd.setFileUrl(aIpd.getString("file_url"));
+                            //user data
+                            JSONObject jUser = aIpd.getJSONObject("user_details");
+                            User u = new User();
+                            u.setId(jUser.getString("id"));
+                            u.setFirstname(jUser.getString("first_name"));
+                            u.setLastname(jUser.getString("last_name"));
+                            //TODO: organisations?
+                            mDba.saveUser(u);
+                            mDba.saveIpd(ipd);
+                            
+                            //Loop on nested comments?
+                            /*
+                            JSONArray commentsArray = aPeriod.getJSONArray("comments"); 
+                            for (int ii = 0; ii < indicatorsArray.length(); ii++) {
+                                JSONObject aIndicator = indicatorsArray.getJSONObject(ii);
+                                Ipdc c = new Ipdc();
+                                i.setId(aIndicator.getString("id"));
+                                i.setResultId(aIndicator.getString("result"));
+                                i.setTitle(aIndicator.getString("title"));
+                                i.setDescription(aIndicator.getString("description"));
+                                mDba.saveIndicator(i);
+                   */
+                        }
+            			
             		}        		
         		}
     		}
