@@ -16,7 +16,6 @@
  -->
  
 <resources>
-  <string name="app_name">Akvo RSR Up</string>
   <string name="app_subtitle">Really Simple Reporting</string>
   <string name="app_version">Versión</string>
   <string name="action_settings">Configuración</string>
@@ -170,9 +169,6 @@
   <string name="authtext">Por favor introduzca la contraseña del administrador</string>
   <string name="authfailed">La autorización falló</string>
   <string name="invalidpassword">Contraseña inválida</string>
-  <string name="dummy_project_title">Título del projecto</string>
-  <string name="dummy_update_title">Título de la actualización </string>
-  <string name="dummy_update_description">Introduzca la descripción de la actualización. El largo de la descripción es ilimitado. Por favor note que el botón permanecerá al fondo de la pantalla.</string>
   <string name="connection_pending">- pendiente</string>
 </resources>
  
