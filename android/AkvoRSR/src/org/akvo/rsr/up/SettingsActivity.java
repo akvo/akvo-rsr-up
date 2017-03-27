@@ -60,8 +60,7 @@ public class SettingsActivity extends PreferenceActivity {
 						final EditText inputView = new EditText(SettingsActivity.this);
 						//one line only
 						inputView.setSingleLine();
-						inputView.setText("http://");//seed input field 
-						//TODO: change to https when we have that?
+						inputView.setText("https://");//seed input field 
 						inputView.setSelection(7);
 						DialogUtil.showTextInputDialog(
 								SettingsActivity.this,
@@ -86,9 +85,7 @@ public class SettingsActivity extends PreferenceActivity {
 												s += ":" + u.getPort();
 											//save to preferences
 											customPref.setSummary(s);
-											SettingsUtil.Write(SettingsActivity.this,
-													ConstantUtil.HOST_SETTING_KEY,
-													s);
+											SettingsUtil.setHost(SettingsActivity.this,s);
 											//clear local database to prevent db mixups
                                             SettingsUtil.WriteLong(SettingsActivity.this, ConstantUtil.FETCH_TIME_KEY, 0L); //forget time of last fetch
 											FileUtil.clearCache(SettingsActivity.this, false);

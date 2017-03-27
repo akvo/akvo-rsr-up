@@ -28,10 +28,9 @@ public class ConstantUtil {
 	/**
 	 * server and API constants
 	 */
-	public static final String TEST_HOST = "http://rsr.uat.akvo.org";
-	public static final String LIVE_HOST = "http://rsr.akvo.org";
+	public static final String OLD_HOST = "http://rsr.akvo.org";
+	public static final String LIVE_HOST = "https://rsr.akvo.org";
 	public static final String PWD_URL = "/sign_in/";
-//    public static final String AUTH_URL = "/auth/token/";
     public static final String AUTH_URL = "/auth/token/?format=json";
     public static final String POST_UPDATE_URL = "/rest/v1/project_update/?format=xml";
     public static final String POST_RESULT_URL = "/rest/v1/indicator_period_data/?format=json";

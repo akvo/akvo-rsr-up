@@ -51,7 +51,7 @@ public class GetProjectDataService extends IntentService {
     private static final boolean mFetchCountries = true;
     private static final boolean mFetchUpdates = true;
     private static final boolean mFetchOrgs = true;
-    private static final boolean mFetchResults = true;
+    private static final boolean mFetchResults = false;
 
     public GetProjectDataService() {
         super(TAG);
@@ -170,9 +170,9 @@ public class GetProjectDataService extends IntentService {
                                 id
                                 );
 //                        k++;
-                    } catch (FileNotFoundException e) {
+//                    } catch (FileNotFoundException e) {
                         // possibly because user is no longer active
-                        Log.w(TAG, "Cannot find user:" + id);
+//                        Log.w(TAG, "Cannot find user:" + id);
                         // errMsg = "Cannot find: "+ e.getMessage(); //not serious
                     } catch (Exception e) { // probably network reasons
                         Log.e(TAG, "Bad user fetch:", e);
@@ -197,9 +197,9 @@ public class GetProjectDataService extends IntentService {
                                 id
                                 );
                         j++;
-                    } catch (FileNotFoundException e) { // possibly because user
+//                    } catch (FileNotFoundException e) { // possibly because user
                                                         // is no longer active
-                        Log.w(TAG, "Cannot find org:" + id);
+//                        Log.w(TAG, "Cannot find org:" + id);
                     } catch (Exception e) { // probably network reasons
                         Log.e(TAG, "Bad org fetch:", e);
                         errMsg = getResources().getString(R.string.errmsg_org_fetch_failed) + e.getMessage();
