@@ -105,14 +105,16 @@ public class OrgJsonParser extends BaseJsonParser {
     		org.setEmail(mRoot.getString("contact_email"));
             org.setOldType(mRoot.getString("organisation_type"));
             org.setNewType(mRoot.getString("new_organisation_type"));
-            int primaryLoc = mRoot.getInt("primary_location");
-            //Loop on nested locations
-            JSONArray locationsArray = mRoot.getJSONArray("locations"); 
-            for (int i = 0; i < locationsArray.length(); i++) {
-                JSONObject aLocation = locationsArray.getJSONObject(i);
-                //o.addCountryId(aLocation.getString("country"));
-                if (mRoot.getInt("id") == primaryLoc) {
-                    org.setPrimaryCountryId(aLocation.getString("country"));
+            if (!mRoot.isNull("primary_location")) {
+                int primaryLoc = mRoot.getInt("primary_location");
+                //Loop on nested locations
+                JSONArray locationsArray = mRoot.getJSONArray("locations"); 
+                for (int i = 0; i < locationsArray.length(); i++) {
+                    JSONObject aLocation = locationsArray.getJSONObject(i);
+                    //o.addCountryId(aLocation.getString("country"));
+                    if (mRoot.getInt("id") == primaryLoc) {
+                        org.setPrimaryCountryId(aLocation.getString("country"));
+                    }
                 }
             }
     		
