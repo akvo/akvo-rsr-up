@@ -59,7 +59,8 @@ public class SettingsActivity extends PreferenceActivity {
 					@Override
 					public void onAuthenticated() {
 						final EditText inputView = new EditText(SettingsActivity.this);
-						inputView.setText(HOST_SEED); //seed the input field 
+						inputView.setSingleLine(); //one line only
+						inputView.setText(HOST_SEED); //seed input field 
 						inputView.setSelection(HOST_SEED.length());
 						DialogUtil.showTextInputDialog(
 								SettingsActivity.this,
