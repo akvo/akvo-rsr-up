@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2015-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -107,7 +107,7 @@ public class OrgJsonParser extends BaseJsonParser {
             org.setNewType(mRoot.getString("new_organisation_type"));
             if (!mRoot.isNull("primary_location")) {
                 int primaryLoc = mRoot.getInt("primary_location");
-                //Loop on nested locations
+                //Loop on nested locations to find the primary
                 JSONArray locationsArray = mRoot.getJSONArray("locations"); 
                 for (int i = 0; i < locationsArray.length(); i++) {
                     JSONObject aLocation = locationsArray.getJSONObject(i);

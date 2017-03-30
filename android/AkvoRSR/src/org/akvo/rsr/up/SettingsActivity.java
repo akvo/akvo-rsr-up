@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -39,7 +39,8 @@ import android.preference.PreferenceActivity;
 
 public class SettingsActivity extends PreferenceActivity {
 	
-	final String TAG = "SettingsActivity";
+    final String TAG = "SettingsActivity";
+    final String HOST_SEED = "https://";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,10 +59,9 @@ public class SettingsActivity extends PreferenceActivity {
 					@Override
 					public void onAuthenticated() {
 						final EditText inputView = new EditText(SettingsActivity.this);
-						//one line only
-						inputView.setSingleLine();
-						inputView.setText("https://");//seed input field 
-						inputView.setSelection(7);
+						inputView.setSingleLine(); //one line only
+						inputView.setText(HOST_SEED); //seed input field 
+						inputView.setSelection(HOST_SEED.length());
 						DialogUtil.showTextInputDialog(
 								SettingsActivity.this,
 								R.string.host_dialog_title,
