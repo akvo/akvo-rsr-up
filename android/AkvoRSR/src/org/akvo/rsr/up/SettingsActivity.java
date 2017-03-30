@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -39,7 +39,8 @@ import android.preference.PreferenceActivity;
 
 public class SettingsActivity extends PreferenceActivity {
 	
-	final String TAG = "SettingsActivity";
+    final String TAG = "SettingsActivity";
+    final String HOST_SEED = "https://";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +59,9 @@ public class SettingsActivity extends PreferenceActivity {
 					@Override
 					public void onAuthenticated() {
 						final EditText inputView = new EditText(SettingsActivity.this);
-						//one line only
-						inputView.setSingleLine();
-						inputView.setText("http://");//seed input field 
-						//TODO: change to https when we have that?
-						inputView.setSelection(7);
+						inputView.setSingleLine(); //one line only
+						inputView.setText(HOST_SEED); //seed input field 
+						inputView.setSelection(HOST_SEED.length());
 						DialogUtil.showTextInputDialog(
 								SettingsActivity.this,
 								R.string.host_dialog_title,
@@ -86,9 +85,7 @@ public class SettingsActivity extends PreferenceActivity {
 												s += ":" + u.getPort();
 											//save to preferences
 											customPref.setSummary(s);
-											SettingsUtil.Write(SettingsActivity.this,
-													ConstantUtil.HOST_SETTING_KEY,
-													s);
+											SettingsUtil.setHost(SettingsActivity.this,s);
 											//clear local database to prevent db mixups
                                             SettingsUtil.WriteLong(SettingsActivity.this, ConstantUtil.FETCH_TIME_KEY, 0L); //forget time of last fetch
 											FileUtil.clearCache(SettingsActivity.this, false);
