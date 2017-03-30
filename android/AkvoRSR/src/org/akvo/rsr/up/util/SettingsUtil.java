@@ -77,7 +77,13 @@ public class SettingsUtil {
 
     // convenience method to read current data host
     public static String host(Context context) {
-        return Read(context, ConstantUtil.HOST_SETTING_KEY);
+        String h = Read(context, ConstantUtil.HOST_SETTING_KEY);
+        return h == "" ? ConstantUtil.LIVE_HOST : h;
+    }
+
+    // convenience method to set current data host
+    public static void setHost(Context context, String host) {
+        Write(context, ConstantUtil.HOST_SETTING_KEY, host);
     }
 
     public static void signOut(Context c) {

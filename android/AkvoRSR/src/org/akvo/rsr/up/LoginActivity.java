@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -80,9 +80,8 @@ public class LoginActivity extends Activity {
             DialogUtil.errorAlert(this, R.string.nocard_dialog_title, R.string.nocard_dialog_msg);
         }
 
-        // temporary hack for testing used TEST_HOST
-        if (SettingsUtil.host(this).length() == 0) {// isEmpty() is too modern
-            SettingsUtil.Write(this, ConstantUtil.HOST_SETTING_KEY, ConstantUtil.LIVE_HOST);
+        if (SettingsUtil.host(this).equalsIgnoreCase(ConstantUtil.OLD_HOST)) {
+            SettingsUtil.setHost(this, ""); //clear it so new default will be used
         }
 
         setContentView(R.layout.activity_login);

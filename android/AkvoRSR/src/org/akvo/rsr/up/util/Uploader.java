@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -42,7 +42,6 @@ import org.akvo.rsr.up.json.IndicatorPeriodDataJsonParser;
 import org.akvo.rsr.up.json.OrgTypeaheadJsonParser;
 import org.akvo.rsr.up.util.Downloader.FailedFetchException;
 import org.akvo.rsr.up.util.Downloader.ProgressReporter;
-import org.akvo.rsr.up.xml.AuthHandler;
 import org.akvo.rsr.up.xml.UpdateRestHandler;
 import org.akvo.rsr.up.xml.UpdateRestListHandler;
 import org.json.JSONException;
@@ -103,10 +102,13 @@ public class Uploader {
 
         Log.v(TAG, "Verifying update " + localId);
 
-        User user = SettingsUtil.getAuthUser(ctx);
-        HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
-        h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
-        int code = h.code();//evaluation starts the exchange
+        HttpRequest h;
+        try {
+            h = Downloader.getWithRedirect(ctx, url);
+        } catch (FailedFetchException e1) {
+            throw new FailedPostException(e1.getMessage());
+        }
+        int code = h.code();
         if (code == 200) {
             String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
             /* Get a SAXParser from the SAXPArserFactory. */
@@ -866,51 +868,7 @@ photo                                       or file
         }
     }
 
-    /**
-     * logs in to server and fetches API key
-     * @param url
-     * @param username
-     * @param password
-     * @return user if success, null on simple authorization failure
-     * @throws ParserConfigurationException
-     * @throws SAXException
-     * @throws HttpRequestException
-     * @throws IOException
-     */
-    static public User authorizeXML(URL url, String username, String password) throws ParserConfigurationException, SAXException, HttpRequestException, IOException {
-        Map<String, String> data = new HashMap<String, String>();
-        data.put("username", username);
-        data.put("password", password);
-        data.put("handles_unemployed", "True");
-        
-        HttpRequest h = HttpRequest.post(url).form(data).connectTimeout(10000); //10 sec timeout
-        int code = h.code();
-        if (code == 200) {
-            /* Get a SAXParser from the SAXPArserFactory. */
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            SAXParser sp = spf.newSAXParser();
-            /* Get the XMLReader of the SAXParser we created. */
-            XMLReader xr = sp.getXMLReader();
-            /* Create a new ContentHandler and apply it to the XML-Reader*/ 
-            AuthHandler myAuthHandler = new AuthHandler();
-            xr.setContentHandler(myAuthHandler);
-            /* Parse the xml-data from our URL. */
-            xr.parse(new InputSource(h.stream()));
-            /* Parsing has finished. */
 
-            Log.i(TAG, "Fetched API key");
-
-            return myAuthHandler.getUser();
-        } else {
-            //Vanilla case is 403 forbidden on an auth failure
-            //TODO raise exception if we get a 500
-            Log.e(TAG, "Authorization HTTP error:" + code);
-            String why = h.body();
-            return null;
-        }
-    }
-
-	
     /**
      * checks connectivity by asking Android.
      */

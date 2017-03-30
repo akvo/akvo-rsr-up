@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2016 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2017 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -27,10 +27,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Project;
-import org.akvo.rsr.up.domain.Update;
 import org.akvo.rsr.up.domain.User;
 import org.akvo.rsr.up.json.CountryListJsonParser;
 import org.akvo.rsr.up.json.BaseJsonParser;
@@ -38,7 +36,6 @@ import org.akvo.rsr.up.json.EmploymentListJsonParser;
 import org.akvo.rsr.up.json.ListJsonParser;
 import org.akvo.rsr.up.json.OrgJsonParser;
 import org.akvo.rsr.up.json.OrgListJsonParser;
-import org.akvo.rsr.up.json.OrgStreamingJsonParser;
 import org.akvo.rsr.up.json.OrgTypeaheadJsonParser;
 import org.akvo.rsr.up.json.ProjectResultListJsonParser;
 import org.akvo.rsr.up.json.UserJsonParser;
@@ -49,7 +46,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.github.kevinsawicki.http.HttpRequest;
 
 import android.content.Context;
@@ -82,7 +78,36 @@ public class Downloader {
     }
     
 
-
+    /**
+     * makes a GET call, with (TODO) the possibility of automatically following permanent redirects
+     * @param ctx
+     * @param url
+     * @return
+     * @throws FailedFetchException
+     */
+    public static HttpRequest getWithRedirect(Context ctx, URL url) throws FailedFetchException {
+        for (;;) {
+            User user = SettingsUtil.getAuthUser(ctx);
+            HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
+            h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
+            int code = h.code(); //evaluation starts the exchange
+            if (code == 301) { //permanent redirect 
+                //change the server setting? 
+                //retry the fetch with a modified URL?
+                try {
+                    URL newUrl = new URL(h.location()); //parse new place
+                    String newhost = newUrl.getProtocol() + "://" + newUrl.getHost();
+//                    SettingsUtil.setHost(ctx, newhost);
+                    throw new FailedFetchException("Server has moved to a new URL, " + newhost);
+                } catch (MalformedURLException e) {
+                    throw new FailedFetchException("Invalid server redirect: " + h.location());
+                }
+            } else {
+                return h;
+            }
+        }
+    }
+    
     /**
      * populates the Results/Indicators/Periods tables for a single project
      * URL should specify all results for a single project
@@ -96,14 +121,12 @@ public class Downloader {
      */
     public Date fetchProjectResultsPaged(Context ctx, RsrDbAdapter dba, URL url) throws FailedFetchException {
         Date serverDate = null;
-        User user = SettingsUtil.getAuthUser(ctx);
         int total = 0;
         int page = 0;
         //the fetch is called in a loop to get it page by page, otherwise it would take too long for server
         while (url != null) {
-            HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
-            h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
-            int code = h.code();//evaluation starts the exchange
+            HttpRequest h = getWithRedirect(ctx, url);
+            int code = h.code();
             if (code == 200) {
                 page++;
                 String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
@@ -119,7 +142,7 @@ public class Downloader {
                 }
                 /* Parsing has finished. */
                 Log.d(TAG, "URL " + url.toString());
-                Log.i(TAG, "Fetched " + jp.getCount() + " updates; target total = "+ jp.getTotalCount());
+                Log.i(TAG, "Fetched " + jp.getCount() + " results; target total = "+ jp.getTotalCount());
                
                 total += jp.getCount();
                 if (jp.getNextUrl().length() == 0) { //string needs to be trimmed from whitespace
@@ -138,7 +161,7 @@ public class Downloader {
                 url = null;//we are done
             } else {
                 //Vanilla case is 403 forbidden on an auth failure
-                Log.e(TAG, "Fetch update list HTTP error code:" + code + ' ' + h.message());
+                Log.e(TAG, "Fetch result list HTTP error code:" + code + ' ' + h.message());
                 Log.e(TAG, h.body());
                 throw new FailedFetchException("Unexpected server response: " + code + ' ' + h.message());
             }
@@ -155,14 +178,12 @@ public class Downloader {
 	 * @param url
 	 * @throws ParserConfigurationException
 	 * @throws SAXException
-	 * @throws IOException
+	 * @throws FailedFetchException 
 	 */
-	public Date fetchProject(Context ctx, RsrDbAdapter dba, URL url) throws ParserConfigurationException, SAXException, IOException {
+	public Date fetchProject(Context ctx, RsrDbAdapter dba, URL url) throws ParserConfigurationException, SAXException, IOException, FailedFetchException {
 
-        User user = SettingsUtil.getAuthUser(ctx);
-        HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
-        h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
-        int code = h.code();//evaluation starts the exchange
+        HttpRequest h = getWithRedirect(ctx, url);
+        int code = h.code();
         String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
         Date serverDate = new Date(h.date());
         if (code == 200) {
@@ -182,14 +203,14 @@ public class Downloader {
     		    dba.saveProject(proj);
     	        Log.i(TAG, "Fetched project #" + proj.getId());
     		} else {
-                Log.e(TAG, "Fetch update failed:" + myHandler.getError());
+                Log.e(TAG, "Fetch project failed:" + myHandler.getError());
     		    
     		}
         } else {
             //Vanilla case is 403 forbidden on an auth failure
-            Log.e(TAG, "Fetch update list HTTP error code:" + code);
+            Log.e(TAG, "Fetch project HTTP error code:" + code);
             Log.e(TAG, h.body());
-            throw new IOException("Unexpected server response " + code);
+            throw new FailedFetchException("Unexpected server response " + code);
         }
         return serverDate;
 
@@ -209,13 +230,12 @@ public class Downloader {
      * @throws ParserConfigurationException
      * @throws SAXException
      * @throws IOException
+     * @throws FailedFetchException 
      */
-    public Date fetchUpdateListRestApi(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException {
+    public Date fetchUpdateListRestApi(Context ctx, URL url) throws ParserConfigurationException, SAXException, IOException, FailedFetchException {
 
-        User user = SettingsUtil.getAuthUser(ctx);
-        HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
-        h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
-        int code = h.code();//evaluation starts the exchange
+        HttpRequest h = getWithRedirect(ctx, url);
+        int code = h.code();
         Date serverDate = new Date(h.date());
         if (code == 200) {
             String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
@@ -239,7 +259,7 @@ public class Downloader {
             //Vanilla case is 403 forbidden on an auth failure
             Log.e(TAG, "Fetch update list HTTP error code:" + code);
             Log.e(TAG, h.body());
-            throw new IOException("Unexpected server response " + code);
+            throw new FailedFetchException("Unexpected server response " + code);
         }
         return serverDate;
     }
@@ -261,7 +281,6 @@ public class Downloader {
      */
     public Date fetchUpdateListRestApiPaged(Context ctx, URL url, ArrayList<String> fetchedIds) throws ParserConfigurationException, SAXException, IOException, FailedFetchException {
         Date serverDate = null;
-        User user = SettingsUtil.getAuthUser(ctx);
         int total = 0;
         int page = 0;
         RsrDbAdapter dba = new RsrDbAdapter(ctx);
@@ -269,9 +288,8 @@ public class Downloader {
 
         //the fetch is called in a loop to get it page by page, otherwise it would take too long for server
         while (url != null) {
-            HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
-            h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
-            int code = h.code(); //evaluation starts the exchange
+            HttpRequest h = getWithRedirect(ctx, url);
+            int code = h.code();
             if (code == 200) {
                 page++;
                 String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
@@ -321,18 +339,15 @@ public class Downloader {
      * 
      * @param ctx
      * @param url
-     * @throws IOException
      * @throws FailedFetchException 
      */
     public Date fetchCountryListRestApiPaged(Context ctx, RsrDbAdapter dba, URL url) throws FailedFetchException {
         Date serverDate = null;
-        User user = SettingsUtil.getAuthUser(ctx);
         int total = 0;
         //the fetch is called in a loop to get it page by page, otherwise it would take too long for server
         while (url != null) {
-            HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
-            h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
-            int code = h.code();//evaluation starts the exchange
+            HttpRequest h = getWithRedirect(ctx, url);
+            int code = h.code();
             if (code == 200) {
                 String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
                 serverDate = new Date(h.date());
@@ -389,14 +404,12 @@ public class Downloader {
      */
     public Date fetchOrgListRestApiPaged(Context ctx, RsrDbAdapter dba, URL url, ProgressReporter prog) throws FailedFetchException {
         Date serverDate = null;
-        User user = SettingsUtil.getAuthUser(ctx);
         int runningTotal = 0;
         int page = 0;
         while (url != null) { //one page at a time
             Log.d(TAG, "URL " + url.toString());
-            HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
-            h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
-            int code = h.code(); //evaluation starts the exchange
+            HttpRequest h = getWithRedirect(ctx, url);
+            int code = h.code();
             if (code == 200) {
                 page++;
                 String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
@@ -456,14 +469,12 @@ public class Downloader {
      */
     public Date fetchEmploymentListPaged(Context ctx, RsrDbAdapter dba, URL url, ProgressReporter prog) throws FailedFetchException {
         Date serverDate = null;
-        User user = SettingsUtil.getAuthUser(ctx);
         int runningTotal = 0;
         int page = 0;
         while (url != null) { //one page at a time
             Log.d(TAG, "URL " + url.toString());
-            HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
-            h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
-            int code = h.code(); //evaluation starts the exchange
+            HttpRequest h = getWithRedirect(ctx, url);
+            int code = h.code();
             if (code == 200) {
                 page++;
                 String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
@@ -521,10 +532,8 @@ public class Downloader {
      */
     public Date fetchTypeaheadOrgList(Context ctx, RsrDbAdapter dba, URL url, ProgressReporter prog) throws FailedFetchException {
         Date serverDate = null;
-        User user = SettingsUtil.getAuthUser(ctx);
         Log.d(TAG, "URL " + url.toString());
-        HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
-        h.header("Authorization", "Token " + user.getApiKey()); //This API actually needs no authorization
+        HttpRequest h = getWithRedirect(ctx, url);
         int code = h.code(); //evaluation starts the exchange
         if (code == 200) {
             String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
@@ -568,11 +577,9 @@ public class Downloader {
      * @throws IOException
      * @throws FailedFetchException 
      */
-    public void fetchUser(Context ctx, RsrDbAdapter ad, URL url, String defaultId) throws ParserConfigurationException, SAXException, IOException, FailedFetchException {
-        User user = SettingsUtil.getAuthUser(ctx);
-        HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
-        h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
-        int code = h.code();//evaluation starts the exchange
+    public void fetchUser(Context ctx, RsrDbAdapter ad, URL url, String defaultId) throws ParserConfigurationException, SAXException, FailedFetchException {
+        HttpRequest h = getWithRedirect(ctx, url);
+        int code = h.code();
         if (code == 200) {
         	String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
         	String jsonBody = h.body();
@@ -598,11 +605,9 @@ public class Downloader {
      * @throws IOException
      * @throws FailedFetchException 
      */
-    public void fetchOrg(Context ctx, RsrDbAdapter ad, URL url, String defaultId) throws ParserConfigurationException, SAXException, IOException, FailedFetchException {
-        User user = SettingsUtil.getAuthUser(ctx);
-        HttpRequest h = HttpRequest.get(url).connectTimeout(10000); //10 sec timeout
-        h.header("Authorization", "Token " + user.getApiKey()); //This API needs authorization
-        int code = h.code();//evaluation starts the exchange
+    public void fetchOrg(Context ctx, RsrDbAdapter ad, URL url, String defaultId) throws ParserConfigurationException, SAXException, FailedFetchException {
+        HttpRequest h = getWithRedirect(ctx, url);
+        int code = h.code();
         if (code == 200) {
         	String serverVersion = h.header(ConstantUtil.SERVER_VERSION_HEADER);
         	String jsonBody = h.body();
@@ -624,6 +629,7 @@ public class Downloader {
 	 * @param file
 	 */
 	public static void httpGetToFile(URL url, File file) {
+	    //TODO: use getWithRedirect here?
 		HttpRequest.get(url).receive(file);		
 	}
 
