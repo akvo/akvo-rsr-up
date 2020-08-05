@@ -80,13 +80,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.zip.GZIPInputStream;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
 
 /**
  * A fluid interface for making HTTP requests using an underlying
@@ -287,6 +281,11 @@ public class HttpRequest {
       try {
         SSLContext context = SSLContext.getInstance("TLS");
         context.init(null, trustAllCerts, new SecureRandom());
+        SSLSessionContext sslSessionContext = context.getServerSessionContext();
+        int sessionCacheSize = sslSessionContext.getSessionCacheSize();
+        if (sessionCacheSize > 0) {
+          sslSessionContext.setSessionCacheSize(0);
+        }
         TRUSTED_FACTORY = context.getSocketFactory();
       } catch (GeneralSecurityException e) {
         IOException ioException = new IOException(
