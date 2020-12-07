@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2012-2015 Stichting Akvo (Akvo Foundation)
+ *  Copyright (C) 2012-2015,2020 Stichting Akvo (Akvo Foundation)
  *
  *  This file is part of Akvo RSR.
  *
@@ -36,7 +36,7 @@ public class LicenseActivity extends AppCompatActivity {
 		
 		// OR, you can also load from an HTML string:
 		String summary = "<html><body>" +
-                "<H2>Akvo RSR Up</H2><H3>Android app</H3><P>Copyright &#169 2012-2015 Stichting Akvo</P>" +
+                "<H2>Akvo RSR Up</H2><H3>Android app</H3><P>Copyright &#169 2012-2015,2020 Stichting Akvo</P>" +
 		        "<P>Akvo RSR is free software: you can redistribute it and modify it under the terms of the "+
                     "GNU Affero General Public License (AGPL) as published by the Free Software Foundation,"+
                     " either version 3 of the License or any later version.</P>"+
