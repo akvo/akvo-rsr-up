@@ -1,23 +1,18 @@
 package org.akvo.rsr.up.service;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
-import org.akvo.rsr.up.LoginActivity;
-import org.akvo.rsr.up.R;
-import org.akvo.rsr.up.util.ConstantUtil;
-import org.akvo.rsr.up.util.Downloader;
-import org.akvo.rsr.up.util.Uploader;
-import org.akvo.rsr.up.util.SettingsUtil;
-
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
+
+import org.akvo.rsr.up.util.ConstantUtil;
+import org.akvo.rsr.up.util.Downloader;
+import org.akvo.rsr.up.util.SettingsUtil;
+import org.akvo.rsr.up.util.Uploader;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class VerifyProjectUpdateService extends Service {
@@ -26,10 +21,6 @@ public class VerifyProjectUpdateService extends Service {
     private static Timer timer;
     private static final long INITIAL_DELAY_MS = 60000; //one minute
     private static final long INTERVAL_MS = 300000; //five minutes
-
-//    private static final long INITIAL_DELAY_MS = 6000;
-//    private static final long INTERVAL_MS = 30000;
-
 
     /**
      * life cycle method for the service. This is called by the system when the
@@ -70,17 +61,10 @@ public class VerifyProjectUpdateService extends Service {
 					if (unresolveds == 0) { //mission accomplished
 						Log.i(TAG, "Every update verified");
 						
-						//notify user
-						String ns = Context.NOTIFICATION_SERVICE;
-						NotificationManager notifcationMgr = (NotificationManager) context.getSystemService(ns);
-						String headline = "Synchronization complete";
-						Notification notification = new Notification(R.drawable.logo_small, headline, System.currentTimeMillis());
-						notification.flags = Notification.FLAG_AUTO_CANCEL; 
-						Intent notificationIntent = new Intent(context, LoginActivity.class);
-						PendingIntent contentIntent = PendingIntent.getActivity(context, 0,	notificationIntent, 0);
-					    //notification.setLatestEventInfo(context, headline, "Update status is resolved", contentIntent); //TODO: fix use builder https://developer.android.com/reference/android/support/v4/app/NotificationCompat.Builder.html
-					    notifcationMgr.notify(7777, notification); //id is irrelevant when notification is autocanceled					    
-					    
+						NotificationHelper helper = new NotificationHelper();
+						helper.createNotificationChannel(context);
+						helper.displayNotification(context);
+
 				        if (timer != null) {
 				            timer.cancel();
 				        }
@@ -91,8 +75,9 @@ public class VerifyProjectUpdateService extends Service {
 					}
 
                 } catch (Uploader.FailedPostException e) {
-                   
+                   Log.e(TAG, "Update error", e);
                 } catch (Exception e) {
+					Log.e(TAG, "Update error", e);
                     i.putExtra(ConstantUtil.SERVICE_ERRMSG_KEY, e.getMessage());
 				}
 				

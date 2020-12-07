@@ -233,5 +233,9 @@
 
     <string name="title_activity_back">BackActivity</string>
     <string name="hello_world">Hello world!</string>
+    <string name="channel_name">RSR Notifications</string>
+    <string name="channel_description">RSR Notifications</string>
+    <string name="sync_notification_title">Synchronization complete</string>
+    <string name="sync_notification_text">Update status is resolved</string>
 
 </resources>
