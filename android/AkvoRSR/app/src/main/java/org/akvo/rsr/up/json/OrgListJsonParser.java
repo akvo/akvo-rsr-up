@@ -69,9 +69,9 @@ import org.json.JSONObject;
             "contact_email": "info@1procentclub.nl",
             "description": "The 1%CLUB Foundation is an initiative of Anna Chojnacka and Bart Lacroix.
 
-The 1%CLUB is about power and powerlessness. We live in a world where economic means are very unequally divided. At least you can independently make sure that a part of our means ends up where you think it would be most useful! - Anna Chojnacka.
+"The 1%CLUB is about power and powerlessness. We live in a world where economic means are very unequally divided. At least you can independently make sure that a part of our means ends up where you think it would be most useful!" - Anna Chojnacka.
 
-Through the website you can choose yourself which projects you want to support, so you know exactly where your 1% is going. The website combines Web 2.0 elements with the rise of people and organisations who want to contribute to development cooperation, and is therefore really in itself a form of International Cooperation 2.0  Bart Lacroix.
+"Through the website you can choose yourself which projects you want to support, so you know exactly where your 1% is going. The website combines Web 2.0 elements with the rise of people and organisations who want to contribute to development cooperation, and is therefore really in itself a form of International Cooperation 2.0" - Bart Lacroix.
 
 1%Club is a marketplace that connects smart development projects with people, money and knowledge around the world. Based in Amsterdam, it is focused on engaging individuals and groups to commit one per cent of their time and money to international development projects.",
             "notes": "",
