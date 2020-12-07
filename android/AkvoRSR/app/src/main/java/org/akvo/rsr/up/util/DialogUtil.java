@@ -29,92 +29,51 @@ import androidx.appcompat.app.AlertDialog;
 import org.akvo.rsr.up.R;
 
 public class DialogUtil {
-	public static void errorAlert(Context ctx, String title, Exception e) {
-		/* Display any Error to the GUI. */
-		androidx.appcompat.app.AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
-	    alert.setTitle(title);
-	    alert.setMessage(e.toString());
-	
-	    alert.setPositiveButton(R.string.btncaption_ok, new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int whichButton) {
-		    	dialog.cancel();
-		    	}
-		    });
-	    alert.show();
-	}
 
     public static void errorAlert(Context ctx, String title, String msg) {
-        /* Display any Error to the GUI. */
-        androidx.appcompat.app.AlertDialog.Builder alert = new androidx.appcompat.app.AlertDialog.Builder(ctx);
+        AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
         alert.setTitle(title);
         alert.setMessage(msg);
         alert.setIcon(android.R.drawable.ic_dialog_alert);
-        alert.setPositiveButton(R.string.btncaption_ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.cancel();
-                }
-            });
+        alert.setPositiveButton(R.string.btncaption_ok, (dialog, whichButton) -> dialog.cancel());
         alert.show();
     }
     
     public static void errorAlert(Context ctx, int title, int msg) {
-        /* Display any Error to the GUI. */
-        androidx.appcompat.app.AlertDialog.Builder alert = new androidx.appcompat.app.AlertDialog.Builder(ctx);
+        AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
         alert.setTitle(title);
         alert.setMessage(msg);
         alert.setIcon(android.R.drawable.ic_dialog_alert);
-        alert.setPositiveButton(R.string.btncaption_ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.cancel();
-                }
-            });
+        alert.setPositiveButton(R.string.btncaption_ok, (dialog, whichButton) -> dialog.cancel());
         alert.show();
     }
     
     public static void infoAlert(Context ctx, String title, String msg) {
-        /* Display an info dialog to the GUI. */
-        AlertDialog.Builder alert = new androidx.appcompat.app.AlertDialog.Builder(ctx);
+        AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
         alert.setTitle(title).setMessage(msg).setIcon(android.R.drawable.ic_dialog_info);
     
-        alert.setPositiveButton(R.string.btncaption_ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.cancel();
-                }
-            });
+        alert.setPositiveButton(R.string.btncaption_ok, (dialog, whichButton) -> dialog.cancel());
         alert.show();
     }
     
     public static void infoAlert(Context ctx, int title, int msg) {
-        /* Display an info dialog to the GUI. */
-        androidx.appcompat.app.AlertDialog.Builder alert = new androidx.appcompat.app.AlertDialog.Builder(ctx);
+        AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
         alert.setTitle(title).setMessage(msg).setIcon(android.R.drawable.ic_dialog_info);
     
-        alert.setPositiveButton(R.string.btncaption_ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.cancel();
-                }
-            });
+        alert.setPositiveButton(R.string.btncaption_ok, (dialog, whichButton) -> dialog.cancel());
         alert.show();
     }
     
     public static void infoAlert(Context ctx, int title, String msg) {
-        /* Display an info dialog to the GUI. */
-        androidx.appcompat.app.AlertDialog.Builder alert = new androidx.appcompat.app.AlertDialog.Builder(ctx);
+        AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
         alert.setTitle(title).setMessage(msg).setIcon(android.R.drawable.ic_dialog_info);
     
-        alert.setPositiveButton(R.string.btncaption_ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.cancel();
-                }
-            });
+        alert.setPositiveButton(R.string.btncaption_ok, (dialog, whichButton) -> dialog.cancel());
         alert.show();
     }
     
 	/**
 	 * shows an authentication dialog that asks for the administrator passcode
-	 * 
-	 * @param parentContext
-	 * @param listener
 	 */
 	public static void showAdminAuthDialog(final Context parentContext,
 			final AdminAuthDialogListener listener) {
@@ -124,23 +83,17 @@ public class DialogUtil {
 				R.string.authtitle,
 				R.string.authtext,
 				input,
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						String val = input.getText().toString();
-						if (ConstantUtil.ADMIN_AUTH_CODE.equals(val)) {
-							listener.onAuthenticated();
-							if (dialog != null) {
-								dialog.dismiss();
-							}
-						} else {
-							 showConfirmDialog(R.string.authfailed, R.string.invalidpassword, parentContext);
-							if (dialog != null) {
-								dialog.dismiss();
-							}
-						}
-					}
-				});
+                (dialog, which) -> {
+                    String val = input.getText().toString();
+                    if (ConstantUtil.ADMIN_AUTH_CODE.equals(val)) {
+                        listener.onAuthenticated();
+                    } else {
+                         showConfirmDialog(R.string.authfailed, R.string.invalidpassword, parentContext);
+                    }
+                    if (dialog != null) {
+                        dialog.dismiss();
+                    }
+                });
 	}
 	
 
@@ -148,20 +101,15 @@ public class DialogUtil {
 	 * displays a simple dialog box with only a single, positive button using
 	 * the resource ids of the strings passed in for the title and text.
 	 * 
-	 * @param titleId
-	 * @param textId
-	 * @param parentContext
 	 */
 	public static void showConfirmDialog(int titleId, int textId,
 			Context parentContext) {
 		showConfirmDialog(titleId, textId, parentContext, false,
-				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						if (dialog != null) {
-							dialog.cancel();
-						}
-					}
-				});
+                (dialog, id) -> {
+                    if (dialog != null) {
+                        dialog.cancel();
+                    }
+                });
 	}
 
 	/**
@@ -169,20 +117,14 @@ public class DialogUtil {
 	 * optional (based on a flag) cancel button using the resource ids of the
 	 * strings passed in for the title and text.
 	 * 
-	 * @param titleId
-	 * @param textId
-	 * @param parentContext
 	 */
     public static void showConfirmDialog(int titleId, int textId,
             Context parentContext, boolean includeNegative,
             DialogInterface.OnClickListener listener) {
         showConfirmDialog(titleId, textId, parentContext, includeNegative,
-                listener, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (dialog != null) {
-                            dialog.dismiss();
-                        }
+                listener, (dialog, which) -> {
+                    if (dialog != null) {
+                        dialog.dismiss();
                     }
                 });
     }
@@ -190,12 +132,9 @@ public class DialogUtil {
             Context parentContext, boolean includeNegative,
             DialogInterface.OnClickListener listener) {
         showConfirmDialog(titleId, textId, parentContext, includeNegative,
-                listener, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (dialog != null) {
-                            dialog.dismiss();
-                        }
+                listener, (dialog, which) -> {
+                    if (dialog != null) {
+                        dialog.dismiss();
                     }
                 });
     }
@@ -207,9 +146,6 @@ public class DialogUtil {
 	 * strings passed in for the title and text. users can install listeners for
 	 * both the positive and negative buttons
 	 * 
-	 * @param titleId
-	 * @param textId
-	 * @param parentContext
 	 * @param includeNegative
 	 * @param positiveListener
 	 *            - if includeNegative is false, this will also be bound to the
@@ -224,7 +160,7 @@ public class DialogUtil {
             Context parentContext, boolean includeNegative,
             final DialogInterface.OnClickListener positiveListener,
             final DialogInterface.OnClickListener negativeListener) {
-        AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(parentContext);
+        AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
         TextView tipText = new TextView(parentContext);
         builder.setTitle(titleId);
         tipText.setText(textId);
@@ -236,20 +172,10 @@ public class DialogUtil {
         if (includeNegative) {
             builder.setNegativeButton(R.string.btncaption_cancel, negativeListener);
             if (negativeListener != null) {
-                builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        negativeListener.onClick(dialog, -1);
-                    }
-                });
+                builder.setOnCancelListener(dialog -> negativeListener.onClick(dialog, -1));
             }
         } else if (positiveListener != null) {
-            builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface dialog) {
-                    positiveListener.onClick(dialog, -1);
-                }
-            });
+            builder.setOnCancelListener(dialog -> positiveListener.onClick(dialog, -1));
         }
 
         builder.show();
@@ -262,9 +188,6 @@ public class DialogUtil {
      * string passed in for the title and a string for the text. users can install listeners for
      * both the positive and negative buttons
      * 
-     * @param titleId
-     * @param text
-     * @param parentContext
      * @param includeNegative
      * @param positiveListener
      *            - if includeNegative is false, this will also be bound to the
@@ -279,7 +202,7 @@ public class DialogUtil {
             Context parentContext, boolean includeNegative,
             final DialogInterface.OnClickListener positiveListener,
             final DialogInterface.OnClickListener negativeListener) {
-        androidx.appcompat.app.AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
+        AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
         TextView tipText = new TextView(parentContext);
         builder.setTitle(titleId);
         tipText.setText(text);
@@ -291,20 +214,10 @@ public class DialogUtil {
         if (includeNegative) {
             builder.setNegativeButton(R.string.btncaption_cancel, negativeListener);
             if (negativeListener != null) {
-                builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        negativeListener.onClick(dialog, -1);
-                    }
-                });
+                builder.setOnCancelListener(dialog -> negativeListener.onClick(dialog, -1));
             }
         } else if (positiveListener != null) {
-            builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                @Override
-                public void onCancel(DialogInterface dialog) {
-                    positiveListener.onClick(dialog, -1);
-                }
-            });
+            builder.setOnCancelListener(dialog -> positiveListener.onClick(dialog, -1));
         }
 
         builder.show();
@@ -317,31 +230,19 @@ public class DialogUtil {
      * string passed in for the title and a string for the text. users can install listeners for
      * both the positive and negative buttons
      * 
-     * @param titleId
-     * @param textId
-     * @param detailedMsg
-     * @param parentContext
      */
     public static void errorAlertWithDetail(
             final Context parentContext,
             int titleId, int textId,
             final String detailedMsg) {
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(parentContext);
+        AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
         builder.setTitle(titleId);
         builder.setMessage(textId);
         builder.setIcon(android.R.drawable.ic_dialog_alert);
         //The OK button just dismisses the dialog
-        builder.setPositiveButton(R.string.btncaption_ok, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.cancel();
-                }
-            });
+        builder.setPositiveButton(R.string.btncaption_ok, (dialog, whichButton) -> dialog.cancel());
         //Details button shows the whole truth
-        builder.setNegativeButton(R.string.btncaption_details, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                infoAlert(parentContext, R.string.detail_dialog_title, detailedMsg);
-                }
-            });
+        builder.setNegativeButton(R.string.btncaption_details, (dialog, whichButton) -> infoAlert(parentContext, R.string.detail_dialog_title, detailedMsg));
     
         builder.show();
     }
@@ -351,10 +252,6 @@ public class DialogUtil {
 	 * shows a dialog that prompts the user to enter a single text value as
 	 * input
 	 * 
-	 * @param parentContext
-	 * @param title
-	 * @param text
-	 * @param clickListener
 	 */
 	public static void showTextInputDialog(
 	        final Context parentContext,
@@ -362,7 +259,7 @@ public class DialogUtil {
 			int text,
 			EditText inputView,
 			DialogInterface.OnClickListener clickListener) {
-		androidx.appcompat.app.AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
+		AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
 		LinearLayout main = new LinearLayout(parentContext);
 		main.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 		main.setOrientation(LinearLayout.VERTICAL);
@@ -376,23 +273,18 @@ public class DialogUtil {
 		builder.setPositiveButton(R.string.btncaption_ok, clickListener);
 
 		builder.setNegativeButton(R.string.btncaption_cancel,
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						if (dialog != null) {
-							dialog.dismiss();
-						}
-					}
-				});
+                (dialog, which) -> {
+                    if (dialog != null) {
+                        dialog.dismiss();
+                    }
+                });
 
 		builder.show();
 	}
 	/**
 	 * interface that should be implemented by uses of the AdminAuthDialog to be
 	 * notified when authorization is successful
-	 * 
-	 * 
-	 * 
+	 *
 	 */
 	public interface AdminAuthDialogListener {
 		void onAuthenticated();
@@ -405,28 +297,17 @@ public class DialogUtil {
      * launched. If the negative button is clicked, it will just close the
      * dialog
      * 
-     * @param parentContext
      */
     public static void showGPSDialog(final Context parentContext) {
-        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(parentContext);
+        AlertDialog.Builder builder = new AlertDialog.Builder(parentContext);
         builder.setMessage(R.string.gpsdisabled_dialog_msg)
                 .setCancelable(true)
                 .setPositiveButton(R.string.btncaption_ok,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                parentContext
-                                        .startActivity(new Intent(
-                                                "android.settings.LOCATION_SOURCE_SETTINGS"));
-                            }
-                        })
+                        (dialog, id) -> parentContext
+                                .startActivity(new Intent(
+                                        "android.settings.LOCATION_SOURCE_SETTINGS")))
                 .setNegativeButton(R.string.btncaption_cancel,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
+                        (dialog, id) -> dialog.cancel());
         builder.show();
     }
-
-
 }
