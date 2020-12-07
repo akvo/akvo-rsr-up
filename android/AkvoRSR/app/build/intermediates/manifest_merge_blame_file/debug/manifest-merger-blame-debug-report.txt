@@ -1,0 +1,338 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="org.akvo.rsr.up"
+4    android:versionCode="33"
+5    android:versionName="1.6.1" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="14"
+8-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml
+9        android:targetSdkVersion="28" />
+9-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml
+10
+11    <uses-permission android:name="android.permission.INTERNET" />
+11-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:5:5-67
+11-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:5:22-64
+12    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+12-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:6:5-79
+12-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:6:22-76
+13    <uses-permission
+13-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:7:5-9:36
+14        android:name="android.permission.CAMERA"
+14-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:8:9-49
+15        android:required="false" />
+15-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:9:9-33
+16    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+16-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:10:5-81
+16-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:10:22-78
+17
+18    <uses-feature
+18-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:12:5-14:36
+19        android:name="android.hardware.camera"
+19-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:13:9-47
+20        android:required="false" />
+20-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:14:9-33
+21
+22    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+22-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:16:5-79
+22-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:16:22-76
+23
+24    <application
+24-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:18:5-177:19
+25        android:allowBackup="true"
+25-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:19:9-35
+26        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+26-->[androidx.core:core:1.3.0] /home/valeria/.gradle/caches/transforms-2/files-2.1/8dcd1701ae68e2a64de609ba4b65471f/core-1.3.0/AndroidManifest.xml:24:18-86
+27        android:debuggable="true"
+28        android:icon="@drawable/ic_launcher"
+28-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:20:9-45
+29        android:label="@string/app_name"
+29-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:21:9-41
+30        android:testOnly="true"
+31        android:theme="@style/AppTheme" >
+31-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:22:9-40
+32        <activity
+32-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:23:9-32:20
+33            android:name="org.akvo.rsr.up.LoginActivity"
+33-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:24:13-42
+34            android:label="@string/title_activity_login"
+34-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:25:13-57
+35            android:theme="@style/AppThemeNoTitle" >
+35-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:26:13-51
+36            <intent-filter>
+36-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:27:13-31:29
+37                <action android:name="android.intent.action.MAIN" />
+37-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:28:17-69
+37-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:28:25-66
+38
+39                <category android:name="android.intent.category.LAUNCHER" />
+39-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:30:17-77
+39-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:30:27-74
+40            </intent-filter>
+41        </activity>
+42        <activity
+42-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:33:9-37:20
+43            android:name="org.akvo.rsr.up.ProjectListActivity"
+43-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:34:13-48
+44            android:configChanges="keyboardHidden|orientation"
+44-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:35:13-63
+45            android:label="@string/title_activity_project_list" >
+45-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:36:13-64
+46        </activity>
+47        <activity
+47-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:38:9-45:20
+48            android:name="org.akvo.rsr.up.OrgListActivity"
+48-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:39:13-44
+49            android:configChanges="orientation"
+49-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:40:13-48
+50            android:label="@string/title_activity_project_list" >
+50-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:41:13-64
+51            <meta-data
+51-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:42:13-44:71
+52                android:name="android.support.PARENT_ACTIVITY"
+52-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:43:17-63
+53                android:value="org.akvo.rsr.up.ProjectListActivity" />
+53-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:44:17-68
+54        </activity>
+55        <activity
+55-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:46:9-53:20
+56            android:name="org.akvo.rsr.up.EmploymentApplicationActivity"
+56-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:47:13-58
+57            android:configChanges="orientation"
+57-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:48:13-48
+58            android:label="@string/title_activity_employment_application" >
+58-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:49:13-74
+59            <meta-data
+59-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:42:13-44:71
+60                android:name="android.support.PARENT_ACTIVITY"
+60-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:43:17-63
+61                android:value="org.akvo.rsr.up.ProjectListActivity" />
+61-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:44:17-68
+62        </activity>
+63        <activity
+63-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:54:9-60:20
+64            android:name="org.akvo.rsr.up.UpdateListActivity"
+64-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:55:13-47
+65            android:label="@string/title_activity_update_list" >
+65-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:56:13-63
+66            <meta-data
+66-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:42:13-44:71
+67                android:name="android.support.PARENT_ACTIVITY"
+67-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:43:17-63
+68                android:value="org.akvo.rsr.up.ProjectDetailActivity" />
+68-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:44:17-68
+69        </activity>
+70        <activity
+70-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:61:9-67:20
+71            android:name="org.akvo.rsr.up.ResultListActivity"
+71-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:62:13-47
+72            android:label="@string/title_activity_result_list" >
+72-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:63:13-63
+73            <meta-data
+73-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:42:13-44:71
+74                android:name="android.support.PARENT_ACTIVITY"
+74-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:43:17-63
+75                android:value="org.akvo.rsr.up.ProjectDetailActivity" />
+75-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:44:17-68
+76        </activity>
+77        <activity
+77-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:68:9-74:20
+78            android:name="org.akvo.rsr.up.ProjectDetailActivity"
+78-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:69:13-50
+79            android:label="@string/title_activity_project_detail" >
+79-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:70:13-66
+80            <meta-data
+80-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:42:13-44:71
+81                android:name="android.support.PARENT_ACTIVITY"
+81-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:43:17-63
+82                android:value="org.akvo.rsr.up.ProjectListActivity" />
+82-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:44:17-68
+83        </activity>
+84        <activity
+84-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:75:9-81:20
+85            android:name="org.akvo.rsr.up.PeriodDetailActivity"
+85-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:76:13-49
+86            android:label="@string/title_activity_period_detail" >
+86-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:77:13-65
+87            <meta-data
+87-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:42:13-44:71
+88                android:name="android.support.PARENT_ACTIVITY"
+88-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:43:17-63
+89                android:value="org.akvo.rsr.up.ResultListActivity" />
+89-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:44:17-68
+90        </activity>
+91        <activity
+91-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:82:9-88:20
+92            android:name="org.akvo.rsr.up.DiagnosticActivity"
+92-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:83:13-47
+93            android:label="@string/title_activity_diagnostics" >
+93-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:84:13-63
+94            <meta-data
+94-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:42:13-44:71
+95                android:name="android.support.PARENT_ACTIVITY"
+95-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:43:17-63
+96                android:value="org.akvo.rsr.up.ProjectListActivity" />
+96-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:44:17-68
+97        </activity>
+98        <activity
+98-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:89:9-95:20
+99            android:name="org.akvo.rsr.up.MessageActivity"
+99-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:90:13-44
+100            android:label="@string/title_activity_messages" >
+100-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:91:13-60
+101            <meta-data
+101-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:42:13-44:71
+102                android:name="android.support.PARENT_ACTIVITY"
+102-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:43:17-63
+103                android:value="org.akvo.rsr.up.ProjectListActivity" />
+103-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:44:17-68
+104        </activity>
+105        <activity
+105-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:96:9-102:20
+106            android:name="org.akvo.rsr.up.UpdateDetailActivity"
+106-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:97:13-49
+107            android:label="@string/title_activity_update_detail" >
+107-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:98:13-65
+108            <meta-data
+108-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:42:13-44:71
+109                android:name="android.support.PARENT_ACTIVITY"
+109-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:43:17-63
+110                android:value="org.akvo.rsr.up.UpdateListActivity" />
+110-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:44:17-68
+111        </activity>
+112        <activity
+112-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:103:9-110:20
+113            android:name="org.akvo.rsr.up.UpdateEditorActivity"
+113-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:104:13-49
+114            android:configChanges="keyboardHidden|orientation"
+114-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:105:13-63
+115            android:label="@string/title_activity_update_edit" >
+115-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:106:13-63
+116            <meta-data
+116-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:42:13-44:71
+117                android:name="android.support.PARENT_ACTIVITY"
+117-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:43:17-63
+118                android:value="org.akvo.rsr.up.UpdateListActivity" />
+118-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:44:17-68
+119        </activity>
+120        <activity
+120-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:111:9-114:20
+121            android:name="org.akvo.rsr.up.SettingsActivity"
+121-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:112:13-45
+122            android:label="@string/title_activity_settings" >
+122-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:113:13-60
+123        </activity>
+124        <activity
+124-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:115:9-121:20
+125            android:name="org.akvo.rsr.up.AboutActivity"
+125-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:116:13-42
+126            android:label="@string/title_activity_about" >
+126-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:117:13-57
+127            <meta-data
+127-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:42:13-44:71
+128                android:name="android.support.PARENT_ACTIVITY"
+128-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:43:17-63
+129                android:value="org.akvo.rsr.up.LoginActivity" />
+129-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:44:17-68
+130        </activity>
+131        <activity
+131-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:122:9-128:20
+132            android:name="org.akvo.rsr.up.LicenseActivity"
+132-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:123:13-44
+133            android:label="@string/title_activity_license" >
+133-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:124:13-59
+134            <meta-data
+134-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:42:13-44:71
+135                android:name="android.support.PARENT_ACTIVITY"
+135-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:43:17-63
+136                android:value="org.akvo.rsr.up.AboutActivity" />
+136-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:44:17-68
+137        </activity>
+138        <activity
+138-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:129:9-135:20
+139            android:name="org.akvo.rsr.up.ResultEditorActivity"
+139-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:130:13-49
+140            android:label="@string/title_activity_result_editor" >
+140-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:131:13-65
+141            <meta-data
+141-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:42:13-44:71
+142                android:name="android.support.PARENT_ACTIVITY"
+142-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:43:17-63
+143                android:value="org.akvo.rsr.up.ResultListActivity" />
+143-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:44:17-68
+144        </activity>
+145
+146        <service
+146-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:137:9-141:19
+147            android:name="org.akvo.rsr.up.service.SubmitProjectUpdateService"
+147-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:138:13-63
+148            android:enabled="true"
+148-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:139:13-35
+149            android:exported="false" >
+149-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:140:13-37
+150        </service>
+151        <service
+151-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:142:9-146:19
+152            android:name="org.akvo.rsr.up.service.SubmitIpdService"
+152-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:143:13-53
+153            android:enabled="true"
+153-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:144:13-35
+154            android:exported="false" >
+154-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:145:13-37
+155        </service>
+156        <service
+156-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:147:9-151:19
+157            android:name="org.akvo.rsr.up.service.SubmitEmploymentService"
+157-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:148:13-60
+158            android:enabled="true"
+158-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:149:13-35
+159            android:exported="false" >
+159-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:150:13-37
+160        </service>
+161        <service
+161-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:152:9-156:19
+162            android:name="org.akvo.rsr.up.service.GetProjectDataService"
+162-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:153:13-58
+163            android:enabled="true"
+163-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:154:13-35
+164            android:exported="false" >
+164-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:155:13-37
+165        </service>
+166        <service
+166-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:157:9-161:19
+167            android:name="org.akvo.rsr.up.service.SignInService"
+167-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:158:13-50
+168            android:enabled="true"
+168-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:159:13-35
+169            android:exported="false" >
+169-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:160:13-37
+170        </service>
+171        <service
+171-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:162:9-166:19
+172            android:name="org.akvo.rsr.up.service.VerifyProjectUpdateService"
+172-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:163:13-63
+173            android:enabled="true"
+173-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:164:13-35
+174            android:exported="false" >
+174-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:165:13-37
+175        </service>
+176        <service
+176-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:167:9-171:19
+177            android:name="org.akvo.rsr.up.service.GetOrgDataService"
+177-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:168:13-54
+178            android:enabled="true"
+178-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:169:13-35
+179            android:exported="false" >
+179-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:170:13-37
+180        </service>
+181
+182        <activity
+182-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:173:9-176:20
+183            android:name="org.akvo.rsr.up.BackActivity"
+183-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:174:13-41
+184            android:label="@string/title_activity_back" >
+184-->/home/valeria/src/akvo-rsr-up/android/AkvoRSR/app/src/main/AndroidManifest.xml:175:13-56
+185        </activity>
+186    </application>
+187
+188</manifest>
