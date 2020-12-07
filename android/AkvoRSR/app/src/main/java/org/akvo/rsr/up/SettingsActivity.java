@@ -19,7 +19,6 @@ package org.akvo.rsr.up;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.DialogUtil;
