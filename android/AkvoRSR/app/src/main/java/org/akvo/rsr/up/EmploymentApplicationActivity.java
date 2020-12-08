@@ -184,24 +184,25 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
         //fetch data
         mDba.open();
         Cursor dataCursor = mDba.listAllEmploymentsForUser(SettingsUtil.getAuthUser(this).getId());
-        mDba.close();
-        String list = "";
-        if (dataCursor.getCount() > 0) {
+        StringBuilder list = new StringBuilder();
+
+        if (dataCursor.moveToFirst()) {
             final int org_name_col = dataCursor.getColumnIndex("name"); //from join
             final int approved_col = dataCursor.getColumnIndex(RsrDbAdapter.APPROVED_COL);
             final int groupname_col = dataCursor.getColumnIndex(RsrDbAdapter.GROUP_NAME_COL);
-            while (dataCursor.moveToNext()) {  //must be grouped on result and indicator
+            do {  //must be grouped on result and indicator
                 String org_name = dataCursor.getString(org_name_col);
-                if (dataCursor.getInt(approved_col)==0) {
+                if (dataCursor.getInt(approved_col) == 0) {
                     org_name += " - pending";//TODO localization
                 } else {
                     org_name += " (" + dataCursor.getString(groupname_col) + ")";
                 }
-                list += org_name + "\n";
-            }
+                list.append(org_name).append("\n");
+            } while (dataCursor.moveToNext());
         }
         dataCursor.close();
-        mList.setText(list);
+        mDba.close();
+        mList.setText(list.toString());
     }   
         
     
