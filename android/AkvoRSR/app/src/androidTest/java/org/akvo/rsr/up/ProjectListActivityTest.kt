@@ -24,7 +24,7 @@ class ProjectListActivityTest {
     fun activityShouldDisplayCorrectEmptyScreen() {
         ScreenRobot.withRobot(ProjectListRobot::class.java)
             .provideContext(InstrumentationRegistry.getInstrumentation().targetContext)
-            .checkViewDisplayedWithText(R.id.projcountlabel, "0")
+            .checkViewWithIdDisplayedWithText(R.id.projcountlabel, "0")
             .checkViewDisplayedWithTextId(R.id.unemployed_text, R.string.label_unemployed_proj_list)
     }
 

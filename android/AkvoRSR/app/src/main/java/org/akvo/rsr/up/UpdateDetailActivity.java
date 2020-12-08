@@ -22,7 +22,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -46,74 +45,51 @@ public class UpdateDetailActivity extends AppCompatActivity {
 	private Update update = null;
 	private boolean editable;
 	private boolean synching;
-	private boolean debug;
-	//UI
-	private TextView projTitleLabel;
-	private TextView projupdTitleText;
-	private TextView projupdDescriptionText;
-    private TextView projupdUser;
-    private TextView projupdPhotoCredit;
-    private TextView projupdPhotoCaption;
-	private TextView synchFlag;
-	private TextView projupdLocationText;
-	private ImageView projupdImage;
-	private Button btnEdit;
-	//Database
 	private RsrDbAdapter dba;
-	
-	//TODO: may want to have an onResume where we check if an upload is ongoing,
-	// and if so display a progress indicator
-	
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		debug = SettingsUtil.ReadBoolean(this, "setting_debug", false);
+		boolean debug = SettingsUtil.ReadBoolean(this, "setting_debug", false);
 
 		//find which update we are showing
 		//TODO, use uuid as update id? Would let us stick around while an update is posted (and changes id)
         projectId = getIntent().getStringExtra(ConstantUtil.PROJECT_ID_KEY);
         updateId = getIntent().getStringExtra(ConstantUtil.UPDATE_ID_KEY);
 		if (projectId == null || updateId == null) {
-			DialogUtil.errorAlert(this,R.string.noid_dialog_title, R.string.noid_dialog_msg);
+			DialogUtil.errorAlert(this, R.string.noid_dialog_title, R.string.noid_dialog_msg);
 		}
-		
-		
-		//get the look
-		setContentView(R.layout.activity_update_detail);
-		//find the fields
-		projTitleLabel = (TextView) findViewById(R.id.projupd_edit_proj_title);
-		projupdTitleText = (TextView) findViewById(R.id.projupd_detail_title);
-        projupdDescriptionText = (TextView) findViewById(R.id.projupd_detail_descr);
-        projupdPhotoCaption = (TextView) findViewById(R.id.projupd_detail_photo_caption);
-        projupdPhotoCredit = (TextView) findViewById(R.id.projupd_detail_photo_credit);
-        projupdImage = (ImageView) findViewById(R.id.image_update_detail);
-        projupdUser = (TextView) findViewById(R.id.projupd_detail_user);
-        projupdLocationText = (TextView) findViewById(R.id.text_projupd_location);
-        synchFlag = (TextView) findViewById(R.id.projupd_detail_synchronising);
 
-		//Activate buttons
-				
-        btnEdit = (Button) findViewById(R.id.btn_edit_update);
-        btnEdit.setOnClickListener( new View.OnClickListener() {
-			public void onClick(View view) {
-				Intent i = new Intent(view.getContext(), UpdateEditorActivity.class);
-				i.putExtra(ConstantUtil.PROJECT_ID_KEY, projectId);
-				i.putExtra(ConstantUtil.UPDATE_ID_KEY, updateId);
-				startActivity(i);
-				finishThisActivity();//close this, as ID will change if update is published -- WINDOW LEAK!
-			}
+		setContentView(R.layout.activity_update_detail);
+		TextView projTitleLabel = (TextView) findViewById(R.id.projupd_edit_proj_title);
+		TextView projupdTitleText = (TextView) findViewById(R.id.projupd_detail_title);
+		TextView projupdDescriptionText = (TextView) findViewById(R.id.projupd_detail_descr);
+		TextView projupdPhotoCaption = (TextView) findViewById(R.id.projupd_detail_photo_caption);
+		TextView projupdPhotoCredit = (TextView) findViewById(R.id.projupd_detail_photo_credit);
+		ImageView projupdImage = (ImageView) findViewById(R.id.image_update_detail);
+		TextView projupdUser = (TextView) findViewById(R.id.projupd_detail_user);
+		TextView projupdLocationText = (TextView) findViewById(R.id.text_projupd_location);
+		TextView synchFlag = (TextView) findViewById(R.id.projupd_detail_synchronising);
+
+		Button btnEdit = (Button) findViewById(R.id.btn_edit_update);
+        btnEdit.setOnClickListener(view -> {
+			Intent i = new Intent(view.getContext(), UpdateEditorActivity.class);
+			i.putExtra(ConstantUtil.PROJECT_ID_KEY, projectId);
+			i.putExtra(ConstantUtil.UPDATE_ID_KEY, updateId);
+			startActivity(i);
+			finishThisActivity();//close this, as ID will change if update is published -- WINDOW LEAK!
 		});
 
-		
 		dba = new RsrDbAdapter(this);
 		dba.open();
 		try {
-    		Project project = dba.findProject(projectId);
-    		projTitleLabel.setText(project.getTitle());
-    
-    		update = dba.findUpdate(updateId);
+			Project project = projectId == null ? null : dba.findProject(projectId);
+			if (project != null) {
+				projTitleLabel.setText(project.getTitle());
+			}
+
+			update = updateId == null? null: dba.findUpdate(updateId);
     		if (update == null) {
     			DialogUtil.errorAlert(this, R.string.noupd_dialog_title ,R.string.noupd_dialog_msg);
     		} else {
@@ -154,18 +130,11 @@ public class UpdateDetailActivity extends AppCompatActivity {
 	                loc = loc.substring(0, loc.length()-2);
 	            }
 	    
-	            //TODO check against 0,0 too?
 	            //TODO string constant!
 	            if (update.validLatLon()) {
 	                loc += "\nLatitude " + update.getLatitude() +
  	                        " Longitude " + update.getLongitude();
-	                projupdLocationText.setOnClickListener(
-	                    new OnClickListener() {
-	                        @Override
-	                        public void onClick(View v) {
-	                            launchLatLonIntent();
-	                        }
-	                    });
+	                projupdLocationText.setOnClickListener(v -> launchLatLonIntent());
 	            } else {
 	                projupdLocationText.setOnClickListener(null);
 	            }
@@ -181,21 +150,10 @@ public class UpdateDetailActivity extends AppCompatActivity {
 		btnEdit.setEnabled(editable);
 		btnEdit.setVisibility(editable?View.VISIBLE:View.GONE);
 		synchFlag.setVisibility(synching?View.VISIBLE:View.GONE);
-		
-		// Show the Up button in the action bar.
-		//		setupActionBar();
 	}
-	
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-	}
-
 	
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.update_detail, menu);
         return true;
     }
@@ -205,9 +163,13 @@ public class UpdateDetailActivity extends AppCompatActivity {
      */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         MenuItem del = menu.findItem(R.id.action_delete_update);
-        del.setEnabled(update.getUnsent() || update.getDraft());
+        if (update != null) {
+        	del.setEnabled(update.getUnsent() || update.getDraft());
+		} else {
+        	//update is null so nothing to delete
+        	del.setEnabled(false);
+		}
         return true;
     }
 
@@ -234,7 +196,6 @@ public class UpdateDetailActivity extends AppCompatActivity {
     	    default:
     	        return super.onOptionsItemSelected(item);
 	    }
-
 	}
 	
 	public void finishThisActivity() {
