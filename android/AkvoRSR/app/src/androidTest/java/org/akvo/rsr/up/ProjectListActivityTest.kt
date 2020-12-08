@@ -19,6 +19,7 @@ class ProjectListActivityTest {
             .provideContext(InstrumentationRegistry.getInstrumentation().targetContext)
             .checkTitleIs(R.string.title_activity_project_list)
     }
+
     @Test
     fun activityShouldDisplayCorrectEmptyScreen() {
         ScreenRobot.withRobot(ProjectListRobot::class.java)

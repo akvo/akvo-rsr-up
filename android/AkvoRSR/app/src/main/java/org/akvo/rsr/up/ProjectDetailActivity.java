@@ -71,7 +71,8 @@ public class ProjectDetailActivity extends AppCompatActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+		setContentView(R.layout.activity_project_detail);
+
 		mDebug = SettingsUtil.ReadBoolean(this, "setting_debug", false);
 
 		//find which project we will be showing
@@ -83,8 +84,6 @@ public class ProjectDetailActivity extends AppCompatActivity {
 					.getString(ConstantUtil.PROJECT_ID_KEY) : null;
 		}
 
-		//get the look
-		setContentView(R.layout.activity_project_detail);
 		//find the fields
 		projTitleLabel		= (TextView) findViewById(R.id.text_proj_detail_title);
 		projLocationText 	= (TextView) findViewById(R.id.text_proj_location);
