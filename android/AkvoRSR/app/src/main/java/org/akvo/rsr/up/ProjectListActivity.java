@@ -52,7 +52,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class ProjectListActivity extends AppCompatActivity {
 
-
 	private static final String TAG = "ProjectListActivity";
 
 	private RsrDbAdapter ad;
@@ -74,11 +73,10 @@ public class ProjectListActivity extends AppCompatActivity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-	    //employment can for now only change at login, so assign it for life of activity
-	    mEmployed = !SettingsUtil.getAuthUser(this).getOrgIds().isEmpty();
-	    
-	    super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_project_list);
+		//employment can for now only change at login, so assign it for life of activity
+		mEmployed = !SettingsUtil.getAuthUser(this).getOrgIds().isEmpty();
 
         projCountLabel = (TextView) findViewById(R.id.projcountlabel);
 		inProgress = (LinearLayout) findViewById(R.id.projlistprogress);
@@ -292,7 +290,6 @@ public class ProjectListActivity extends AppCompatActivity {
 		//Populate list view
 		ProjectListCursorAdapter projects = new ProjectListCursorAdapter(this, dataCursor);
 		mList.setAdapter(projects);
-//		setListAdapter(projects);
 	}
 
 		
