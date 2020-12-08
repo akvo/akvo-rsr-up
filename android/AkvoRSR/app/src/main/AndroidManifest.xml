@@ -169,11 +169,6 @@
             android:enabled="true"
             android:exported="false" >
         </service>
-
-        <activity
-            android:name=".BackActivity"
-            android:label="@string/title_activity_back" >
-        </activity>
     </application>
 
 </manifest>
