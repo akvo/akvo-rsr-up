@@ -237,5 +237,8 @@
     <string name="channel_description">RSR Notifications</string>
     <string name="sync_notification_title">Synchronization complete</string>
     <string name="sync_notification_text">Update status is resolved</string>
+    <string name="progress_projects">Projects</string>
+    <string name="progress_updates">Updates</string>
+    <string name="progress_photos">Photos</string>
 
 </resources>

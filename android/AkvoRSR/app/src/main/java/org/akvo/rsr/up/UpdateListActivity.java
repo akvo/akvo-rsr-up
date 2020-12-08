@@ -16,7 +16,6 @@
 
 package org.akvo.rsr.up;
 
-import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -24,14 +23,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Project;
@@ -39,7 +36,6 @@ import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.viewadapter.UpdateListCursorAdapter;
 
 public class UpdateListActivity extends AppCompatActivity {
-
 
 	private static final String TAG = "UpdateListActivity";
 
@@ -49,12 +45,11 @@ public class UpdateListActivity extends AppCompatActivity {
 	private TextView updateCountLabel;
     private ListView mList;
 	private String projId;
-	private BroadcastReceiver broadRec;
-
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_update_list);
 
 		//find which project we will be showing updates for
 		Bundle extras = getIntent().getExtras();
@@ -65,39 +60,25 @@ public class UpdateListActivity extends AppCompatActivity {
 					.getString(ConstantUtil.PROJECT_ID_KEY) : null;
 		}
 
-		setContentView(R.layout.activity_update_list);
 
 		projectTitleLabel = (TextView) findViewById(R.id.ulisttitlelabel);
 		updateCountLabel = (TextView) findViewById(R.id.updatecountlabel);
         mList = (ListView) findViewById(R.id.list_updates);
-        mList.setOnItemClickListener(new OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent i = new Intent(view.getContext(), UpdateDetailActivity.class);
-                i.putExtra(ConstantUtil.UPDATE_ID_KEY, ((Long) view.getTag(R.id.update_id_tag)).toString());
-                i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(R.id.project_id_tag)).toString());
-                startActivity(i);
-            }
-        });
-        
-        
-
-		View listFooter = getLayoutInflater().inflate(R.layout.update_list_footer, null, false);
-		//if the button were not the outermost view we would need to find it to set onClick
-		Button addButton = (Button) listFooter.findViewById(R.id.btn_add_update2);
-		addButton.setOnClickListener( new View.OnClickListener() {
-			public void onClick(View view) {
-				startEditorNew();
-			}
+        mList.setOnItemClickListener((OnItemClickListener) (parent, view, position, id) -> {
+			Intent i = new Intent(view.getContext(), UpdateDetailActivity.class);
+			i.putExtra(ConstantUtil.UPDATE_ID_KEY, ((Long) view.getTag(R.id.update_id_tag)).toString());
+			i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(R.id.project_id_tag)).toString());
+			startActivity(i);
 		});
+        
+		View listFooter = getLayoutInflater().inflate(R.layout.update_list_footer, mList, false);
+		Button addButton = (Button) listFooter.findViewById(R.id.btn_add_update2);
+		addButton.setOnClickListener(view -> startEditorNew());
 		
 		mList.addFooterView(listFooter);
 		
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		
-        //Create db
-
 		ad = new RsrDbAdapter(this);
         ad.open();
 	}
@@ -110,7 +91,6 @@ public class UpdateListActivity extends AppCompatActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.update_list, menu);
 		return true;
 	}
@@ -120,7 +100,6 @@ public class UpdateListActivity extends AppCompatActivity {
 	    switch (item.getItemId()) {
 	        case android.R.id.home:
 	            finish();
-	            //NavUtils.navigateUpFromSameTask(this);
 	            return true;
     	    case R.id.action_settings:
     			Intent intent = new Intent(this, SettingsActivity.class);
@@ -135,22 +114,19 @@ public class UpdateListActivity extends AppCompatActivity {
 
 	}
 	
-
 	@Override
 	public void onResume() {
 		super.onResume();
 		getData();
 	}
 	
-	
 	@Override
 	protected void onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadRec);
 		if (dataCursor != null) {
 			try {
 				dataCursor.close();
 			} catch (Exception e) {
-
+				Log.w(TAG, "Error closing cursor");
 			}
 		}
 		if (ad != null) {
@@ -158,8 +134,6 @@ public class UpdateListActivity extends AppCompatActivity {
 		}
 		super.onDestroy();
 	}
-
-
 
 	/**
 	 * show count and list of all the updates in the database for this project
@@ -170,20 +144,16 @@ public class UpdateListActivity extends AppCompatActivity {
 				dataCursor.close();
 			}
 		} catch(Exception e) {
-			Log.w(TAG, "Could not close old cursor before reloading list",e);
+			Log.w(TAG, "Could not close old cursor before reloading list", e);
 		}
 
-		//Show title
 		Project p = ad.findProject(projId);
-		projectTitleLabel.setText(p.getTitle());
-		//fetch data
+		if (p != null) {
+			projectTitleLabel.setText(p.getTitle());
+		} //TODO: what if project is null?
 		dataCursor = ad.listAllUpdatesNewestFirstFor(projId);
-		//Show count
 		updateCountLabel.setText(Integer.valueOf(dataCursor.getCount()).toString());
-		//Populate list view
 		UpdateListCursorAdapter updates = new UpdateListCursorAdapter(this, dataCursor);
 		mList.setAdapter(updates);
-
-	}	
-
+	}
 }
