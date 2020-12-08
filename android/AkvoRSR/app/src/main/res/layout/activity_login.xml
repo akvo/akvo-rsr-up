@@ -49,6 +49,32 @@
             android:orientation="vertical"
             android:padding="10dip">
 
+
+            <EditText
+                android:id="@+id/edit_username"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dip"
+                android:layout_marginBottom="5dip"
+                android:textColor="@color/black"
+                android:textColorHint="@color/lt_gray"
+                android:background="@android:color/white"
+                android:hint="@string/username"
+                android:padding="5dip"
+                android:singleLine="true" />
+            <EditText
+                android:id="@+id/edit_password"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dip"
+                android:layout_marginBottom="20dip"
+                android:background="@android:color/white"
+                android:textColor="@color/black"
+                android:textColorHint="@color/lt_gray"
+                android:hint="@string/password"
+                android:inputType="textPassword"
+                android:padding="5dip"
+                android:singleLine="true" />
             <Button
                 android:id="@+id/btn_login"
                 android:layout_width="wrap_content"
@@ -61,32 +87,6 @@
                 android:paddingBottom="10dip"
                 android:text="@string/btncaption_sign_in"
                 android:textColor="@color/rsr_purple" />
-
-            <EditText
-                android:id="@+id/edit_password"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dip"
-                android:layout_marginBottom="20dip"
-                android:background="@android:color/white"
-                android:hint="@string/password"
-                android:inputType="textPassword"
-                android:padding="5dip"
-                android:singleLine="true" />
-            <!-- Login button -->
-            <EditText
-                android:id="@+id/edit_username"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dip"
-                android:layout_marginBottom="5dip"
-                android:background="@android:color/white"
-                android:hint="@string/username"
-                android:padding="5dip"
-                android:singleLine="true" />
-
-            <!-- Link to Registration Screen -->
-
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
