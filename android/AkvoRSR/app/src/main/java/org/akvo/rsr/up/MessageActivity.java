@@ -16,15 +16,6 @@
 
 package org.akvo.rsr.up;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-
-import org.akvo.rsr.up.R;
-import org.akvo.rsr.up.dao.RsrDbAdapter;
-import org.akvo.rsr.up.util.ConstantUtil;
-import org.akvo.rsr.up.util.FileUtil;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,68 +23,49 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import org.akvo.rsr.up.dao.RsrDbAdapter;
+import org.akvo.rsr.up.util.ConstantUtil;
+import org.akvo.rsr.up.util.FileUtil;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 public class MessageActivity extends BackActivity {
 
     public static String TAG = "MessageActivity";
-
 	private TextView mTextView;
-//	private Button mBtnUpdates;
-//	private Button mBtnClearDb;
 
 	private RsrDbAdapter mDb;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		//get the look
 		setContentView(R.layout.activity_diagnostic);
-		//find the fields
 		mTextView = (TextView) findViewById(R.id.text_field);
-		//Activate buttons
-/* TODO: make buttons? for now they are menu choices
-		mBtnUpdates = (Button) findViewById(R.id.btn_diag_a);
-		mBtnUpdates.setOnClickListener( new View.OnClickListener() {
-			public void onClick(View view) {//delete image cache files
-				clearCache(DiagnosticActivity.this);
-			}
-		});
-		mBtnClearDb = (Button) findViewById(R.id.btn_diag_b);
-		mBtnClearDb.setOnClickListener( new View.OnClickListener() {
-			public void onClick(View view) {
-				clearData();
-			}
-		});
- */
 		mDb = new RsrDbAdapter(this);
 		mDb.open();
 	}
 
-	
 	@Override
 	protected void onResume() {
 		super.onResume();
-        mTextView.setText("Messages, newest last:");
+        mTextView.setText(R.string.messages_subtitle);
         fetchLog();
 	}
 
-	
     /**
      * Displays the error log
-     * 
      */
     private void fetchLog() {
         try {
             // Open file
-            BufferedReader buf = new BufferedReader( new FileReader(FileUtil.getExternalCacheDir(this) + ConstantUtil.LOG_FILE_NAME));
-            try {
+            try (BufferedReader buf = new BufferedReader(new FileReader(FileUtil.getExternalCacheDir(this) + ConstantUtil.LOG_FILE_NAME))) {
                 String s;
                 while ((s = buf.readLine()) != null) {
                     mTextView.append(s);
                 }
-                
-            } finally {
-                buf.close();
+
             }
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
@@ -110,7 +82,6 @@ public class MessageActivity extends BackActivity {
 
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.messages, menu);
         return super.onCreateOptionsMenu(menu);
     }
@@ -128,7 +99,5 @@ public class MessageActivity extends BackActivity {
         default:
             return super.onOptionsItemSelected(item);
         }
-
     }
-
 }

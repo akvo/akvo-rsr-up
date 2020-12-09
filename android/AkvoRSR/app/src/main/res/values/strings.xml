@@ -240,5 +240,6 @@
     <string name="progress_projects">Projects</string>
     <string name="progress_updates">Updates</string>
     <string name="progress_photos">Photos</string>
+    <string name="messages_subtitle">Messages, newest last:</string>
 
 </resources>
