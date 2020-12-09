@@ -51,7 +51,6 @@ import android.database.Cursor;
 
 public class OrgListActivity extends AppCompatActivity {
 
-
 	private static final String TAG = "OrgListActivity";
 
 	private RsrDbAdapter ad;
@@ -71,11 +70,10 @@ public class OrgListActivity extends AppCompatActivity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-	    //employment can for now only change at login, so assign it for life of activity
-	    mEmployed = !SettingsUtil.getAuthUser(this).getOrgIds().isEmpty();
-	    
-	    super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_org_list);
+		//employment can for now only change at login, so assign it for life of activity
+		mEmployed = !SettingsUtil.getAuthUser(this).getOrgIds().isEmpty();
 
         projCountLabel = (TextView) findViewById(R.id.orgcountlabel);
 		inProgress = (LinearLayout) findViewById(R.id.orglistprogress);
@@ -85,17 +83,7 @@ public class OrgListActivity extends AppCompatActivity {
         mEmptyText = (TextView) findViewById(R.id.list_empty_text);
         mFirstTimeText = (TextView) findViewById(R.id.first_time_text);
         mUnemployedText = (TextView) findViewById(R.id.unemployed_text);
-        mList.setOnItemClickListener(new OnItemClickListener() {
 
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-// NYI               Intent i = new Intent(view.getContext(), OrgDetailActivity.class);
-//                i.putExtra(ConstantUtil.PROJECT_ID_KEY, ((Long) view.getTag(R.id.project_id_tag)).toString());
-//                startActivity(i); 
-            }
-        });
-        
-        
         searchButton = (Button) findViewById(R.id.btn_projsearch);        
         searchButton.setOnClickListener( new View.OnClickListener() {
             public void onClick(View view) {
@@ -111,8 +99,6 @@ public class OrgListActivity extends AppCompatActivity {
                     //show X instead of magnifying glass
                     searchButton.setCompoundDrawablesWithIntrinsicBounds(R.drawable.btn_close_normal,0,0,0);
                     searchField.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
-//                    searchField.requestFocus();
-//                    showSoftKeyBoard(searchField);
                     }
             }
         });
@@ -121,7 +107,6 @@ public class OrgListActivity extends AppCompatActivity {
         searchField.setOnEditorActionListener(new OnEditorActionListener() {
                 @Override
                 public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                    hideSoftKeyBoard();
                     // update list with new search string
                     getData();
                     return true;
@@ -145,7 +130,6 @@ public class OrgListActivity extends AppCompatActivity {
         }
 	}
 
-	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -177,18 +161,11 @@ public class OrgListActivity extends AppCompatActivity {
 	    }
 	}
 
-	
-	@Override
-	protected void onPause() {
-		super.onPause();
-	}
-	
 	@Override
 	public void onResume() {
 		super.onResume();
 		getData();
 	}
-	
 	
 	@Override
 	protected void onDestroy() {
@@ -204,7 +181,6 @@ public class OrgListActivity extends AppCompatActivity {
 		super.onDestroy();
 	}
 
-    
 	/**
 	 * shows all projects visible to this user.
 	 * Assumes DB is open
@@ -259,7 +235,6 @@ public class OrgListActivity extends AppCompatActivity {
 		mList.setAdapter(projects);
 	}
 
-		
 	/**
 	 * starts the service fetching new project data
 	 */
@@ -278,10 +253,8 @@ public class OrgListActivity extends AppCompatActivity {
 		inProgress1.setProgress(0);
 	}
 
-	
 	/**
 	 * handles result of refresh service
-	 * @param intent
 	 */
 	private void onFetchFinished(Intent intent) {
 		// Hide in-progress indicators
@@ -302,9 +275,6 @@ public class OrgListActivity extends AppCompatActivity {
 
 	/**
 	 * updates the progress bars as fetch progresses
-	 * @param phase
-	 * @param done
-	 * @param total
 	 */
 	private void onFetchProgress(int done, int total) {
 	    inProgress1.setIndeterminate(false);
@@ -314,20 +284,22 @@ public class OrgListActivity extends AppCompatActivity {
 
 	/**
 	 * receives status updates from any IntentService
-	 *
 	 */
 	private class ResponseReceiver extends BroadcastReceiver {
 		// Prevents instantiation
 		private ResponseReceiver() {
 		}
 		
-		// Called when the BroadcastReceiver gets an Intent it's registered to receive
 		public void onReceive(Context context, Intent intent) {
-			if (intent.getAction() == ConstantUtil.ORGS_FETCHED_ACTION)
-				onFetchFinished(intent);
-			else if (intent.getAction() == ConstantUtil.ORGS_PROGRESS_ACTION)
-				onFetchProgress(intent.getExtras().getInt(ConstantUtil.SOFAR_KEY, 0),
-						        intent.getExtras().getInt(ConstantUtil.TOTAL_KEY, 100));
+			switch (intent.getAction()) {
+				case ConstantUtil.ORGS_FETCHED_ACTION:
+					onFetchFinished(intent);
+					break;
+				case ConstantUtil.ORGS_PROGRESS_ACTION:
+					onFetchProgress(intent.getExtras().getInt(ConstantUtil.SOFAR_KEY, 0),
+							intent.getExtras().getInt(ConstantUtil.TOTAL_KEY, 100));
+					break;
+			}
 		}
 	}
 }
