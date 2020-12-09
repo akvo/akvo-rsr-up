@@ -4,12 +4,6 @@
         android:title="@string/action_delete_update"
         android:icon="@drawable/ic_menu_close_clear_cancel"        
          />
-<!-- 
-    <item android:id="@+id/action_attach_photo"
-        android:title="@string/action_attach_photo"
-        android:icon="@drawable/ic_menu_camera"        
-         />
-     -->
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:icon="@drawable/ic_menu_settings_holo_light"        
