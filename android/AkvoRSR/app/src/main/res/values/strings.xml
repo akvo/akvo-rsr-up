@@ -219,7 +219,7 @@
     <string name="dummy_version">0.0</string>
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent pharetra ultricies ante, imperdiet viverra nisi rutrum a. Integer consequat laoreet malesuada. Nam fermentum risus id aliquet pellentesque. Sed nec nisl in turpis sodales ultricies. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Interdum et malesuada fames ac ante ipsum primis in faucibus.</string>
     <string name="connection_pending">- pending</string>
-    
+
     <string-array name="types">
         <item>Type 1</item>
         <item>Type 2</item>

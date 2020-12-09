@@ -15,29 +15,26 @@
  */
 package org.akvo.rsr.up;
 
-import android.net.Uri;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.ImageButton;
-import android.widget.TextView;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
+import android.os.Bundle;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class AboutActivity extends AppCompatActivity {
 
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_about);
 		//plug in the version name from the manifest
-		String version = "<unset>";
+		String version;
 		try {
 		    version = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
 		} catch (NameNotFoundException e) {
-//		    Log.e("tag", e.getMessage());
 			version = "<not found>";
 		}
 		TextView tv = (TextView) findViewById(R.id.version_name);
@@ -45,21 +42,12 @@ public class AboutActivity extends AppCompatActivity {
 			tv.setText(version);
 		
         final ImageButton btnUpdates = (ImageButton) findViewById(R.id.btn_akvo_link);
-        btnUpdates.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.akvo.org/"));
-                startActivity(myIntent);                                
-            }
-        });
+        btnUpdates.setOnClickListener(v -> {
+			Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.akvo.org/"));
+			startActivity(myIntent);
+		});
 
         final TextView licenseLink = (TextView) findViewById(R.id.link_to_license);
-        licenseLink.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                startActivity(new Intent(AboutActivity.this, LicenseActivity.class));
-            }
-        });
+        licenseLink.setOnClickListener(v -> startActivity(new Intent(AboutActivity.this, LicenseActivity.class)));
 	}
-
-
-
 }
