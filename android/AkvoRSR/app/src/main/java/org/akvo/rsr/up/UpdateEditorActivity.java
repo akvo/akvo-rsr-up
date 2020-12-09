@@ -18,7 +18,6 @@ package org.akvo.rsr.up;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
@@ -44,7 +43,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -60,6 +58,7 @@ import org.akvo.rsr.up.util.Downloader;
 import org.akvo.rsr.up.util.FileUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
 import org.akvo.rsr.up.util.ThumbnailUtil;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -83,10 +82,6 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
     private final String TITLE_PLACEHOLDER = "?";
 
     private String captureFilename = null;
-    private boolean warnAboutBigImage = false;
-    private boolean shrinkBigImage = true;
-    private final int shrinkSize = 1024;
-    private User mUser;
 
     private int nextLocalId; // load from / save to variable store
     private String projectId = null;
@@ -94,8 +89,6 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
     private Update update = null;
     private boolean editable;
 
-    // UI
-    private TextView projTitleLabel;
     private TextView projupdTitleCount;
     private EditText projupdTitleText;
     private EditText projupdDescriptionText;
@@ -105,9 +98,7 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
     private Button btnSubmit;
     private Button btnDraft;
     private Button btnTakePhoto;
-    private Button btnAttachPhoto;
     private Button btnDelPhoto;
-    private Button btnRotRightPhoto;
     private View photoAndToolsGroup;
     private View photoAddGroup;
     private View progressGroup;
@@ -137,8 +128,9 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_update_editor);
 
-        mUser = SettingsUtil.getAuthUser(this);
+        User mUser = SettingsUtil.getAuthUser(this);
         nextLocalId = SettingsUtil.ReadInt(this, ConstantUtil.LOCAL_ID_KEY, -1);
 
         if (savedInstanceState != null) {  //being recreated, restore state 
@@ -183,18 +175,15 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
             }
 
             private boolean isCharAllowed(char c) {
-//              return !Character.isSurrogate(c); //From API 19
                 return !(c >= 0xD800 && c <= 0xDFFF);
             }
         };
-        
-        
-        // get the look
-        setContentView(R.layout.activity_update_editor);
+
         // find the fields
         progressGroup = findViewById(R.id.sendprogress_group);
         uploadProgress = (ProgressBar) findViewById(R.id.sendProgressBar);
-        projTitleLabel = (TextView) findViewById(R.id.projupd_edit_proj_title);
+        // UI
+        TextView projTitleLabel = (TextView) findViewById(R.id.projupd_edit_proj_title);
         projupdTitleCount = (TextView) findViewById(R.id.projupd_edit_titlecount);
         projupdTitleCount.setText(Integer.toString(TITLE_LENGTH));
         projupdTitleText = (EditText) findViewById(R.id.projupd_edit_title);
@@ -229,96 +218,62 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
         searchingIndicator = (TextView) findViewById(R.id.gps_searching);
         gpsProgress = (ProgressBar) findViewById(R.id.progress_gps);
 
-        // Activate buttons
         btnSubmit = (Button) findViewById(R.id.btn_send_update);
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                sendUpdate();
-            }
-        });
+        btnSubmit.setOnClickListener(view -> sendUpdate());
 
         btnDraft = (Button) findViewById(R.id.btn_save_draft);
-        btnDraft.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                saveAsDraft(true);
-            }
-        });
+        btnDraft.setOnClickListener(view -> saveAsDraft(true));
 
         btnTakePhoto = (Button) findViewById(R.id.btn_take_photo);
-        btnTakePhoto.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                // generate unique filename
-                captureFilename = FileUtil.getExternalPhotoDir(UpdateEditorActivity.this)
-                        + File.separator + "capture" + System.nanoTime() + ".jpg";
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-                        Uri.fromFile(new File(captureFilename)));
-                startActivityForResult(takePictureIntent, photoRequest);
-            }
+        btnTakePhoto.setOnClickListener(view -> {
+            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            // generate unique filename
+            captureFilename = FileUtil.getExternalPhotoDir(UpdateEditorActivity.this)
+                    + File.separator + "capture" + System.nanoTime() + ".jpg";
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                    Uri.fromFile(new File(captureFilename)));
+            startActivityForResult(takePictureIntent, photoRequest);
         });
 
-        btnAttachPhoto = (Button) findViewById(R.id.btn_attach_photo);
-        btnAttachPhoto.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-                photoPickerIntent.setType("image/*");
-                startActivityForResult(photoPickerIntent, photoPick);
-            }
+        Button btnAttachPhoto = (Button) findViewById(R.id.btn_attach_photo);
+        btnAttachPhoto.setOnClickListener(view -> {
+            Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+            photoPickerIntent.setType("image/*");
+            startActivityForResult(photoPickerIntent, photoPick);
         });
 
         btnDelPhoto = (Button) findViewById(R.id.btn_delete_photo);
-        btnDelPhoto.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                // Forget image
-                update.setThumbnailFilename(null);
-                // TODO: delete image file if it was taken through this app?
-                // Hide photo w tools
-                showPhoto(false);
-            }
+        btnDelPhoto.setOnClickListener(view -> {
+            // Forget image
+            update.setThumbnailFilename(null);
+            // TODO: delete image file if it was taken through this app?
+            // Hide photo w tools
+            showPhoto(false);
         });
 
-        btnRotRightPhoto = (Button) findViewById(R.id.btn_rotate_photo_r);
-        btnRotRightPhoto.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                // Rotate image right
-                rotatePhoto(true);
-            }
+        Button btnRotRightPhoto = (Button) findViewById(R.id.btn_rotate_photo_r);
+        btnRotRightPhoto.setOnClickListener(view -> {
+            // Rotate image right
+            rotatePhoto(true);
         });
 
         btnGpsGeo = (Button) findViewById(R.id.btn_gps_position);
-        btnGpsGeo.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                onGetGPSClick(view);
-            }
-        });
+        btnGpsGeo.setOnClickListener(this::onGetGPSClick);
 
         btnPhotoGeo = (Button) findViewById(R.id.btn_photo_position);
-        btnPhotoGeo.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                onGetPhotoLocationClick(view);
-            }
-        });
+        btnPhotoGeo.setOnClickListener(this::onGetPhotoLocationClick);
 
         dba = new RsrDbAdapter(this);
         dba.open();
 
         Project project = dba.findProject(projectId);
-        projTitleLabel.setText(project.getTitle());
+        if (project != null) {
+            projTitleLabel.setText(project.getTitle());
+        }
 
-        if (updateId == null) { // create new
+        if (updateId == null) {
             update = new Update();
-            update.setUuid(UUID.randomUUID().toString()); // should do sth
-                                                          // better, especially
-                                                          // if MAC address is
-                                                          // avaliable
-            /*
-             * WifiManager wifiManager = (WifiManager)
-             * getSystemService(Context.WIFI_SERVICE); WifiInfo wInfo =
-             * wifiManager.getConnectionInfo(); String macAddress =
-             * wInfo.getMacAddress(); if (macAddress == null) txt_View.append(
-             * "MAC Address : " + macAddress + "\n" ); else txt_View.append(
-             * "MAC Address : " + macAddress + "\n" ); }
-             */
+            update.setUuid(UUID.randomUUID().toString());
             update.setUserId(mUser.getId());
             update.setDate(new Date());
             editable = true;
@@ -327,7 +282,6 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
             if (update == null) {
                 DialogUtil.errorAlert(this, R.string.noupd_dialog_title, R.string.noupd2_dialog_msg);
             } else {
-                // populate fields
                 editable = update.getDraft(); // This should always be true with
                                               // the current UI flow - we go to
                                               // UpdateDetailActivity if it is sent
@@ -347,7 +301,6 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
                 }
                 // show preexisting image
                 if (update.getThumbnailFilename() != null) {
-                    // btnTakePhoto.setText(R.string.btncaption_rephoto);
                     ThumbnailUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(),
                             update.getThumbnailFilename(), null, null, false);
                     photoLocation = FileUtil.exifLocation(update.getThumbnailFilename());
@@ -365,10 +318,6 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
         enableChanges(editable);
         btnDraft.setVisibility(editable ? View.VISIBLE : View.GONE);
         btnSubmit.setVisibility(editable ? View.VISIBLE : View.GONE);
-        // btnTakePhoto.setVisibility(editable?View.VISIBLE:View.GONE);
-
-        // Show the Up button in the action bar.
-        // setupActionBar();
     }
 
     private void showPhoto(boolean show) {
@@ -386,7 +335,6 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
         }
     }
 
-    
     private void rotatePhoto(boolean clockwise) {
         try {
             FileUtil.rotateImageFileKeepExif(update.getThumbnailFilename(), clockwise);
@@ -414,7 +362,6 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
         btnDelPhoto.setEnabled(enabled);                
     }
     
-    
     private static final int IO_BUFFER_SIZE = 4 * 1024;
 
     private static void copyStream(InputStream in, OutputStream out) throws IOException {
@@ -425,7 +372,6 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
         }
     }
 
-    
     /**
      * gets notification of photo taken or picked
      */
@@ -433,32 +379,22 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // Handle photo taken by camera app
         if (requestCode == photoRequest || requestCode == photoPick) {
             if (resultCode == RESULT_CANCELED) {
                 return;
             }
-            boolean camera = true;
-            
-            // Handle picked photo
+
             if (requestCode == photoPick) {
-                camera = false;
                 if (resultCode == RESULT_CANCELED) {
                     return;
                 }
-                // data.getData is a content: URI. Need to copy the content to a
-                // file, so we can resize and rotate in place
                 InputStream imageStream;
                 try {
                     imageStream = getContentResolver().openInputStream(data.getData());
                     captureFilename = FileUtil.getExternalPhotoDir(this) + File.separator + "pick"
                             + System.nanoTime() + ".jpg";
-                    OutputStream os = new FileOutputStream(captureFilename);
-                    try {
+                    try (OutputStream os = new FileOutputStream(captureFilename)) {
                         copyStream(imageStream, os);
-                    }
-                    finally {
-                        os.close();
                     }
                 } catch (FileNotFoundException e) {
                     projupdImage.setImageResource(R.drawable.thumbnail_error);
@@ -466,30 +402,17 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            } 
-            if (warnAboutBigImage) {
-                // check if file too large - if so, show error dialog and return
-                File sizeTest = new File(captureFilename);
-                if (sizeTest.length() > ConstantUtil.MAX_IMAGE_UPLOAD_SIZE) {
-                    DialogUtil.errorAlert(this, R.string.warnbig_dialog_title,
-                            camera ? R.string.warnbig_dialog_msg1 : R.string.warnbig_dialog_msg2);
-                    return;
-                }
             }
-            if (shrinkBigImage) {
-                // make long edge 1024 px
-                if (!FileUtil.shrinkImageFileExactlyKeepExif(captureFilename, shrinkSize)) { 
-                    DialogUtil.errorAlert(this, R.string.shrinkbig_dialog_title,
-                            R.string.shrinkbig_dialog_msg);
-                }
+            // make long edge 1024 px
+            int shrinkSize = 1024;
+            if (!FileUtil.shrinkImageFileExactlyKeepExif(captureFilename, shrinkSize)) {
+                DialogUtil.errorAlert(this, R.string.shrinkbig_dialog_title,
+                        R.string.shrinkbig_dialog_msg);
             }
             update.setThumbnailFilename(captureFilename);
-            update.setThumbnailUrl("dummyUrl"); // absence will be interpreted
-                                                // as unset thumbnail
+            update.setThumbnailUrl("dummyUrl");
             ThumbnailUtil.setPhotoFile(projupdImage, update.getThumbnailUrl(), captureFilename, null, null, false);
-            // show result
             photoLocation = FileUtil.exifLocation(captureFilename);
-            
             showPhoto(true);
         }
     }
@@ -519,16 +442,13 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
             return;
          }
 
-                update.setDraft(true);
+        update.setDraft(true);
         update.setUnsent(false);
         fetchFields();
         if (untitled()) {
-            update.setTitle(TITLE_PLACEHOLDER); // must have something.
-            //In retrospect, we should have allowed nulls in this column and just disallowed posting
+            update.setTitle(TITLE_PLACEHOLDER);
         }
-        // update.setDate(new Date()); //should have date from when it was created
-        if (update.getId() == null) {// new
-            // MUST have project and a local update id
+        if (update.getId() == null) {
             update.setProjectId(projectId);
             update.setId(Integer.toString(nextLocalId));
             nextLocalId--;
@@ -536,8 +456,6 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
         }
         dba.saveUpdate(update, true);
         if (interactive) {
-            // Tell user what happened
-            // TODO: use a confirm dialog instead
             Context context = getApplicationContext();
             Toast toast = Toast.makeText(context, R.string.msg_success_drafted, Toast.LENGTH_SHORT);
             toast.show();
@@ -550,12 +468,10 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
      */
     private void sendUpdate() {
         if (untitled()) {
-            // Tell user why not
             DialogUtil.errorAlert(this, R.string.error_dialog_title , R.string.errmsg_empty_title);
             return;
         }
         if (!Downloader.haveNetworkConnection(this, false)) {
-            // helpful error message, instead of a failure later
             DialogUtil.errorAlert(this, R.string.nonet_dialog_title, R.string.nonet_dialog_msg);
             return;
         }
@@ -570,8 +486,7 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
         update.setDraft(false);
         fetchFields();
         update.setProjectId(projectId);
-        // update.setDate(new Date()); //keep date from when it was created
-        if (update.getId() == null) {// new
+        if (update.getId() == null) {
             update.setId(Integer.toString(nextLocalId));
             nextLocalId--;
             SettingsUtil.WriteInt(this, ConstantUtil.LOCAL_ID_KEY, nextLocalId);
@@ -587,32 +502,19 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
         enableChanges(false);
         // Show the "progress" animation
         progressGroup.setVisibility(View.VISIBLE);
-
-        // Now we wait...
-
     }
 
-    /** checks if user has set an update title */
+    /**
+     * checks if user has set an update title
+     */
     private boolean untitled() {
         return (projupdTitleText.getText().toString().trim().length() == 0);
     }
 
-    /** opens database when Activity resumes */
-    @Override
-    protected void onResume() {
-        super.onResume();
-        /*
-         * if (projectId != null) { Project project =
-         * dba.findProject(projectId);
-         * projTitleLabel.setText(project.getTitle()); } else {
-         * projTitleLabel.setText("<NO PROJECT ID>"); }
-         */
-
-    }
-
-    /** handles result of send attempt */
+    /**
+     * handles result of send attempt
+     */
     private void onSendFinished(Intent i) {
-        //Hide progressbar
         progressGroup.setVisibility(View.GONE);
 
         String err = i.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
@@ -621,19 +523,14 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
         if (err == null) {
             msgTitle = R.string.msg_update_published;
             msgText = R.string.msg_update_success;
-            // display result dialog
             DialogUtil.showConfirmDialog(msgTitle,
                     msgText,
                     this,
                     false,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if (dialog != null) {
-                                dialog.dismiss();
-                                // Return to project or update list
-                                finish();
-                            }
+                    (dialog, which) -> {
+                        if (dialog != null) {
+                            dialog.dismiss();
+                            finish();
                         }
                     });
         } else {
@@ -645,51 +542,36 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
                         new Intent(this, VerifyProjectUpdateService.class));
                 msgTitle = R.string.msg_synchronising;
             } else { // was saved as draft
-//                msgTitle = R.string.msg_network_problem;
-//                msgText = R.string.msg_update_drafted;
                 msgTitle = R.string.msg_update_drafted;
             }
-            // display result dialog
             DialogUtil.showConfirmDialog(msgTitle,
                     err,
                     this,
                     false,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            if (dialog != null) {
-                                dialog.dismiss();
-                                // Return to project or update list
-                                finish();
-                            }
+                    (dialog, which) -> {
+                        if (dialog != null) {
+                            dialog.dismiss();
+                            finish();
                         }
                     });
         }
     }
 
-
-    /** closes database when activity is paused */
+    /**
+     * saves update being worked on before we leave the activity
+     */
     @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    /** saves update being worked on before we leave the activity */
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NotNull Bundle outState) {
+        super.onSaveInstanceState(outState);
         outState.putString(ConstantUtil.PROJECT_ID_KEY, projectId);
         // store most state by saving the update as a draft until we get restarted
         saveAsDraft(false);
         // In case that call created the update in the DB, there was no id before, but now we can store that
         outState.putString(ConstantUtil.UPDATE_ID_KEY, update.getId());
-        // In case we are being bumped to make room for the camera app: 
+        // In case we are being bumped to make room for the camera app:
         outState.putString(ConstantUtil.IMAGE_FILENAME_KEY, captureFilename);
-
-        // Always call the superclass so it can save the view hierarchy state
-        super.onSaveInstanceState(outState);
     }
 
-    /** cleans up */
     @Override
     protected void onDestroy() {
         if (dba != null) {
@@ -701,27 +583,12 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
         super.onDestroy();
     }
 
-    /**
-     * Sets up the {@link ActionBar}, if the API is available.
-     * 
-     * @TargetApi(Build.VERSION_CODES.HONEYCOMB) private void setupActionBar() {
-     *                                           if (Build.VERSION.SDK_INT >=
-     *                                           Build.VERSION_CODES.HONEYCOMB)
-     *                                           {
-     *                                           getActionBar().setDisplayHomeAsUpEnabled
-     *                                           (true); } }
-     */
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.update_editor, menu);
         return true;
     }
 
-    /**
-     * Handles context menu buttons being pushed
-     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -747,11 +614,8 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
     }
     /**
      * updates the progress bars
-     * @param phase
-     * @param done
-     * @param total
      */
-    private void onFetchProgress(int phase, int done, int total) {
+    private void onFetchProgress(int done, int total) {
         uploadProgress.setIndeterminate(false);
         uploadProgress.setProgress(done);
         uploadProgress.setMax(total);
@@ -759,26 +623,24 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
 
     /**
      * receives status updates from an IntentService
-     *
      */
     private class ResponseReceiver extends BroadcastReceiver {
-        // Prevents instantiation
         private ResponseReceiver() {
         }
         
-        // Called when the BroadcastReceiver gets an Intent it's registered to receive
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction() == ConstantUtil.UPDATES_SENT_ACTION) {
-                onSendFinished(intent);
-            } else if (intent.getAction() == ConstantUtil.UPDATES_SENDPROGRESS_ACTION) {
-                onFetchProgress(intent.getExtras().getInt(ConstantUtil.PHASE_KEY, 0),
-                                intent.getExtras().getInt(ConstantUtil.SOFAR_KEY, 0),
-                                intent.getExtras().getInt(ConstantUtil.TOTAL_KEY, 100));
+            switch (intent.getAction()) {
+                case ConstantUtil.UPDATES_SENT_ACTION:
+                    onSendFinished(intent);
+                    break;
+                case ConstantUtil.UPDATES_SENDPROGRESS_ACTION:
+                    onFetchProgress(intent.getExtras().getInt(ConstantUtil.SOFAR_KEY, 0),
+                            intent.getExtras().getInt(ConstantUtil.TOTAL_KEY, 100));
+                    break;
             }
         }
     }
 
-    
     /**
      * When the user clicks the "Get Location" button, start listening for
      * location updates
@@ -791,7 +653,7 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
             locMgr.removeUpdates(this);
             searchingIndicator.setText("");           
             accuracyField.setText("");
-            gpsProgress.setVisibility(View.GONE); //hide in-progress wheel
+            gpsProgress.setVisibility(View.GONE);
         } else {//turn on
             if (locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 positionGroup.setVisibility(View.VISIBLE);
@@ -801,20 +663,16 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
                 lonField.setText("");
                 eleField.setText("");
                 btnGpsGeo.setText(R.string.btncaption_gps_cancel);
-                gpsProgress.setVisibility(View.VISIBLE); //Hide progress
+                gpsProgress.setVisibility(View.VISIBLE);
                 needUpdate = true;
                 searchingIndicator.setText(R.string.label_gps_searching);
                 lastAccuracy = UNKNOWN_ACCURACY;
                 locMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
             } else {
-                // we can't turn GPS on directly, the best we can do is launch the
-                // settings page
                 DialogUtil.showGPSDialog(this);
             }
         }
-
     }
-
 
     /**
      * When the user clicks the "Get photo Location" button
@@ -830,20 +688,18 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
 
     /**
      * populates the fields on the UI with the location info from the event
-     * 
-     * @param loc
      */
     private void populateLocation(Location loc) {
         if (loc.hasAccuracy()) {
-            accuracyField.setText(new DecimalFormat("#").format(loc.getAccuracy()) + " m");
+            accuracyField.setText(String.format("%s m", new DecimalFormat("#").format(loc.getAccuracy())));
             if (loc.getAccuracy() <= ACCURACY_THRESHOLD) {
                 accuracyField.setTextColor(Color.GREEN);
             } else {
                 accuracyField.setTextColor(Color.RED);
             }
         }
-        latField.setText(loc.getLatitude() + "");
-        lonField.setText(loc.getLongitude() + "");
+        latField.setText(String.format("%s", loc.getLatitude()));
+        lonField.setText(String.format("%s", loc.getLongitude()));
         // elevation is in meters, even one decimal is way more than GPS precision
         eleField.setText(new DecimalFormat("#.#").format(loc.getAltitude()));
     }
@@ -863,7 +719,7 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
                 LocationManager locMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
                 locMgr.removeUpdates(this);
                 searchingIndicator.setText(R.string.label_gps_ready);
-                gpsProgress.setVisibility(View.GONE); //hide in-progress wheel
+                gpsProgress.setVisibility(View.GONE);
             }
 
             // if the location reading is more accurate than the last, update
@@ -890,7 +746,4 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
     public void onStatusChanged(String provider, int status, Bundle extras) {
         // no op. needed for LocationListener interface
     }
-
-
-
 }
