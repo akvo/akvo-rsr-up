@@ -1090,31 +1090,33 @@ public class RsrDbAdapter {
 	 */
 	public Project findProject(String _id) {
 		Project project = null;
-		Cursor cursor = database.query(PROJECT_COUNTRY_JOIN,
-									   null,
-									   "project._id = ?",
-									   new String[] { _id }, null, null, null);
-		if (cursor != null) {
-			if (cursor.getCount() > 0) {
-				cursor.moveToFirst();
-				project = new Project();
-				project.setId(_id); //no confusion with country id
-				project.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(TITLE_COL)));
-				project.setSubtitle(cursor.getString(cursor.getColumnIndexOrThrow(SUBTITLE_COL)));
-				project.setSummary(cursor.getString(cursor.getColumnIndexOrThrow(SUMMARY_COL)));
-				project.setThumbnailUrl(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_URL_COL)));
-				project.setThumbnail(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_FILENAME_COL)));
-				project.setCountry(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
-				project.setState(cursor.getString(cursor.getColumnIndexOrThrow(STATE_COL)));
-				project.setCity(cursor.getString(cursor.getColumnIndexOrThrow(CITY_COL)));
-				project.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(LAT_COL)));
-				project.setLongitude(cursor.getString(cursor.getColumnIndexOrThrow(LON_COL)));
-				project.setHidden(0 != cursor.getInt(cursor.getColumnIndexOrThrow(HIDDEN_COL)));
-				project.setLastFetch(new Date(1000L * cursor.getInt(cursor.getColumnIndexOrThrow(LAST_FETCH_COL))));
-				//Log.d(TAG, "Project "+_id+" last fetch (s)"+cursor.getInt(cursor.getColumnIndexOrThrow(LAST_FETCH_COL)));
+		if (_id != null) {
+			Cursor cursor = database.query(PROJECT_COUNTRY_JOIN,
+					null,
+					"project._id = ?",
+					new String[]{_id}, null, null, null);
+			if (cursor != null) {
+				if (cursor.getCount() > 0) {
+					cursor.moveToFirst();
+					project = new Project();
+					project.setId(_id); //no confusion with country id
+					project.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(TITLE_COL)));
+					project.setSubtitle(cursor.getString(cursor.getColumnIndexOrThrow(SUBTITLE_COL)));
+					project.setSummary(cursor.getString(cursor.getColumnIndexOrThrow(SUMMARY_COL)));
+					project.setThumbnailUrl(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_URL_COL)));
+					project.setThumbnail(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_FILENAME_COL)));
+					project.setCountry(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
+					project.setState(cursor.getString(cursor.getColumnIndexOrThrow(STATE_COL)));
+					project.setCity(cursor.getString(cursor.getColumnIndexOrThrow(CITY_COL)));
+					project.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(LAT_COL)));
+					project.setLongitude(cursor.getString(cursor.getColumnIndexOrThrow(LON_COL)));
+					project.setHidden(0 != cursor.getInt(cursor.getColumnIndexOrThrow(HIDDEN_COL)));
+					project.setLastFetch(new Date(1000L * cursor.getInt(cursor.getColumnIndexOrThrow(LAST_FETCH_COL))));
+					//Log.d(TAG, "Project "+_id+" last fetch (s)"+cursor.getInt(cursor.getColumnIndexOrThrow(LAST_FETCH_COL)));
+				}
+				cursor.close();
 			}
-			cursor.close();
-			}
+		}
 
 		return project;
 	}
@@ -1124,39 +1126,41 @@ public class RsrDbAdapter {
 	 * Gets a single update from the db using its primary key
 	 */
 	public Update findUpdate(String _id) {
-	    Update update = null;
-		Cursor cursor = database.query(UPDATE_COUNTRY_JOIN,
-										null, //all columns
-										"_update._id = ?",
-										new String[] { _id }, null, null, null);
-		if (cursor != null) {
-		    if (cursor.moveToFirst()) {
-		        update = new Update();
-				update.setId(_id);
-				update.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(TITLE_COL)));
-				update.setProjectId(cursor.getString(cursor.getColumnIndexOrThrow(PROJECT_COL)));
-				update.setText(cursor.getString(cursor.getColumnIndexOrThrow(TEXT_COL)));
-				update.setUuid(cursor.getString(cursor.getColumnIndexOrThrow(UUID_COL)));
-				update.setUserId(cursor.getString(cursor.getColumnIndexOrThrow(USER_COL)));
-                update.setThumbnailUrl(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_URL_COL)));
-                update.setThumbnailFilename(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_FILENAME_COL)));
-                update.setVideoUrl(cursor.getString(cursor.getColumnIndexOrThrow(VIDEO_URL_COL)));
-                update.setVideoFilename(cursor.getString(cursor.getColumnIndexOrThrow(VIDEO_FILENAME_COL)));
-                update.setPhotoCaption(cursor.getString(cursor.getColumnIndexOrThrow(PHOTO_CAPTION_COL)));
-                update.setPhotoCredit(cursor.getString(cursor.getColumnIndexOrThrow(PHOTO_CREDIT_COL)));
-				update.setDraft(0 != cursor.getInt(cursor.getColumnIndexOrThrow(DRAFT_COL)));
-				update.setUnsent(0 != cursor.getInt(cursor.getColumnIndexOrThrow(UNSENT_COL)));
-				update.setDate(new Date(1000L * cursor.getLong(cursor.getColumnIndexOrThrow(CREATED_COL))));
-                update.setCountry(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
-                update.getLocation().setCountryId(cursor.getString(cursor.getColumnIndexOrThrow(COUNTRY_ID_COL)));
-				update.setState(cursor.getString(cursor.getColumnIndexOrThrow(STATE_COL)));
-				update.setCity(cursor.getString(cursor.getColumnIndexOrThrow(CITY_COL)));
-				update.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(LAT_COL)));
-                update.setLongitude(cursor.getString(cursor.getColumnIndexOrThrow(LON_COL)));
-                update.setElevation(cursor.getString(cursor.getColumnIndexOrThrow(ELE_COL)));
+		Update update = null;
+		if (_id != null) {
+			Cursor cursor = database.query(UPDATE_COUNTRY_JOIN,
+					null, //all columns
+					"_update._id = ?",
+					new String[]{_id}, null, null, null);
+			if (cursor != null) {
+				if (cursor.moveToFirst()) {
+					update = new Update();
+					update.setId(_id);
+					update.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(TITLE_COL)));
+					update.setProjectId(cursor.getString(cursor.getColumnIndexOrThrow(PROJECT_COL)));
+					update.setText(cursor.getString(cursor.getColumnIndexOrThrow(TEXT_COL)));
+					update.setUuid(cursor.getString(cursor.getColumnIndexOrThrow(UUID_COL)));
+					update.setUserId(cursor.getString(cursor.getColumnIndexOrThrow(USER_COL)));
+					update.setThumbnailUrl(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_URL_COL)));
+					update.setThumbnailFilename(cursor.getString(cursor.getColumnIndexOrThrow(THUMBNAIL_FILENAME_COL)));
+					update.setVideoUrl(cursor.getString(cursor.getColumnIndexOrThrow(VIDEO_URL_COL)));
+					update.setVideoFilename(cursor.getString(cursor.getColumnIndexOrThrow(VIDEO_FILENAME_COL)));
+					update.setPhotoCaption(cursor.getString(cursor.getColumnIndexOrThrow(PHOTO_CAPTION_COL)));
+					update.setPhotoCredit(cursor.getString(cursor.getColumnIndexOrThrow(PHOTO_CREDIT_COL)));
+					update.setDraft(0 != cursor.getInt(cursor.getColumnIndexOrThrow(DRAFT_COL)));
+					update.setUnsent(0 != cursor.getInt(cursor.getColumnIndexOrThrow(UNSENT_COL)));
+					update.setDate(new Date(1000L * cursor.getLong(cursor.getColumnIndexOrThrow(CREATED_COL))));
+					update.setCountry(cursor.getString(cursor.getColumnIndexOrThrow(NAME_COL)));
+					update.getLocation().setCountryId(cursor.getString(cursor.getColumnIndexOrThrow(COUNTRY_ID_COL)));
+					update.setState(cursor.getString(cursor.getColumnIndexOrThrow(STATE_COL)));
+					update.setCity(cursor.getString(cursor.getColumnIndexOrThrow(CITY_COL)));
+					update.setLatitude(cursor.getString(cursor.getColumnIndexOrThrow(LAT_COL)));
+					update.setLongitude(cursor.getString(cursor.getColumnIndexOrThrow(LON_COL)));
+					update.setElevation(cursor.getString(cursor.getColumnIndexOrThrow(ELE_COL)));
+				}
+				cursor.close();
 			}
-			cursor.close();
-		    }
+		}
 		return update;
 	}
 

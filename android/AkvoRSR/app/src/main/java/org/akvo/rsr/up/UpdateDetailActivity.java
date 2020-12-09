@@ -84,12 +84,12 @@ public class UpdateDetailActivity extends AppCompatActivity {
 		dba = new RsrDbAdapter(this);
 		dba.open();
 		try {
-			Project project = projectId == null ? null : dba.findProject(projectId);
+			Project project = dba.findProject(projectId);
 			if (project != null) {
 				projTitleLabel.setText(project.getTitle());
 			}
 
-			update = updateId == null? null: dba.findUpdate(updateId);
+			update = dba.findUpdate(updateId);
     		if (update == null) {
     			DialogUtil.errorAlert(this, R.string.noupd_dialog_title ,R.string.noupd_dialog_msg);
     		} else {
