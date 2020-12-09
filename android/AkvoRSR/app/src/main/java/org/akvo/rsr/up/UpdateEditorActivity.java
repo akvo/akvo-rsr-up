@@ -16,15 +16,19 @@
 
 package org.akvo.rsr.up;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
@@ -44,6 +48,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.akvo.rsr.up.dao.RsrDbAdapter;
@@ -75,6 +80,8 @@ import java.util.UUID;
  */
 
 public class UpdateEditorActivity extends AppCompatActivity implements LocationListener {
+
+    private static final int PERMISSION_REQUEST_CODE = 123;
 
     private final int TITLE_LENGTH = 50;
     private final int photoRequest = 777;
@@ -573,6 +580,12 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        removeLocationUpdates();
+    }
+
+    @Override
     protected void onDestroy() {
         if (dba != null) {
             dba.close();
@@ -580,7 +593,13 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
         if (broadRec != null) {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(broadRec);
         }
+        removeLocationUpdates();
         super.onDestroy();
+    }
+
+    private void removeLocationUpdates() {
+        LocationManager locMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locMgr.removeUpdates(this);
     }
 
     @Override
@@ -642,16 +661,41 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
     }
 
     /**
-     * When the user clicks the "Get Location" button, start listening for
-     * location updates
+     * When the user clicks the "Get Location" button, check for permissions if relevant and start
+     * listening for location updates
      */
     public void onGetGPSClick(View v) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                getLocation();
+            } else {
+                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
+            }
+        } else {
+            getLocation();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NotNull String[] permissions,
+                                           @NotNull int[] grantResults) {
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+               getLocation();
+            } else {
+               Toast.makeText(this, R.string.location_permission_required, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private void getLocation() {
         LocationManager locMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (needUpdate) {//turn off
             needUpdate = false;
             btnGpsGeo.setText(R.string.btncaption_gps_position);
             locMgr.removeUpdates(this);
-            searchingIndicator.setText("");           
+            searchingIndicator.setText("");
             accuracyField.setText("");
             gpsProgress.setVisibility(View.GONE);
         } else {//turn on
@@ -716,8 +760,7 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
             // This means that after the geolocation is 'green', it stays the same,
             // otherwise it keeps on listening
             if (currentAccuracy <= ACCURACY_THRESHOLD) {
-                LocationManager locMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                locMgr.removeUpdates(this);
+                removeLocationUpdates();
                 searchingIndicator.setText(R.string.label_gps_ready);
                 gpsProgress.setVisibility(View.GONE);
             }

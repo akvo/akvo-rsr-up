@@ -241,5 +241,6 @@
     <string name="progress_updates">Updates</string>
     <string name="progress_photos">Photos</string>
     <string name="messages_subtitle">Messages, newest last:</string>
+    <string name="location_permission_required">Location permission is required to perform this action</string>
 
 </resources>
