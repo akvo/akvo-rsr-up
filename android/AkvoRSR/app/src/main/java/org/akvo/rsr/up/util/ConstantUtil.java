@@ -46,9 +46,6 @@ public class ConstantUtil {
     public static final String FETCH_ORG_URL_PATTERN = "/rest/v1/organisation/%s/?format=json";
     public static final String FETCH_RESULTS_URL_PATTERN = "/rest/v1/results_framework/?format=json&project=%s"; //includes results, indicators, periods and data
     public static final String FETCH_EMPLOYMENTS_URL_PATTERN = "/rest/v1/employment/?format=json&user=%s";
-    public static final String FETCH_PARTNERSHIPS_BY_ORG_URL_PATTERN = "/rest/v1/partnership_more_link/?format=json&organisation=%s";
-    public static final String FETCH_PARTNERSHIPS_BY_PROJ_URL_PATTERN = "/rest/v1/partnership_more_link/?format=json&project=%s";
-	public static final int    MAX_IMAGE_UPLOAD_SIZE = 2000000; //Nginx POST limit is 3MB, B64 encoding expands 33% and there may be long text 
 	public static final String SERVER_VERSION_HEADER = "X-RSR-Version";
     public static final String UPDATE_METHOD_MOBILE = "M";
     public static final String xmlContent = "application/xml";
@@ -57,32 +54,9 @@ public class ConstantUtil {
     /**
 	 * file system constants
 	 */
-	public static final String XML_SUFFIX = ".xml";
-	public static final String JPG_SUFFIX = ".jpg";
-//	public static final String TOP_DIR = "/akvorsr/";
-	public static final String PHOTO_DIR = "/akvorsr/photos/";
-    public static final String IMAGECACHE_DIR = "/akvorsr/imagecache/";
     public static final String LOG_FILE_NAME = "error_messages.txt";
+	public static final String FILE_PROVIDER_AUTHORITY = "org.akvo.rsr.up.fileprovider";
 
-	/**
-	 * status related constants
-	 */
-	public static final String COMPLETE_STATUS = "Complete";
-	public static final String SENT_STATUS = "Sent";
-	public static final String RUNNING_STATUS = "Running";
-	public static final String IN_PROGRESS_STATUS = "In Progress";
-	public static final String QUEUED_STATUS = "Queued";
-	public static final String FAILED_STATUS = "Failed";
-
-	
-	/**
-	 * notification types
-	 */
-	public static final String PROGRESS = "PROGRESS";
-	public static final String FILE_COMPLETE = "FILE_COMPLETE";
-	public static final String ERROR = "ERROR";
-
-	
 	/**
 	 * keys for saved state and bundle extras
 	 */
@@ -90,14 +64,11 @@ public class ConstantUtil {
     public static final String UPDATE_ID_KEY = "org.akvo.rsr.up.UPDATE";
     public static final String IMAGE_FILENAME_KEY = "org.akvo.rsr.up.IMAGE_FILENAME";
 
-	
 	/**
 	 * settings keys
 	 */
 	public static final String HOST_SETTING_KEY = "data_host";
-	public static final String DEBUG_SETTING_KEY = "setting_debug";
 	public static final String SEND_IMG_SETTING_KEY = "setting_send_images";
-	public static final String DELAY_IMG_SETTING_KEY = "setting_delay_image_fetch";
 	public static final String AUTH_USERNAME_KEY = "authorized_username";
 	public static final String AUTH_APIKEY_KEY = "authorized_apikey";
 	public static final String AUTH_USERID_KEY = "authorized_userid";
@@ -107,6 +78,7 @@ public class ConstantUtil {
     public static final String AUTH_APPVERSION_KEY = "authorized_app_version";
 	public static final String LOCAL_ID_KEY	= "next_local_id";
 	public static final String FETCH_TIME_KEY = "last_updates_fetch_time";
+
 	/**
 	 * intents
 	 */
@@ -121,9 +93,6 @@ public class ConstantUtil {
     public static final String ORGS_FETCHED_ACTION = "org.akvo.rsr.up.ORGS_FETCHED";
     public static final String ORGS_PROGRESS_ACTION = "org.akvo.rsr.up.ORGS_PROGRESS";
 
-	public static final String GPS_STATUS_INTENT = "com.eclipsim.gpsstatus.VIEW";
-	public static final String BARCODE_SCAN_INTENT = "com.google.zxing.client.android.SCAN";
-
 	/**
 	 * intent extra keys
 	 */
@@ -136,38 +105,23 @@ public class ConstantUtil {
 	public static final String PASSWORD_KEY = "org.akvo.rsr.up.PASSWORD";
     public static final String PERIOD_ID_KEY = "org.akvo.rsr.up.PERIOD_ID";
     public static final String DESCRIPTION_KEY = "org.akvo.rsr.up.DESCRIPTION";
-    public static final String COMMENT_KEY = "org.akvo.rsr.up.COMMENT";
     public static final String DATA_KEY = "org.akvo.rsr.up.IPD_DATA";
     public static final String CURRENT_ACTUAL_VALUE_KEY = "org.akvo.rsr.up.CURRENT_ACTUAL_VALUE";
     public static final String RELATIVE_DATA_KEY = "org.akvo.rsr.up.RELATIVE_IPD_DATA";
     public static final String PHOTO_FN_KEY = "org.akvo.rsr.up.PHOTO_FILENAME";
     public static final String FILE_FN_KEY = "org.akvo.rsr.up.FILE_FILENAME";
-    public static final String PERIOD_START_KEY = "org.akvo.rsr.up.INDICATOR_PERIOD_START";
-    public static final String PERIOD_END_KEY = "org.akvo.rsr.up.INDICATOR_PERIOD_END";
     public static final String ORG_ID_KEY = "org.akvo.rsr.up.ORGANISATION_ID";
     public static final String COUNTRY_ID_KEY = "org.akvo.rsr.up.COUNTRY_ID";
     public static final String JOB_TITLE_KEY = "org.akvo.rsr.up.JOB_TITLE";
-
-	/**
-	 * posting outcomes
-	 */
-	public static final int POST_SUCCESS = 0;
-	public static final int POST_FAILURE = 1;
-	public static final int POST_UNKNOWN = 2;
-	
-	
-	/**
-	 * language codes
-	 */
-	public static final String ENGLISH_CODE = "en";
-
 
 	/**
 	 * "code" to prevent unauthorized use of administrative settings/preferences
 	 */
 	public static final String ADMIN_AUTH_CODE = "12345";
 
-	/**
+    public static final int PHOTO_REQUEST = 777;
+
+    /**
 	 * prevent instantiation
 	 */
 	private ConstantUtil() {

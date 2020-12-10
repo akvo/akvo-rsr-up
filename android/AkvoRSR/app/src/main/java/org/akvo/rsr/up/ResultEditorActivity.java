@@ -36,7 +36,6 @@ import org.jetbrains.annotations.NotNull;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -50,9 +49,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import static org.akvo.rsr.up.util.ConstantUtil.PHOTO_REQUEST;
+
 public class ResultEditorActivity extends BackActivity {
 
-    private static final int PHOTO_RESULT = 1111;
     private static final int PHOTO_PICK = 1112;
     private static final int FILE_PICK = 1113;
     private static final String endash = "\u2013";
@@ -72,6 +72,8 @@ public class ResultEditorActivity extends BackActivity {
     private String mPeriodId;
     private String mPeriodActualValue;
     private String mCaptureFilename;
+
+    private final Navigator navigator = new Navigator();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,13 +122,9 @@ public class ResultEditorActivity extends BackActivity {
 
         Button btnTakePhoto = (Button) findViewById(R.id.btn_take_photo);
         btnTakePhoto.setOnClickListener(view -> {
-            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             // generate unique filename
-            mCaptureFilename = FileUtil.getExternalPhotoDir(ResultEditorActivity.this)
-                    + File.separator + "capture" + System.nanoTime() + ".jpg";
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-                    Uri.fromFile(new File(mCaptureFilename)));
-            startActivityForResult(takePictureIntent, PHOTO_RESULT);
+            mCaptureFilename = FileUtil.generateImageFile("capture", ResultEditorActivity.this);
+            navigator.navigateToCamera(mCaptureFilename, ResultEditorActivity.this);
         });
 
         Button btnAttachPhoto = (Button) findViewById(R.id.btn_attach_photo);
@@ -217,7 +215,7 @@ public class ResultEditorActivity extends BackActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == PHOTO_RESULT || requestCode == PHOTO_PICK) {
+        if (requestCode == PHOTO_REQUEST || requestCode == PHOTO_PICK) {
             if (resultCode == RESULT_CANCELED) {
                 mCaptureFilename = null;
                 return;

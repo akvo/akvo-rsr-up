@@ -27,10 +27,8 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.SpannableString;
@@ -65,7 +63,6 @@ import org.akvo.rsr.up.util.SettingsUtil;
 import org.akvo.rsr.up.util.ThumbnailUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -82,11 +79,9 @@ import java.util.UUID;
 public class UpdateEditorActivity extends AppCompatActivity implements LocationListener {
 
     private static final int PERMISSION_REQUEST_CODE = 123;
-
-    private final int TITLE_LENGTH = 50;
-    private final int photoRequest = 777;
-    private final int photoPick = 888;
-    private final String TITLE_PLACEHOLDER = "?";
+    private static final int TITLE_LENGTH = 50;
+    private static final int PHOTO_PICK = 888;
+    private static final String TITLE_PLACEHOLDER = "?";
 
     private String captureFilename = null;
 
@@ -126,6 +121,7 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
     private float lastAccuracy;
     private boolean needUpdate = false;
     private org.akvo.rsr.up.domain.Location photoLocation;
+    private final Navigator navigator = new Navigator();
     
     // Database
     private RsrDbAdapter dba;
@@ -233,20 +229,16 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
 
         btnTakePhoto = (Button) findViewById(R.id.btn_take_photo);
         btnTakePhoto.setOnClickListener(view -> {
-            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             // generate unique filename
-            captureFilename = FileUtil.getExternalPhotoDir(UpdateEditorActivity.this)
-                    + File.separator + "capture" + System.nanoTime() + ".jpg";
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-                    Uri.fromFile(new File(captureFilename)));
-            startActivityForResult(takePictureIntent, photoRequest);
+            captureFilename = FileUtil.generateImageFile("capture", UpdateEditorActivity.this);
+            navigator.navigateToCamera(captureFilename, UpdateEditorActivity.this);
         });
 
         Button btnAttachPhoto = (Button) findViewById(R.id.btn_attach_photo);
         btnAttachPhoto.setOnClickListener(view -> {
             Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
             photoPickerIntent.setType("image/*");
-            startActivityForResult(photoPickerIntent, photoPick);
+            startActivityForResult(photoPickerIntent, PHOTO_PICK);
         });
 
         btnDelPhoto = (Button) findViewById(R.id.btn_delete_photo);
@@ -327,6 +319,7 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
         btnSubmit.setVisibility(editable ? View.VISIBLE : View.GONE);
     }
 
+
     private void showPhoto(boolean show) {
         if (show) {
             photoAndToolsGroup.setVisibility(View.VISIBLE);
@@ -386,20 +379,19 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == photoRequest || requestCode == photoPick) {
+        if (requestCode == ConstantUtil.PHOTO_REQUEST || requestCode == PHOTO_PICK) {
             if (resultCode == RESULT_CANCELED) {
                 return;
             }
 
-            if (requestCode == photoPick) {
+            if (requestCode == PHOTO_PICK) {
                 if (resultCode == RESULT_CANCELED) {
                     return;
                 }
                 InputStream imageStream;
                 try {
                     imageStream = getContentResolver().openInputStream(data.getData());
-                    captureFilename = FileUtil.getExternalPhotoDir(this) + File.separator + "pick"
-                            + System.nanoTime() + ".jpg";
+                    captureFilename = FileUtil.generateImageFile("pick", UpdateEditorActivity.this);
                     try (OutputStream os = new FileOutputStream(captureFilename)) {
                         copyStream(imageStream, os);
                     }

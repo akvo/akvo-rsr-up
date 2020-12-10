@@ -31,6 +31,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 
+import androidx.core.content.FileProvider;
+
 public class ThumbnailUtil {
 
     public static String TAG = "ThumbnailUtil";
@@ -257,8 +259,10 @@ public class ThumbnailUtil {
         // Launch default viewer for the file
         Intent intent = new Intent();
         intent.setAction(android.content.Intent.ACTION_VIEW);
-        Uri hacked_uri = Uri.parse("file://" + fn);
-        intent.setDataAndType(hacked_uri, "image/*");
+        Uri fileUri = FileProvider
+                .getUriForFile(iv.getContext(), ConstantUtil.FILE_PROVIDER_AUTHORITY, new File(fn));
+        intent.setDataAndType(fileUri, "image/*");
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         iv.getContext().startActivity(intent);
 
     }

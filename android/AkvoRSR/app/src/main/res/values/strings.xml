@@ -242,5 +242,6 @@
     <string name="progress_photos">Photos</string>
     <string name="messages_subtitle">Messages, newest last:</string>
     <string name="location_permission_required">Location permission is required to perform this action</string>
+    <string name="take_photo_error">No camera on device or no app found to take pictures</string>
 
 </resources>

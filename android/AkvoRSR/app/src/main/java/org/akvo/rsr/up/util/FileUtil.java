@@ -16,24 +16,20 @@
 
 package org.akvo.rsr.up.util;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Location;
+import org.jetbrains.annotations.NotNull;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
-import android.os.Build;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -43,53 +39,13 @@ public class FileUtil {
     public static String TAG = "FileUtil";
 
     /**
-     * Reads a file into a byte array
-     * 
-     * @param file
-     * @return the bytes of the file
-     */
-    public static byte[] readFile(File file) throws IOException {
-        // Open file
-        RandomAccessFile f = new RandomAccessFile(file, "r");
-        try {
-            // Get and check length
-            long longlength = f.length();
-            int length = (int) longlength;
-            if (length != longlength) {
-                throw new IOException("File size >= 2 GB");
-            }
-            // Read file and return data
-            byte[] data = new byte[length];
-            f.readFully(data);
-            return data;
-        } finally {
-            f.close();
-        }
-    }
-
-    public static byte[] readFile(String file) throws IOException {
-        return readFile(new File(file));
-    }
-
-    /**
      * Get the external app image directory.
      * 
      * @param context The context to use
      * @return The external cache dir
      */
-    @TargetApi(Build.VERSION_CODES.FROYO)
     public static File getExternalCacheDir(Context context) {
-        if (hasExternalCacheDir()) {
-            File cacheDir = context.getExternalCacheDir();
-            if (cacheDir != null) {
-                return cacheDir;
-            }
-        }
-
-        // Before Froyo we need to construct the external cache dir ourselves
-        // AND it will not be automatically created
-        final String cacheDir = "/Android/data/" + context.getPackageName() + "/cache";
-        return new File(Environment.getExternalStorageDirectory().getPath() + cacheDir);
+        return context.getExternalCacheDir();
     }
 
     /**
@@ -98,50 +54,13 @@ public class FileUtil {
      * @param context The context to use
      * @return The external cache dir
      */
-    @TargetApi(Build.VERSION_CODES.FROYO)
     public static File getExternalPhotoDir(Context context) {
-        if (hasExternalCacheDir()) {
-            File cacheDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-            if (cacheDir != null) {
-                return cacheDir;
-            }
-        }
-
-        // Before Froyo we need to construct the external files dir ourselves
-        // AND it will not be automatically created
-        final String cacheDir = "/Android/data/" + context.getPackageName() + "/files/Pictures";
-        return new File(Environment.getExternalStorageDirectory().getPath() + cacheDir);
+        return context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
     }
 
-    /**
-     * Checks if OS version has built-in external cache dir method.
-     */
-    public static boolean hasExternalCacheDir() {
-        return hasFroyo();
-    }
-
-    public static boolean hasFroyo() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO;
-    }
-
-    public static boolean hasGingerbread() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD;
-    }
-
-    public static boolean hasHoneycomb() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB;
-    }
-
-    public static boolean hasHoneycombMR1() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1;
-    }
-
-    public static boolean hasICS() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH;
-    }
-
-    public static boolean hasJellyBean() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
+    @NotNull
+    public static String generateImageFile(String name, Context context) {
+        return getExternalPhotoDir(context) + File.separator + name + System.nanoTime() + ".jpg";
     }
 
     /**
@@ -187,30 +106,6 @@ public class FileUtil {
         o2.inSampleSize = subsamplingFactor(o, maxSize);
         Log.v(TAG, "Shrinking image by a factor of " + o2.inSampleSize);
         return BitmapFactory.decodeFile(filename, o2);
-    }
-
-    /**
-     * shrinks an image file (to save upload bandwidth) the quick way, by a
-     * power-of-2 integer factor This will lose any EXIF information
-     */
-    public static boolean shrinkImageFileQuickly(String filename, int maxSize) {
-        Bitmap bm = readSubsampledImageFile(filename, maxSize);
-        if (bm == null) {
-            return false;
-        } else {
-            // save it back
-            try {
-                FileOutputStream stream = new FileOutputStream(filename);
-                if (bm.compress(Bitmap.CompressFormat.JPEG, 90, stream)) {
-                    stream.close();
-                    return true;
-                }
-                return false;
-            } catch (IOException e) {
-                Log.e(TAG, "Could not write resized image: ", e);
-                return false;
-            }
-        }
     }
 
     /**
@@ -347,11 +242,8 @@ public class FileUtil {
         matrix.postRotate(clockwise ? 90 : -90);
         Bitmap rotatedBitmap = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), matrix, true);
         // write image file
-        FileOutputStream ostream = new FileOutputStream(filename);
-        try {
+        try (FileOutputStream ostream = new FileOutputStream(filename)) {
             rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
-        } finally {
-            ostream.close();
         }
     }
 
@@ -360,63 +252,6 @@ public class FileUtil {
         rotateImageFile(filename, clockwise);
         exif1.setAttribute(ExifInterface.TAG_ORIENTATION, Integer.toString(ExifInterface.ORIENTATION_NORMAL));
         exif1.saveAttributes();
-    }
-
-    /**
-     * propagates the EXIF rotation attribute
-     * 
-     * @param originalImage
-     * @param resizedImage
-     */
-    public static void propagateOrientation(String originalImage, String resizedImage) {
-        try {
-            ExifInterface exif1 = new ExifInterface(originalImage);
-            ExifInterface exif2 = new ExifInterface(resizedImage);
-
-            final String orientation1 = exif1.getAttribute(ExifInterface.TAG_ORIENTATION);
-            final String orientation2 = exif2.getAttribute(ExifInterface.TAG_ORIENTATION);
-
-            if (!TextUtils.isEmpty(orientation1) && !orientation1.equals(orientation2)) {
-                Log.d(TAG, "Orientation property in EXIF does not match. Overriding it with original value...");
-                exif2.setAttribute(ExifInterface.TAG_ORIENTATION, orientation1);
-                exif2.saveAttributes();
-            }
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
-        }
-
-    }
-
-    /**
-     * propagates the EXIF geolocation
-     * 
-     * @param originalImage
-     * @param resizedImage
-     * @return true if original image had a position and it was copied
-     */
-    public static boolean propagateLocation(String originalImage, String resizedImage) {
-        try {
-            ExifInterface exif1 = new ExifInterface(originalImage);
-            ExifInterface exif2 = new ExifInterface(resizedImage);
-
-            final String lon1 = exif1.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
-            final String lat1 = exif1.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
-            // final String alt1 =
-            // exif1.getAttribute(ExifInterface.TAG_GPS_ALTITUDE);
-            // more??
-
-            if (!TextUtils.isEmpty(lon1) && !TextUtils.isEmpty(lat1)) {
-                Log.d(TAG, "Location defined. Propagating it.");
-                exif2.setAttribute(ExifInterface.TAG_GPS_LATITUDE, lat1);
-                exif2.setAttribute(ExifInterface.TAG_GPS_LONGITUDE, lon1);
-                // exif2.setAttribute(ExifInterface.TAG_GPS_ALTITUDE, alt1);
-                exif2.saveAttributes();
-                return true;
-            }
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
-        }
-        return false;
     }
 
     /**
@@ -430,19 +265,10 @@ public class FileUtil {
             ExifInterface exif1 = new ExifInterface(originalImage);
             float[] latlon = new float[2];
 
-            // double altitude =
-            // exif1.getAttributeDouble(ExifInterface.TAG_GPS_ALTITUDE, -1);
-            // int ref =
-            // exif1.getAttributeInt(ExifInterface.TAG_GPS_ALTITUDE_REF, -1);
-
             if (exif1.getLatLong(latlon)) {
                 Location loc = new Location();
                 loc.setLatitude(Float.toString(latlon[0]));
                 loc.setLongitude(Float.toString(latlon[1]));
-                // if (altitude >= 0 && ref >= 0) {
-                // loc.setElevation(Double.toString(altitude * ((ref == 1) ? -1
-                // : 1)));
-                // }
                 return loc;
             }
         } catch (IOException e) {
@@ -473,28 +299,4 @@ public class FileUtil {
             Log.e(TAG, e.getMessage());
         }
     }
-
-    
-    /**
-     * writes to the error log
-     * 
-     * @param record the string to append to the log
-     */
-    public static void appendToLog(Context context, String record) {
-        try {
-            // Open file
-            BufferedWriter buf = new BufferedWriter( new FileWriter(getExternalCacheDir(context) + ConstantUtil.LOG_FILE_NAME));
-            try {
-                buf.append(record);
-            } finally {
-                buf.close();
-            }
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
-        }
-    }
-
-
-    
-    
 }
