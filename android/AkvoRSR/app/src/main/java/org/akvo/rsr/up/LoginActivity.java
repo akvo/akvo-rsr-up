@@ -24,7 +24,9 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
+import android.util.TimeUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,8 +35,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.work.Configuration;
+import androidx.work.Data;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import org.akvo.rsr.up.service.SignInService;
 import org.akvo.rsr.up.util.ConstantUtil;
@@ -42,6 +53,7 @@ import org.akvo.rsr.up.util.DialogUtil;
 import org.akvo.rsr.up.util.Downloader;
 import org.akvo.rsr.up.util.FileUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
+import org.akvo.rsr.up.worker.SignInWorker;
 
 import java.io.File;
 
@@ -51,7 +63,6 @@ public class LoginActivity extends AppCompatActivity {
     private EditText usernameEdit;
     private EditText passwordEdit;
     private ProgressDialog progress = null;
-    private BroadcastReceiver rec;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,11 +126,6 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(new Intent(LoginActivity.this, AboutActivity.class));
             }
         });
-
-        // register a listener for the completion intent
-        IntentFilter f = new IntentFilter(ConstantUtil.AUTHORIZATION_RESULT_ACTION);
-        rec = new ResponseReceiver();
-        LocalBroadcastManager.getInstance(this).registerReceiver(rec, f);
     }
 
     @Override
@@ -133,17 +139,15 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             passwordEdit.setText("");
         }
-    }
 
-    @Override
-    protected void onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(rec);
-        super.onDestroy();
+        if (BuildConfig.DEBUG) {
+            usernameEdit.setText(BuildConfig.TEST_USER);
+            passwordEdit.setText(BuildConfig.TEST_PASSWORD);
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.login, menu);
         return true;
     }
@@ -164,8 +168,6 @@ public class LoginActivity extends AppCompatActivity {
 
     /**
      * starts the sign in process
-     * 
-     * @param view
      */
     public void signIn(View view) {
         // We must have a connection
@@ -181,55 +183,59 @@ public class LoginActivity extends AppCompatActivity {
         progress.show();
 
         // request API key from server
-        Intent intent = new Intent(this, SignInService.class);
-        intent.putExtra(ConstantUtil.USERNAME_KEY, usernameEdit.getText().toString());
-        intent.putExtra(ConstantUtil.PASSWORD_KEY, passwordEdit.getText().toString());
-        getApplicationContext().startService(intent);
-        // now we wait for a broadcast...
-    }
+        WorkManager workManager = WorkManager.getInstance(getApplicationContext());
+        OneTimeWorkRequest signInRequest =
+                new OneTimeWorkRequest.Builder(SignInWorker.class)
+                        .addTag(SignInWorker.TAG)
+                        .setInputData(createInputDataForUri(usernameEdit.getText().toString(), passwordEdit.getText().toString()))
+                        .build();
+        workManager.enqueueUniqueWork(SignInWorker.TAG, ExistingWorkPolicy.REPLACE, signInRequest);
+        workManager.getWorkInfosByTagLiveData(SignInWorker.TAG).observe(this, listOfWorkInfos -> {
 
-    /**
-     * completes the sign-in process after network activity is done
-     * 
-     * @param intent
-     */
-    private void onAuthFinished(Intent intent) {
-        // Dismiss any in-progress dialog
-        if (progress != null) {
-            progress.dismiss();
-        }
-
-        String err = intent.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
-        if (err == null) {
-            String msg = getResources().getString(R.string.msg_logged_in_as_template, SettingsUtil.Read(this, "authorized_username"));
-            Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
-            // Go to main screen
-            Intent mainIntent = new Intent(this, ProjectListActivity.class);
-            startActivity(mainIntent);
-            finish();
-        } else {
-            passwordEdit.setText("");
-            // Let user keep username
-            // stay on this page
-            DialogUtil.errorAlert(this, "Error", err);
-        }
-    }
-
-    /**
-     * Broadcast receiver for receiving status updates from the auth IntentService
-     *
-     */
-    private class ResponseReceiver extends BroadcastReceiver {
-        // Prevents instantiation
-        private ResponseReceiver() {
-        }
-
-        // Called when the BroadcastReceiver gets an Intent it's registered to receive
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction() == ConstantUtil.AUTHORIZATION_RESULT_ACTION) {
-                onAuthFinished(intent);
+            // If there are no matching work info, do nothing
+            if (listOfWorkInfos == null || listOfWorkInfos.isEmpty()) {
+                return;
             }
-        }
+
+            // We only care about the first output status.
+            WorkInfo workInfo = listOfWorkInfos.get(0);
+
+            boolean finished = workInfo.getState().isFinished();
+            if (finished) {
+                // Dismiss any in-progress dialog
+                if (progress != null) {
+                    progress.dismiss();
+                }
+
+                if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                    String msg = getResources().getString(R.string.msg_logged_in_as_template, SettingsUtil.Read(this, "authorized_username"));
+                    Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                    // Go to main screen
+                    Intent mainIntent = new Intent(this, ProjectListActivity.class);
+                    startActivity(mainIntent);
+                    finish();
+                } else {
+                    passwordEdit.setText("");
+                    // Let user keep username
+                    // stay on this page
+                    String err = workInfo.getOutputData().getString(ConstantUtil.SERVICE_ERRMSG_KEY);
+                    if (!TextUtils.isEmpty(err)) {
+                        DialogUtil.errorAlert(this, "Error", err);
+                    }
+                }
+            }
+        });
     }
 
+    private Data createInputDataForUri(String login, String password) {
+        Data.Builder builder = new Data.Builder();
+        if (login != null) {
+            builder.putString(ConstantUtil.USERNAME_KEY, login);
+        }
+
+        if (password != null) {
+            builder.putString(ConstantUtil.PASSWORD_KEY, password);
+        }
+        return builder.build();
+    }
 }
