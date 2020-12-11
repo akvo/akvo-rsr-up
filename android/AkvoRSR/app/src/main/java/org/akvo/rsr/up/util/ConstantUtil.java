@@ -87,7 +87,6 @@ public class ConstantUtil {
     public static final String UPDATES_SENT_ACTION = "org.akvo.rsr.up.UPDATES_SENT";
     public static final String UPDATES_SENDPROGRESS_ACTION = "org.akvo.rsr.up.UPDATES_PROGRESS";
     public static final String UPDATES_VERIFIED_ACTION = "org.akvo.rsr.up.UPDATES_VERIFIED";
-    public static final String AUTHORIZATION_RESULT_ACTION = "org.akvo.rsr.up.AUTHORIZATION_RESULT";
     public static final String RESULT_SENT_ACTION = "org.akvo.rsr.up.RESULT_SENT";
     public static final String EMPLOYMENT_SENT_ACTION = "org.akvo.rsr.up.EMPLOYMENT_SENT";
     public static final String ORGS_FETCHED_ACTION = "org.akvo.rsr.up.ORGS_FETCHED";
