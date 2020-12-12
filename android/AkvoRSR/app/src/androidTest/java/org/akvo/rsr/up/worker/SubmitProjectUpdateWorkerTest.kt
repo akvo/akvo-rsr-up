@@ -5,13 +5,16 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.workDataOf
+import org.akvo.rsr.up.dao.RsrDbAdapter
+import org.akvo.rsr.up.domain.Update
 import org.akvo.rsr.up.util.ConstantUtil
 import org.akvo.rsr.up.util.SettingsUtil
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.Assert.assertThat
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import java.util.Date
+import java.util.UUID
 
 class SubmitProjectUpdateWorkerTest {
 
@@ -23,9 +26,29 @@ class SubmitProjectUpdateWorkerTest {
 
     @Test
     fun testSignInWorkSuccess() {
+        val update = Update()
+        update.uuid = UUID.randomUUID().toString()
+        update.userId = "45994"
+        update.date = Date()
+        update.unsent = true
+        update.draft = false
+        update.projectId = "2"
+        update.title = "Some title ${update.uuid}"
+        update.text = "Some description ${update.uuid}"
 
-        //TODO: add project update to db
-        val inputData = workDataOf(ConstantUtil.UPDATE_ID_KEY to "") //TODO: add project update id
+        val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
+        var nextLocalId = SettingsUtil.ReadInt(targetContext, ConstantUtil.LOCAL_ID_KEY, -1)
+        val dba = RsrDbAdapter(targetContext)
+        dba.open()
+        update.id = nextLocalId.toString()
+        nextLocalId--
+        SettingsUtil.WriteInt(targetContext,
+            ConstantUtil.LOCAL_ID_KEY,
+            nextLocalId)
+        dba.saveUpdate(update, true)
+        dba.close()
+
+        val inputData = workDataOf(ConstantUtil.UPDATE_ID_KEY to update.id)
 
         val request = OneTimeWorkRequestBuilder<SubmitProjectUpdateWorker>()
             .setInputData(inputData)
@@ -35,7 +58,8 @@ class SubmitProjectUpdateWorkerTest {
         val workInfo = wmRule.workManager.getWorkInfoById(request.id).get()
 
         assertThat(workInfo.state, `is`(WorkInfo.State.SUCCEEDED))
-        assertTrue(SettingsUtil.haveCredentials(InstrumentationRegistry.getInstrumentation().targetContext))
+
+        //TODO: delete update
     }
 
     @Test

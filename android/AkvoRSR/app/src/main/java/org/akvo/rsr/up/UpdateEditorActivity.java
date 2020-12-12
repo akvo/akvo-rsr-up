@@ -382,9 +382,6 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
             }
 
             if (requestCode == PHOTO_PICK) {
-                if (resultCode == RESULT_CANCELED) {
-                    return;
-                }
                 InputStream imageStream;
                 try {
                     imageStream = getContentResolver().openInputStream(data.getData());
