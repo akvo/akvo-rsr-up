@@ -132,11 +132,6 @@
         </activity>
 
         <service
-            android:name=".service.SubmitProjectUpdateService"
-            android:enabled="true"
-            android:exported="false" >
-        </service>
-        <service
             android:name=".service.SubmitIpdService"
             android:enabled="true"
             android:exported="false" >

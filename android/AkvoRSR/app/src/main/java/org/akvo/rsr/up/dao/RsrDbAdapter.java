@@ -18,7 +18,6 @@ package org.akvo.rsr.up.dao;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -151,6 +150,7 @@ public class RsrDbAdapter {
     public static final String ORG_ID_COL = "organisation_id";
     public static final String GROUP_ID_COL = "group_id";
     public static final String GROUP_NAME_COL = "group_name";
+	private static final int SQLITE_MAX_DEPTH = 950;
 
 	private DatabaseHelper databaseHelper;
 	private SQLiteDatabase database;
@@ -538,15 +538,23 @@ public class RsrDbAdapter {
 		//Show selected
 		updatedValues = new ContentValues();
 		updatedValues.put(HIDDEN_COL, 0);
-	    Iterator<String> itr = ids.iterator();
-	    if (itr.hasNext()) {
-	    	String whereList = "";
-	    	whereList += PK_ID_COL + "=" + itr.next();
-	    	while(itr.hasNext()) {
-	    		whereList += " OR " + PK_ID_COL + "=" + itr.next();
-	    	}
-	    	database.update(PROJECT_TABLE, updatedValues, whereList, null);
-	    }
+
+		StringBuilder whereList = new StringBuilder();
+
+		for (String id : ids) {
+			if (whereList.length() == 0) {
+				whereList.append(PK_ID_COL + "=").append(id);
+			} else if (whereList.length() < SQLITE_MAX_DEPTH) {
+				whereList.append(" OR " + PK_ID_COL + "=").append(id);
+			} else {
+				database.update(PROJECT_TABLE, updatedValues, whereList.toString(), null);
+				whereList = new StringBuilder();
+			}
+		}
+		//update last one
+		if (whereList.length() > 0) {
+			database.update(PROJECT_TABLE, updatedValues, whereList.toString(), null);
+		}
 	}
 
 	
@@ -1463,29 +1471,33 @@ public class RsrDbAdapter {
      * Gets results, indicators and periods for a specific project
      */
     public Cursor listResultsIndicatorsPeriodsFor(String _id) {
-        Cursor cursor = database.query(RESULT_TABLE + 
-                                        " LEFT JOIN "+ INDICATOR_TABLE + " ON  " + RESULT_TABLE + "._id = " + INDICATOR_TABLE + ".result_id" +
-                                        " LEFT JOIN " + PERIOD_TABLE + " ON  " + INDICATOR_TABLE + "._id = " + PERIOD_TABLE + ".indicator_id",
-                                        new String[] {
-                                            "_result._id as result_id",
-                                            "_indicator._id as indicator_id",
-                                            "_period._id as period_id",
-                                            "_result.title as result_title",
-                                            "_indicator.title as indicator_title",
-                                            "_period.period_start",
-                                            "_period.period_end",
-                                            "_period.actual_value",
-                                            "_period.target_value",
-                                            "_period.locked"
-                                            },
-                                        PROJECT_ID_COL + " = ?",
-                                        new String[] { _id },
-                                        null, //group by
-                                        null,
-                                        "_result._id,_indicator._id,_period._id DESC"); //order by
+		if (_id != null) {
+			Cursor cursor = database.query(RESULT_TABLE +
+											" LEFT JOIN "+ INDICATOR_TABLE + " ON  " + RESULT_TABLE + "._id = " + INDICATOR_TABLE + ".result_id" +
+											" LEFT JOIN " + PERIOD_TABLE + " ON  " + INDICATOR_TABLE + "._id = " + PERIOD_TABLE + ".indicator_id",
+											new String[] {
+												"_result._id as result_id",
+												"_indicator._id as indicator_id",
+												"_period._id as period_id",
+												"_result.title as result_title",
+												"_indicator.title as indicator_title",
+												"_period.period_start",
+												"_period.period_end",
+												"_period.actual_value",
+												"_period.target_value",
+												"_period.locked"
+												},
+											PROJECT_ID_COL + " = ?",
+											new String[] { _id },
+											null, //group by
+											null,
+											"_result._id,_indicator._id,_period._id DESC"); //order by
 
-        return cursor;
-    }
+			return cursor;
+		} else {
+			return null;
+		}
+	}
     /**
      * Gets data and comments for a specific period, all columns
      */
@@ -1580,39 +1592,41 @@ public class RsrDbAdapter {
      * Gets a single result from the db using its primary key
      */
     public Period findPeriod(String _id) {
-        Period per = null;
-        Cursor cursor = database.query(PERIOD_TABLE,
-                                       null,
-                                       "_id = ?",
-                                       new String[] { _id }, null, null, null);
-        if (cursor != null) {
-            if (cursor.moveToFirst()) {
-                per = new Period();
-                per.setId(_id);
-                per.setIndicatorId(cursor.getString(cursor.getColumnIndexOrThrow(INDICATOR_ID_COL)));
-                per.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(TITLE_COL)));
-                per.setLocked(0 != cursor.getInt(cursor.getColumnIndexOrThrow(LOCKED_COL)));
-                per.setActualValue(cursor.getString(cursor.getColumnIndexOrThrow(ACTUAL_VALUE_COL)));
-                per.setTargetValue(cursor.getString(cursor.getColumnIndexOrThrow(TARGET_VALUE_COL)));
-                per.setActualComment(cursor.getString(cursor.getColumnIndexOrThrow(ACTUAL_COMMENT_COL)));
-                per.setTargetComment(cursor.getString(cursor.getColumnIndexOrThrow(TARGET_COMMENT_COL)));
-                //Dates that can be null
-                if (cursor.isNull(cursor.getColumnIndexOrThrow(PERIOD_START_COL))) {
-                    per.setPeriodStart(null);      
-                } else {
-                    per.setPeriodStart(new Date(1000L * cursor.getLong(cursor.getColumnIndexOrThrow(PERIOD_START_COL))));
-                }
-                if (cursor.isNull(cursor.getColumnIndexOrThrow(PERIOD_END_COL))) {
-                    per.setPeriodEnd(null);      
-                } else {
-                    per.setPeriodEnd(new Date(1000L * cursor.getLong(cursor.getColumnIndexOrThrow(PERIOD_END_COL))));
-                }
+		Period per = null;
+		if (_id != null) {
+			Cursor cursor = database.query(PERIOD_TABLE,
+					null,
+					"_id = ?",
+					new String[]{_id}, null, null, null);
+			if (cursor != null) {
+				if (cursor.moveToFirst()) {
+					per = new Period();
+					per.setId(_id);
+					per.setIndicatorId(cursor.getString(cursor.getColumnIndexOrThrow(INDICATOR_ID_COL)));
+					per.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(TITLE_COL)));
+					per.setLocked(0 != cursor.getInt(cursor.getColumnIndexOrThrow(LOCKED_COL)));
+					per.setActualValue(cursor.getString(cursor.getColumnIndexOrThrow(ACTUAL_VALUE_COL)));
+					per.setTargetValue(cursor.getString(cursor.getColumnIndexOrThrow(TARGET_VALUE_COL)));
+					per.setActualComment(cursor.getString(cursor.getColumnIndexOrThrow(ACTUAL_COMMENT_COL)));
+					per.setTargetComment(cursor.getString(cursor.getColumnIndexOrThrow(TARGET_COMMENT_COL)));
+					//Dates that can be null
+					if (cursor.isNull(cursor.getColumnIndexOrThrow(PERIOD_START_COL))) {
+						per.setPeriodStart(null);
+					} else {
+						per.setPeriodStart(new Date(1000L * cursor.getLong(cursor.getColumnIndexOrThrow(PERIOD_START_COL))));
+					}
+					if (cursor.isNull(cursor.getColumnIndexOrThrow(PERIOD_END_COL))) {
+						per.setPeriodEnd(null);
+					} else {
+						per.setPeriodEnd(new Date(1000L * cursor.getLong(cursor.getColumnIndexOrThrow(PERIOD_END_COL))));
+					}
 
-                }
-            cursor.close();
-            }
+				}
+				cursor.close();
+			}
+		}
 
-        return per;
+		return per;
     }
 
 

@@ -48,12 +48,16 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.work.Data;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Project;
 import org.akvo.rsr.up.domain.Update;
 import org.akvo.rsr.up.domain.User;
-import org.akvo.rsr.up.service.SubmitProjectUpdateService;
 import org.akvo.rsr.up.service.VerifyProjectUpdateService;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.DialogUtil;
@@ -61,6 +65,7 @@ import org.akvo.rsr.up.util.Downloader;
 import org.akvo.rsr.up.util.FileUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
 import org.akvo.rsr.up.util.ThumbnailUtil;
+import org.akvo.rsr.up.worker.SubmitProjectUpdateWorker;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.FileNotFoundException;
@@ -126,8 +131,6 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
     // Database
     private RsrDbAdapter dba;
 
-    private BroadcastReceiver broadRec;
-        
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -308,12 +311,6 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
             }
         }
 
-        // register a listener for a completion and progress intents
-        broadRec = new ResponseReceiver();
-        IntentFilter f = new IntentFilter(ConstantUtil.UPDATES_SENT_ACTION);
-        f.addAction(ConstantUtil.UPDATES_SENDPROGRESS_ACTION);
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadRec, f);
-
         enableChanges(editable);
         btnDraft.setVisibility(editable ? View.VISIBLE : View.GONE);
         btnSubmit.setVisibility(editable ? View.VISIBLE : View.GONE);
@@ -492,15 +489,57 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
         }
         dba.saveUpdate(update, true);
 
-        // start upload service
-        Intent i = new Intent(this, SubmitProjectUpdateService.class);
-        i.putExtra(ConstantUtil.UPDATE_ID_KEY, update.getId());
-        getApplicationContext().startService(i);
-
         // Disable UI during send to avoid confusion
         enableChanges(false);
         // Show the "progress" animation
         progressGroup.setVisibility(View.VISIBLE);
+
+        // start upload worker
+        WorkManager workManager = WorkManager.getInstance(getApplicationContext());
+        Data.Builder builder = new Data.Builder();
+        builder.putString(ConstantUtil.UPDATE_ID_KEY, update.getId());
+        OneTimeWorkRequest oneTimeWorkRequest =
+                new OneTimeWorkRequest.Builder(SubmitProjectUpdateWorker.class)
+                        .addTag(SubmitProjectUpdateWorker.TAG)
+                        .setInputData(builder.build())
+                        .build();
+        workManager.enqueueUniqueWork(SubmitProjectUpdateWorker.TAG, ExistingWorkPolicy.REPLACE, oneTimeWorkRequest);
+        workManager.getWorkInfosByTagLiveData(SubmitProjectUpdateWorker.TAG).observe(this, listOfWorkInfos -> {
+
+            // If there are no matching work info, do nothing
+            if (listOfWorkInfos == null || listOfWorkInfos.isEmpty()) {
+                return;
+            }
+
+            // We only care about the first output status.
+            WorkInfo workInfo = listOfWorkInfos.get(0);
+
+            boolean finished = workInfo.getState().isFinished();
+
+            if (finished) {
+                // Dismiss any in-progress dialog
+                String err = workInfo.getOutputData().getString(ConstantUtil.SERVICE_ERRMSG_KEY);
+                boolean unresolved = workInfo.getOutputData().getBoolean(ConstantUtil.SERVICE_UNRESOLVED_KEY, false);
+                onSendFinished(err, unresolved);
+            }
+        });
+
+        workManager.getWorkInfosByTagLiveData(SubmitProjectUpdateWorker.TAG).observe(this, listOfWorkInfos -> {
+            // If there are no matching work info, do nothing
+            if (listOfWorkInfos == null || listOfWorkInfos.isEmpty()) {
+                return;
+            }
+
+            // We only care about the first output status.
+            WorkInfo workInfo = listOfWorkInfos.get(0);
+
+            if (WorkInfo.State.RUNNING.equals(workInfo.getState())) {
+                int sofar = workInfo.getProgress().getInt(ConstantUtil.SOFAR_KEY, 0);
+                int total = workInfo.getProgress().getInt(ConstantUtil.TOTAL_KEY, 100);
+                onFetchProgress(sofar, total);
+            }
+
+        });
     }
 
     /**
@@ -513,11 +552,9 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
     /**
      * handles result of send attempt
      */
-    private void onSendFinished(Intent i) {
+    private void onSendFinished(String err, boolean unresolved) {
         progressGroup.setVisibility(View.GONE);
 
-        String err = i.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
-        boolean unresolved = i.getBooleanExtra(ConstantUtil.SERVICE_UNRESOLVED_KEY, false);
         int msgTitle, msgText;
         if (err == null) {
             msgTitle = R.string.msg_update_published;
@@ -582,9 +619,6 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
         if (dba != null) {
             dba.close();
         }
-        if (broadRec != null) {
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(broadRec);
-        }
         removeLocationUpdates();
         super.onDestroy();
     }
@@ -630,26 +664,6 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
         uploadProgress.setIndeterminate(false);
         uploadProgress.setProgress(done);
         uploadProgress.setMax(total);
-    }
-
-    /**
-     * receives status updates from an IntentService
-     */
-    private class ResponseReceiver extends BroadcastReceiver {
-        private ResponseReceiver() {
-        }
-        
-        public void onReceive(Context context, Intent intent) {
-            switch (intent.getAction()) {
-                case ConstantUtil.UPDATES_SENT_ACTION:
-                    onSendFinished(intent);
-                    break;
-                case ConstantUtil.UPDATES_SENDPROGRESS_ACTION:
-                    onFetchProgress(intent.getExtras().getInt(ConstantUtil.SOFAR_KEY, 0),
-                            intent.getExtras().getInt(ConstantUtil.TOTAL_KEY, 100));
-                    break;
-            }
-        }
     }
 
     /**
@@ -765,7 +779,6 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
                 populateLocation(location);
             }
         } else if (needUpdate) {
-            needUpdate = true;
             populateLocation(location);
         }
     }
