@@ -137,11 +137,6 @@
             android:exported="false" >
         </service>
         <service
-            android:name=".service.SubmitEmploymentService"
-            android:enabled="true"
-            android:exported="false" >
-        </service>
-        <service
             android:name=".service.VerifyProjectUpdateService"
             android:enabled="true"
             android:exported="false" >

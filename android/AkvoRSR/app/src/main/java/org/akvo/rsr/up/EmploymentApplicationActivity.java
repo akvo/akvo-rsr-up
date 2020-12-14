@@ -19,20 +19,17 @@ package org.akvo.rsr.up;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Country;
 import org.akvo.rsr.up.domain.Organisation;
-import org.akvo.rsr.up.service.SubmitEmploymentService;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.DialogUtil;
 import org.akvo.rsr.up.util.Downloader;
 import org.akvo.rsr.up.util.SettingsUtil;
 import org.akvo.rsr.up.worker.GetOrgDataWorker;
+import org.akvo.rsr.up.worker.SubmitEmploymentWorker;
 
 import android.os.Bundle;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
@@ -74,7 +71,6 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
     
     private LinearLayout mProgress;
     private ProgressBar mProgressBar;
-    private BroadcastReceiver mBroadRec;
     private Button mApplyButton;
 
     private RsrDbAdapter mDba;
@@ -114,22 +110,11 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
         });
         mApplyButton.setEnabled(false); //until something is selected
 
-        // register a listener for completion intents
-        IntentFilter filter = new IntentFilter(ConstantUtil.EMPLOYMENT_SENT_ACTION);
-        mBroadRec = new ResponseReceiver();
-        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadRec, filter);
-        
         //Create db
         mDba = new RsrDbAdapter(this);
 
         getData();
         getOrgs();
-    }
-
-    @Override
-    protected void onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadRec);
-        super.onDestroy();
     }
 
     private void getOrgs() {
@@ -297,20 +282,41 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
         mProgressBar.setProgress(0);
 
         // start the upload service
-        Intent intent = new Intent(this, SubmitEmploymentService.class);
-        intent.putExtra(ConstantUtil.ORG_ID_KEY, mSelectedOrgId);
-        if (c != null) intent.putExtra(ConstantUtil.COUNTRY_ID_KEY, c.getId());
-        String jt = mJobTitle.getText().toString();
-        intent.putExtra(ConstantUtil.JOB_TITLE_KEY, jt);
-        getApplicationContext().startService(intent);
-        // now we wait for a broadcast...
+        WorkManager workManager = WorkManager.getInstance(getApplicationContext());
+        Data.Builder builder = new Data.Builder();
+        builder.putString(ConstantUtil.ORG_ID_KEY, mSelectedOrgId);
+        builder.putString(ConstantUtil.JOB_TITLE_KEY, mJobTitle.getText().toString());
+        if (c != null) {
+            builder.putString(ConstantUtil.ORG_ID_KEY, c.getId());
+        }
+        OneTimeWorkRequest oneTimeWorkRequest =
+                new OneTimeWorkRequest.Builder(SubmitEmploymentWorker.class)
+                        .addTag(SubmitEmploymentWorker.TAG)
+                        .setInputData(builder.build())
+                        .build();
+        workManager.enqueueUniqueWork(SubmitEmploymentWorker.TAG, ExistingWorkPolicy.REPLACE, oneTimeWorkRequest);
+        workManager.getWorkInfosByTagLiveData(SubmitEmploymentWorker.TAG).observe(this, listOfWorkInfos -> {
+
+            // If there are no matching work info, do nothing
+            if (listOfWorkInfos == null || listOfWorkInfos.isEmpty()) {
+                return;
+            }
+
+            // We only care about the first output status.
+            WorkInfo workInfo = listOfWorkInfos.get(0);
+
+            boolean finished = workInfo.getState().isFinished();
+
+            if (finished) {
+                // Dismiss any in-progress dialog
+                String err = workInfo.getOutputData().getString(ConstantUtil.SERVICE_ERRMSG_KEY);
+                onSendFinished(err);
+            }
+        });
     }
 
-    
     /**
      * completes the sign-in process after network activity is done
-     *
-     * @param err
      */
     private void onSendFinished(String err) {
         // Dismiss any in-progress dialog
@@ -326,25 +332,6 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
             DialogUtil.errorAlert(this, "Error", err);
         }
     }
-
-
-    /**
-     * Broadcast receiver for receiving status updates from any IntentService
-     *
-     */
-    private class ResponseReceiver extends BroadcastReceiver {
-        // Prevents instantiation
-        private ResponseReceiver() {
-        }
-
-        // Called when the BroadcastReceiver gets an Intent it's registered to receive
-        public void onReceive(Context context, Intent intent) {
-           if (intent.getAction() == ConstantUtil.EMPLOYMENT_SENT_ACTION) {
-                onSendFinished(intent.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY));
-            }
-        }
-    }
-
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
