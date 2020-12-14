@@ -5,11 +5,13 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.workDataOf
+import org.akvo.rsr.up.BuildConfig
 import org.akvo.rsr.up.dao.RsrDbAdapter
 import org.akvo.rsr.up.domain.Update
 import org.akvo.rsr.up.util.ConstantUtil
 import org.akvo.rsr.up.util.SettingsUtil
 import org.hamcrest.CoreMatchers.`is`
+import org.junit.Assert
 import org.junit.Assert.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -25,7 +27,9 @@ class SubmitProjectUpdateWorkerTest {
     var wmRule = WorkManagerTestRule()
 
     @Test
-    fun testSignInWorkSuccess() {
+    fun testSubmitProjectWorkerSuccess() {
+        login()
+
         val update = Update()
         update.uuid = UUID.randomUUID().toString()
         update.userId = "45994"
@@ -46,7 +50,7 @@ class SubmitProjectUpdateWorkerTest {
             ConstantUtil.LOCAL_ID_KEY,
             nextLocalId)
         dba.saveUpdate(update, true)
-        dba.close()
+
 
         val inputData = workDataOf(ConstantUtil.UPDATE_ID_KEY to update.id)
 
@@ -59,11 +63,30 @@ class SubmitProjectUpdateWorkerTest {
 
         assertThat(workInfo.state, `is`(WorkInfo.State.SUCCEEDED))
 
-        //TODO: delete update
+        dba.clearAllData()
+        dba.close()
+
+    }
+
+    private fun login() {
+        SettingsUtil.signOut(InstrumentationRegistry.getInstrumentation().targetContext)
+
+        val inputData = workDataOf(ConstantUtil.USERNAME_KEY to BuildConfig.TEST_USER,
+            ConstantUtil.PASSWORD_KEY to BuildConfig.TEST_PASSWORD)
+
+        val request = OneTimeWorkRequestBuilder<SignInWorker>()
+            .setInputData(inputData)
+            .build()
+
+        wmRule.workManager.enqueue(request).result.get()
+        val workInfo = wmRule.workManager.getWorkInfoById(request.id).get()
+
+        assertThat(workInfo.state, `is`(WorkInfo.State.SUCCEEDED))
+        Assert.assertTrue(SettingsUtil.haveCredentials(InstrumentationRegistry.getInstrumentation().targetContext))
     }
 
     @Test
-    fun testSignInWorkFailure() {
+    fun testSubmitProjectWorkerFailure() {
         //input data will be null
         val request = OneTimeWorkRequestBuilder<SubmitProjectUpdateWorker>().build()
 

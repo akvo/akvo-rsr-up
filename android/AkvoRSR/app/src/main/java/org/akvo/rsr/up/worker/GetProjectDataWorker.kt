@@ -59,7 +59,7 @@ class GetProjectDataWorker(ctx: Context, params: WorkerParameters) : Worker(ctx,
                         ConstantUtil.TOTAL_KEY to projects))
                 }
                 // country list rarely changes, so only fetch countries if we never did that
-                if (FETCH_COUNTRIES && (fullSynch || ad.countryCount == 0)) {
+                if (FETCH_COUNTRIES && (fullSynch || ad.getCountryCount() == 0)) {
                     dl.fetchCountryListRestApiPaged(appContext, ad, getCountriesUrl(appContext))
                 }
                 setProgressAsync(workDataOf(ConstantUtil.PHASE_KEY to 0, ConstantUtil.SOFAR_KEY to 100,

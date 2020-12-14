@@ -24,6 +24,7 @@ class SignInWorkerTest {
 
     @Test
     fun testSignInWorkSuccess() {
+        SettingsUtil.signOut(InstrumentationRegistry.getInstrumentation().targetContext)
 
         val inputData = workDataOf(ConstantUtil.USERNAME_KEY to BuildConfig.TEST_USER,
             ConstantUtil.PASSWORD_KEY to BuildConfig.TEST_PASSWORD)
@@ -37,6 +38,8 @@ class SignInWorkerTest {
 
         assertThat(workInfo.state, `is`(WorkInfo.State.SUCCEEDED))
         assertTrue(SettingsUtil.haveCredentials(InstrumentationRegistry.getInstrumentation().targetContext))
+
+        SettingsUtil.signOut(InstrumentationRegistry.getInstrumentation().targetContext)
     }
 
     @Test
