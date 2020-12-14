@@ -17,11 +17,11 @@
 package org.akvo.rsr.up;
 
 import org.akvo.rsr.up.dao.RsrDbAdapter;
-import org.akvo.rsr.up.service.GetOrgDataService;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.DialogUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
 import org.akvo.rsr.up.viewadapter.OrgListCursorAdapter;
+import org.akvo.rsr.up.worker.GetOrgDataWorker;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -30,8 +30,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -42,11 +40,13 @@ import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import androidx.work.Data;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
+
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
 
 public class OrgListActivity extends AppCompatActivity {
@@ -63,7 +63,6 @@ public class OrgListActivity extends AppCompatActivity {
     private TextView mEmptyText;
     private TextView mFirstTimeText;
     private TextView mUnemployedText;
-	private BroadcastReceiver broadRec;
     private Button searchButton;
 
     private boolean mEmployed; //False if user is not employed with any organisation
@@ -117,17 +116,6 @@ public class OrgListActivity extends AppCompatActivity {
         //Create db
         ad = new RsrDbAdapter(this);
         ad.open();
-
-		//register a listener for completion broadcasts
-		IntentFilter f = new IntentFilter(ConstantUtil.ORGS_FETCHED_ACTION);
-		f.addAction(ConstantUtil.ORGS_PROGRESS_ACTION);
-		broadRec = new ResponseReceiver();
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadRec, f);
-        
-        //in case we came back here during a refresh
-        if (GetOrgDataService.isRunning(this)) {
-            inProgress.setVisibility(View.VISIBLE);
-        }
 	}
 
 	@Override
@@ -141,7 +129,6 @@ public class OrgListActivity extends AppCompatActivity {
 		return true;
 	}
 
-	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
@@ -169,7 +156,6 @@ public class OrgListActivity extends AppCompatActivity {
 	
 	@Override
 	protected void onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadRec);
         if (dataCursor != null) {
             Log.d(TAG, "Closing cursor during destroy");
             dataCursor.close();
@@ -239,28 +225,59 @@ public class OrgListActivity extends AppCompatActivity {
 	 * starts the service fetching new project data
 	 */
 	private void startGetOrgsService() {
-        if (GetOrgDataService.isRunning(this)) { //TODO should disable menu choice instead
-            return; //only one at a time
-        }
-        
-		//TODO: disable menu choice
-		//start a service		
-		Intent i = new Intent(this, GetOrgDataService.class);
-		getApplicationContext().startService(i);
-		
 		//start progress animation
 		inProgress.setVisibility(View.VISIBLE);
 		inProgress1.setProgress(0);
+
+		WorkManager workManager = WorkManager.getInstance(getApplicationContext());
+		Data.Builder builder = new Data.Builder();
+		OneTimeWorkRequest oneTimeWorkRequest =
+				new OneTimeWorkRequest.Builder(GetOrgDataWorker.class)
+						.addTag(GetOrgDataWorker.TAG)
+						.setInputData(builder.build())
+						.build();
+		workManager.enqueueUniqueWork(GetOrgDataWorker.TAG, ExistingWorkPolicy.REPLACE, oneTimeWorkRequest);
+
+		workManager.getWorkInfosForUniqueWorkLiveData(GetOrgDataWorker.TAG).observe(this, listOfWorkInfos -> {
+			// If there are no matching work info, do nothing
+			if (listOfWorkInfos == null || listOfWorkInfos.isEmpty()) {
+				return;
+			}
+
+			// We only care about the first output status.
+			WorkInfo workInfo = listOfWorkInfos.get(0);
+			boolean finished = workInfo.getState().isFinished();
+
+			if (finished) {
+				String err = workInfo.getOutputData().getString(ConstantUtil.SERVICE_ERRMSG_KEY);
+				onFetchFinished(err);
+			}
+		});
+
+		workManager.getWorkInfosByTagLiveData(GetOrgDataWorker.TAG).observe(this, listOfWorkInfos -> {
+			// If there are no matching work info, do nothing
+			if (listOfWorkInfos == null || listOfWorkInfos.isEmpty()) {
+				return;
+			}
+
+			// We only care about the first output status.
+			WorkInfo workInfo = listOfWorkInfos.get(0);
+
+			if (WorkInfo.State.RUNNING.equals(workInfo.getState())) {
+				int sofar = workInfo.getProgress().getInt(ConstantUtil.SOFAR_KEY, 0);
+				int total = workInfo.getProgress().getInt(ConstantUtil.TOTAL_KEY, 100);
+				onFetchProgress(sofar, total);
+			}
+		});
 	}
 
 	/**
 	 * handles result of refresh service
 	 */
-	private void onFetchFinished(Intent intent) {
+	private void onFetchFinished(String err) {
 		// Hide in-progress indicators
 		inProgress.setVisibility(View.GONE);
-		
-		String err = intent.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
+
 		if (err == null) {
 			Toast.makeText(getApplicationContext(), R.string.msg_fetch_complete, Toast.LENGTH_SHORT).show();
 		} else {
@@ -272,34 +289,12 @@ public class OrgListActivity extends AppCompatActivity {
 		getData();
 	}
 
-
 	/**
 	 * updates the progress bars as fetch progresses
 	 */
 	private void onFetchProgress(int done, int total) {
-	    inProgress1.setIndeterminate(false);
-	    inProgress1.setMax(total);
-	    inProgress1.setProgress(done);
-		}
-
-	/**
-	 * receives status updates from any IntentService
-	 */
-	private class ResponseReceiver extends BroadcastReceiver {
-		// Prevents instantiation
-		private ResponseReceiver() {
-		}
-		
-		public void onReceive(Context context, Intent intent) {
-			switch (intent.getAction()) {
-				case ConstantUtil.ORGS_FETCHED_ACTION:
-					onFetchFinished(intent);
-					break;
-				case ConstantUtil.ORGS_PROGRESS_ACTION:
-					onFetchProgress(intent.getExtras().getInt(ConstantUtil.SOFAR_KEY, 0),
-							intent.getExtras().getInt(ConstantUtil.TOTAL_KEY, 100));
-					break;
-			}
-		}
+		inProgress1.setIndeterminate(false);
+		inProgress1.setMax(total);
+		inProgress1.setProgress(done);
 	}
 }

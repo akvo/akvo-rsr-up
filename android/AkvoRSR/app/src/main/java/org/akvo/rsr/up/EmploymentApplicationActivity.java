@@ -19,12 +19,12 @@ package org.akvo.rsr.up;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Country;
 import org.akvo.rsr.up.domain.Organisation;
-import org.akvo.rsr.up.service.GetOrgDataService;
 import org.akvo.rsr.up.service.SubmitEmploymentService;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.DialogUtil;
 import org.akvo.rsr.up.util.Downloader;
 import org.akvo.rsr.up.util.SettingsUtil;
+import org.akvo.rsr.up.worker.GetOrgDataWorker;
 
 import android.os.Bundle;
 import android.content.BroadcastReceiver;
@@ -33,6 +33,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.work.Data;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -103,15 +109,13 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
         mApplyButton = (Button) findViewById(R.id.btn_send_result);
         mApplyButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                sendIt(v);
+                sendIt();
             }
         });
         mApplyButton.setEnabled(false); //until something is selected
 
         // register a listener for completion intents
         IntentFilter filter = new IntentFilter(ConstantUtil.EMPLOYMENT_SENT_ACTION);
-        filter.addAction(ConstantUtil.ORGS_FETCHED_ACTION);
-        filter.addAction(ConstantUtil.ORGS_PROGRESS_ACTION);
         mBroadRec = new ResponseReceiver();
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadRec, filter);
         
@@ -123,17 +127,11 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
     protected void onDestroy() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadRec);
         super.onDestroy();
     }
 
-    
     private void getOrgs() {
         mDba.open();
         orgNames = mDba.getOrgNameList().toArray(orgNames);
@@ -152,20 +150,17 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
         mCountryEdit.setAdapter(countryAdapter);        
     }
 
-    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.org_list, menu);
         return true;
     }
 
-    
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.menu_refresh:
-            startGetOrgsService();
+            startGetOrgsWorker();
             return true;
         case R.id.menu_settings:
             Intent i = new Intent(this, SettingsActivity.class);
@@ -175,7 +170,6 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
             return super.onOptionsItemSelected(item);
         }
     }
-
 
     /**
      * show list of all employments for this user
@@ -204,37 +198,64 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
         mDba.close();
         mList.setText(list.toString());
     }   
-        
-    
-    
+
     /**
      * starts the service fetching new project data
      */
-    private void startGetOrgsService() {
-        if (GetOrgDataService.isRunning(this)) { //TODO should disable menu choice instead
-            return; //only one at a time
-        }
-        
-        //start a service       
-        Intent i = new Intent(this, GetOrgDataService.class);
-        //brief info fetch is the default
-        getApplicationContext().startService(i);
-        
+    private void startGetOrgsWorker() {
         //start progress animation
         mProgress.setVisibility(View.VISIBLE);
         mProgressBar.setProgress(0);
+
+        WorkManager workManager = WorkManager.getInstance(getApplicationContext());
+        Data.Builder builder = new Data.Builder();
+        OneTimeWorkRequest oneTimeWorkRequest =
+                new OneTimeWorkRequest.Builder(GetOrgDataWorker.class)
+                        .addTag(GetOrgDataWorker.TAG)
+                        .setInputData(builder.build())
+                        .build();
+        workManager.enqueueUniqueWork(GetOrgDataWorker.TAG, ExistingWorkPolicy.REPLACE, oneTimeWorkRequest);
+
+        workManager.getWorkInfosForUniqueWorkLiveData(GetOrgDataWorker.TAG).observe(this, listOfWorkInfos -> {
+            // If there are no matching work info, do nothing
+            if (listOfWorkInfos == null || listOfWorkInfos.isEmpty()) {
+                return;
+            }
+
+            // We only care about the first output status.
+            WorkInfo workInfo = listOfWorkInfos.get(0);
+            boolean finished = workInfo.getState().isFinished();
+
+            if (finished) {
+                String err = workInfo.getOutputData().getString(ConstantUtil.SERVICE_ERRMSG_KEY);
+                onFetchFinished(err);
+            }
+        });
+
+        workManager.getWorkInfosByTagLiveData(GetOrgDataWorker.TAG).observe(this, listOfWorkInfos -> {
+            // If there are no matching work info, do nothing
+            if (listOfWorkInfos == null || listOfWorkInfos.isEmpty()) {
+                return;
+            }
+
+            // We only care about the first output status.
+            WorkInfo workInfo = listOfWorkInfos.get(0);
+
+            if (WorkInfo.State.RUNNING.equals(workInfo.getState())) {
+                int sofar = workInfo.getProgress().getInt(ConstantUtil.SOFAR_KEY, 0);
+                int total = workInfo.getProgress().getInt(ConstantUtil.TOTAL_KEY, 100);
+                onFetchProgress(sofar, total);
+            }
+        });
     }
 
-    
     /**
      * handles result of refresh service
-     * @param intent
      */
-    private void onFetchFinished(Intent intent) {
+    private void onFetchFinished(String err) {
         // Hide in-progress indicators
         mProgress.setVisibility(View.GONE);
-        
-        String err = intent.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
+
         if (err == null) {
             Toast.makeText(getApplicationContext(), R.string.msg_fetch_complete, Toast.LENGTH_SHORT).show();
         } else {
@@ -247,27 +268,19 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
         getData();
     }
 
-
     /**
      * updates the progress bars as fetch progresses
-     * @param phase
-     * @param done
-     * @param total
      */
     private void onFetchProgress(int done, int total) {
         mProgressBar.setIndeterminate(false);
         mProgressBar.setMax(total);
         mProgressBar.setProgress(done);
-        }
+    }
 
-    
-    
     /**
      * starts the submission process
-     * 
-     * @param view
      */
-    private void sendIt(View view) {
+    private void sendIt() {
         // We must have a connection
         if (!Downloader.haveNetworkConnection(this, false)) {
             // helpful error message, instead of a failure later
@@ -288,7 +301,7 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
         intent.putExtra(ConstantUtil.ORG_ID_KEY, mSelectedOrgId);
         if (c != null) intent.putExtra(ConstantUtil.COUNTRY_ID_KEY, c.getId());
         String jt = mJobTitle.getText().toString();
-        if (jt != null) intent.putExtra(ConstantUtil.JOB_TITLE_KEY, jt);
+        intent.putExtra(ConstantUtil.JOB_TITLE_KEY, jt);
         getApplicationContext().startService(intent);
         // now we wait for a broadcast...
     }
@@ -296,21 +309,18 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
     
     /**
      * completes the sign-in process after network activity is done
-     * 
-     * @param intent
+     *
+     * @param err
      */
-    private void onSendFinished(Intent intent) {
+    private void onSendFinished(String err) {
         // Dismiss any in-progress dialog
         mProgress.setVisibility(View.GONE);
 
-        String err = intent.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
         if (err == null) {
             getData(); //show the new employment record
             findViewById(R.id.mainLayout).requestFocus(); //clear focus from form fields
             mScroll.scrollTo(0, 0); //Scroll up top to show new entry in list
-            String msg = getResources().getString(R.string.msg_emp_applied);
             DialogUtil.infoAlert(this, R.string.msg_send_success, R.string.msg_emp_applied);
-//            Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
         } else {
             // stay on this page
             DialogUtil.errorAlert(this, "Error", err);
@@ -329,13 +339,8 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
 
         // Called when the BroadcastReceiver gets an Intent it's registered to receive
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction() == ConstantUtil.ORGS_FETCHED_ACTION)
-                onFetchFinished(intent);
-            else if (intent.getAction() == ConstantUtil.ORGS_PROGRESS_ACTION)
-                onFetchProgress(intent.getExtras().getInt(ConstantUtil.SOFAR_KEY, 0),
-                                intent.getExtras().getInt(ConstantUtil.TOTAL_KEY, 100));
-            else if (intent.getAction() == ConstantUtil.EMPLOYMENT_SENT_ACTION) {
-                onSendFinished(intent);
+           if (intent.getAction() == ConstantUtil.EMPLOYMENT_SENT_ACTION) {
+                onSendFinished(intent.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY));
             }
         }
     }

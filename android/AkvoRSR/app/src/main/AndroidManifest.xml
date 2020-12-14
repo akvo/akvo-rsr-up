@@ -146,11 +146,7 @@
             android:enabled="true"
             android:exported="false" >
         </service>
-        <service
-            android:name=".service.GetOrgDataService"
-            android:enabled="true"
-            android:exported="false" >
-        </service>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="org.akvo.rsr.up.fileprovider"

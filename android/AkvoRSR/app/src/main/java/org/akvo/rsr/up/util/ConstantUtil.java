@@ -82,12 +82,9 @@ public class ConstantUtil {
 	/**
 	 * intents
 	 */
-    public static final String PROJECTS_FETCHED_ACTION = "org.akvo.rsr.up.PROJECTS_FETCHED";
     public static final String UPDATES_VERIFIED_ACTION = "org.akvo.rsr.up.UPDATES_VERIFIED";
     public static final String RESULT_SENT_ACTION = "org.akvo.rsr.up.RESULT_SENT";
     public static final String EMPLOYMENT_SENT_ACTION = "org.akvo.rsr.up.EMPLOYMENT_SENT";
-    public static final String ORGS_FETCHED_ACTION = "org.akvo.rsr.up.ORGS_FETCHED";
-    public static final String ORGS_PROGRESS_ACTION = "org.akvo.rsr.up.ORGS_PROGRESS";
 
 	/**
 	 * intent extra keys
