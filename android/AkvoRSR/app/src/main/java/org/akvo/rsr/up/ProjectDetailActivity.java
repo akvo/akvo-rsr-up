@@ -16,10 +16,7 @@
 
 package org.akvo.rsr.up;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
@@ -34,15 +31,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.work.Data;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Project;
-import org.akvo.rsr.up.service.GetProjectDataService;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.DialogUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
 import org.akvo.rsr.up.util.ThumbnailUtil;
+import org.akvo.rsr.up.worker.GetProjectDataWorker;
 import org.jetbrains.annotations.NotNull;
 
 public class ProjectDetailActivity extends AppCompatActivity {
@@ -122,19 +123,13 @@ public class ProjectDetailActivity extends AppCompatActivity {
 		
 		// Show the Up button in the action bar.
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        
-        IntentFilter f = new IntentFilter(ConstantUtil.PROJECTS_FETCHED_ACTION);
-        f.addAction(ConstantUtil.PROJECTS_PROGRESS_ACTION);
-		BroadcastReceiver mBroadRec = new ResponseReceiver();
-        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadRec, f);
-
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
 		mDba.open();
-		try{
+		try {
     		project = mDba.findProject(projId);
     		if (project == null) { //DB may have been cleared
     		    return;
@@ -189,7 +184,6 @@ public class ProjectDetailActivity extends AppCompatActivity {
 		} finally {
             mDba.close();    
         }
-
 	}
 	
     @Override
@@ -234,31 +228,66 @@ public class ProjectDetailActivity extends AppCompatActivity {
      * starts the service fetching new project data
      */
     private void startGetProjectsService() {
-        if (GetProjectDataService.isRunning(this)) {
-            return; //only one at a time
-        }
         //disable button
         btnRefresh.setEnabled(false);
-        Intent i = new Intent(this, GetProjectDataService.class);
-        i.putExtra(ConstantUtil.PROJECT_ID_KEY, projId);
-        getApplicationContext().startService(i);
-        
         inProgress.setVisibility(View.VISIBLE);
         mInProgressBar.setProgress(0);
         mInProgressWhat.setText("=====");
-    }
+
+		WorkManager workManager = WorkManager.getInstance(getApplicationContext());
+		Data.Builder builder = new Data.Builder();
+		builder.putString(ConstantUtil.PROJECT_ID_KEY, projId);
+		OneTimeWorkRequest oneTimeWorkRequest =
+				new OneTimeWorkRequest.Builder(GetProjectDataWorker.class)
+						.addTag(GetProjectDataWorker.TAG)
+						.setInputData(builder.build())
+						.build();
+		workManager.enqueueUniqueWork(GetProjectDataWorker.TAG, ExistingWorkPolicy.REPLACE, oneTimeWorkRequest);
+
+		workManager.getWorkInfosForUniqueWorkLiveData(GetProjectDataWorker.TAG).observe(this, listOfWorkInfos -> {
+			// If there are no matching work info, do nothing
+			if (listOfWorkInfos == null || listOfWorkInfos.isEmpty()) {
+				return;
+			}
+
+			// We only care about the first output status.
+			WorkInfo workInfo = listOfWorkInfos.get(0);
+			boolean finished = workInfo.getState().isFinished();
+
+			if (finished) {
+					String err = workInfo.getOutputData().getString(ConstantUtil.SERVICE_ERRMSG_KEY);
+					onFetchFinished(err);
+			}
+		});
+
+		workManager.getWorkInfosByTagLiveData(GetProjectDataWorker.TAG).observe(this, listOfWorkInfos -> {
+			// If there are no matching work info, do nothing
+			if (listOfWorkInfos == null || listOfWorkInfos.isEmpty()) {
+				return;
+			}
+
+			// We only care about the first output status.
+			WorkInfo workInfo = listOfWorkInfos.get(0);
+
+			if (WorkInfo.State.RUNNING.equals(workInfo.getState())) {
+				int phase = workInfo.getProgress().getInt(ConstantUtil.PHASE_KEY, 0);
+				int sofar = workInfo.getProgress().getInt(ConstantUtil.SOFAR_KEY, 0);
+				int total = workInfo.getProgress().getInt(ConstantUtil.TOTAL_KEY, 100);
+				onFetchProgress(phase, sofar, total);
+			}
+		});
+	}
 
     /**
      * handles result of refresh service
      */
-    private void onFetchFinished(Intent intent) {
+    private void onFetchFinished(String err) {
         // Hide in-progress indicators
         inProgress.setVisibility(View.GONE);
         //Re-enable button
         btnRefresh.setEnabled(true);
-        
-        String err = intent.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
-        if (err == null) {
+
+		if (err == null) {
             Toast.makeText(getApplicationContext(), R.string.msg_fetch_complete, Toast.LENGTH_SHORT).show();
         } else {
             //show a dialog instead
@@ -289,28 +318,5 @@ public class ProjectDetailActivity extends AppCompatActivity {
 				mInProgressWhat.setText("???");
 				break;
 		}
-    }
-    
-    /**
-     * receives status updates from any IntentService
-     *
-     */
-    private class ResponseReceiver extends BroadcastReceiver {
-        // Prevents instantiation
-        private ResponseReceiver() {
-        }
-        
-        public void onReceive(Context context, Intent intent) {
-			switch (intent.getAction()) {
-				case ConstantUtil.PROJECTS_FETCHED_ACTION:
-					onFetchFinished(intent);
-					break;
-				case ConstantUtil.PROJECTS_PROGRESS_ACTION:
-					onFetchProgress(intent.getExtras().getInt(ConstantUtil.PHASE_KEY, 0),
-							intent.getExtras().getInt(ConstantUtil.SOFAR_KEY, 0),
-							intent.getExtras().getInt(ConstantUtil.TOTAL_KEY, 100));
-					break;
-			}
-        }
     }
 }
