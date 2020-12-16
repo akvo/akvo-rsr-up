@@ -4,7 +4,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
-import org.akvo.rsr.up.BuildConfig
 import org.akvo.rsr.up.dao.RsrDbAdapter
 import org.akvo.rsr.up.domain.Country
 import org.akvo.rsr.up.domain.User
@@ -39,10 +38,7 @@ class GetProjectDataWorkerTest {
     fun testGetProjectDataWorkerFailureIfWrongUser() {
         val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
         SettingsUtil.signOut(targetContext)
-        val user = User()
-        user.username = "test"
-        user.id = "123"
-        user.apiKey = "test123"
+        val user = createFakeTestUser()
         SettingsUtil.signIn(targetContext, user)
         assertTrue(SettingsUtil.haveCredentials(targetContext))
 
@@ -60,10 +56,7 @@ class GetProjectDataWorkerTest {
         val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
         SettingsUtil.signOut(targetContext)
 
-        val user = User()
-        user.username = BuildConfig.TEST_USER
-        user.id = "45994"
-        user.apiKey = "test123"
+        val user = createExistingTestUser()
         SettingsUtil.signIn(targetContext, user)
         assertTrue(SettingsUtil.haveCredentials(targetContext))
         SettingsUtil.WriteBoolean(targetContext, "setting_fullsynch", false)
@@ -87,4 +80,5 @@ class GetProjectDataWorkerTest {
         dba.close()
         SettingsUtil.signOut(InstrumentationRegistry.getInstrumentation().targetContext)
     }
+
 }

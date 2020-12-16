@@ -131,12 +131,6 @@
                 android:value="org.akvo.rsr.up.ResultListActivity" />
         </activity>
 
-        <service
-            android:name=".service.VerifyProjectUpdateService"
-            android:enabled="true"
-            android:exported="false" >
-        </service>
-
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="org.akvo.rsr.up.fileprovider"

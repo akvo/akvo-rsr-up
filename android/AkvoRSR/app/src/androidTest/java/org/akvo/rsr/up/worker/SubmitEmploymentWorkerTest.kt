@@ -24,10 +24,7 @@ class SubmitEmploymentWorkerTest {
     fun testSubmitEmploymentFailure() {
         val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
         SettingsUtil.signOut(targetContext)
-        val user = User()
-        user.username = "test"
-        user.id = "123"
-        user.apiKey = "test123"
+        val user = createFakeTestUser()
         SettingsUtil.signIn(targetContext, user)
         assertTrue(SettingsUtil.haveCredentials(targetContext))
 

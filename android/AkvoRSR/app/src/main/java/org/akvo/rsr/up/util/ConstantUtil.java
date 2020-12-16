@@ -80,12 +80,6 @@ public class ConstantUtil {
 	public static final String FETCH_TIME_KEY = "last_updates_fetch_time";
 
 	/**
-	 * intents
-	 */
-    public static final String UPDATES_VERIFIED_ACTION = "org.akvo.rsr.up.UPDATES_VERIFIED";
-    public static final String RESULT_SENT_ACTION = "org.akvo.rsr.up.RESULT_SENT";
-
-	/**
 	 * intent extra keys
 	 */
 	public static final String PHASE_KEY = "PHASE_KEY";

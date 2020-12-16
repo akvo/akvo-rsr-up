@@ -8,7 +8,6 @@ import org.akvo.rsr.up.domain.User
 import org.akvo.rsr.up.util.ConstantUtil
 import org.akvo.rsr.up.util.SettingsUtil
 import org.hamcrest.CoreMatchers
-import org.junit.Assert
 import org.junit.Assert.assertThat
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -26,12 +25,9 @@ class SubmitIpdWorkerTest {
     fun testSubmitIpdFailure() {
         val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
         SettingsUtil.signOut(targetContext)
-        val user = User()
-        user.username = "test"
-        user.id = "123"
-        user.apiKey = "test123"
+        val user = createFakeTestUser()
         SettingsUtil.signIn(targetContext, user)
-        Assert.assertTrue(SettingsUtil.haveCredentials(targetContext))
+        assertTrue(SettingsUtil.haveCredentials(targetContext))
 
         val request = OneTimeWorkRequestBuilder<SubmitIpdWorker>().build()
 

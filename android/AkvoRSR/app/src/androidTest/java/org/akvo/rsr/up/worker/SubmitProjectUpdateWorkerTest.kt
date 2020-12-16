@@ -30,15 +30,7 @@ class SubmitProjectUpdateWorkerTest {
     fun testSubmitProjectWorkerSuccess() {
         login()
 
-        val update = Update()
-        update.uuid = UUID.randomUUID().toString()
-        update.userId = "45994"
-        update.date = Date()
-        update.unsent = true
-        update.draft = false
-        update.projectId = "2"
-        update.title = "Some title ${update.uuid}"
-        update.text = "Some description ${update.uuid}"
+        val update = createTestUpdate()
 
         val targetContext = InstrumentationRegistry.getInstrumentation().targetContext
         var nextLocalId = SettingsUtil.ReadInt(targetContext, ConstantUtil.LOCAL_ID_KEY, -1)
@@ -50,7 +42,6 @@ class SubmitProjectUpdateWorkerTest {
             ConstantUtil.LOCAL_ID_KEY,
             nextLocalId)
         dba.saveUpdate(update, true)
-
 
         val inputData = workDataOf(ConstantUtil.UPDATE_ID_KEY to update.id)
 

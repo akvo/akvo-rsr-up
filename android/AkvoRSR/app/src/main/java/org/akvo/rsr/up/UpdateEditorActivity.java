@@ -49,8 +49,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.work.Data;
+import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
+import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
@@ -58,7 +60,6 @@ import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Project;
 import org.akvo.rsr.up.domain.Update;
 import org.akvo.rsr.up.domain.User;
-import org.akvo.rsr.up.service.VerifyProjectUpdateService;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.DialogUtil;
 import org.akvo.rsr.up.util.Downloader;
@@ -66,6 +67,7 @@ import org.akvo.rsr.up.util.FileUtil;
 import org.akvo.rsr.up.util.SettingsUtil;
 import org.akvo.rsr.up.util.ThumbnailUtil;
 import org.akvo.rsr.up.worker.SubmitProjectUpdateWorker;
+import org.akvo.rsr.up.worker.VerifyProjectUpdateWorker;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.FileNotFoundException;
@@ -76,6 +78,7 @@ import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 /**
  * implements the page where the user inputs and sends an update
@@ -569,10 +572,15 @@ public class UpdateEditorActivity extends AppCompatActivity implements LocationL
         } else {
             //TODO expose err
             if (unresolved) {
-                // Update still has unsent flag set, start service for
+                // Update still has unsent flag set, start worker for
                 // background synchronisation
-                getApplicationContext().startService(
-                        new Intent(this, VerifyProjectUpdateService.class));
+                WorkManager workManager = WorkManager.getInstance(getApplicationContext());
+                PeriodicWorkRequest request =
+                        new PeriodicWorkRequest.Builder(VerifyProjectUpdateWorker.class,  15, TimeUnit.MINUTES, 5, TimeUnit.MINUTES)
+                                .addTag(VerifyProjectUpdateWorker.TAG)
+                                .setInitialDelay(0, TimeUnit.SECONDS)
+                                .build();
+                workManager.enqueueUniquePeriodicWork(VerifyProjectUpdateWorker.TAG, ExistingPeriodicWorkPolicy.REPLACE, request);
                 msgTitle = R.string.msg_synchronising;
             } else { // was saved as draft
                 msgTitle = R.string.msg_update_drafted;
