@@ -58,10 +58,8 @@ import android.widget.AdapterView.OnItemSelectedListener;
  * Displays a list of current employments ("connections"), approved and non-approved, and a form that lets user add more.
  * Organisation and country input fields use completion.
  */
-public class EmploymentApplicationActivity extends BackActivity implements OnItemSelectedListener,OnItemClickListener {
+public class EmploymentApplicationActivity extends BackActivity implements OnItemSelectedListener, OnItemClickListener {
 
-    private static final String TAG = "EmploymentApplicationActivity";
-    
     private ScrollView mScroll;
     private TextView mList;
     private AutoCompleteTextView mOrganisationEdit;

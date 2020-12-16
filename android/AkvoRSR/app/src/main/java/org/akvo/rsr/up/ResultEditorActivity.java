@@ -26,12 +26,12 @@ import java.util.Locale;
 
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.Period;
-import org.akvo.rsr.up.service.SubmitIpdService;
 import org.akvo.rsr.up.util.ConstantUtil;
 import org.akvo.rsr.up.util.DialogUtil;
 import org.akvo.rsr.up.util.Downloader;
 import org.akvo.rsr.up.util.FileUtil;
 import org.akvo.rsr.up.util.ThumbnailUtil;
+import org.akvo.rsr.up.worker.SubmitIpdWorker;
 import org.jetbrains.annotations.NotNull;
 
 import android.net.Uri;
@@ -42,6 +42,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.work.Data;
+import androidx.work.ExistingWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -61,7 +67,6 @@ public class ResultEditorActivity extends BackActivity {
     private EditText mDescriptionEdit;
     private CheckBox mRelativeDataCheckbox;
     private ProgressDialog mProgress = null;
-    private BroadcastReceiver rec;
     private View mPhotoTools;
     private View mFileTools;
 
@@ -141,17 +146,6 @@ public class ResultEditorActivity extends BackActivity {
             filePickerIntent.setType("*/*");
             startActivityForResult(filePickerIntent, FILE_PICK);
         });
-
-        // register a listener for the completion intent
-        IntentFilter f = new IntentFilter(ConstantUtil.RESULT_SENT_ACTION);
-        rec = new ResponseReceiver();
-        LocalBroadcastManager.getInstance(this).registerReceiver(rec, f);
-    }
-
-    @Override
-    protected void onDestroy() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(rec);
-        super.onDestroy();
     }
 
     /**
@@ -169,26 +163,48 @@ public class ResultEditorActivity extends BackActivity {
         mProgress.show();
 
         // start the upload service
-        Intent intent = new Intent(this, SubmitIpdService.class);
-        intent.putExtra(ConstantUtil.DATA_KEY, mDataEdit.getText().toString());
-        intent.putExtra(ConstantUtil.RELATIVE_DATA_KEY, mRelativeDataCheckbox.isChecked());
-        intent.putExtra(ConstantUtil.DESCRIPTION_KEY, mDescriptionEdit.getText().toString());
-        intent.putExtra(ConstantUtil.PERIOD_ID_KEY, mPeriodId);
-        intent.putExtra(ConstantUtil.CURRENT_ACTUAL_VALUE_KEY, mPeriodActualValue);
-        intent.putExtra(ConstantUtil.PHOTO_FN_KEY, mCaptureFilename);
+        WorkManager workManager = WorkManager.getInstance(getApplicationContext());
+        Data.Builder builder = new Data.Builder();
+        builder.putString(ConstantUtil.DATA_KEY, mDataEdit.getText().toString());
+        builder.putBoolean(ConstantUtil.RELATIVE_DATA_KEY, mRelativeDataCheckbox.isChecked());
+        builder.putString(ConstantUtil.DESCRIPTION_KEY, mDescriptionEdit.getText().toString());
+        builder.putString(ConstantUtil.PERIOD_ID_KEY, mPeriodId);
+        builder.putString(ConstantUtil.CURRENT_ACTUAL_VALUE_KEY, mPeriodActualValue);
+        builder.putString(ConstantUtil.PHOTO_FN_KEY, mCaptureFilename);
+        OneTimeWorkRequest oneTimeWorkRequest =
+                new OneTimeWorkRequest.Builder(SubmitIpdWorker.class)
+                        .addTag(SubmitIpdWorker.TAG)
+                        .setInputData(builder.build())
+                        .build();
+        workManager.enqueueUniqueWork(SubmitIpdWorker.TAG, ExistingWorkPolicy.REPLACE, oneTimeWorkRequest);
+        workManager.getWorkInfosByTagLiveData(SubmitIpdWorker.TAG).observe(this, listOfWorkInfos -> {
 
-        getApplicationContext().startService(intent);
+            // If there are no matching work info, do nothing
+            if (listOfWorkInfos == null || listOfWorkInfos.isEmpty()) {
+                return;
+            }
+
+            // We only care about the first output status.
+            WorkInfo workInfo = listOfWorkInfos.get(0);
+
+            boolean finished = workInfo.getState().isFinished();
+
+            if (finished) {
+                // Dismiss any in-progress dialog
+                String err = workInfo.getOutputData().getString(ConstantUtil.SERVICE_ERRMSG_KEY);
+                onSendFinished(err);
+            }
+        });
     }
 
     /**
      * completes the sign-in process after network activity is done
      */
-    private void onSendFinished(Intent intent) {
+    private void onSendFinished(String err) {
         if (mProgress != null) {
             mProgress.dismiss();
         }
 
-        String err = intent.getStringExtra(ConstantUtil.SERVICE_ERRMSG_KEY);
         if (err == null) {
             DialogUtil.infoAlert(this, R.string.msg_send_success, R.string.msg_period_data_submitted);
             finish();
@@ -258,21 +274,6 @@ public class ResultEditorActivity extends BackActivity {
         }
     }
 
-    /**
-     * Broadcast receiver for receiving status updates from the SubmitIpdService IntentService
-     */
-    private class ResponseReceiver extends BroadcastReceiver {
-        // Prevents instantiation
-        private ResponseReceiver() {
-        }
-
-        public void onReceive(Context context, Intent intent) {
-            if (ConstantUtil.RESULT_SENT_ACTION.equals(intent.getAction())) {
-                onSendFinished(intent);
-            }
-        }
-    }
-    
     @Override
     protected void onSaveInstanceState(@NotNull Bundle outState) {
         super.onSaveInstanceState(outState);
