@@ -24,10 +24,8 @@
     <string name="action_about">Om appen</string>
     <string name="action_add_update">Skapa uppdatering</string>
     <string name="action_delete_update">Ta bort uppdatering</string>
-    <string name="action_attach_photo">Bifoga foto</string>
-    <string name="action_logout">Logga ut</string>
-    <string name="action_sendall">Skicka allt oskickat</string>
-    <string name="copyright">Copyright &#169; 2012-2015,2020 Stichting Akvo</string>
+   <string name="action_logout">Logga ut</string>
+   <string name="copyright">Copyright &#169; 2012-2015,2020 Stichting Akvo</string>
     <string name="powered_by_akvo">Powered by Akvo</string>
     <string name="title_activity_login">Akvo RSR Up</string>
     <string name="title_activity_project_list">RSR Up</string>
@@ -47,8 +45,7 @@
     <string name="hint_update_description">Beskrivning</string>
     <string name="hint_update_caption">Fototext</string>
     <string name="hint_update_credit">Fotograf</string>
-    <string name="label_update_description">Uppdateringsbeskrivning:</string>
-    <string name="label_send_progress">Publicerar uppdatering</string>
+   <string name="label_send_progress">Publicerar uppdatering</string>
     <string name="label_project_location">Plats:</string>
     <string name="label_project_summary">Sammanfattning:</string>
     <string name="label_photo_credit">Foto: %s</string>
@@ -74,34 +71,27 @@
     <string name="label_setting_removeloc">Tag bort GPS-position i bilder</string> 
     <string name="summary_setting_feedback">Öppnar ett webbformulär där du kan berätta vad du tycker om denna app.</string>    
     <string name="summary_setting_debuginfo">Visa teknisk info som id-nummer etc.</string>    
-    <string name="summary_setting_removeloc">Positionsinformation i bildfiler skickas inte vid publicering.</string>    
-    <string name="label_setting_messages">Visa meddelanden</string>    
-    <string name="summary_setting_messages">Visa en lista av fel och andra meddelanden.</string>    
+    <string name="summary_setting_removeloc">Positionsinformation i bildfiler skickas inte vid publicering.</string>
 
-    <string name="state_draft">Utkast</string>
+   <string name="state_draft">Utkast</string>
     <string name="state_published">Publicerat</string>
     <string name="state_synchronising">Synkroniserar</string>
     <string name="count_draft">&#160;Utkast</string>
     <string name="count_published">&#160;Publicerade</string>
-    <string name="count_unsynch">&#160;Osynkroniserade</string>
-    <string name="count_zero">Inga uppdateringar</string>
-    <string name="updates_txt">STATUS PÅ UPPDATERINGAR</string>
+   <string name="updates_txt">STATUS PÅ UPPDATERINGAR</string>
     <string name="username">Användarnamn</string>
-    <string name="email_address">Epostadress</string>
-    <string name="password">Lösenord</string>
+   <string name="password">Lösenord</string>
     <string name="forgot_password_">Glömt löseordet?</string>
     <string name="btncaption_sign_in">LOGGA IN</string>
     <string name="btncaption_take_photo">Ta bild</string>
     <string name="btncaption_attach_photo">Bifoga bild</string>
-    <string name="btncaption_rephoto">Byt bild</string>
-    <string name="btncaption_dephoto">Ta bort bild</string>
+   <string name="btncaption_dephoto">Ta bort bild</string>
     <string name="btncaption_rotphoto">Rotera bild</string>
     <string name="btncaption_add_update">Addera uppdatering</string>
     <string name="btncaption_edit_update">Redigera</string>
     <string name="btncaption_refresh">Förnya projektlista</string> 
-    <string name="btncaption_viewupdates">Lista uppdateringar</string>   
-    <string name="btncaption_clear_data">Töm alla data</string>
-    <string name="btncaption_send_update">Skicka uppdatering</string>
+    <string name="btncaption_viewupdates">Lista uppdateringar</string>
+   <string name="btncaption_send_update">Skicka uppdatering</string>
     <string name="btncaption_save_draft">Spara utkast</string>
     <string name="btncaption_gps_position">GPS-position</string>
     <string name="btncaption_gps_cancel">Avbryt GPS-position</string>
@@ -133,10 +123,6 @@
     <string name="norot_dialog_title2">Bildfilen för stor för att roteras</string>
     <string name="norot_dialog_msg">Försök med en bild med lägr upplösning</string>
     			
-    <string name="warnbig_dialog_title">Bildfilen för stor</string>
-    <string name="warnbig_dialog_msg1">Ställ in kameran på lägre upplösning</string>
-    <string name="warnbig_dialog_msg2">Välj en minder bild</string>
-    			
     <string name="shrinkbig_dialog_title">Kunde inte krympa bilden</string>
     <string name="shrinkbig_dialog_msg">Originalet var för stort för att öppnas</string>
     
@@ -163,8 +149,7 @@
     <string name="msg_update_interrupted">Nätverksproblem under sändning av uppdatering</string>
     <string name="msg_update_duplicated">Uppdateringen duplicerad på servern. Meddela utvecklarna!</string>
     <string name="msg_update_success">Uppdatering skickad</string>
-    <string name="msg_network_problem">Nätverksproblem</string>
-    <string name="msg_synchronising">Uppdatering synkroniseras fortfarande...</string>
+   <string name="msg_synchronising">Uppdatering synkroniseras fortfarande...</string>
     <string name="msg_update_drafted">Uppdatering sparad som utkast</string>
     <string name="msg_success_drafted">Utkast sparat</string>
     <string name="msg_logged_in_as_template">Inloggad som %s</string>
@@ -197,18 +182,6 @@
     <string name="dummy_version">0.0</string>
     
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent pharetra ultricies ante, imperdiet viverra nisi rutrum a. Integer consequat laoreet malesuada. Nam fermentum risus id aliquet pellentesque. Sed nec nisl in turpis sodales ultricies. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Interdum et malesuada fames ac ante ipsum primis in faucibus.</string>
-    
-    
-    <string-array name="types">
-        <item>Type 1</item>
-        <item>Type 2</item>
-        <item>Type 3</item>
-    </string-array>
-    <string-array name="types_values">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-    </string-array>
 
 
 </resources>

@@ -24,9 +24,7 @@
   <string name="action_about">Sobre</string>
   <string name="action_add_update">Añadir actualización</string>
   <string name="action_delete_update">Borrar actualización</string>
-  <string name="action_attach_photo">Añadir foto</string>
   <string name="action_logout">Finalizar sesión</string>
-  <string name="action_sendall">Enviar lo no enviado</string>
   <string name="powered_by_akvo">Desarrollado por Akvo</string>
   <string name="title_activity_login">Akvo RSR Up</string>
   <string name="title_activity_project_list">RSR Up</string>
@@ -43,7 +41,6 @@
   <string name="label_update_title">Añadir una actualizaión</string>
   <string name="hint_update_title">Título</string>
   <string name="hint_search">Buscar</string>
-  <string name="label_update_description">Descripción de la actualicación</string>
   <string name="label_send_progress">Fecha de publicación</string>
   <string name="label_project_location">Ubicación</string>
   <string name="label_project_summary">Resumen</string>
@@ -75,31 +72,24 @@
   <string name="summary_setting_feedback">Que opina sobre esta aplicación? </string>
   <string name="summary_setting_debuginfo">Mostrar los ID\'s del proyecto y las actualizaciones y otra información de debug</string>
   <string name="summary_setting_removeloc">La información de geolocalización en las fotos será removida antes de subirlas al servidor</string>
-  <string name="label_setting_messages">Mostrar mensajes</string>
-  <string name="summary_setting_messages">Mostrar una lista de errores y otros mensajes</string>
   <string name="state_draft">Borrador</string>
   <string name="state_published">Publicado</string>
   <string name="state_synchronising">Sincronizando</string>
   <string name="count_draft">&#160;Borrador</string>
   <string name="count_published">&#160;Publicado</string>
-  <string name="count_zero">Sin actualizaciones</string>
-  <string name="count_unsynch">&#160;Sin categorizar</string>
   <string name="updates_txt">STATUS DE ACTUALIZACION</string>
   <string name="username">Nombre de usuario</string>
-  <string name="email_address">Correo electrónico</string>
   <string name="password">Contraseña</string>
   <string name="forgot_password_">Olvidó su contraseña?</string>
   <string name="btncaption_sign_in">Iniciar sesión</string>
   <string name="btncaption_take_photo">Tomar imagen</string>
   <string name="btncaption_attach_photo">Añadir imagen</string>
-  <string name="btncaption_rephoto">Reemplazar imagen</string>
   <string name="btncaption_dephoto">Borrar imagen</string>
   <string name="btncaption_rotphoto">Rotar imagen</string>
   <string name="btncaption_add_update">Añadir actualización</string>
   <string name="btncaption_edit_update">Editar esta actualización</string>
   <string name="btncaption_refresh">Refrescar lista de proyectos</string>
   <string name="btncaption_viewupdates">Visualizar todas las actualizaciones</string>
-  <string name="btncaption_clear_data">Borrar toda la información</string>
   <string name="btncaption_send_update">Enviar actualización</string>
   <string name="btncaption_save_draft">Guardar borrador</string>
   <string name="btncaption_gps_position">Determinar localización GPS</string>
@@ -123,9 +113,6 @@
   <string name="norot_dialog_title">Error IO al rotar la imagen</string>
   <string name="norot_dialog_title2">La imagen es muy grande para rotar</string>
   <string name="norot_dialog_msg">Por favor intente con una foto de menor resolución</string>
-  <string name="warnbig_dialog_title">Tamaño de imagen demasiado grande</string>
-  <string name="warnbig_dialog_msg1">Ajuste su cámara a la resolución más baja</string>
-  <string name="warnbig_dialog_msg2">Selecione una imagen con menor tamaño</string>
   <string name="shrinkbig_dialog_title">No se pudo reducir el tamaño de la imagen</string>
   <string name="shrinkbig_dialog_msg">La imagen original es demasiado grande para procesar</string>
   <string name="nonet_dialog_title">Sin red disponible</string>
@@ -148,7 +135,6 @@
   <string name="msg_update_success">La actualización ha sido enviada al servidor</string>
   <string name="msg_update_interrupted">La conexión a la red fue perdida durante la actualización</string>
   <string name="msg_update_duplicated">La actualización se encuentra duplicada en el servidor. Por favor avise a los desarrolladores!</string>
-  <string name="msg_network_problem">Problemas con la conexión a la red</string>
   <string name="msg_synchronising">La actualización esta sincronizándose</string>
   <string name="msg_update_drafted">La actualización fue guardada como borrador</string>
   <string name="msg_success_drafted">El borrador ha sido guardado</string>
@@ -173,6 +159,5 @@
   <string name="dummy_project_title">Título del projecto</string>
   <string name="dummy_update_title">Título de la actualización </string>
   <string name="dummy_update_description">Introduzca la descripción de la actualización. El largo de la descripción es ilimitado. Por favor note que el botón permanecerá al fondo de la pantalla.</string>
-  <string name="connection_pending">- pendiente</string>
 </resources>
  

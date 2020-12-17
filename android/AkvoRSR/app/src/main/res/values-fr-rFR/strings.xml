@@ -24,9 +24,7 @@
   <string name="action_about">A propos de</string>
   <string name="action_add_update">Ajouter une mise à jour</string>
   <string name="action_delete_update">Effacer une mise à jour</string>
-  <string name="action_attach_photo">Joindre une photo</string>
   <string name="action_logout">Déconnecter</string>
-  <string name="action_sendall">Envoyer tous les non-envoyés</string>
   <string name="copyright">Copyright © 2012-2016,2020 Stichting Akvo</string>
   <string name="powered_by_akvo">Développé par Akvo</string>
   <string name="title_activity_login">Akvo RSR Up</string>
@@ -44,7 +42,6 @@
   <string name="label_update_title">Ajouter une mise à jour de projet</string>
   <string name="hint_update_title">Titre</string>
   <string name="hint_search">Rechercher</string>
-  <string name="label_update_description">Description de la mise à jour:</string>
   <string name="label_send_progress">Publication de la mise à jour en cours </string>
   <string name="label_project_location">Lieu/ Localisation:</string>
   <string name="label_project_summary">Résumé:</string>
@@ -75,31 +72,24 @@
   <string name="summary_setting_feedback">Ouvrir un formulaire de réaction en ligne, pour partager votre opinion sur cette application.</string>
   <string name="summary_setting_debuginfo">Présenter ids de projets et mises à jour, et autre information de débogages.</string>
   <string name="summary_setting_removeloc">L\'information de géolocalisation dans les photos sera effacée avant de télécharger</string>
-  <string name="label_setting_messages">Montrer/ présenter les messages</string>
-  <string name="summary_setting_messages">Afficher une liste des erreurs et autres messages</string>
   <string name="state_draft">Version préliminaire</string>
   <string name="state_published">Publié</string>
   <string name="state_synchronising">Synchronisation</string>
   <string name="count_draft">Version préliminaire</string>
   <string name="count_published">publiées</string>
-  <string name="count_zero">Pas de mises à jours/ aucune mise à jour</string>
-  <string name="count_unsynch">Non-synchronisé</string>
   <string name="updates_txt">Statut des mises à jour</string>
   <string name="username">Nom d\'utilisateur</string>
-  <string name="email_address">Adresse e-mail</string>
   <string name="password">Mot de passe</string>
   <string name="forgot_password_">Avez-vous oublié votre mot de passe?</string>
   <string name="btncaption_sign_in">S\'ENREGISTRER</string>
   <string name="btncaption_take_photo">Prenez une photo</string>
   <string name="btncaption_attach_photo">Joindre une photo</string>
-  <string name="btncaption_rephoto">Remplacer une photo</string>
   <string name="btncaption_dephoto">Effacer une photo</string>
   <string name="btncaption_rotphoto">Tourner la photo</string>
   <string name="btncaption_add_update">Ajouter une mise à jour</string>
   <string name="btncaption_edit_update">Editer cette mise à jour</string>
   <string name="btncaption_refresh">Rafraichir la liste des projets</string>
   <string name="btncaption_viewupdates">Voir toutes les mises à jour</string>
-  <string name="btncaption_clear_data">Effacer toutes les données</string>
   <string name="btncaption_send_update">Envoyer une mise à jour</string>
   <string name="btncaption_save_draft">Sauvegarder la version préliminaire</string>
   <string name="btncaption_gps_position">Veuillez prendre votre géolocalisation</string>
@@ -123,9 +113,6 @@
   <string name="norot_dialog_title">Erreur IO en tournant le fichier de photo</string>
   <string name="norot_dialog_title2">La photo est trop large pour tourner</string>
   <string name="norot_dialog_msg">Essayer une photo de résolution plus basse</string>
-  <string name="warnbig_dialog_title">Fichier de photo est trop large</string>
-  <string name="warnbig_dialog_msg1">Régler votre caméra à une résolution plus basse</string>
-  <string name="warnbig_dialog_msg2">Choisir une photo plus petite</string>
   <string name="shrinkbig_dialog_title">La photo n\'a pu être rétréci</string>
   <string name="shrinkbig_dialog_msg">L\'original était trop large pour être traité</string>
   <string name="nonet_dialog_title">Pas de réseau disponible</string>
@@ -147,7 +134,6 @@
   <string name="msg_update_success">Mise à jour bien envoyée au serveur</string>
   <string name="msg_update_interrupted">Réseau de connexion absent durant l\'envoi de la mise à jour</string>
   <string name="msg_update_duplicated">La mise à jour a été dupliqué sur le serveur. Veuillez informer les développeurs. </string>
-  <string name="msg_network_problem">Problème de connexion au réseau</string>
   <string name="msg_synchronising">Synchronisation de mise à jour continue</string>
   <string name="msg_update_drafted">Mise à jour sauvegardée comme version préliminaire</string>
   <string name="msg_success_drafted">Version préliminaire bien sauvergardée</string>
@@ -177,15 +163,4 @@
   <string name="dummy_time">2014-04-23 17:18</string>
   <string name="dummy_version">0.0</string>
   <string name="lorem_ipsum">orem ipsum dolor sit amet, consectetur adipiscing elit. Praesent pharetra ultricies ante, imperdiet viverra nisi rutrum a. Integer consequat laoreet malesuada. Nam fermentum risus id aliquet pellentesque. Sed nec nisl in turpis sodales ultricies. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Interdum et malesuada fames ac ante ipsum primis in faucibus.</string>
-  <string name="connection_pending">- en attente</string>
-  <string-array name="types">
-    <item>Type 1</item>
-    <item>Type 2</item>
-    <item>Type 3</item>
-  </string-array>
-  <string-array name="types_values">
-    <item>1</item>
-    <item>2</item>
-    <item>3</item>
-  </string-array>
 </resources>

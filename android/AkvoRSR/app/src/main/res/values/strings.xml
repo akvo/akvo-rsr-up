@@ -25,9 +25,7 @@
     <string name="action_about">About</string>
     <string name="action_add_update">Add Update</string>
     <string name="action_delete_update">Delete Update</string>
-    <string name="action_attach_photo">Attach Photo</string>
     <string name="action_logout">Log out</string>
-    <string name="action_sendall">Send all unsent</string>
     <string name="app_name">Akvo RSR Up</string>
     <string name="app_subtitle">Really Simple Reporting</string>
     <string name="app_version">&#160;Version&#160;</string>
@@ -55,7 +53,6 @@
     <string name="label_update_title">Add a project update:</string>
     <string name="hint_update_title">Title</string>
     <string name="hint_search">Search</string>
-    <string name="label_update_description">Update Description:</string>
     <string name="label_send_progress">Publishing update</string>
     <string name="label_project_location">Location:</string>
     <string name="label_project_summary">Summary:</string>
@@ -103,8 +100,6 @@
     <string name="summary_setting_feedback">Open a web feedback form where you can tell us what you think of this app.</string>
     <string name="summary_setting_debuginfo">Show project and update ids and other debug info.</string>
     <string name="summary_setting_removeloc">Geolocation info in photo files will be removed before upload.</string>
-    <string name="label_setting_messages">Show messages</string>
-    <string name="summary_setting_messages">Display a list of errors and other messages.</string>
     <string name="state_draft">Draft</string>
     <string name="state_published">Published</string>
     <string name="state_synchronising">Synchronising</string>
@@ -112,11 +107,8 @@
     <string name="count_published">&#160;Published</string>
     <string name="count_results">&#160;Results</string>
     <string name="count_indicators">&#160;Indicators</string>
-    <string name="count_zero">No updates</string>
-    <string name="count_unsynch">&#160;Unsynchronised</string>
     <string name="updates_txt">UPDATES STATUS</string>
     <string name="username">Username</string>
-    <string name="email_address">Email Address</string>
     <string name="password">Password</string>
     <string name="forgot_password_">Forgot Password?</string>
     <string name="btncaption_ok">OK</string>
@@ -127,7 +119,6 @@
     <string name="btncaption_take_photo">Take photo</string>
     <string name="btncaption_attach_photo">Attach photo</string>
     <string name="btncaption_attach_file">Attach file</string>
-    <string name="btncaption_rephoto">Replace photo</string>
     <string name="btncaption_dephoto">Delete photo</string>
     <string name="btncaption_rotphoto">Rotate photo</string>
     <string name="btncaption_add_update">Add update</string>
@@ -137,7 +128,6 @@
     <string name="btncaption_refresh_oneproj">Refresh project</string>
     <string name="btncaption_view_results">View results</string>
     <string name="btncaption_viewupdates">View all updates</string>
-    <string name="btncaption_clear_data">Clear all data</string>
     <string name="btncaption_send_update">Send update</string>
     <string name="btncaption_save_draft">Save draft</string>
     <string name="btncaption_gps_position">Get GPS location</string>
@@ -161,9 +151,6 @@
     <string name="norot_dialog_title">IO Error rotating photo file</string>
     <string name="norot_dialog_title2">Photo file too big to rotate</string>
     <string name="norot_dialog_msg">Try a lower resolution photo</string>
-    <string name="warnbig_dialog_title">Photo file too big</string>
-    <string name="warnbig_dialog_msg1">Set your camera to a lower resolution</string>
-    <string name="warnbig_dialog_msg2">Pick a smaller photo</string>
     <string name="shrinkbig_dialog_title">Could not shrink photo</string>
     <string name="shrinkbig_dialog_msg">Original was too big to process</string>
     <string name="nonet_dialog_title">No network available</string>
@@ -187,7 +174,6 @@
     <string name="msg_update_success">Update successfully sent to server</string>
     <string name="msg_update_interrupted">Network connection was lost while sending update</string>
     <string name="msg_update_duplicated">Update somehow duplicated on server. Please tell the developers!</string>
-    <string name="msg_network_problem">Network connection problem</string>
     <string name="msg_synchronising">Update still synchronising...</string>
     <string name="msg_update_drafted">Update was saved as draft</string>
     <string name="msg_success_drafted">Draft saved successfully</string>
@@ -218,21 +204,7 @@
     <string name="dummy_date">2016-01-31</string>
     <string name="dummy_version">0.0</string>
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent pharetra ultricies ante, imperdiet viverra nisi rutrum a. Integer consequat laoreet malesuada. Nam fermentum risus id aliquet pellentesque. Sed nec nisl in turpis sodales ultricies. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Interdum et malesuada fames ac ante ipsum primis in faucibus.</string>
-    <string name="connection_pending">- pending</string>
 
-    <string-array name="types">
-        <item>Type 1</item>
-        <item>Type 2</item>
-        <item>Type 3</item>
-    </string-array>
-    <string-array name="types_values">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-    </string-array>
-
-    <string name="title_activity_back">BackActivity</string>
-    <string name="hello_world">Hello world!</string>
     <string name="channel_name">RSR Notifications</string>
     <string name="channel_description">RSR Notifications</string>
     <string name="sync_notification_title">Synchronization complete</string>
