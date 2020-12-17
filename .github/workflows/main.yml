@@ -4,7 +4,8 @@ name: Testing Workflow
 on:
   pull_request:
     branches:
-      - issue/211-targetsdk-upgrade-part6
+      - issue/*
+      - develop
 
 jobs:
   testing:
