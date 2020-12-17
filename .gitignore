@@ -29,6 +29,7 @@ Desktop.ini
 *.class
 
 ### Package Files #
+!android/AkvoRSR/gradle/wrapper/gradle-wrapper.jar
 *.jar
 *.war
 *.ear
