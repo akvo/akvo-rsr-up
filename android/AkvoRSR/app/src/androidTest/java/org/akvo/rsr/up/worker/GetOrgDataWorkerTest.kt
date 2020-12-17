@@ -21,9 +21,6 @@ class GetOrgDataWorkerTest {
     @Test
     fun testGetOrgDataFailure() {
         SettingsUtil.signOut(InstrumentationRegistry.getInstrumentation().targetContext)
-        //set a dummy host so the test fails
-        //TODO: create a custom host for tests
-        SettingsUtil.setHost(InstrumentationRegistry.getInstrumentation().targetContext, "test")
 
         val request = OneTimeWorkRequestBuilder<GetOrgDataWorker>().build()
 
