@@ -21,23 +21,31 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-
+    
+      - name: check current dir
+        run: pwd
+        working-directory: ./android/AkvoRSR
+        
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+        working-directory: ./android/AkvoRSR
+        
       # Step 2: Check the code with ktlint
       - name: Run Kotlin Linter
         run: ./gradlew ktlint
-        working-directory: /android/AkvoRSR
+        working-directory: ./android/AkvoRSR
 
       # Step 3: Check the code with Android linter
       - name: Run Android Linter
         run: ./gradlew lintStagingDebug
-        working-directory: /android/AkvoRSR
+        working-directory: ./android/AkvoRSR
 
       # Step 4: Assemble debug apk to send to firebase test lab
       - name: Assemble Debug APK
         run: ./gradlew assembleDebug
-        working-directory: /android/AkvoRSR
+        working-directory: ./android/AkvoRSR
 
       # Step 5: Assemble debug test apk to send to firebase test lab
       - name: Assemble Debug Test APK
         run: ./gradlew assembleDebugAndroidTest
-        working-directory: /android/AkvoRSR
+        working-directory: ./android/AkvoRSR
