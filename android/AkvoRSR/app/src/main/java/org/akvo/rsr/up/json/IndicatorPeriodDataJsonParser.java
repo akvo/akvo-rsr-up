@@ -18,9 +18,7 @@ package org.akvo.rsr.up.json;
 
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.domain.IndicatorPeriodData;
-import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /*
  * http://rsr.akvo.org/rest/v1/indicator_period_data/nnn/?format=json

@@ -18,7 +18,7 @@ package org.akvo.rsr.up.util;
 
 import java.io.File;
 import java.net.URL;
-import java.util.Hashtable;
+
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 

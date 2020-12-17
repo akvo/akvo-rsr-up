@@ -17,7 +17,6 @@
 package org.akvo.rsr.up.json;
 
 import org.akvo.rsr.up.dao.RsrDbAdapter;
-import org.akvo.rsr.up.domain.Country;
 import org.akvo.rsr.up.domain.Employment;
 import org.json.JSONException;
 import org.json.JSONObject;

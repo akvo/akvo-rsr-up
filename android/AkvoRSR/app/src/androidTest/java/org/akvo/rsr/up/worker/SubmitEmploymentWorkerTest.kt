@@ -4,7 +4,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
-import org.akvo.rsr.up.domain.User
 import org.akvo.rsr.up.util.ConstantUtil
 import org.akvo.rsr.up.util.SettingsUtil
 import org.hamcrest.CoreMatchers

@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.util.SettingsUtil;
-import org.akvo.rsr.up.viewadapter.ResultNode;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -28,7 +27,6 @@ import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;

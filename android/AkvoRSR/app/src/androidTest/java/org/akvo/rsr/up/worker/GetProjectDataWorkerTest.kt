@@ -6,7 +6,6 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import org.akvo.rsr.up.dao.RsrDbAdapter
 import org.akvo.rsr.up.domain.Country
-import org.akvo.rsr.up.domain.User
 import org.akvo.rsr.up.util.SettingsUtil
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.Assert.assertThat

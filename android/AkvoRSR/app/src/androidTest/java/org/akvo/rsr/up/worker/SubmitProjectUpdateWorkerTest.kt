@@ -7,7 +7,6 @@ import androidx.work.WorkInfo
 import androidx.work.workDataOf
 import org.akvo.rsr.up.BuildConfig
 import org.akvo.rsr.up.dao.RsrDbAdapter
-import org.akvo.rsr.up.domain.Update
 import org.akvo.rsr.up.util.ConstantUtil
 import org.akvo.rsr.up.util.SettingsUtil
 import org.hamcrest.CoreMatchers.`is`
@@ -15,8 +14,6 @@ import org.junit.Assert
 import org.junit.Assert.assertThat
 import org.junit.Rule
 import org.junit.Test
-import java.util.Date
-import java.util.UUID
 
 class SubmitProjectUpdateWorkerTest {
 

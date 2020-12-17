@@ -17,10 +17,8 @@
 package org.akvo.rsr.up.json;
 
 import org.akvo.rsr.up.dao.RsrDbAdapter;
-import org.akvo.rsr.up.domain.Indicator;
 import org.akvo.rsr.up.domain.Period;
 import org.akvo.rsr.up.domain.IndicatorPeriodData;
-import org.akvo.rsr.up.domain.Result;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -19,12 +19,9 @@ package org.akvo.rsr.up.viewadapter;
 import org.akvo.rsr.up.R;
 import org.akvo.rsr.up.dao.RsrDbAdapter;
 import org.akvo.rsr.up.util.SettingsUtil;
-import org.akvo.rsr.up.util.ThumbnailUtil;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.database.Cursor;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

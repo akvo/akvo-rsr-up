@@ -17,11 +17,9 @@
 package org.akvo.rsr.up.json;
 
 import org.akvo.rsr.up.dao.RsrDbAdapter;
-import org.akvo.rsr.up.domain.Organisation;
 import org.akvo.rsr.up.domain.User;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /*
  * http://rsr.akvo.org/auth/?format=json

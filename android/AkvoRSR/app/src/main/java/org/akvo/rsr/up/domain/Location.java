@@ -16,8 +16,6 @@
 
 package org.akvo.rsr.up.domain;
 
-import java.util.Date;
-
 /**
  * Holds information about a location
  */
