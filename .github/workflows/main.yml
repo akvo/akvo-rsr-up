@@ -41,3 +41,10 @@ jobs:
       - name: Assemble Debug Test APK
         run: ./gradlew assembleDebugAndroidTest
         working-directory: ./android/AkvoRSR
+      
+      - name: Run tests on Firebase Test Lab
+        uses: asadmansr/Firebase-Test-Lab-Action@v1.0
+        with:
+          arg-spec: '.github/test-lab-config.yml:android-pixel-4'
+        env:
+          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
