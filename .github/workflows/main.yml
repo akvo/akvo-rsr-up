@@ -1,0 +1,38 @@
+name: Testing Workflow
+
+# Step 1: Choose the branch or branches you want to run this workflow
+on:
+  pull_request:
+    branches:
+      - issue/211-targetsdk-upgrade-part6
+
+jobs:
+  testing:
+    name: Lint Check and Testing
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone Repo
+        uses: actions/checkout@v1
+
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      # Step 2: Check the code with ktlint
+      - name: Run Kotlin Linter
+        run: ./gradlew ktlint
+
+      # Step 3: Check the code with Android linter
+      - name: Run Android Linter
+        run: ./gradlew lintStagingDebug
+
+      # Step 4: Assemble debug apk to send to firebase test lab
+      - name: Assemble Debug APK
+        run: ./gradlew assembleDebug
+
+      # Step 5: Assemble debug test apk to send to firebase test lab
+      - name: Assemble Debug Test APK
+        run: ./gradlew assembleDebugAndroidTest
