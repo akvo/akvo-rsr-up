@@ -61,6 +61,7 @@ android {
             }
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -71,6 +72,7 @@ android {
     }
 
     lintOptions {
+        baseline file("lint-baseline.xml")
         abortOnError false
     }
 }
@@ -86,6 +88,7 @@ dependencies {
     implementation "androidx.core:core-ktx:1.3.2"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "androidx.work:work-runtime-ktx:2.4.0"
+    implementation 'androidx.exifinterface:exifinterface:1.3.2'
 
     testImplementation 'junit:junit:4.13.1'
 
@@ -97,15 +100,4 @@ dependencies {
     androidTestImplementation "androidx.work:work-testing:2.4.0"
     androidTestImplementation "androidx.test:rules:1.3.0"
     androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
-}
-
-private Properties readProperties(String fileName) {
-    Properties versionProps = new Properties()
-    def versionPropsFile = file(fileName)
-    if (versionPropsFile.canRead()) {
-        versionProps.load(new FileInputStream(versionPropsFile))
-    } else {
-        throw new GradleException("Could not read ${fileName}")
-    }
-    versionProps
 }
