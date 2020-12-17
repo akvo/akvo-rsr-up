@@ -24,26 +24,32 @@ class SignInWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params)
         val appContext = applicationContext
 
         return try {
-            val user = Uploader.authorize(URL(SettingsUtil.host(appContext) + ConstantUtil.AUTH_URL),
+            val user = Uploader.authorize(
+                URL(SettingsUtil.host(appContext) + ConstantUtil.AUTH_URL),
                 username,
-                password)
+                password
+            )
             if (user != null) {
-                //Yes!
+                // Yes!
                 SettingsUtil.signIn(appContext, user)
 
-                //use project list to set projects visible
+                // use project list to set projects visible
                 val dba = RsrDbAdapter(appContext)
                 dba.open()
                 dba.setVisibleProjects(user.publishedProjIds)
-                //detailed employment list is short and will be useful on early logins
+                // detailed employment list is short and will be useful on early logins
                 Downloader().fetchEmploymentListPaged(
                     appContext,
                     dba,
-                    URL(SettingsUtil.host(appContext) + String.format(ConstantUtil.FETCH_EMPLOYMENTS_URL_PATTERN,
-                        SettingsUtil.getAuthUser(appContext).id)),
+                    URL(
+                        SettingsUtil.host(appContext) + String.format(
+                            ConstantUtil.FETCH_EMPLOYMENTS_URL_PATTERN,
+                            SettingsUtil.getAuthUser(appContext).id
+                        )
+                    ),
                     null
                 )
-                //TODO maybe fetch countries and (minimal)organisations too (if never done before)
+                // TODO maybe fetch countries and (minimal)organisations too (if never done before)
                 dba.close()
                 Result.success()
             } else {

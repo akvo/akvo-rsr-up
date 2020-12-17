@@ -20,5 +20,5 @@ class ResultEditorActivityTest {
             .checkTitleIs(R.string.title_activity_result_editor)
     }
 
-    class ResultEditorRobot: ScreenRobot<ResultEditorRobot>()
+    class ResultEditorRobot : ScreenRobot<ResultEditorRobot>()
 }

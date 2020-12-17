@@ -49,21 +49,29 @@ class GetProjectDataWorker(ctx: Context, params: WorkerParameters) : Worker(ctx,
                     projectSet.add(projectId)
                 }
                 val projects = projectSet.size
-                //Iterate over projects instead of using a complex query URL, since it can take so long that the proxy times out
+                // Iterate over projects instead of using a complex query URL, since it can take so long that the proxy times out
                 projectSet.withIndex().forEach { (i, id) ->
-                    dl.fetchProject(appContext, ad, getProjectUpdateUrl(appContext, id)) //TODO: JSON
+                    dl.fetchProject(appContext, ad, getProjectUpdateUrl(appContext, id)) // TODO: JSON
                     if (FETCH_RESULTS) {
                         dl.fetchProjectResultsPaged(appContext, ad, getResultsUrl(host, id))
                     }
-                    setProgressAsync(workDataOf(ConstantUtil.PHASE_KEY to 0, ConstantUtil.SOFAR_KEY to i + 1,
-                        ConstantUtil.TOTAL_KEY to projects))
+                    setProgressAsync(
+                        workDataOf(
+                            ConstantUtil.PHASE_KEY to 0, ConstantUtil.SOFAR_KEY to i + 1,
+                            ConstantUtil.TOTAL_KEY to projects
+                        )
+                    )
                 }
                 // country list rarely changes, so only fetch countries if we never did that
                 if (FETCH_COUNTRIES && (fullSynch || ad.getCountryCount() == 0)) {
                     dl.fetchCountryListRestApiPaged(appContext, ad, getCountriesUrl(appContext))
                 }
-                setProgressAsync(workDataOf(ConstantUtil.PHASE_KEY to 0, ConstantUtil.SOFAR_KEY to 100,
-                    ConstantUtil.TOTAL_KEY to 100))
+                setProgressAsync(
+                    workDataOf(
+                        ConstantUtil.PHASE_KEY to 0, ConstantUtil.SOFAR_KEY to 100,
+                        ConstantUtil.TOTAL_KEY to 100
+                    )
+                )
 
                 if (FETCH_UPDATES) {
                     val df1 = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
@@ -72,12 +80,12 @@ class GetProjectDataWorker(ctx: Context, params: WorkerParameters) : Worker(ctx,
                     projectSet.withIndex().forEach { (k, projId) ->
                         val project = ad.findProject(projId)
                         if (project != null) {
-                            //since last fetch or forever?
+                            // since last fetch or forever?
                             val url = getProjectUpdateUrl(projId, df1, fullSynch, project, host)
                             val date = dl.fetchUpdateListRestApiPaged(appContext, url, fetchedIds)
-                            //fetch completed; remember fetch date of this project - other users of the app may have different project set
+                            // fetch completed; remember fetch date of this project - other users of the app may have different project set
                             ad.updateProjectLastFetch(projId, date)
-                            if (fullSynch) { //now delete those that went away
+                            if (fullSynch) { // now delete those that went away
                                 val removeIds = ad.getUpdatesForList(projId)
                                 removeIds.removeAll(fetchedIds)
                                 removeIds.forEach { id ->
@@ -86,11 +94,14 @@ class GetProjectDataWorker(ctx: Context, params: WorkerParameters) : Worker(ctx,
                                 }
                             }
                         }
-                        //show progress
-                        //TODO this is *very* uninformative for a user with one project and many updates!
-                        setProgressAsync(workDataOf(ConstantUtil.PHASE_KEY to 1, ConstantUtil.SOFAR_KEY to k + 1,
-                            ConstantUtil.TOTAL_KEY to projects))
-
+                        // show progress
+                        // TODO this is *very* uninformative for a user with one project and many updates!
+                        setProgressAsync(
+                            workDataOf(
+                                ConstantUtil.PHASE_KEY to 1, ConstantUtil.SOFAR_KEY to k + 1,
+                                ConstantUtil.TOTAL_KEY to projects
+                            )
+                        )
                     }
                 }
             } catch (e: FileNotFoundException) {
@@ -130,17 +141,25 @@ class GetProjectDataWorker(ctx: Context, params: WorkerParameters) : Worker(ctx,
                 }
                 Log.i(TAG, "Fetched $j orgs")
             }
-            setProgressAsync(workDataOf(ConstantUtil.PHASE_KEY to 1, ConstantUtil.SOFAR_KEY to 100,
-                ConstantUtil.TOTAL_KEY to 100))
+            setProgressAsync(
+                workDataOf(
+                    ConstantUtil.PHASE_KEY to 1, ConstantUtil.SOFAR_KEY to 100,
+                    ConstantUtil.TOTAL_KEY to 100
+                )
+            )
             if (fetchImages) {
                 try {
-                    dl.fetchMissingThumbnails(appContext,
+                    dl.fetchMissingThumbnails(
+                        appContext,
                         host,
                         FileUtil.getExternalCacheDir(appContext).toString()
                     ) { sofar, total ->
-                        setProgressAsync(workDataOf(ConstantUtil.PHASE_KEY to 2, ConstantUtil.SOFAR_KEY to sofar,
-                            ConstantUtil.TOTAL_KEY to total))
-
+                        setProgressAsync(
+                            workDataOf(
+                                ConstantUtil.PHASE_KEY to 2, ConstantUtil.SOFAR_KEY to sofar,
+                                ConstantUtil.TOTAL_KEY to total
+                            )
+                        )
                     }
                 } catch (e: MalformedURLException) {
                     Log.e(TAG, "Bad thumbnail URL:", e)
@@ -165,9 +184,13 @@ class GetProjectDataWorker(ctx: Context, params: WorkerParameters) : Worker(ctx,
         return workDataOf(ConstantUtil.SERVICE_ERRMSG_KEY to context.resources.getString(R.string.errmsg_signin_failed) + message)
     }
 
-    private fun getOrgsUrl(host: String, id: String?) = URL(host
-            + String.format(Locale.US,
-        ConstantUtil.FETCH_ORG_URL_PATTERN, id))
+    private fun getOrgsUrl(host: String, id: String?) = URL(
+        host +
+            String.format(
+                Locale.US,
+                ConstantUtil.FETCH_ORG_URL_PATTERN, id
+            )
+    )
 
     private fun getCountriesUrl(appContext: Context) =
         URL(SettingsUtil.host(appContext) + String.format(ConstantUtil.FETCH_COUNTRIES_URL))
@@ -187,9 +210,11 @@ class GetProjectDataWorker(ctx: Context, params: WorkerParameters) : Worker(ctx,
         project: Project,
         host: String,
     ): URL {
-        val u = String.format(ConstantUtil.FETCH_UPDATE_URL_PATTERN,
+        val u = String.format(
+            ConstantUtil.FETCH_UPDATE_URL_PATTERN,
             projId,
-            df1.format(if (fullSynch) 0 else project.lastFetch))
+            df1.format(if (fullSynch) 0 else project.lastFetch)
+        )
         return URL(host + u)
     }
 
@@ -202,6 +227,6 @@ class GetProjectDataWorker(ctx: Context, params: WorkerParameters) : Worker(ctx,
         private const val FETCH_COUNTRIES = true
         private const val FETCH_UPDATES = true
         private const val FETCH_ORGS = true
-        private const val FETCH_RESULTS = false //TODO: why is this false?
+        private const val FETCH_RESULTS = false // TODO: why is this false?
     }
 }

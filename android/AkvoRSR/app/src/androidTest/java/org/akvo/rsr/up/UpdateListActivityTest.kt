@@ -13,8 +13,10 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class UpdateListActivityTest {
 
-    private val intent = Intent(ApplicationProvider.getApplicationContext(),
-        UpdateListActivity::class.java)
+    private val intent = Intent(
+        ApplicationProvider.getApplicationContext(),
+        UpdateListActivity::class.java
+    )
         .putExtra(ConstantUtil.PROJECT_ID_KEY, "0")
 
     @get:Rule

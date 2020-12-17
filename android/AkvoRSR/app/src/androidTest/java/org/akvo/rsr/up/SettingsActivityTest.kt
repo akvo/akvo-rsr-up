@@ -15,7 +15,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-
 @RunWith(AndroidJUnit4::class)
 class SettingsActivityTest {
 
@@ -31,9 +30,14 @@ class SettingsActivityTest {
     class SettingsScreenRobot : ScreenRobot<SettingsScreenRobot>() {
 
         fun checkPreferenceDisplayedWithTitle(@StringRes title: Int): SettingsScreenRobot {
-            onData(allOf(`is`(
-                instanceOf(Preference::class.java)),
-                withTitle(title)))
+            onData(
+                allOf(
+                    `is`(
+                        instanceOf(Preference::class.java)
+                    ),
+                    withTitle(title)
+                )
+            )
                 .check(matches(isDisplayed()))
             return this
         }

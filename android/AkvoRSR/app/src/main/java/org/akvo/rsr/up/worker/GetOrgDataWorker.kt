@@ -15,7 +15,7 @@ import java.net.MalformedURLException
 import java.net.URL
 
 class GetOrgDataWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
-    
+
     override fun doWork(): Result {
         val appContext = applicationContext
 
@@ -23,7 +23,6 @@ class GetOrgDataWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, par
         val dl = Downloader()
         var errMsg: String? = null
         val fetchImages = !SettingsUtil.ReadBoolean(appContext, "setting_delay_image_fetch", false)
-
 
         val host = SettingsUtil.host(appContext)
         val start = System.currentTimeMillis()
@@ -50,7 +49,7 @@ class GetOrgDataWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, par
                             updateProgress(0, sofar, total)
                         }
                     }
-                    //TODO need a way to get this called by the paged fetch: broadcastProgress(0, j, dl.???);
+                    // TODO need a way to get this called by the paged fetch: broadcastProgress(0, j, dl.???);
                 } catch (e: Exception) { // probably network reasons
                     Log.e(TAG, "Bad organisation fetch:", e)
                     errMsg = appContext.resources.getString(R.string.errmsg_org_fetch_failed) + e.message
@@ -62,12 +61,16 @@ class GetOrgDataWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, par
                     dl.fetchEmploymentListPaged(
                         appContext,
                         ad,
-                        URL(host + String.format(ConstantUtil.FETCH_EMPLOYMENTS_URL_PATTERN,
-                            SettingsUtil.getAuthUser(appContext).id))
+                        URL(
+                            host + String.format(
+                                ConstantUtil.FETCH_EMPLOYMENTS_URL_PATTERN,
+                                SettingsUtil.getAuthUser(appContext).id
+                            )
+                        )
                     ) { sofar, total ->
                         updateProgress(0, sofar, total)
                     }
-                    //TODO need a way to get this called by the paged fetch: broadcastProgress(0, j, dl.???);
+                    // TODO need a way to get this called by the paged fetch: broadcastProgress(0, j, dl.???);
                 } catch (e: Exception) { // probably network reasons
                     Log.e(TAG, "Bad employment fetch:", e)
                     errMsg = appContext.resources.getString(R.string.errmsg_emp_fetch_failed) + e.message
@@ -76,19 +79,22 @@ class GetOrgDataWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, par
             updateProgress(0, 100, 100)
             try {
                 if (FETCH_COUNTRIES && ad.getCountryCount() == 0) { // rarely changes, so only fetch countries if we never did that
-                    dl.fetchCountryListRestApiPaged(appContext,
+                    dl.fetchCountryListRestApiPaged(
+                        appContext,
                         ad,
-                        URL(SettingsUtil.host(appContext) + String.format(ConstantUtil.FETCH_COUNTRIES_URL)))
+                        URL(SettingsUtil.host(appContext) + String.format(ConstantUtil.FETCH_COUNTRIES_URL))
+                    )
                 }
             } catch (e: Exception) { // probably network reasons
                 Log.e(TAG, "Bad organisation fetch:", e)
                 errMsg = appContext.resources.getString(R.string.errmsg_org_fetch_failed) + e.message
             }
             updateProgress(1, 100, 100)
-            //logos?
+            // logos?
             if (fetchImages) {
                 try {
-                    dl.fetchMissingThumbnails(appContext,
+                    dl.fetchMissingThumbnails(
+                        appContext,
                         host,
                         FileUtil.getExternalCacheDir(appContext).toString()
                     ) { sofar, total ->
@@ -115,8 +121,12 @@ class GetOrgDataWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, par
     }
 
     private fun updateProgress(phase: Int, sofar: Int, total: Int) {
-        setProgressAsync(workDataOf(ConstantUtil.PHASE_KEY to phase, ConstantUtil.SOFAR_KEY to sofar,
-            ConstantUtil.TOTAL_KEY to total))
+        setProgressAsync(
+            workDataOf(
+                ConstantUtil.PHASE_KEY to phase, ConstantUtil.SOFAR_KEY to sofar,
+                ConstantUtil.TOTAL_KEY to total
+            )
+        )
     }
 
     companion object {
@@ -124,6 +134,6 @@ class GetOrgDataWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, par
         private const val FETCH_EMPLOYMENTS = true
         private const val FETCH_ORGS = true
         private const val FETCH_COUNTRIES = true
-        private const val BRIEF = true //TODO put the brief/full flag in the intent
+        private const val BRIEF = true // TODO put the brief/full flag in the intent
     }
 }

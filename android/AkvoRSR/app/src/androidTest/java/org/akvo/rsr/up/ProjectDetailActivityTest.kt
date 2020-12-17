@@ -13,8 +13,10 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class ProjectDetailActivityTest {
 
-    private val intent = Intent(ApplicationProvider.getApplicationContext(),
-        ProjectDetailActivity::class.java)
+    private val intent = Intent(
+        ApplicationProvider.getApplicationContext(),
+        ProjectDetailActivity::class.java
+    )
         .putExtra(ConstantUtil.PROJECT_ID_KEY, "0")
 
     @get:Rule
@@ -27,5 +29,5 @@ class ProjectDetailActivityTest {
             .checkTitleIs(R.string.title_activity_project_detail)
     }
 
-    class ProjectDetailRobot: ScreenRobot<ProjectDetailRobot>()
+    class ProjectDetailRobot : ScreenRobot<ProjectDetailRobot>()
 }

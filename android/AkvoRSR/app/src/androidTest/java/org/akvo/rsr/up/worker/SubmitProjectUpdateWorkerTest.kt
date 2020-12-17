@@ -35,9 +35,11 @@ class SubmitProjectUpdateWorkerTest {
         dba.open()
         update.id = nextLocalId.toString()
         nextLocalId--
-        SettingsUtil.WriteInt(targetContext,
+        SettingsUtil.WriteInt(
+            targetContext,
             ConstantUtil.LOCAL_ID_KEY,
-            nextLocalId)
+            nextLocalId
+        )
         dba.saveUpdate(update, true)
 
         val inputData = workDataOf(ConstantUtil.UPDATE_ID_KEY to update.id)
@@ -53,14 +55,15 @@ class SubmitProjectUpdateWorkerTest {
 
         dba.clearAllData()
         dba.close()
-
     }
 
     private fun login() {
         SettingsUtil.signOut(InstrumentationRegistry.getInstrumentation().targetContext)
 
-        val inputData = workDataOf(ConstantUtil.USERNAME_KEY to BuildConfig.TEST_USER,
-            ConstantUtil.PASSWORD_KEY to BuildConfig.TEST_PASSWORD)
+        val inputData = workDataOf(
+            ConstantUtil.USERNAME_KEY to BuildConfig.TEST_USER,
+            ConstantUtil.PASSWORD_KEY to BuildConfig.TEST_PASSWORD
+        )
 
         val request = OneTimeWorkRequestBuilder<SignInWorker>()
             .setInputData(inputData)
@@ -75,7 +78,7 @@ class SubmitProjectUpdateWorkerTest {
 
     @Test
     fun testSubmitProjectWorkerFailure() {
-        //input data will be null
+        // input data will be null
         val request = OneTimeWorkRequestBuilder<SubmitProjectUpdateWorker>().build()
 
         wmRule.workManager.enqueue(request).result.get()

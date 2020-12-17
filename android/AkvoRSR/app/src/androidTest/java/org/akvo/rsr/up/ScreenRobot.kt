@@ -20,9 +20,13 @@ abstract class ScreenRobot<T : ScreenRobot<T>> {
 
     private var context: Context? = null
 
-    fun checkTitleIs(@StringRes stringRes: Int) : T {
-        onView(allOf(isAssignableFrom(AppCompatTextView::class.java),
-            withParent(isAssignableFrom(Toolbar::class.java))))
+    fun checkTitleIs(@StringRes stringRes: Int): T {
+        onView(
+            allOf(
+                isAssignableFrom(AppCompatTextView::class.java),
+                withParent(isAssignableFrom(Toolbar::class.java))
+            )
+        )
             .check(matches(withText((context!!.getString(stringRes)))))
         return this as T
     }
@@ -38,14 +42,29 @@ abstract class ScreenRobot<T : ScreenRobot<T>> {
     }
 
     fun checkViewWithTextIsDisplayed(@StringRes stringRes: Int): T {
-        onView(withText(context!!.getString(
-            stringRes))).check(matches(isDisplayed()))
+        onView(
+            withText(
+                context!!.getString(
+                    stringRes
+                )
+            )
+        ).check(matches(isDisplayed()))
         return this as T
     }
 
     fun checkViewDisplayedWithTextId(@IdRes viewId: Int, @StringRes stringRes: Int): T {
-        onView(withId(viewId)).check(matches(allOf(isDisplayed(), withText(context!!.getString(
-            stringRes)))))
+        onView(withId(viewId)).check(
+            matches(
+                allOf(
+                    isDisplayed(),
+                    withText(
+                        context!!.getString(
+                            stringRes
+                        )
+                    )
+                )
+            )
+        )
         return this as T
     }
 
@@ -84,7 +103,6 @@ abstract class ScreenRobot<T : ScreenRobot<T>> {
             } catch (ie: InstantiationException) {
                 throw RuntimeException("InstantiationException", ie)
             }
-
         }
     }
 }

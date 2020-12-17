@@ -66,7 +66,7 @@ class GetProjectDataWorkerTest {
         country.isoCode = "ES"
         val dba = RsrDbAdapter(targetContext)
         dba.open()
-        dba.saveCountry(country);
+        dba.saveCountry(country)
 
         val request = OneTimeWorkRequestBuilder<GetProjectDataWorker>().build()
 
@@ -79,5 +79,4 @@ class GetProjectDataWorkerTest {
         dba.close()
         SettingsUtil.signOut(InstrumentationRegistry.getInstrumentation().targetContext)
     }
-
 }

@@ -26,8 +26,10 @@ class SignInWorkerTest {
     fun testSignInWorkSuccess() {
         SettingsUtil.signOut(InstrumentationRegistry.getInstrumentation().targetContext)
 
-        val inputData = workDataOf(ConstantUtil.USERNAME_KEY to BuildConfig.TEST_USER,
-            ConstantUtil.PASSWORD_KEY to BuildConfig.TEST_PASSWORD)
+        val inputData = workDataOf(
+            ConstantUtil.USERNAME_KEY to BuildConfig.TEST_USER,
+            ConstantUtil.PASSWORD_KEY to BuildConfig.TEST_PASSWORD
+        )
 
         val request = OneTimeWorkRequestBuilder<SignInWorker>()
             .setInputData(inputData)
@@ -44,7 +46,7 @@ class SignInWorkerTest {
 
     @Test
     fun testSignInWorkFailure() {
-        //input data will be null
+        // input data will be null
         val request = OneTimeWorkRequestBuilder<SignInWorker>().build()
 
         wmRule.workManager.enqueue(request).result.get()

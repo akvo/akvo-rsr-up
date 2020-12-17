@@ -33,7 +33,9 @@ class SubmitEmploymentWorkerTest {
         val workInfo = wmRule.workManager.getWorkInfoById(request.id).get()
 
         assertThat(workInfo.state, CoreMatchers.`is`(WorkInfo.State.FAILED))
-        assertTrue(workInfo.outputData.getString(ConstantUtil.SERVICE_ERRMSG_KEY)!!
-            .contains("Server rejected employment request"))
+        assertTrue(
+            workInfo.outputData.getString(ConstantUtil.SERVICE_ERRMSG_KEY)!!
+                .contains("Server rejected employment request")
+        )
     }
 }

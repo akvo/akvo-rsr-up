@@ -28,5 +28,5 @@ class ProjectListActivityTest {
             .checkViewDisplayedWithTextId(R.id.unemployed_text, R.string.label_unemployed_proj_list)
     }
 
-    class ProjectListRobot: ScreenRobot<ProjectListRobot>()
+    class ProjectListRobot : ScreenRobot<ProjectListRobot>()
 }

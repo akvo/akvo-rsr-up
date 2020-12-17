@@ -20,5 +20,5 @@ class ResultListActivityTest {
             .checkTitleIs(R.string.title_activity_result_list)
     }
 
-    class ResultListRobot: ScreenRobot<ResultListRobot>()
+    class ResultListRobot : ScreenRobot<ResultListRobot>()
 }

@@ -18,8 +18,10 @@ class UpdateDetailActivityTest {
 
     @Test
     fun activityShouldDisplayErrorMessageForMissingUpdate() {
-        val intent = Intent(ApplicationProvider.getApplicationContext(),
-            UpdateDetailActivity::class.java).putExtra(ConstantUtil.PROJECT_ID_KEY, "0")
+        val intent = Intent(
+            ApplicationProvider.getApplicationContext(),
+            UpdateDetailActivity::class.java
+        ).putExtra(ConstantUtil.PROJECT_ID_KEY, "0")
             .putExtra(ConstantUtil.UPDATE_ID_KEY, "0")
         scenario = launchActivity(intent)
 
@@ -30,8 +32,10 @@ class UpdateDetailActivityTest {
 
     @Test
     fun activityShouldDisplayErrorMessageForNullUpdateAndProject() {
-        val intent = Intent(ApplicationProvider.getApplicationContext(),
-            UpdateDetailActivity::class.java)
+        val intent = Intent(
+            ApplicationProvider.getApplicationContext(),
+            UpdateDetailActivity::class.java
+        )
         scenario = launchActivity(intent)
 
         ScreenRobot.withRobot(UpdateDetailRobot::class.java)

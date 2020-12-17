@@ -27,8 +27,10 @@ class UpdateEditorActivityTest {
 
     @Test
     fun activityShouldDisplayErrorMessageForNullUpdateAndProject() {
-        val intent = Intent(ApplicationProvider.getApplicationContext(),
-            UpdateEditorActivity::class.java)
+        val intent = Intent(
+            ApplicationProvider.getApplicationContext(),
+            UpdateEditorActivity::class.java
+        )
         scenario = launchActivity(intent)
 
         ScreenRobot.withRobot(UpdateEditorRobot::class.java)
@@ -42,8 +44,10 @@ class UpdateEditorActivityTest {
         dba.open()
         dba.createProject("test")
 
-        val intent = Intent(ApplicationProvider.getApplicationContext(),
-            UpdateEditorActivity::class.java).putExtra(ConstantUtil.PROJECT_ID_KEY, "0")
+        val intent = Intent(
+            ApplicationProvider.getApplicationContext(),
+            UpdateEditorActivity::class.java
+        ).putExtra(ConstantUtil.PROJECT_ID_KEY, "0")
 
         scenario = launchActivity(intent)
 
@@ -61,13 +65,15 @@ class UpdateEditorActivityTest {
         dba.open()
         dba.createProject("test")
 
-        val intent = Intent(ApplicationProvider.getApplicationContext(),
-            UpdateEditorActivity::class.java).putExtra(ConstantUtil.PROJECT_ID_KEY, "0")
+        val intent = Intent(
+            ApplicationProvider.getApplicationContext(),
+            UpdateEditorActivity::class.java
+        ).putExtra(ConstantUtil.PROJECT_ID_KEY, "0")
 
         scenario = launchActivity(intent)
 
         val locMgr = InstrumentationRegistry.getInstrumentation().targetContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        if (locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER))  {
+        if (locMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             ScreenRobot.withRobot(UpdateEditorRobot::class.java)
                 .provideContext(InstrumentationRegistry.getInstrumentation().targetContext)
                 .clickOnViewWithId(R.id.btn_gps_position)
@@ -90,7 +96,7 @@ class UpdateEditorActivityTest {
                 .checkViewWithTextIsDisplayed(R.string.noproj_dialog_msg)
         }
 
-        fun checkErrorEnableLocation() : UpdateEditorRobot {
+        fun checkErrorEnableLocation(): UpdateEditorRobot {
             return checkViewWithTextIsDisplayed(R.string.gpsdisabled_dialog_msg)
         }
     }

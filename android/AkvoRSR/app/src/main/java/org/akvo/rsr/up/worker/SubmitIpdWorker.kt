@@ -36,12 +36,18 @@ class SubmitIpdWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, para
                 photoFn,
                 fileFn,
                 SettingsUtil.getAuthUser(appContext),
-                null)
+                null
+            )
             Result.success()
         } catch (e: Exception) {
             Log.e(TAG, "SubmitIpdService() error:", e)
-            Result.failure(workDataOf(ConstantUtil.SERVICE_ERRMSG_KEY to appContext.resources.getString(
-                R.string.errmsg_resultpost_failed) + e.message))
+            Result.failure(
+                workDataOf(
+                    ConstantUtil.SERVICE_ERRMSG_KEY to appContext.resources.getString(
+                        R.string.errmsg_resultpost_failed
+                    ) + e.message
+                )
+            )
         }
     }
 

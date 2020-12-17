@@ -16,14 +16,16 @@ class VerifyProjectUpdateWorker(ctx: Context, params: WorkerParameters) : Worker
     override fun doWork(): Result {
         return try {
             val context: Context = applicationContext
-            val unresolvedUpdates = Uploader.verifyUpdates(context,
-                SettingsUtil.host(context) + ConstantUtil.VERIFY_UPDATE_PATTERN)
-            if (unresolvedUpdates == 0) { //mission accomplished
+            val unresolvedUpdates = Uploader.verifyUpdates(
+                context,
+                SettingsUtil.host(context) + ConstantUtil.VERIFY_UPDATE_PATTERN
+            )
+            if (unresolvedUpdates == 0) { // mission accomplished
                 Log.i(TAG, "Every update verified")
                 val helper = NotificationHelper()
                 helper.createNotificationChannel(context)
                 helper.displayNotification(context)
-                //stop the service
+                // stop the service
                 val workManager = WorkManager.getInstance(context)
                 workManager.cancelAllWorkByTag(TAG)
                 Result.success()

@@ -20,6 +20,5 @@ class EmploymentApplicationActivityTest {
             .checkTitleIs(R.string.title_activity_employment_application)
     }
 
-    class EmploymentApplicationRobot: ScreenRobot<EmploymentApplicationRobot>()
-
+    class EmploymentApplicationRobot : ScreenRobot<EmploymentApplicationRobot>()
 }

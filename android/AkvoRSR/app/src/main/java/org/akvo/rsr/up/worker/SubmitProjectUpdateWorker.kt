@@ -22,23 +22,32 @@ class SubmitProjectUpdateWorker(ctx: Context, params: WorkerParameters) : Worker
         val user = SettingsUtil.getAuthUser(appContext)
         if (projectId != null) {
             try {
-                Uploader.sendUpdate(appContext,
+                Uploader.sendUpdate(
+                    appContext,
                     projectId,
-                    SettingsUtil.host(appContext) + ConstantUtil.POST_UPDATE_URL,  //+ ConstantUtil.API_KEY_PATTERN,
+                    SettingsUtil.host(appContext) + ConstantUtil.POST_UPDATE_URL, // + ConstantUtil.API_KEY_PATTERN,
                     SettingsUtil.host(appContext) + ConstantUtil.VERIFY_UPDATE_PATTERN,
                     sendImg,
                     user
                 ) { sofar, total ->
-                    setProgressAsync(workDataOf(ConstantUtil.SOFAR_KEY to sofar,
-                        ConstantUtil.TOTAL_KEY to total))
+                    setProgressAsync(
+                        workDataOf(
+                            ConstantUtil.SOFAR_KEY to sofar,
+                            ConstantUtil.TOTAL_KEY to total
+                        )
+                    )
                 }
                 return Result.success()
             } catch (e: FailedPostException) {
                 return Result.failure(workDataOf(ConstantUtil.SERVICE_ERRMSG_KEY to e.message))
             } catch (e: UnresolvedPostException) {
-                return Result.failure(workDataOf(ConstantUtil.SERVICE_ERRMSG_KEY to e.message,
-                    ConstantUtil.SERVICE_UNRESOLVED_KEY to true))
-            } catch (e: Exception) { //TODO: show to user
+                return Result.failure(
+                    workDataOf(
+                        ConstantUtil.SERVICE_ERRMSG_KEY to e.message,
+                        ConstantUtil.SERVICE_UNRESOLVED_KEY to true
+                    )
+                )
+            } catch (e: Exception) { // TODO: show to user
                 Log.e(TAG, "Config problem", e)
             }
         }

@@ -17,4 +17,5 @@ allprojects {
         google()
         jcenter()
     }
+    apply from: "$rootDir/ktlint.gradle"
 }

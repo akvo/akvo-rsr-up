@@ -27,7 +27,6 @@ fun createExistingTestUser(): User {
     return user
 }
 
-
 fun createFakeTestUser(): User {
     val user = User()
     user.username = "test"

@@ -24,7 +24,8 @@ internal class NotificationHelper {
             val channel = NotificationChannel(CHANNEL_ID, name, importance)
             channel.description = description
             val notificationManager = context.getSystemService(
-                NotificationManager::class.java)
+                NotificationManager::class.java
+            )
             notificationManager.createNotificationChannel(channel)
         }
     }

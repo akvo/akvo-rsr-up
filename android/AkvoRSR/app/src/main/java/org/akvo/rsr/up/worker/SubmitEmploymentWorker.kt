@@ -31,8 +31,13 @@ class SubmitEmploymentWorker(ctx: Context, params: WorkerParameters) : Worker(ct
             Result.success()
         } catch (e: Exception) {
             Log.e(TAG, "SubmitEmploymentService() error:", e)
-            Result.failure(workDataOf(ConstantUtil.SERVICE_ERRMSG_KEY to appContext.resources.getString(
-                R.string.errmsg_emp_application_failed) + e.message))
+            Result.failure(
+                workDataOf(
+                    ConstantUtil.SERVICE_ERRMSG_KEY to appContext.resources.getString(
+                        R.string.errmsg_emp_application_failed
+                    ) + e.message
+                )
+            )
         }
     }
 
