@@ -10,7 +10,7 @@ on:
 jobs:
   testing:
     name: Lint Check and Testing
-
+    
     runs-on: ubuntu-latest
 
     steps:
@@ -25,15 +25,19 @@ jobs:
       # Step 2: Check the code with ktlint
       - name: Run Kotlin Linter
         run: ./gradlew ktlint
+        working-directory: /android/AkvoRSR
 
       # Step 3: Check the code with Android linter
       - name: Run Android Linter
         run: ./gradlew lintStagingDebug
+        working-directory: /android/AkvoRSR
 
       # Step 4: Assemble debug apk to send to firebase test lab
       - name: Assemble Debug APK
         run: ./gradlew assembleDebug
+        working-directory: /android/AkvoRSR
 
       # Step 5: Assemble debug test apk to send to firebase test lab
       - name: Assemble Debug Test APK
         run: ./gradlew assembleDebugAndroidTest
+        working-directory: /android/AkvoRSR
