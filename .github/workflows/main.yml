@@ -26,9 +26,10 @@ jobs:
         env:
           TEST_LOGIN_CONFIG: ${{ secrets.TEST_LOGIN_CONFIG }}
           TEST_PASSWORD_CONFIG: ${{ secrets.TEST_PASSWORD_CONFIG }}
-        run: 
-          echo $TEST_LOGIN_CONFIG >> android/AkvoRSR/local.properties
-          echo $TEST_PASSWORD_CONFIG >> android/AkvoRSR/local.properties
+        - run: touch local.properties
+        - run: echo -e "\n$TEST_LOGIN_CONFIG" >> android/AkvoRSR/local.properties
+        - run: echo -e "\n$TEST_PASSWORD_CONFIG" >> android/AkvoRSR/local.properties
+        - run: cat local.properties
        
       # Step 2: Check the code with ktlint
       - name: Run Kotlin Linter
