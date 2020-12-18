@@ -21,7 +21,12 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-        
+          
+      - name: Config login details
+        env:
+          TEST_LOGIN_CONFIG: ${{ secrets.TEST_LOGIN_CONFIG }}
+        run: echo $TEST_LOGIN_CONFIG >> android/AkvoRSR/local.properties
+       
       # Step 2: Check the code with ktlint
       - name: Run Kotlin Linter
         run: ./gradlew ktlint
