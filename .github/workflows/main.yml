@@ -26,7 +26,7 @@ jobs:
         env:
           TEST_LOGIN_CONFIG: ${{ secrets.TEST_LOGIN_CONFIG }}
           TEST_PASSWORD_CONFIG: ${{ secrets.TEST_PASSWORD_CONFIG }}
-        run:
+        run: |
           touch local.properties
           echo -e "\n$TEST_LOGIN_CONFIG" >> android/AkvoRSR/local.properties
           echo -e "\n$TEST_PASSWORD_CONFIG" >> android/AkvoRSR/local.properties
