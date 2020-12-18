@@ -75,6 +75,7 @@ abstract class ScreenRobot<T : ScreenRobot<T>> {
 
     fun clickOnViewWithId(@IdRes viewId: Int): T {
         onView(withId(viewId)).perform(click())
+        addExecutionDelay(300)
         return this as T
     }
 

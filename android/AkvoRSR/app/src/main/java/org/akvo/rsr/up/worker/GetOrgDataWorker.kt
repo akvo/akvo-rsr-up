@@ -134,6 +134,6 @@ class GetOrgDataWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, par
         private const val FETCH_EMPLOYMENTS = true
         private const val FETCH_ORGS = true
         private const val FETCH_COUNTRIES = true
-        private const val BRIEF = true // TODO put the brief/full flag in the intent
+        private const val BRIEF = false // TODO put the brief/full flag in the intent
     }
 }
