@@ -10,7 +10,7 @@ on:
 jobs:
   testing:
     name: Lint Check and Testing
-
+    
     runs-on: ubuntu-latest
 
     steps:
@@ -21,19 +21,30 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.8
-
+        
       # Step 2: Check the code with ktlint
       - name: Run Kotlin Linter
         run: ./gradlew ktlint
+        working-directory: ./android/AkvoRSR
 
       # Step 3: Check the code with Android linter
       - name: Run Android Linter
-        run: ./gradlew lintStagingDebug
+        run: ./gradlew lintDebug
+        working-directory: ./android/AkvoRSR
 
       # Step 4: Assemble debug apk to send to firebase test lab
       - name: Assemble Debug APK
         run: ./gradlew assembleDebug
+        working-directory: ./android/AkvoRSR
 
       # Step 5: Assemble debug test apk to send to firebase test lab
       - name: Assemble Debug Test APK
         run: ./gradlew assembleDebugAndroidTest
+        working-directory: ./android/AkvoRSR
+      
+      - name: Run tests on Firebase Test Lab
+        uses: asadmansr/Firebase-Test-Lab-Action@v1.0
+        with:
+          arg-spec: '.github/test-lab-config.yml:android-pixel-4'
+        env:
+          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
