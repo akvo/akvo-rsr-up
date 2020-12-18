@@ -24,8 +24,8 @@ jobs:
           
       - name: Config login details
         env:
-          FIREBASE_CONFIG: ${{ secrets.TEST_LOGIN_KEYS }}
-        run: echo $TEST_LOGIN_KEYS >> android/AkvoRSR/local.properties
+          TEST_LOGIN_CONFIG: ${{ secrets.TEST_LOGIN_CONFIG }}
+        run: echo $TEST_LOGIN_CONFIG >> android/AkvoRSR/local.properties
        
       # Step 2: Check the code with ktlint
       - name: Run Kotlin Linter
