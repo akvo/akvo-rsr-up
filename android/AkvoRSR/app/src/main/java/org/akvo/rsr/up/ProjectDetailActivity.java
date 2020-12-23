@@ -31,6 +31,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
 import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
@@ -45,6 +46,8 @@ import org.akvo.rsr.up.util.SettingsUtil;
 import org.akvo.rsr.up.util.ThumbnailUtil;
 import org.akvo.rsr.up.worker.GetProjectDataWorker;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class ProjectDetailActivity extends AppCompatActivity {
 
@@ -244,7 +247,9 @@ public class ProjectDetailActivity extends AppCompatActivity {
 						.build();
 		workManager.enqueueUniqueWork(GetProjectDataWorker.TAG, ExistingWorkPolicy.REPLACE, oneTimeWorkRequest);
 
-		workManager.getWorkInfosForUniqueWorkLiveData(GetProjectDataWorker.TAG).observe(this, listOfWorkInfos -> {
+		LiveData<List<WorkInfo>> uniqueWorkLiveData = workManager.getWorkInfosForUniqueWorkLiveData(GetProjectDataWorker.TAG);
+		uniqueWorkLiveData.removeObservers(this);
+		uniqueWorkLiveData.observe(this, listOfWorkInfos -> {
 			// If there are no matching work info, do nothing
 			if (listOfWorkInfos == null || listOfWorkInfos.isEmpty()) {
 				return;
@@ -260,7 +265,7 @@ public class ProjectDetailActivity extends AppCompatActivity {
 			}
 		});
 
-		workManager.getWorkInfosByTagLiveData(GetProjectDataWorker.TAG).observe(this, listOfWorkInfos -> {
+		uniqueWorkLiveData.observe(this, listOfWorkInfos -> {
 			// If there are no matching work info, do nothing
 			if (listOfWorkInfos == null || listOfWorkInfos.isEmpty()) {
 				return;

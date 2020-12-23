@@ -42,11 +42,14 @@ import android.content.Intent;
 import android.database.Cursor;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
 import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
+
+import java.util.List;
 
 public class ProjectListActivity extends AppCompatActivity {
 
@@ -131,7 +134,9 @@ public class ProjectListActivity extends AppCompatActivity {
 
 	private void setUpWorkManagerListeners() {
 		WorkManager workManager = WorkManager.getInstance(getApplicationContext());
-		workManager.getWorkInfosForUniqueWorkLiveData(GetProjectDataWorker.TAG).observe(this, listOfWorkInfos -> {
+		workManager.getWorkInfosForUniqueWorkLiveData(GetProjectDataWorker.TAG).removeObservers(this);
+		LiveData<List<WorkInfo>> uniqueWorkLiveData = workManager.getWorkInfosForUniqueWorkLiveData(GetProjectDataWorker.TAG);
+		uniqueWorkLiveData.observe(this, listOfWorkInfos -> {
 			// If there are no matching work info, do nothing
 			if (listOfWorkInfos == null || listOfWorkInfos.isEmpty()) {
 				return;
@@ -153,7 +158,7 @@ public class ProjectListActivity extends AppCompatActivity {
 			}
 		});
 
-		workManager.getWorkInfosByTagLiveData(GetProjectDataWorker.TAG).observe(this, listOfWorkInfos -> {
+		uniqueWorkLiveData.observe(this, listOfWorkInfos -> {
 			// If there are no matching work info, do nothing
 			if (listOfWorkInfos == null || listOfWorkInfos.isEmpty()) {
 				return;
