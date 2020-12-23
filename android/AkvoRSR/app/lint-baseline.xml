@@ -1,0 +1,4055 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="5" by="lint 4.1.0" client="gradle" variant="debug" version="4.1.0">
+
+    <issue
+        id="ObsoleteLintCustomCheck"
+        message="Lint found an issue registry (`androidx.appcompat.AppCompatIssueRegistry`) which is older than the current API level; these checks may not work correctly.&#xA;&#xA;Recompile the checks against the latest version. Custom check API version is 7 (4.0), current lint API level is 8 (4.1+)">
+        <location
+            file="../../../../../.gradle/caches/transforms-2/files-2.1/a527ad4f532df6b258c428a911debd89/appcompat-1.2.0/jars/lint.jar"/>
+    </issue>
+
+    <issue
+        id="MissingPermission"
+        message="Call requires permission which may be rejected by user: code should explicitly check to see if permission is available (with `checkPermission`) or explicitly handle a potential `SecurityException`"
+        errorLine1="                locMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/UpdateEditorActivity.java"
+            line="808"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="ApplySharedPref"
+        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
+        errorLine1="        editor.commit();"
+        errorLine2="        ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/util/SettingsUtil.java"
+            line="38"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ApplySharedPref"
+        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
+        errorLine1="        editor.commit();"
+        errorLine2="        ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/util/SettingsUtil.java"
+            line="51"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ApplySharedPref"
+        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
+        errorLine1="        editor.commit();"
+        errorLine2="        ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/util/SettingsUtil.java"
+            line="68"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ApplySharedPref"
+        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
+        errorLine1="        editor.commit();"
+        errorLine2="        ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/util/SettingsUtil.java"
+            line="75"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ExifInterface"
+        message="Avoid using `android.media.ExifInterface`; use `android.support.media.ExifInterface` from the support library instead"
+        errorLine1="import android.media.ExifInterface;"
+        errorLine2="       ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/util/FileUtil.java"
+            line="35"
+            column="8"/>
+    </issue>
+
+    <issue
+        id="OldTargetApi"
+        message="Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the android.os.Build.VERSION_CODES javadoc for details."
+        errorLine1="        targetSdkVersion 28"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="build.gradle"
+            line="8"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="InflateParams"
+        message="Avoid passing `null` as the view root (needed to resolve layout parameters on the inflated layout&apos;s root element)"
+        errorLine1="  View view = inflater.inflate(R.layout.org_list_item, null);"
+        errorLine2="                                                       ~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/viewadapter/OrgListCursorAdapter.java"
+            line="90"
+            column="56"/>
+    </issue>
+
+    <issue
+        id="InflateParams"
+        message="Avoid passing `null` as the view root (needed to resolve layout parameters on the inflated layout&apos;s root element)"
+        errorLine1="  View view = inflater.inflate(R.layout.project_list_item, null);"
+        errorLine2="                                                           ~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/viewadapter/ProjectListCursorAdapter.java"
+            line="110"
+            column="60"/>
+    </issue>
+
+    <issue
+        id="InflateParams"
+        message="Avoid passing `null` as the view root (needed to resolve layout parameters on the inflated layout&apos;s root element)"
+        errorLine1="         v = inflater.inflate(R.layout.result_list_item, null);"
+        errorLine2="                                                         ~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/viewadapter/ResultListArrayAdapter.java"
+            line="69"
+            column="58"/>
+    </issue>
+
+    <issue
+        id="InflateParams"
+        message="Avoid passing `null` as the view root (needed to resolve layout parameters on the inflated layout&apos;s root element)"
+        errorLine1="  View listFooter = getLayoutInflater().inflate(R.layout.update_list_footer, null, false);"
+        errorLine2="                                                                             ~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/UpdateListActivity.java"
+            line="86"
+            column="78"/>
+    </issue>
+
+    <issue
+        id="InflateParams"
+        message="Avoid passing `null` as the view root (needed to resolve layout parameters on the inflated layout&apos;s root element)"
+        errorLine1="  View view = inflater.inflate(R.layout.update_list_item, null);"
+        errorLine2="                                                          ~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/viewadapter/UpdateListCursorAdapter.java"
+            line="143"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="LongLogTag"
+        message="The logging tag can be at most 23 characters, was 26 (SubmitProjectUpdateService)"
+        errorLine1="   Log.e(TAG, &quot;Config problem&quot;, e);"
+        errorLine2="         ~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/service/SubmitProjectUpdateService.java"
+            line="70"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="        case R.id.menu_refresh:"
+        errorLine2="             ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/EmploymentApplicationActivity.java"
+            line="167"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="        case R.id.menu_settings:"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/EmploymentApplicationActivity.java"
+            line="170"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="        case R.id.action_settings:"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/LoginActivity.java"
+            line="154"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="        case R.id.action_about:"
+        errorLine2="             ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/LoginActivity.java"
+            line="157"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="        case R.id.action_clear_messages:"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/MessageActivity.java"
+            line="121"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="        case R.id.action_mail_messages:"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/MessageActivity.java"
+            line="124"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="        case R.id.menu_refresh:"
+        errorLine2="             ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/OrgListActivity.java"
+            line="164"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="        case R.id.menu_settings:"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/OrgListActivity.java"
+            line="167"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="        case R.id.menu_messages:"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/OrgListActivity.java"
+            line="171"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="         case R.id.action_settings:"
+        errorLine2="              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectDetailActivity.java"
+            line="252"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="     case R.id.menu_refresh:"
+        errorLine2="          ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectListActivity.java"
+            line="170"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="        case R.id.menu_settings:"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectListActivity.java"
+            line="173"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="        case R.id.menu_messages:"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectListActivity.java"
+            line="176"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="        case R.id.menu_connect:"
+        errorLine2="             ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectListActivity.java"
+            line="179"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="        case R.id.menu_organisations:"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectListActivity.java"
+            line="182"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="        case R.id.menu_diagnostics:"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectListActivity.java"
+            line="185"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="        case R.id.menu_logout:"
+        errorLine2="             ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectListActivity.java"
+            line="188"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="         case R.id.action_settings:"
+        errorLine2="              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ResultListActivity.java"
+            line="123"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="        case R.id.action_diagnostics:"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/SettingsActivity.java"
+            line="161"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="            case R.id.action_delete_update:"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/UpdateDetailActivity.java"
+            line="221"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="            case R.id.action_settings:"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/UpdateDetailActivity.java"
+            line="230"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="            case R.id.action_delete_update:"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/UpdateEditorActivity.java"
+            line="731"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="            case R.id.action_settings:"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/UpdateEditorActivity.java"
+            line="739"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="         case R.id.action_settings:"
+        errorLine2="              ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/UpdateListActivity.java"
+            line="125"
+            column="15"/>
+    </issue>
+
+    <issue
+        id="NonConstantResourceId"
+        message="Resource IDs will be non-final in Android Gradle Plugin version 5.0, avoid using them in switch case statements"
+        errorLine1="            case R.id.action_add_update:"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/UpdateListActivity.java"
+            line="129"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;action_messages&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;action_messages&quot;>Messages&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="22"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;action_organisations&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;action_organisations&quot;>Organisations&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="23"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;action_connect&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;action_connect&quot;>Connect&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="24"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;copyright&quot; is not translated in &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;copyright&quot;>Copyright &amp;#169; 2012-2016,2020 Stichting Akvo&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="37"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;title_activity_result_editor&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;title_activity_result_editor&quot;>RSR Up&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="44"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;title_activity_result_list&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;title_activity_result_list&quot;>RSR Up&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="45"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;title_activity_period_detail&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;title_activity_period_detail&quot;>RSR Up&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="46"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;title_activity_employment_application&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;title_activity_employment_application&quot;>RSR Up&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="47"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;hint_optional&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;hint_optional&quot;>(Optional)&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="65"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;label_org_list&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;label_org_list&quot;>Organisations:&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="71"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;label_result_list&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;label_result_list&quot;>Results, Indicators:&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="73"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;label_progress_orgs&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;label_progress_orgs&quot;>Organisations&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="78"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;label_progress_countries&quot; is not translated in &quot;sv&quot; (Swedish) or &quot;fr&quot; (French)"
+        errorLine1="    &lt;string name=&quot;label_progress_countries&quot;>Countries&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="79"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;label_setting_fullsynch&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;label_setting_fullsynch&quot;>Full refresh&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="84"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;label_connect_title&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;label_connect_title&quot;>Connect with:&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="91"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;label_connections_title&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;label_connections_title&quot;>Your connections:&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="92"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;label_connect_instructions&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;label_connect_instructions&quot;>Type all or part of the name. If you cannot find your organisation in the list, use refresh.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="93"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;label_country&quot; is not translated in &quot;sv&quot; (Swedish) or &quot;fr&quot; (French)"
+        errorLine1="    &lt;string name=&quot;label_country&quot;>Country&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="94"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;label_job_title&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;label_job_title&quot;>Job title&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="95"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;label_add_perioddata&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;label_add_perioddata&quot;>Add data for period:&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="96"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;label_relative_data&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;label_relative_data&quot;>Relative data&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="97"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;hint_data&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;hint_data&quot;>Data&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="98"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;hint_text&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;hint_text&quot;>Text&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="99"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;summary_setting_fullsynch&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;summary_setting_fullsynch&quot;>Do full fetches that can detect deleted updates, but will take longer.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="102"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;count_results&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;count_results&quot;>&amp;#160;Results&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="113"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;count_indicators&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;count_indicators&quot;>&amp;#160;Indicators&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="114"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;btncaption_apply&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;btncaption_apply&quot;>APPLY&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="125"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;btncaption_send_data&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;btncaption_send_data&quot;>SEND DATA&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="126"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;btncaption_attach_file&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;btncaption_attach_file&quot;>Attach file&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="129"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;btncaption_add_data&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;btncaption_add_data&quot;>Add period data&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="134"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;btncaption_refresh_oneproj&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;btncaption_refresh_oneproj&quot;>Refresh project&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="137"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;btncaption_view_results&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;btncaption_view_results&quot;>View results&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="138"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;msg_emp_applied&quot; is not translated in &quot;sv&quot; (Swedish)"
+        errorLine1="    &lt;string name=&quot;msg_emp_applied&quot;>Your request is now pending and will have to be approved.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="184"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;msg_period_data_submitted&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;msg_period_data_submitted&quot;>Update published&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="185"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;msg_send_success&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;msg_send_success&quot;>Successfully sent to server&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="186"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;errmsg_emp_fetch_failed&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;errmsg_emp_fetch_failed&quot;>Employment fetch failed: &lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="199"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;errmsg_emp_application_failed&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;errmsg_emp_application_failed&quot;>Unable to submit application: &lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="200"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;errmsg_emp_exists&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;errmsg_emp_exists&quot;>Connection already exists (or is being applied for)&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="201"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;errmsg_resultpost_failed&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;errmsg_resultpost_failed&quot;>Unable to post result: &lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="209"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;dummy_indicator_title&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;dummy_indicator_title&quot;>Indicator title here&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="213"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;dummy_author&quot; is not translated in &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;dummy_author&quot;>Nomen Nescio, Akvo&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="215"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;dummy_count&quot; is not translated in &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;dummy_count&quot;>17&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="216"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;dummy_time&quot; is not translated in &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;dummy_time&quot;>2014-04-23 17:18&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="217"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;dummy_date&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;dummy_date&quot;>2016-01-31&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="218"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;dummy_version&quot; is not translated in &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;dummy_version&quot;>0.0&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="219"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;lorem_ipsum&quot; is not translated in &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;lorem_ipsum&quot;>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent pharetra ultricies ante, imperdiet viverra nisi rutrum a. Integer consequat laoreet malesuada. Nam fermentum risus id aliquet pellentesque. Sed nec nisl in turpis sodales ultricies. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Interdum et malesuada fames ac ante ipsum primis in faucibus.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="220"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;connection_pending&quot; is not translated in &quot;sv&quot; (Swedish)"
+        errorLine1="    &lt;string name=&quot;connection_pending&quot;>- pending&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="221"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;title_activity_back&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;title_activity_back&quot;>BackActivity&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="234"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;hello_world&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;hello_world&quot;>Hello world!&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="235"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;channel_name&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;channel_name&quot;>RSR Notifications&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="236"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;channel_description&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;channel_description&quot;>RSR Notifications&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="237"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;sync_notification_title&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;sync_notification_title&quot;>Synchronization complete&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="238"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="MissingTranslation"
+        message="&quot;sync_notification_text&quot; is not translated in &quot;sv&quot; (Swedish), &quot;fr&quot; (French), &quot;es&quot; (Spanish)"
+        errorLine1="    &lt;string name=&quot;sync_notification_text&quot;>Update status is resolved&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="239"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="Typos"
+        message="&quot;area&quot; is a common misspelling; did you mean &quot;área&quot; ?"
+        errorLine1="  &lt;string name=&quot;label_first_proj_list&quot;>Todavía no se ha actualizado su lista de proyectos. Utilice el botón refrescar para ver sus proyectos.\n\nSi usted tiene una conexión con un bajo ancho de banda, active la opción de retrasar la captura de imágenes dentro de el area de ajustes. &lt;/string>"
+        errorLine2="                                                                                                                                                                                                                                                                          ^">
+        <location
+            file="src/main/res/values-es-rUS/strings.xml"
+            line="55"
+            column="267"/>
+    </issue>
+
+    <issue
+        id="PluralsCandidate"
+        message="Formatting %d followed by words (&quot;files&quot;): This should probably be a plural rather than a string"
+        errorLine1="    &lt;string name=&quot;cleared_dialog_msg&quot;>%1$d files deleted (%2$d MB)&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="174"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="TrulyRandom"
+        message="Potentially insecure random numbers on Android 4.3 and older. Read https://android-developers.blogspot.com/2013/08/some-securerandom-thoughts.html for more info."
+        errorLine1="        context.init(null, trustAllCerts, new SecureRandom());"
+        errorLine2="                                              ~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/kevinsawicki/http/HttpRequest.java"
+            line="289"
+            column="47"/>
+    </issue>
+
+    <issue
+        id="BadHostnameVerifier"
+        message="`verify` always returns `true`, which could cause insecure network traffic due to trusting TLS/SSL server certificates for wrong hostnames"
+        errorLine1="        public boolean verify(String hostname, SSLSession session) {"
+        errorLine2="                       ~~~~~~">
+        <location
+            file="src/main/java/com/github/kevinsawicki/http/HttpRequest.java"
+            line="306"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="TrustAllX509TrustManager"
+        message="`checkClientTrusted` is empty, which could cause insecure network traffic due to trusting arbitrary TLS/SSL certificates presented by peers"
+        errorLine1="        public void checkClientTrusted(X509Certificate[] chain, String authType) {"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/kevinsawicki/http/HttpRequest.java"
+            line="279"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="TrustAllX509TrustManager"
+        message="`checkServerTrusted` is empty, which could cause insecure network traffic due to trusting arbitrary TLS/SSL certificates presented by peers"
+        errorLine1="        public void checkServerTrusted(X509Certificate[] chain, String authType) {"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/github/kevinsawicki/http/HttpRequest.java"
+            line="283"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="AllowBackup"
+        message="On SDK version 23 and up, your app data will be automatically backed up and restored on app install. Consider adding the attribute `android:fullBackupContent` to specify an `@xml` resource which configures which files to backup. More info: https://developer.android.com/training/backup/autosyncapi.html"
+        errorLine1="    &lt;application"
+        errorLine2="     ~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="18"
+            column="6"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 14"
+        errorLine1="        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO;"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/util/FileUtil.java"
+            line="124"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 14"
+        errorLine1="        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD;"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/util/FileUtil.java"
+            line="128"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 14"
+        errorLine1="        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB;"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/util/FileUtil.java"
+            line="132"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="ObsoleteSdkInt"
+        message="Unnecessary; SDK_INT is always >= 14"
+        errorLine1="        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1;"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/util/FileUtil.java"
+            line="136"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="UseCompoundDrawables"
+        message="This tag and its children can be replaced by one `&lt;TextView/>` and a compound drawable"
+        errorLine1="        &lt;LinearLayout"
+        errorLine2="         ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_login.xml"
+            line="15"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="UseCompoundDrawables"
+        message="This tag and its children can be replaced by one `&lt;TextView/>` and a compound drawable"
+        errorLine1="            &lt;LinearLayout"
+        errorLine2="             ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_result_editor.xml"
+            line="121"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="UseCompoundDrawables"
+        message="This tag and its children can be replaced by one `&lt;TextView/>` and a compound drawable"
+        errorLine1="            &lt;LinearLayout"
+        errorLine2="             ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_result_editor.xml"
+            line="147"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="UseCompoundDrawables"
+        message="This tag and its children can be replaced by one `&lt;TextView/>` and a compound drawable"
+        errorLine1="&lt;LinearLayout"
+        errorLine2=" ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/result_list_item.xml"
+            line="2"
+            column="2"/>
+    </issue>
+
+    <issue
+        id="UseValueOf"
+        message="Use `Boolean.valueOf(enableExpand)` instead"
+        errorLine1="                imgView.setTag(R.id.thumbnail_expandable_tag, new Boolean(enableExpand));"
+        errorLine2="                                                              ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/util/ThumbnailUtil.java"
+            line="73"
+            column="63"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@color/rsr_purple` with a theme that also paints a background (inferred theme is `@style/AppTheme`)"
+        errorLine1="    android:background=&quot;@color/rsr_purple&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_about.xml"
+            line="6"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@color/lt_gray` with a theme that also paints a background (inferred theme is `@style/AppTheme`)"
+        errorLine1="    android:background=&quot;@color/lt_gray&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_diagnostic.xml"
+            line="6"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@android:color/white` with a theme that also paints a background (inferred theme is `@style/AppTheme`)"
+        errorLine1="    android:background=&quot;@android:color/white&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_org_list.xml"
+            line="4"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@color/lt_gray` with a theme that also paints a background (inferred theme is `@style/AppTheme`)"
+        errorLine1="        android:background=&quot;@color/lt_gray&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_period_detail.xml"
+            line="7"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@android:color/white` with a theme that also paints a background (inferred theme is `@style/AppTheme`)"
+        errorLine1="    android:background=&quot;@android:color/white&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_project_detail.xml"
+            line="5"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@android:color/white` with a theme that also paints a background (inferred theme is `@style/AppTheme`)"
+        errorLine1="    android:background=&quot;@android:color/white&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_project_list.xml"
+            line="4"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@color/lt_gray` with a theme that also paints a background (inferred theme is `@style/AppTheme`)"
+        errorLine1="        android:background=&quot;@color/lt_gray&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_detail.xml"
+            line="7"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.color.draft_text` appears to be unused"
+        errorLine1=" &lt;color name=&quot;draft_text&quot;>#FAA31D&lt;/color>"
+        errorLine2="        ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/colors.xml"
+            line="13"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.layout.gray_gradient` appears to be unused"
+        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^">
+        <location
+            file="src/main/res/layout/gray_gradient.xml"
+            line="2"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.layout.gray_gradient_up` appears to be unused"
+        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^">
+        <location
+            file="src/main/res/layout/gray_gradient_up.xml"
+            line="2"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_action_search` appears to be unused">
+        <location
+            file="src/main/res/drawable-hdpi/ic_action_search.png"/>
+        <location
+            file="src/main/res/drawable-mdpi/ic_action_search.png"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_menu_camera_dk` appears to be unused">
+        <location
+            file="src/main/res/drawable-ldpi/ic_menu_camera_dk.png"/>
+        <location
+            file="src/main/res/drawable-mdpi/ic_menu_camera_dk.png"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_menu_forward` appears to be unused">
+        <location
+            file="src/main/res/drawable-hdpi/ic_menu_forward.png"/>
+        <location
+            file="src/main/res/drawable-mdpi/ic_menu_forward.png"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_menu_refresh_dk` appears to be unused">
+        <location
+            file="src/main/res/drawable-hdpi/ic_menu_refresh_dk.png"/>
+        <location
+            file="src/main/res/drawable-ldpi/ic_menu_refresh_dk.png"/>
+        <location
+            file="src/main/res/drawable-mdpi/ic_menu_refresh_dk.png"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_menu_save` appears to be unused">
+        <location
+            file="src/main/res/drawable-hdpi/ic_menu_save.png"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_menu_upload` appears to be unused">
+        <location
+            file="src/main/res/drawable-hdpi/ic_menu_upload.png"/>
+        <location
+            file="src/main/res/drawable-xhdpi/ic_menu_upload.png"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_menu_view` appears to be unused">
+        <location
+            file="src/main/res/drawable-hdpi/ic_menu_view.png"/>
+        <location
+            file="src/main/res/drawable-ldpi/ic_menu_view.png"/>
+        <location
+            file="src/main/res/drawable-mdpi/ic_menu_view.png"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.action_attach_photo` appears to be unused"
+        errorLine1="    &lt;string name=&quot;action_attach_photo&quot;>Attach Photo&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="28"
+            column="13"/>
+        <location
+            file="src/main/res/values-es-rUS/strings.xml"
+            line="27"
+            column="11"/>
+        <location
+            file="src/main/res/values-fr-rFR/strings.xml"
+            line="27"
+            column="11"/>
+        <location
+            file="src/main/res/values-sv-rSE/strings.xml"
+            line="27"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.action_sendall` appears to be unused"
+        errorLine1="    &lt;string name=&quot;action_sendall&quot;>Send all unsent&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="30"
+            column="13"/>
+        <location
+            file="src/main/res/values-es-rUS/strings.xml"
+            line="29"
+            column="11"/>
+        <location
+            file="src/main/res/values-fr-rFR/strings.xml"
+            line="29"
+            column="11"/>
+        <location
+            file="src/main/res/values-sv-rSE/strings.xml"
+            line="29"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.label_update_description` appears to be unused"
+        errorLine1="    &lt;string name=&quot;label_update_description&quot;>Update Description:&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="58"
+            column="13"/>
+        <location
+            file="src/main/res/values-es-rUS/strings.xml"
+            line="46"
+            column="11"/>
+        <location
+            file="src/main/res/values-fr-rFR/strings.xml"
+            line="47"
+            column="11"/>
+        <location
+            file="src/main/res/values-sv-rSE/strings.xml"
+            line="50"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.label_setting_messages` appears to be unused"
+        errorLine1="    &lt;string name=&quot;label_setting_messages&quot;>Show messages&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="106"
+            column="13"/>
+        <location
+            file="src/main/res/values-es-rUS/strings.xml"
+            line="78"
+            column="11"/>
+        <location
+            file="src/main/res/values-fr-rFR/strings.xml"
+            line="78"
+            column="11"/>
+        <location
+            file="src/main/res/values-sv-rSE/strings.xml"
+            line="78"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.summary_setting_messages` appears to be unused"
+        errorLine1="    &lt;string name=&quot;summary_setting_messages&quot;>Display a list of errors and other messages.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="107"
+            column="13"/>
+        <location
+            file="src/main/res/values-es-rUS/strings.xml"
+            line="79"
+            column="11"/>
+        <location
+            file="src/main/res/values-fr-rFR/strings.xml"
+            line="79"
+            column="11"/>
+        <location
+            file="src/main/res/values-sv-rSE/strings.xml"
+            line="79"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.count_zero` appears to be unused"
+        errorLine1="    &lt;string name=&quot;count_zero&quot;>No updates&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="115"
+            column="13"/>
+        <location
+            file="src/main/res/values-es-rUS/strings.xml"
+            line="85"
+            column="11"/>
+        <location
+            file="src/main/res/values-fr-rFR/strings.xml"
+            line="85"
+            column="11"/>
+        <location
+            file="src/main/res/values-sv-rSE/strings.xml"
+            line="87"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.count_unsynch` appears to be unused"
+        errorLine1="    &lt;string name=&quot;count_unsynch&quot;>&amp;#160;Unsynchronised&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="116"
+            column="13"/>
+        <location
+            file="src/main/res/values-es-rUS/strings.xml"
+            line="86"
+            column="11"/>
+        <location
+            file="src/main/res/values-fr-rFR/strings.xml"
+            line="86"
+            column="11"/>
+        <location
+            file="src/main/res/values-sv-rSE/strings.xml"
+            line="86"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.email_address` appears to be unused"
+        errorLine1="    &lt;string name=&quot;email_address&quot;>Email Address&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="119"
+            column="13"/>
+        <location
+            file="src/main/res/values-es-rUS/strings.xml"
+            line="89"
+            column="11"/>
+        <location
+            file="src/main/res/values-fr-rFR/strings.xml"
+            line="89"
+            column="11"/>
+        <location
+            file="src/main/res/values-sv-rSE/strings.xml"
+            line="90"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.btncaption_rephoto` appears to be unused"
+        errorLine1="    &lt;string name=&quot;btncaption_rephoto&quot;>Replace photo&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="130"
+            column="13"/>
+        <location
+            file="src/main/res/values-es-rUS/strings.xml"
+            line="95"
+            column="11"/>
+        <location
+            file="src/main/res/values-fr-rFR/strings.xml"
+            line="95"
+            column="11"/>
+        <location
+            file="src/main/res/values-sv-rSE/strings.xml"
+            line="96"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.btncaption_clear_data` appears to be unused"
+        errorLine1="    &lt;string name=&quot;btncaption_clear_data&quot;>Clear all data&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="140"
+            column="13"/>
+        <location
+            file="src/main/res/values-es-rUS/strings.xml"
+            line="102"
+            column="11"/>
+        <location
+            file="src/main/res/values-fr-rFR/strings.xml"
+            line="102"
+            column="11"/>
+        <location
+            file="src/main/res/values-sv-rSE/strings.xml"
+            line="103"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.msg_network_problem` appears to be unused"
+        errorLine1="    &lt;string name=&quot;msg_network_problem&quot;>Network connection problem&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="190"
+            column="13"/>
+        <location
+            file="src/main/res/values-es-rUS/strings.xml"
+            line="151"
+            column="11"/>
+        <location
+            file="src/main/res/values-fr-rFR/strings.xml"
+            line="150"
+            column="11"/>
+        <location
+            file="src/main/res/values-sv-rSE/strings.xml"
+            line="166"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.connection_pending` appears to be unused"
+        errorLine1="    &lt;string name=&quot;connection_pending&quot;>- pending&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="221"
+            column="13"/>
+        <location
+            file="src/main/res/values-es-rUS/strings.xml"
+            line="176"
+            column="11"/>
+        <location
+            file="src/main/res/values-fr-rFR/strings.xml"
+            line="180"
+            column="11"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.array.types` appears to be unused"
+        errorLine1="    &lt;string-array name=&quot;types&quot;>"
+        errorLine2="                  ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="223"
+            column="19"/>
+        <location
+            file="src/main/res/values-fr-rFR/strings.xml"
+            line="181"
+            column="17"/>
+        <location
+            file="src/main/res/values-sv-rSE/strings.xml"
+            line="202"
+            column="19"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.array.types_values` appears to be unused"
+        errorLine1="    &lt;string-array name=&quot;types_values&quot;>"
+        errorLine2="                  ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="228"
+            column="19"/>
+        <location
+            file="src/main/res/values-fr-rFR/strings.xml"
+            line="186"
+            column="17"/>
+        <location
+            file="src/main/res/values-sv-rSE/strings.xml"
+            line="207"
+            column="19"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.hello_world` appears to be unused"
+        errorLine1="    &lt;string name=&quot;hello_world&quot;>Hello world!&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="235"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UselessParent"
+        message="This `ScrollView` layout or its `LinearLayout` parent is useless; transfer the `background` attribute to the other view"
+        errorLine1=" &lt;ScrollView"
+        errorLine2="  ~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_diagnostic.xml"
+            line="9"
+            column="3"/>
+    </issue>
+
+    <issue
+        id="TypographyDashes"
+        message="Replace &quot;-&quot; with an &quot;en dash&quot; character (–, &amp;#8211;) ?"
+        errorLine1="  &lt;string name=&quot;copyright&quot;>Copyright © 2012-2016,2020 Stichting Akvo&lt;/string>"
+        errorLine2="                           ^">
+        <location
+            file="src/main/res/values-fr-rFR/strings.xml"
+            line="30"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="TypographyDashes"
+        message="Replace &quot;-&quot; with an &quot;en dash&quot; character (–, &amp;#8211;) ?"
+        errorLine1="    &lt;string name=&quot;copyright&quot;>Copyright &amp;#169; 2012-2015,2020 Stichting Akvo&lt;/string>"
+        errorLine2="                             ^">
+        <location
+            file="src/main/res/values-sv-rSE/strings.xml"
+            line="30"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="TypographyDashes"
+        message="Replace &quot;-&quot; with an &quot;en dash&quot; character (–, &amp;#8211;) ?"
+        errorLine1="    &lt;string name=&quot;copyright&quot;>Copyright &amp;#169; 2012-2016,2020 Stichting Akvo&lt;/string>"
+        errorLine2="                             ^">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="37"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="TypographyDashes"
+        message="Replace &quot;-&quot; with an &quot;en dash&quot; character (–, &amp;#8211;) ?"
+        errorLine1="  &lt;string name=&quot;dummy_time&quot;>2014-04-23 17:18&lt;/string>"
+        errorLine2="                            ^">
+        <location
+            file="src/main/res/values-fr-rFR/strings.xml"
+            line="177"
+            column="29"/>
+    </issue>
+
+    <issue
+        id="TypographyDashes"
+        message="Replace &quot;-&quot; with an &quot;en dash&quot; character (–, &amp;#8211;) ?"
+        errorLine1="    &lt;string name=&quot;dummy_time&quot;>2014-04-23 17:18&lt;/string>"
+        errorLine2="                              ^">
+        <location
+            file="src/main/res/values-sv-rSE/strings.xml"
+            line="196"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="TypographyDashes"
+        message="Replace &quot;-&quot; with an &quot;en dash&quot; character (–, &amp;#8211;) ?"
+        errorLine1="    &lt;string name=&quot;dummy_time&quot;>2014-04-23 17:18&lt;/string>"
+        errorLine2="                              ^">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="217"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="TypographyDashes"
+        message="Replace &quot;-&quot; with an &quot;en dash&quot; character (–, &amp;#8211;) ?"
+        errorLine1="    &lt;string name=&quot;dummy_date&quot;>2016-01-31&lt;/string>"
+        errorLine2="                              ^">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="218"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="  &lt;string name=&quot;send_progress_msg&quot;>Envoi des mises à jour au serveur...&lt;/string>"
+        errorLine2="                                   ^">
+        <location
+            file="src/main/res/values-fr-rFR/strings.xml"
+            line="112"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;send_progress_msg&quot;>Skicakr uppdateringen to servern...&lt;/string>"
+        errorLine2="                                     ^">
+        <location
+            file="src/main/res/values-sv-rSE/strings.xml"
+            line="115"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;send_progress_msg&quot;>Sending update to server...&lt;/string>"
+        errorLine2="                                     ^">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="150"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;msg_synchronising&quot;>Uppdatering synkroniseras fortfarande...&lt;/string>"
+        errorLine2="                                     ^">
+        <location
+            file="src/main/res/values-sv-rSE/strings.xml"
+            line="167"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;msg_synchronising&quot;>Update still synchronising...&lt;/string>"
+        errorLine2="                                     ^">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="191"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-hdpi/ic_menu_add_dk.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-ldpi/ic_menu_add_dk.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-mdpi/ic_menu_add_dk.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-hdpi/ic_menu_attachment.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-ldpi/ic_menu_camera_dk.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-mdpi/ic_menu_camera_dk.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-hdpi/ic_menu_close_clear_cancel.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-ldpi/ic_menu_close_clear_cancel.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-mdpi/ic_menu_close_clear_cancel.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-ldpi/ic_menu_dk_date.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-hdpi/ic_menu_edit.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-ldpi/ic_menu_edit.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-mdpi/ic_menu_edit.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-hdpi/ic_menu_forward.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-mdpi/ic_menu_forward.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-ldpi/ic_menu_lt_date.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-hdpi/ic_menu_red_x.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-hdpi/ic_menu_refresh_dk.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-ldpi/ic_menu_refresh_dk.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-mdpi/ic_menu_refresh_dk.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-hdpi/ic_menu_rot_r.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-hdpi/ic_menu_save_dk.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-ldpi/ic_menu_save_dk.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-mdpi/ic_menu_save_dk.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-mdpi/ic_menu_settings_holo_light.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-hdpi/ic_menu_upload_dk.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-ldpi/ic_menu_upload_dk.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-mdpi/ic_menu_upload_dk.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-hdpi/ic_menu_view.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-ldpi/ic_menu_view.png"/>
+    </issue>
+
+    <issue
+        id="IconColors"
+        message="Action Bar icons should use a single gray color (`#333333` for light themes (with 60%/30% opacity for enabled/disabled), and `#FFFFFF` with opacity 80%/30% for dark themes">
+        <location
+            file="src/main/res/drawable-mdpi/ic_menu_view.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/drawable-ldpi/ic_launcher.png"/>
+    </issue>
+
+    <issue
+        id="IconDipSize"
+        message="The image `ic_menu_refresh.png` varies significantly in its density-independent (dip) size across the various density versions: drawable-hdpi/ic_menu_refresh.png: 32x32 dp (48x48 px), drawable-ldpi/ic_menu_refresh.png: 48x48 dp (36x36 px), drawable-mdpi/ic_menu_refresh.png: 32x32 dp (32x32 px), drawable-xhdpi/ic_menu_refresh.png: 32x32 dp (64x64 px)">
+        <location
+            file="src/main/res/drawable-mdpi/ic_menu_refresh.png"/>
+        <location
+            file="src/main/res/drawable-hdpi/ic_menu_refresh.png"/>
+        <location
+            file="src/main/res/drawable-xhdpi/ic_menu_refresh.png"/>
+        <location
+            file="src/main/res/drawable-ldpi/ic_menu_refresh.png"/>
+    </issue>
+
+    <issue
+        id="IconLocation"
+        message="Found bitmap drawable `res/drawable/box.9.png` in densityless folder">
+        <location
+            file="src/main/res/drawable/box.9.png"/>
+    </issue>
+
+    <issue
+        id="IconDensities"
+        message="Missing the following drawables in `drawable-hdpi`: akvo_badge.png, generic_file_48.png, ic_menu_camera_dk.png, ic_menu_settings_holo_light.png">
+        <location
+            file="src/main/res/drawable-hdpi"/>
+    </issue>
+
+    <issue
+        id="IconDensities"
+        message="Missing the following drawables in `drawable-mdpi`: btn_close_normal.png, ic_menu_attachment.png, ic_menu_camera.png, ic_menu_gallery.png, ic_menu_mylocation.png... (10 more)">
+        <location
+            file="src/main/res/drawable-mdpi"/>
+    </issue>
+
+    <issue
+        id="IconDensities"
+        message="Missing the following drawables in `drawable-xhdpi`: akvo_badge.png, btn_close_normal.png, generic_file_48.png, ic_action_search.png, ic_menu_add_dk.png... (19 more)">
+        <location
+            file="src/main/res/drawable-xhdpi"/>
+    </issue>
+
+    <issue
+        id="IconDensities"
+        message="Missing the following drawables in `drawable-xxhdpi`: akvo_badge.png, btn_close_normal.png, generic_file_48.png, ic_action_search.png, ic_menu_add_dk.png... (24 more)">
+        <location
+            file="src/main/res/drawable-xxhdpi"/>
+    </issue>
+
+    <issue
+        id="IconDuplicates"
+        message="The following unrelated icon files have identical contents: logo.png, logo_small.png">
+        <location
+            file="src/main/res/drawable-hdpi/logo_small.png"/>
+        <location
+            file="src/main/res/drawable-hdpi/logo.png"/>
+    </issue>
+
+    <issue
+        id="ButtonStyle"
+        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
+        errorLine1="       &lt;Button"
+        errorLine2="        ~~~~~~">
+        <location
+            file="src/main/res/layout/activity_project_detail.xml"
+            line="211"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ButtonStyle"
+        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
+        errorLine1="       &lt;Button"
+        errorLine2="        ~~~~~~">
+        <location
+            file="src/main/res/layout/activity_project_detail.xml"
+            line="225"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="ButtonStyle"
+        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
+        errorLine1="                &lt;Button"
+        errorLine2="                 ~~~~~~">
+        <location
+            file="src/main/res/layout/activity_project_detail.xml"
+            line="253"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="ButtonStyle"
+        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
+        errorLine1="                &lt;Button"
+        errorLine2="                 ~~~~~~">
+        <location
+            file="src/main/res/layout/activity_project_detail.xml"
+            line="268"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="ButtonStyle"
+        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
+        errorLine1="                &lt;Button"
+        errorLine2="                 ~~~~~~">
+        <location
+            file="src/main/res/layout/activity_result_editor.xml"
+            line="81"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="ButtonStyle"
+        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
+        errorLine1="                &lt;Button"
+        errorLine2="                 ~~~~~~">
+        <location
+            file="src/main/res/layout/activity_result_editor.xml"
+            line="94"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="ButtonStyle"
+        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
+        errorLine1="                &lt;Button"
+        errorLine2="                 ~~~~~~">
+        <location
+            file="src/main/res/layout/activity_result_editor.xml"
+            line="107"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="ButtonStyle"
+        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
+        errorLine1="                &lt;Button"
+        errorLine2="                 ~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="129"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="ButtonStyle"
+        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
+        errorLine1="                &lt;Button"
+        errorLine2="                 ~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="142"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="ButtonStyle"
+        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
+        errorLine1="                &lt;Button"
+        errorLine2="                 ~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="386"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="ButtonStyle"
+        message="Buttons in button bars should be borderless; use `style=&quot;?android:attr/buttonBarButtonStyle&quot;` (and `?android:attr/buttonBarStyle` on the parent)"
+        errorLine1="                &lt;Button"
+        errorLine2="                 ~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="399"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="TextFields"
+        message="This text field does not specify an `inputType`"
+        errorLine1="            &lt;EditText"
+        errorLine2="             ~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_login.xml"
+            line="53"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="TextFields"
+        message="This text field does not specify an `inputType`"
+        errorLine1="        &lt;EditText"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_org_list.xml"
+            line="97"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="TextFields"
+        message="This text field does not specify an `inputType`"
+        errorLine1="        &lt;EditText"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_project_list.xml"
+            line="97"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="TextFields"
+        message="This text field does not specify an `inputType`"
+        errorLine1="            &lt;EditText android:id=&quot;@+id/edit_comment&quot;"
+        errorLine2="             ~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_result_editor.xml"
+            line="65"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="Autofill"
+        message="Missing `autofillHints` attribute"
+        errorLine1="            &lt;EditText"
+        errorLine2="             ~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_employment_application.xml"
+            line="158"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="Autofill"
+        message="Missing `autofillHints` attribute"
+        errorLine1="            &lt;EditText"
+        errorLine2="             ~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_login.xml"
+            line="53"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="Autofill"
+        message="Missing `autofillHints` attribute"
+        errorLine1="            &lt;EditText"
+        errorLine2="             ~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_login.xml"
+            line="65"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="Autofill"
+        message="Missing `autofillHints` attribute"
+        errorLine1="        &lt;EditText"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_org_list.xml"
+            line="97"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="Autofill"
+        message="Missing `autofillHints` attribute"
+        errorLine1="        &lt;EditText"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_project_list.xml"
+            line="97"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="Autofill"
+        message="Missing `autofillHints` attribute"
+        errorLine1="            &lt;EditText android:id=&quot;@+id/edit_data&quot;"
+        errorLine2="             ~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_result_editor.xml"
+            line="47"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="Autofill"
+        message="Missing `autofillHints` attribute"
+        errorLine1="            &lt;EditText android:id=&quot;@+id/edit_comment&quot;"
+        errorLine2="             ~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_result_editor.xml"
+            line="65"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="Autofill"
+        message="Missing `autofillHints` attribute"
+        errorLine1="                &lt;EditText"
+        errorLine2="                 ~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="80"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="Autofill"
+        message="Missing `autofillHints` attribute"
+        errorLine1="            &lt;EditText"
+        errorLine2="             ~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="107"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="Autofill"
+        message="Missing `autofillHints` attribute"
+        errorLine1="                &lt;EditText"
+        errorLine2="                 ~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="210"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="Autofill"
+        message="Missing `autofillHints` attribute"
+        errorLine1="                &lt;EditText"
+        errorLine2="                 ~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="222"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="            &lt;ImageView"
+        errorLine2="             ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_period_detail.xml"
+            line="106"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="        mSelectedOrg.setText(&quot;[&quot;+position+&quot;]&quot;); "
+        errorLine2="                             ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/EmploymentApplicationActivity.java"
+            line="345"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="        mTextView.setText(&quot;Messages, newest last:&quot;);"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/MessageActivity.java"
+            line="76"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
+        errorLine1="         projCountLabel.setText(Integer.valueOf(count).toString());"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/OrgListActivity.java"
+            line="228"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="            projCountLabel.setText(&quot;(&quot; + Integer.valueOf(count).toString() + &quot;)&quot;);"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/OrgListActivity.java"
+            line="233"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
+        errorLine1="            projCountLabel.setText(&quot;(&quot; + Integer.valueOf(count).toString() + &quot;)&quot;);"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/OrgListActivity.java"
+            line="233"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="       projTitleLabel.setText(&quot;[&quot; + projId + &quot;] &quot; + project.getTitle());"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectDetailActivity.java"
+            line="160"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="      publishedCountView.setText(Integer.toString(stateCounts[2]) + res.getString(R.string.count_published));"
+        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectDetailActivity.java"
+            line="201"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
+        errorLine1="      publishedCountView.setText(Integer.toString(stateCounts[2]) + res.getString(R.string.count_published));"
+        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectDetailActivity.java"
+            line="201"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="            draftCountView.setText(Integer.toString(stateCounts[0]) + res.getString(R.string.count_draft));"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectDetailActivity.java"
+            line="202"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
+        errorLine1="            draftCountView.setText(Integer.toString(stateCounts[0]) + res.getString(R.string.count_draft));"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectDetailActivity.java"
+            line="202"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="            resultCountView.setText(Integer.toString(rc) + res.getString(R.string.count_results) + &quot;, &quot; + Integer.toString(ic) + res.getString(R.string.count_indicators));"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectDetailActivity.java"
+            line="207"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
+        errorLine1="            resultCountView.setText(Integer.toString(rc) + res.getString(R.string.count_results) + &quot;, &quot; + Integer.toString(ic) + res.getString(R.string.count_indicators));"
+        errorLine2="                                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectDetailActivity.java"
+            line="207"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
+        errorLine1="            resultCountView.setText(Integer.toString(rc) + res.getString(R.string.count_results) + &quot;, &quot; + Integer.toString(ic) + res.getString(R.string.count_indicators));"
+        errorLine2="                                                                                                          ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectDetailActivity.java"
+            line="207"
+            column="107"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="            case  0:mInProgressWhat.setText(&quot;Projects&quot;);break;"
+        errorLine2="                                            ~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectDetailActivity.java"
+            line="325"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="            case  1:mInProgressWhat.setText(&quot;Updates&quot;);break;"
+        errorLine2="                                            ~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectDetailActivity.java"
+            line="326"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="            case  2:mInProgressWhat.setText(&quot;Photos&quot;);break;"
+        errorLine2="                                            ~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectDetailActivity.java"
+            line="327"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
+        errorLine1="         projCountLabel.setText(Integer.valueOf(count).toString());"
+        errorLine2="                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectListActivity.java"
+            line="263"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="            projCountLabel.setText(&quot;(&quot; + Integer.valueOf(count).toString() + &quot;)&quot;);"
+        errorLine2="                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectListActivity.java"
+            line="268"
+            column="36"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
+        errorLine1="            projCountLabel.setText(&quot;(&quot; + Integer.valueOf(count).toString() + &quot;)&quot;);"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ProjectListActivity.java"
+            line="268"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="   titleView.setText(&quot;[&quot;+ thisId +&quot;] &quot;+"
+        errorLine2="                     ^">
+        <location
+            file="src/main/java/org/akvo/rsr/up/viewadapter/ProjectListCursorAdapter.java"
+            line="67"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="  publishedCountView.setText(Integer.toString(stateCounts[2]) + res.getString(R.string.count_published));"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/viewadapter/ProjectListCursorAdapter.java"
+            line="83"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
+        errorLine1="  publishedCountView.setText(Integer.toString(stateCounts[2]) + res.getString(R.string.count_published));"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/viewadapter/ProjectListCursorAdapter.java"
+            line="83"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="  draftCountView.setText(Integer.toString(stateCounts[0]) + res.getString(R.string.count_draft));"
+        errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/viewadapter/ProjectListCursorAdapter.java"
+            line="92"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
+        errorLine1="  draftCountView.setText(Integer.toString(stateCounts[0]) + res.getString(R.string.count_draft));"
+        errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/viewadapter/ProjectListCursorAdapter.java"
+            line="92"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="        periodTitleLabel.setText(&quot;Period &quot; + mPeriodStart + endash + mPeriodEnd);//TODO: localisation"
+        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ResultEditorActivity.java"
+            line="117"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="        periodTitleLabel.setText(&quot;Period &quot; + mPeriodStart + endash + mPeriodEnd);//TODO: localisation"
+        errorLine2="                                 ~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ResultEditorActivity.java"
+            line="117"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="              mPhotoInfo.setText(Long.toString(f.length()/1024)+&quot; kB&quot;);"
+        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ResultEditorActivity.java"
+            line="320"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
+        errorLine1="              mPhotoInfo.setText(Long.toString(f.length()/1024)+&quot; kB&quot;);"
+        errorLine2="                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ResultEditorActivity.java"
+            line="320"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="String literal in `setText` can not be translated. Use Android resources instead."
+        errorLine1="              mPhotoInfo.setText(Long.toString(f.length()/1024)+&quot; kB&quot;);"
+        errorLine2="                                                                ~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ResultEditorActivity.java"
+            line="320"
+            column="65"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="        mResultCountLabel.setText(resultCounter + &quot;, &quot; + indicatorCounter);"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/ResultListActivity.java"
+            line="252"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="   titleView.setText(indent+ &quot;[&quot;+ rn.getId() + &quot;] &quot; + rn.mText);"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/viewadapter/ResultListArrayAdapter.java"
+            line="117"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="   titleView.setText(indent + rn.mText);"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/viewadapter/ResultListArrayAdapter.java"
+            line="119"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
+        errorLine1="        projupdTitleCount.setText(Integer.toString(TITLE_LENGTH));"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/UpdateEditorActivity.java"
+            line="199"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="            accuracyField.setText(new DecimalFormat(&quot;#&quot;).format(loc.getAccuracy()) + &quot; m&quot;);"
+        errorLine2="                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/UpdateEditorActivity.java"
+            line="838"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="        latField.setText(loc.getLatitude() + &quot;&quot;);"
+        errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/UpdateEditorActivity.java"
+            line="845"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="        lonField.setText(loc.getLongitude() + &quot;&quot;);"
+        errorLine2="                         ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/UpdateEditorActivity.java"
+            line="846"
+            column="26"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Number formatting does not take into account locale settings. Consider using `String.format` instead."
+        errorLine1="  updateCountLabel.setText(Integer.valueOf(dataCursor.getCount()).toString());"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/org/akvo/rsr/up/UpdateListActivity.java"
+            line="182"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="SetTextI18n"
+        message="Do not concatenate text displayed with `setText`. Use resource string with placeholders."
+        errorLine1="   titleView.setText(&quot;[&quot;+ cursor.getString(idcol) + &quot;] &quot;+"
+        errorLine2="                     ^">
+        <location
+            file="src/main/java/org/akvo/rsr/up/viewadapter/UpdateListCursorAdapter.java"
+            line="72"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Diagnostic output:&quot;, should use `@string` resource"
+        errorLine1="        android:text=&quot;Diagnostic output:&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_diagnostic.xml"
+            line="19"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;---&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;---&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_employment_application.xml"
+            line="32"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Organisation&quot;, should use `@string` resource"
+        errorLine1="                android:hint=&quot;Organisation&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_employment_application.xml"
+            line="97"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Full name&quot;, should use `@string` resource"
+        errorLine1="                android:text=&quot;Full name&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_employment_application.xml"
+            line="110"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Indicator title here&quot;, should use `@string` resource"
+        errorLine1="               android:text=&quot;Indicator title here&quot;"
+        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_period_detail.xml"
+            line="56"
+            column="16"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Period:&quot;, should use `@string` resource"
+        errorLine1="                    android:text=&quot;Period:&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_period_detail.xml"
+            line="73"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot; -- &quot;, should use `@string` resource"
+        errorLine1="                    android:text=&quot; -- &quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_period_detail.xml"
+            line="91"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Target value: &quot;, should use `@string` resource"
+        errorLine1="                    android:text=&quot;Target value: &quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_period_detail.xml"
+            line="120"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;55&quot;, should use `@string` resource"
+        errorLine1="                    android:text=&quot;55&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_period_detail.xml"
+            line="129"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Target value comment comment comment comment&quot;, should use `@string` resource"
+        errorLine1="                android:text=&quot;Target value comment comment comment comment&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_period_detail.xml"
+            line="142"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Actual value: &quot;, should use `@string` resource"
+        errorLine1="                    android:text=&quot;Actual value: &quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_period_detail.xml"
+            line="154"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;63&quot;, should use `@string` resource"
+        errorLine1="                    android:text=&quot;63&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_period_detail.xml"
+            line="163"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Actual value comment comment comment comment&quot;, should use `@string` resource"
+        errorLine1="           android:text=&quot;Actual value comment comment comment comment&quot;"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_period_detail.xml"
+            line="174"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;---&quot;, should use `@string` resource"
+        errorLine1="            android:text=&quot;---&quot; />"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_project_detail.xml"
+            line="30"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;2015-01-01--2015-12-31&quot;, should use `@string` resource"
+        errorLine1="        android:text=&quot;2015-01-01--2015-12-31&quot;"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_result_editor.xml"
+            line="15"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="HardcodedText"
+        message="Hardcoded string &quot;Photo caption&quot;, should use `@string` resource"
+        errorLine1="           android:text=&quot;Photo caption&quot;"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_detail.xml"
+            line="67"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="RtlSymmetry"
+        message="When you define `paddingLeft` you should probably also define `paddingRight` for right-to-left symmetry"
+        errorLine1="                android:paddingLeft=&quot;5dp&quot; >"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_project_detail.xml"
+            line="85"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="RtlSymmetry"
+        message="When you define `paddingLeft` you should probably also define `paddingRight` for right-to-left symmetry"
+        errorLine1="           android:paddingLeft=&quot;5dp&quot;"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_detail.xml"
+            line="66"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="RtlSymmetry"
+        message="When you define `paddingRight` you should probably also define `paddingLeft` for right-to-left symmetry"
+        errorLine1="                    android:paddingRight=&quot;5dp&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="98"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="RtlSymmetry"
+        message="When you define `paddingRight` you should probably also define `paddingLeft` for right-to-left symmetry"
+        errorLine1="            android:paddingRight=&quot;5dp&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/org_list_item.xml"
+            line="38"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="RtlSymmetry"
+        message="When you define `paddingRight` you should probably also define `paddingLeft` for right-to-left symmetry"
+        errorLine1="            android:paddingRight=&quot;5dp&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/org_list_item.xml"
+            line="48"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="RtlSymmetry"
+        message="When you define `paddingRight` you should probably also define `paddingLeft` for right-to-left symmetry"
+        errorLine1="             android:paddingRight=&quot;5dp&quot;"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/project_list_item.xml"
+            line="52"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/activity_employment_application.xml"
+            line="31"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                        ~~~~">
+        <location
+            file="src/main/res/layout/activity_employment_application.xml"
+            line="57"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                        ~~~~">
+        <location
+            file="src/main/res/layout/activity_employment_application.xml"
+            line="74"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                        ~~~~">
+        <location
+            file="src/main/res/layout/activity_employment_application.xml"
+            line="85"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                        ~~~~">
+        <location
+            file="src/main/res/layout/activity_employment_application.xml"
+            line="106"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                        ~~~~">
+        <location
+            file="src/main/res/layout/activity_employment_application.xml"
+            line="118"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                        ~~~~">
+        <location
+            file="src/main/res/layout/activity_employment_application.xml"
+            line="127"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                        ~~~~">
+        <location
+            file="src/main/res/layout/activity_employment_application.xml"
+            line="150"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:paddingStart=&quot;5dip&quot;` to better support right-to-left layouts"
+        errorLine1="                android:paddingLeft=&quot;5dip&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_employment_application.xml"
+            line="151"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:paddingEnd=&quot;5dp&quot;` to better support right-to-left layouts"
+        errorLine1="                android:paddingRight=&quot;5dp&quot;"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_employment_application.xml"
+            line="152"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/activity_org_list.xml"
+            line="27"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/activity_org_list.xml"
+            line="40"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/activity_org_list.xml"
+            line="53"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/activity_org_list.xml"
+            line="74"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`end`&quot; instead of &quot;`right`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;right&quot;"
+        errorLine2="                                    ~~~~~">
+        <location
+            file="src/main/res/layout/activity_org_list.xml"
+            line="86"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/activity_org_list.xml"
+            line="102"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:drawableStart=&quot;@drawable/ic_menu_search&quot;` to better support right-to-left layouts"
+        errorLine1="            android:drawableLeft=&quot;@drawable/ic_menu_search&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_org_list.xml"
+            line="119"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="        android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                ~~~~">
+        <location
+            file="src/main/res/layout/activity_period_detail.xml"
+            line="15"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="          android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                  ~~~~">
+        <location
+            file="src/main/res/layout/activity_period_detail.xml"
+            line="55"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`end`&quot; instead of &quot;`right`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                    android:gravity=&quot;right&quot;"
+        errorLine2="                                     ~~~~~">
+        <location
+            file="src/main/res/layout/activity_period_detail.xml"
+            line="82"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                    android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                            ~~~~">
+        <location
+            file="src/main/res/layout/activity_period_detail.xml"
+            line="128"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                        ~~~~">
+        <location
+            file="src/main/res/layout/activity_period_detail.xml"
+            line="140"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                    android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                            ~~~~">
+        <location
+            file="src/main/res/layout/activity_period_detail.xml"
+            line="162"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="         android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                 ~~~~">
+        <location
+            file="src/main/res/layout/activity_period_detail.xml"
+            line="173"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                        ~~~~">
+        <location
+            file="src/main/res/layout/activity_period_detail.xml"
+            line="201"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                        ~~~~">
+        <location
+            file="src/main/res/layout/activity_period_detail.xml"
+            line="212"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/activity_project_detail.xml"
+            line="29"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="        android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                ~~~~">
+        <location
+            file="src/main/res/layout/activity_project_detail.xml"
+            line="44"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                        ~~~~">
+        <location
+            file="src/main/res/layout/activity_project_detail.xml"
+            line="77"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:paddingStart=&quot;5dp&quot;` to better support right-to-left layouts"
+        errorLine1="                android:paddingLeft=&quot;5dp&quot; >"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_project_detail.xml"
+            line="85"
+            column="17"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="             android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                     ~~~~">
+        <location
+            file="src/main/res/layout/activity_project_detail.xml"
+            line="91"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="             android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                     ~~~~">
+        <location
+            file="src/main/res/layout/activity_project_detail.xml"
+            line="117"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="             android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                     ~~~~">
+        <location
+            file="src/main/res/layout/activity_project_detail.xml"
+            line="130"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/activity_project_detail.xml"
+            line="154"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/activity_project_detail.xml"
+            line="165"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/activity_project_detail.xml"
+            line="182"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="      android:layout_gravity=&quot;left&quot;"
+        errorLine2="                              ~~~~">
+        <location
+            file="src/main/res/layout/activity_project_detail.xml"
+            line="193"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_marginStart=&quot;5dip&quot;` to better support right-to-left layouts"
+        errorLine1="           android:layout_marginLeft=&quot;5dip&quot;"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_project_detail.xml"
+            line="234"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_marginStart=&quot;5dip&quot;` to better support right-to-left layouts"
+        errorLine1="                    android:layout_marginLeft=&quot;5dip&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_project_detail.xml"
+            line="272"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/activity_project_list.xml"
+            line="27"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/activity_project_list.xml"
+            line="40"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/activity_project_list.xml"
+            line="53"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/activity_project_list.xml"
+            line="74"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`end`&quot; instead of &quot;`right`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;right&quot;"
+        errorLine2="                                    ~~~~~">
+        <location
+            file="src/main/res/layout/activity_project_list.xml"
+            line="86"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/activity_project_list.xml"
+            line="102"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:drawableStart=&quot;@drawable/ic_menu_search&quot;` to better support right-to-left layouts"
+        errorLine1="            android:drawableLeft=&quot;@drawable/ic_menu_search&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_project_list.xml"
+            line="119"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="        android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                ~~~~">
+        <location
+            file="src/main/res/layout/activity_result_editor.xml"
+            line="12"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                        ~~~~">
+        <location
+            file="src/main/res/layout/activity_result_editor.xml"
+            line="40"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                    android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                            ~~~~">
+        <location
+            file="src/main/res/layout/activity_result_editor.xml"
+            line="140"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                    android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                            ~~~~">
+        <location
+            file="src/main/res/layout/activity_result_editor.xml"
+            line="166"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/activity_result_list.xml"
+            line="13"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="             android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                     ~~~~">
+        <location
+            file="src/main/res/layout/activity_result_list.xml"
+            line="33"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`end`&quot; instead of &quot;`right`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="             android:layout_gravity=&quot;right&quot;"
+        errorLine2="                                     ~~~~~">
+        <location
+            file="src/main/res/layout/activity_result_list.xml"
+            line="44"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="        android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                ~~~~">
+        <location
+            file="src/main/res/layout/activity_update_detail.xml"
+            line="15"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="              android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                      ~~~~">
+        <location
+            file="src/main/res/layout/activity_update_detail.xml"
+            line="54"
+            column="39"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:paddingStart=&quot;5dp&quot;` to better support right-to-left layouts"
+        errorLine1="           android:paddingLeft=&quot;5dp&quot;"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_detail.xml"
+            line="66"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="          android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                  ~~~~">
+        <location
+            file="src/main/res/layout/activity_update_detail.xml"
+            line="100"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="          android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                  ~~~~">
+        <location
+            file="src/main/res/layout/activity_update_detail.xml"
+            line="114"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="          android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                  ~~~~">
+        <location
+            file="src/main/res/layout/activity_update_detail.xml"
+            line="125"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`end`&quot; instead of &quot;`right`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="          android:gravity=&quot;right&quot;"
+        errorLine2="                           ~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_detail.xml"
+            line="126"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="          android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                  ~~~~">
+        <location
+            file="src/main/res/layout/activity_update_detail.xml"
+            line="137"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`end`&quot; instead of &quot;`right`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="          android:gravity=&quot;right&quot;"
+        errorLine2="                           ~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_detail.xml"
+            line="138"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                        ~~~~">
+        <location
+            file="src/main/res/layout/activity_update_detail.xml"
+            line="156"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                        ~~~~">
+        <location
+            file="src/main/res/layout/activity_update_detail.xml"
+            line="167"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="        android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                ~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="12"
+            column="33"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                        ~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="69"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                    android:layout_gravity=&quot;left|center_vertical&quot;"
+        errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="97"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:paddingEnd=&quot;5dp&quot;` to better support right-to-left layouts"
+        errorLine1="                    android:paddingRight=&quot;5dp&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="98"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                android:gravity=&quot;top|left&quot;"
+        errorLine2="                                 ~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="113"
+            column="34"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                        android:layout_gravity=&quot;left|center_vertical&quot;"
+        errorLine2="                                                ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="174"
+            column="49"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                            android:layout_gravity=&quot;top|left&quot;"
+        errorLine2="                                                    ~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="188"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:drawableStart=&quot;@drawable/ic_menu_red_x&quot;` to better support right-to-left layouts"
+        errorLine1="                            android:drawableLeft=&quot;@drawable/ic_menu_red_x&quot;"
+        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="191"
+            column="29"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                            android:layout_gravity=&quot;bottom|left&quot;"
+        errorLine2="                                                    ~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="200"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:drawableStart=&quot;@drawable/ic_menu_rot_r&quot;` to better support right-to-left layouts"
+        errorLine1="                            android:drawableLeft=&quot;@drawable/ic_menu_rot_r&quot;"
+        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="203"
+            column="29"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:drawableStart=&quot;@drawable/ic_menu_gallery&quot;` to better support right-to-left layouts"
+        errorLine1="                    android:drawableLeft=&quot;@drawable/ic_menu_gallery&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="241"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:drawableStart=&quot;@drawable/ic_menu_mylocation&quot;` to better support right-to-left layouts"
+        errorLine1="                    android:drawableLeft=&quot;@drawable/ic_menu_mylocation&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="270"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_marginStart=&quot;5dp&quot;` to better support right-to-left layouts"
+        errorLine1="                    android:layout_marginLeft=&quot;5dp&quot;"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_editor.xml"
+            line="403"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/activity_update_list.xml"
+            line="13"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="             android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                     ~~~~">
+        <location
+            file="src/main/res/layout/activity_update_list.xml"
+            line="33"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`end`&quot; instead of &quot;`right`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="             android:layout_gravity=&quot;right&quot;"
+        errorLine2="                                     ~~~~~">
+        <location
+            file="src/main/res/layout/activity_update_list.xml"
+            line="44"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/org_list_item.xml"
+            line="37"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:paddingEnd=&quot;5dp&quot;` to better support right-to-left layouts"
+        errorLine1="            android:paddingRight=&quot;5dp&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/org_list_item.xml"
+            line="38"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/org_list_item.xml"
+            line="47"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:paddingEnd=&quot;5dp&quot;` to better support right-to-left layouts"
+        errorLine1="            android:paddingRight=&quot;5dp&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/org_list_item.xml"
+            line="48"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/project_list_item.xml"
+            line="36"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="             android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                     ~~~~">
+        <location
+            file="src/main/res/layout/project_list_item.xml"
+            line="51"
+            column="38"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:paddingEnd=&quot;5dp&quot;` to better support right-to-left layouts"
+        errorLine1="             android:paddingRight=&quot;5dp&quot;"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/project_list_item.xml"
+            line="52"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="                android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                        ~~~~">
+        <location
+            file="src/main/res/layout/project_list_item.xml"
+            line="75"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/update_list_item.xml"
+            line="49"
+            column="37"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
+        errorLine1="            android:layout_gravity=&quot;left&quot;"
+        errorLine2="                                    ~~~~">
+        <location
+            file="src/main/res/layout/update_list_item.xml"
+            line="58"
+            column="37"/>
+    </issue>
+
+</issues>
