@@ -23,16 +23,10 @@ package com.github.kevinsawicki.http;
 
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_CREATED;
-import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
-import static java.net.HttpURLConnection.HTTP_NO_CONTENT;
-import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
-import static java.net.HttpURLConnection.HTTP_NOT_MODIFIED;
-import static java.net.HttpURLConnection.HTTP_OK;
 import static java.net.Proxy.Type.HTTP;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -43,12 +37,9 @@ import java.io.FileOutputStream;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
@@ -62,11 +53,6 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
-import java.security.AccessController;
-import java.security.GeneralSecurityException;
-import java.security.PrivilegedAction;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -79,15 +65,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.zip.GZIPInputStream;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import javax.net.ssl.SSLSessionContext;
 
 /**
  * A fluid interface for making HTTP requests using an underlying
@@ -109,11 +86,6 @@ public class HttpRequest {
   public static final String CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
 
   /**
-   * 'application/json' content type header value
-   */
-  public static final String CONTENT_TYPE_JSON = "application/json";
-
-  /**
    * 'gzip' encoding header value
    */
   public static final String ENCODING_GZIP = "gzip";
@@ -122,26 +94,6 @@ public class HttpRequest {
    * 'Accept' header name
    */
   public static final String HEADER_ACCEPT = "Accept";
-
-  /**
-   * 'Accept-Charset' header name
-   */
-  public static final String HEADER_ACCEPT_CHARSET = "Accept-Charset";
-
-  /**
-   * 'Accept-Encoding' header name
-   */
-  public static final String HEADER_ACCEPT_ENCODING = "Accept-Encoding";
-
-  /**
-   * 'Authorization' header name
-   */
-  public static final String HEADER_AUTHORIZATION = "Authorization";
-
-  /**
-   * 'Cache-Control' header name
-   */
-  public static final String HEADER_CACHE_CONTROL = "Cache-Control";
 
   /**
    * 'Content-Encoding' header name
@@ -164,49 +116,14 @@ public class HttpRequest {
   public static final String HEADER_DATE = "Date";
 
   /**
-   * 'ETag' header name
-   */
-  public static final String HEADER_ETAG = "ETag";
-
-  /**
-   * 'Expires' header name
-   */
-  public static final String HEADER_EXPIRES = "Expires";
-
-  /**
-   * 'If-None-Match' header name
-   */
-  public static final String HEADER_IF_NONE_MATCH = "If-None-Match";
-
-  /**
-   * 'Last-Modified' header name
-   */
-  public static final String HEADER_LAST_MODIFIED = "Last-Modified";
-
-  /**
    * 'Location' header name
    */
   public static final String HEADER_LOCATION = "Location";
 
   /**
-   * 'Proxy-Authorization' header name
-   */
-  public static final String HEADER_PROXY_AUTHORIZATION = "Proxy-Authorization";
-
-  /**
-   * 'Referer' header name
-   */
-  public static final String HEADER_REFERER = "Referer";
-
-  /**
    * 'Server' header name
    */
   public static final String HEADER_SERVER = "Server";
-
-  /**
-   * 'User-Agent' header name
-   */
-  public static final String HEADER_USER_AGENT = "User-Agent";
 
   /**
    * 'DELETE' request method
@@ -219,24 +136,9 @@ public class HttpRequest {
   public static final String METHOD_GET = "GET";
 
   /**
-   * 'HEAD' request method
-   */
-  public static final String METHOD_HEAD = "HEAD";
-
-  /**
-   * 'OPTIONS' options method
-   */
-  public static final String METHOD_OPTIONS = "OPTIONS";
-
-  /**
    * 'POST' request method
    */
   public static final String METHOD_POST = "POST";
-
-  /**
-   * 'PUT' request method
-   */
-  public static final String METHOD_PUT = "PUT";
 
   /**
    * 'TRACE' request method
@@ -255,66 +157,11 @@ public class HttpRequest {
 
   private static final String CRLF = "\r\n";
 
-  private static final String[] EMPTY_STRINGS = new String[0];
-
-  private static SSLSocketFactory TRUSTED_FACTORY;
-
-  private static HostnameVerifier TRUSTED_VERIFIER;
-
   private static String getValidCharset(final String charset) {
     if (charset != null && charset.length() > 0)
       return charset;
     else
       return CHARSET_UTF8;
-  }
-
-  private static SSLSocketFactory getTrustedFactory()
-      throws HttpRequestException {
-    if (TRUSTED_FACTORY == null) {
-      final TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
-
-        public X509Certificate[] getAcceptedIssuers() {
-          return new X509Certificate[0];
-        }
-
-        public void checkClientTrusted(X509Certificate[] chain, String authType) {
-          // Intentionally left blank
-        }
-
-        public void checkServerTrusted(X509Certificate[] chain, String authType) {
-          // Intentionally left blank
-        }
-      } };
-      try {
-        SSLContext context = SSLContext.getInstance("TLS");
-        context.init(null, trustAllCerts, new SecureRandom());
-        SSLSessionContext sslSessionContext = context.getServerSessionContext();
-        int sessionCacheSize = sslSessionContext.getSessionCacheSize();
-        if (sessionCacheSize > 0) {
-          sslSessionContext.setSessionCacheSize(0);
-        }
-        TRUSTED_FACTORY = context.getSocketFactory();
-      } catch (GeneralSecurityException e) {
-        IOException ioException = new IOException(
-            "Security exception configuring SSL context");
-        ioException.initCause(e);
-        throw new HttpRequestException(ioException);
-      }
-    }
-
-    return TRUSTED_FACTORY;
-  }
-
-  private static HostnameVerifier getTrustedVerifier() {
-    if (TRUSTED_VERIFIER == null)
-      TRUSTED_VERIFIER = new HostnameVerifier() {
-
-        public boolean verify(String hostname, SSLSession session) {
-          return true;
-        }
-      };
-
-    return TRUSTED_VERIFIER;
   }
 
   private static StringBuilder addPathSeparator(final String baseUrl,
@@ -401,17 +248,7 @@ public class HttpRequest {
     };
   }
 
-  private static ConnectionFactory CONNECTION_FACTORY = ConnectionFactory.DEFAULT;
-
-  /**
-   * Specify the {@link ConnectionFactory} used to create new requests.
-   */
-  public static void setConnectionFactory(final ConnectionFactory connectionFactory) {
-    if (connectionFactory == null)
-      CONNECTION_FACTORY = ConnectionFactory.DEFAULT;
-    else
-      CONNECTION_FACTORY = connectionFactory;
-  }
+  private static final ConnectionFactory CONNECTION_FACTORY = ConnectionFactory.DEFAULT;
 
   /**
    * Callback interface for reporting upload progress for a request.
@@ -426,9 +263,7 @@ public class HttpRequest {
      */
     void onUpload(long uploaded, long total);
 
-    UploadProgress DEFAULT = new UploadProgress() {
-      public void onUpload(long uploaded, long total) {
-      }
+    UploadProgress DEFAULT = (uploaded, total) -> {
     };
   }
 
@@ -452,9 +287,6 @@ public class HttpRequest {
 
     /** The equals sign (=) as a byte. */
     private final static byte EQUALS_SIGN = (byte) '=';
-
-    /** Preferred encoding. */
-    private final static String PREFERRED_ENCODING = "US-ASCII";
 
     /** The 64 valid Base64 values. */
     private final static byte[] _STANDARD_ALPHABET = { (byte) 'A', (byte) 'B',
@@ -537,63 +369,6 @@ public class HttpRequest {
 
       default:
         return destination;
-      }
-    }
-
-    /**
-     * Encode string as a byte array in Base64 annotation.
-     *
-     * @param string
-     * @return The Base64-encoded data as a string
-     */
-    public static String encode(String string) {
-      byte[] bytes;
-      try {
-        bytes = string.getBytes(PREFERRED_ENCODING);
-      } catch (UnsupportedEncodingException e) {
-        bytes = string.getBytes();
-      }
-      return encodeBytes(bytes);
-    }
-
-    /**
-     * Encodes a byte array into Base64 notation.
-     *
-     * @param source
-     *          The data to convert
-     * @return The Base64-encoded data as a String
-     * @throws NullPointerException
-     *           if source array is null
-     * @throws IllegalArgumentException
-     *           if source array, offset, or length are invalid
-     * @since 2.0
-     */
-    public static String encodeBytes(byte[] source) {
-      return encodeBytes(source, 0, source.length);
-    }
-
-    /**
-     * Encodes a byte array into Base64 notation.
-     *
-     * @param source
-     *          The data to convert
-     * @param off
-     *          Offset in array where conversion should begin
-     * @param len
-     *          Length of data to convert
-     * @return The Base64-encoded data as a String
-     * @throws NullPointerException
-     *           if source array is null
-     * @throws IllegalArgumentException
-     *           if source array, offset, or length are invalid
-     * @since 2.0
-     */
-    public static String encodeBytes(byte[] source, int off, int len) {
-      byte[] encoded = encodeBytesToBytes(source, off, len);
-      try {
-        return new String(encoded, PREFERRED_ENCODING);
-      } catch (UnsupportedEncodingException uue) {
-        return new String(encoded);
       }
     }
 
@@ -842,7 +617,7 @@ public class HttpRequest {
     if (array instanceof Object[])
       return Arrays.asList((Object[]) array);
 
-    List<Object> result = new ArrayList<Object>();
+    List<Object> result = new ArrayList<>();
     // Arrays of the primitive types can't be cast to array of Object, so this:
     if (array instanceof int[])
       for (int value : (int[]) array) result.add(value);
@@ -888,7 +663,7 @@ public class HttpRequest {
     String host = parsed.getHost();
     int port = parsed.getPort();
     if (port != -1)
-      host = host + ':' + Integer.toString(port);
+      host = host + ':' + port;
 
     try {
       String encoded = new URI(parsed.getProtocol(), host, parsed.getPath(),
@@ -1103,70 +878,6 @@ public class HttpRequest {
   }
 
   /**
-   * Start a 'PUT' request to the given URL
-   *
-   * @param url
-   * @return request
-   * @throws HttpRequestException
-   */
-  public static HttpRequest put(final CharSequence url)
-      throws HttpRequestException {
-    return new HttpRequest(url, METHOD_PUT);
-  }
-
-  /**
-   * Start a 'PUT' request to the given URL
-   *
-   * @param url
-   * @return request
-   * @throws HttpRequestException
-   */
-  public static HttpRequest put(final URL url) throws HttpRequestException {
-    return new HttpRequest(url, METHOD_PUT);
-  }
-
-  /**
-   * Start a 'PUT' request to the given URL along with the query params
-   *
-   * @param baseUrl
-   * @param params
-   *          the query parameters to include as part of the baseUrl
-   * @param encode
-   *          true to encode the full URL
-   *
-   * @see #append(CharSequence, Map)
-   * @see #encode(CharSequence)
-   *
-   * @return request
-   */
-  public static HttpRequest put(final CharSequence baseUrl,
-      final Map<?, ?> params, final boolean encode) {
-    String url = append(baseUrl, params);
-    return put(encode ? encode(url) : url);
-  }
-
-  /**
-   * Start a 'PUT' request to the given URL along with the query params
-   *
-   * @param baseUrl
-   * @param encode
-   *          true to encode the full URL
-   * @param params
-   *          the name/value query parameter pairs to include as part of the
-   *          baseUrl
-   *
-   * @see #append(CharSequence, Object...)
-   * @see #encode(CharSequence)
-   *
-   * @return request
-   */
-  public static HttpRequest put(final CharSequence baseUrl,
-      final boolean encode, final Object... params) {
-    String url = append(baseUrl, params);
-    return put(encode ? encode(url) : url);
-  }
-
-  /**
    * Start a 'DELETE' request to the given URL
    *
    * @param url
@@ -1231,93 +942,6 @@ public class HttpRequest {
   }
 
   /**
-   * Start a 'HEAD' request to the given URL
-   *
-   * @param url
-   * @return request
-   * @throws HttpRequestException
-   */
-  public static HttpRequest head(final CharSequence url)
-      throws HttpRequestException {
-    return new HttpRequest(url, METHOD_HEAD);
-  }
-
-  /**
-   * Start a 'HEAD' request to the given URL
-   *
-   * @param url
-   * @return request
-   * @throws HttpRequestException
-   */
-  public static HttpRequest head(final URL url) throws HttpRequestException {
-    return new HttpRequest(url, METHOD_HEAD);
-  }
-
-  /**
-   * Start a 'HEAD' request to the given URL along with the query params
-   *
-   * @param baseUrl
-   * @param params
-   *          The query parameters to include as part of the baseUrl
-   * @param encode
-   *          true to encode the full URL
-   *
-   * @see #append(CharSequence, Map)
-   * @see #encode(CharSequence)
-   *
-   * @return request
-   */
-  public static HttpRequest head(final CharSequence baseUrl,
-      final Map<?, ?> params, final boolean encode) {
-    String url = append(baseUrl, params);
-    return head(encode ? encode(url) : url);
-  }
-
-  /**
-   * Start a 'GET' request to the given URL along with the query params
-   *
-   * @param baseUrl
-   * @param encode
-   *          true to encode the full URL
-   * @param params
-   *          the name/value query parameter pairs to include as part of the
-   *          baseUrl
-   *
-   * @see #append(CharSequence, Object...)
-   * @see #encode(CharSequence)
-   *
-   * @return request
-   */
-  public static HttpRequest head(final CharSequence baseUrl,
-      final boolean encode, final Object... params) {
-    String url = append(baseUrl, params);
-    return head(encode ? encode(url) : url);
-  }
-
-  /**
-   * Start an 'OPTIONS' request to the given URL
-   *
-   * @param url
-   * @return request
-   * @throws HttpRequestException
-   */
-  public static HttpRequest options(final CharSequence url)
-      throws HttpRequestException {
-    return new HttpRequest(url, METHOD_OPTIONS);
-  }
-
-  /**
-   * Start an 'OPTIONS' request to the given URL
-   *
-   * @param url
-   * @return request
-   * @throws HttpRequestException
-   */
-  public static HttpRequest options(final URL url) throws HttpRequestException {
-    return new HttpRequest(url, METHOD_OPTIONS);
-  }
-
-  /**
    * Start a 'TRACE' request to the given URL
    *
    * @param url
@@ -1340,104 +964,6 @@ public class HttpRequest {
     return new HttpRequest(url, METHOD_TRACE);
   }
 
-  /**
-   * Set the 'http.keepAlive' property to the given value.
-   * <p>
-   * This setting will apply to all requests.
-   *
-   * @param keepAlive
-   */
-  public static void keepAlive(final boolean keepAlive) {
-    setProperty("http.keepAlive", Boolean.toString(keepAlive));
-  }
-
-  /**
-   * Set the 'http.maxConnections' property to the given value.
-   * <p>
-   * This setting will apply to all requests.
-   *
-   * @param maxConnections
-   */
-  public static void maxConnections(final int maxConnections) {
-    setProperty("http.maxConnections", Integer.toString(maxConnections));
-  }
-
-  /**
-   * Set the 'http.proxyHost' and 'https.proxyHost' properties to the given host
-   * value.
-   * <p>
-   * This setting will apply to all requests.
-   *
-   * @param host
-   */
-  public static void proxyHost(final String host) {
-    setProperty("http.proxyHost", host);
-    setProperty("https.proxyHost", host);
-  }
-
-  /**
-   * Set the 'http.proxyPort' and 'https.proxyPort' properties to the given port
-   * number.
-   * <p>
-   * This setting will apply to all requests.
-   *
-   * @param port
-   */
-  public static void proxyPort(final int port) {
-    final String portValue = Integer.toString(port);
-    setProperty("http.proxyPort", portValue);
-    setProperty("https.proxyPort", portValue);
-  }
-
-  /**
-   * Set the 'http.nonProxyHosts' property to the given host values.
-   * <p>
-   * Hosts will be separated by a '|' character.
-   * <p>
-   * This setting will apply to all requests.
-   *
-   * @param hosts
-   */
-  public static void nonProxyHosts(final String... hosts) {
-    if (hosts != null && hosts.length > 0) {
-      StringBuilder separated = new StringBuilder();
-      int last = hosts.length - 1;
-      for (int i = 0; i < last; i++)
-        separated.append(hosts[i]).append('|');
-      separated.append(hosts[last]);
-      setProperty("http.nonProxyHosts", separated.toString());
-    } else
-      setProperty("http.nonProxyHosts", null);
-  }
-
-  /**
-   * Set property to given value.
-   * <p>
-   * Specifying a null value will cause the property to be cleared
-   *
-   * @param name
-   * @param value
-   * @return previous value
-   */
-  private static String setProperty(final String name, final String value) {
-    final PrivilegedAction<String> action;
-    if (value != null)
-      action = new PrivilegedAction<String>() {
-
-        public String run() {
-          return System.setProperty(name, value);
-        }
-      };
-    else
-      action = new PrivilegedAction<String>() {
-
-        public String run() {
-          return System.clearProperty(name);
-        }
-      };
-    return AccessController.doPrivileged(action);
-  }
-
   private HttpURLConnection connection = null;
 
   private final URL url;
@@ -1450,11 +976,11 @@ public class HttpRequest {
 
   private boolean form;
 
-  private boolean ignoreCloseExceptions = true;
+  private final boolean ignoreCloseExceptions = true;
 
-  private boolean uncompress = false;
+  private final boolean uncompress = false;
 
-  private int bufferSize = 8192;
+  private final int bufferSize = 8192;
 
   private long totalSize = -1;
 
@@ -1531,30 +1057,6 @@ public class HttpRequest {
   }
 
   /**
-   * Set whether or not to ignore exceptions that occur from calling
-   * {@link Closeable#close()}
-   * <p>
-   * The default value of this setting is <code>true</code>
-   *
-   * @param ignore
-   * @return this request
-   */
-  public HttpRequest ignoreCloseExceptions(final boolean ignore) {
-    ignoreCloseExceptions = ignore;
-    return this;
-  }
-
-  /**
-   * Get whether or not exceptions thrown by {@link Closeable#close()} are
-   * ignored
-   *
-   * @return true if ignoring, false if throwing
-   */
-  public boolean ignoreCloseExceptions() {
-    return ignoreCloseExceptions;
-  }
-
-  /**
    * Get the status code of the response
    *
    * @return the response code
@@ -1584,16 +1086,6 @@ public class HttpRequest {
   }
 
   /**
-   * Is the response code a 200 OK?
-   *
-   * @return true if 200, false otherwise
-   * @throws HttpRequestException
-   */
-  public boolean ok() throws HttpRequestException {
-    return HTTP_OK == code();
-  }
-
-  /**
    * Is the response code a 201 Created?
    *
    * @return true if 201, false otherwise
@@ -1601,56 +1093,6 @@ public class HttpRequest {
    */
   public boolean created() throws HttpRequestException {
     return HTTP_CREATED == code();
-  }
-
-  /**
-   * Is the response code a 204 No Content?
-   *
-   * @return true if 204, false otherwise
-   * @throws HttpRequestException
-   */
-  public boolean noContent() throws HttpRequestException {
-    return HTTP_NO_CONTENT == code();
-  }
-
-  /**
-   * Is the response code a 500 Internal Server Error?
-   *
-   * @return true if 500, false otherwise
-   * @throws HttpRequestException
-   */
-  public boolean serverError() throws HttpRequestException {
-    return HTTP_INTERNAL_ERROR == code();
-  }
-
-  /**
-   * Is the response code a 400 Bad Request?
-   *
-   * @return true if 400, false otherwise
-   * @throws HttpRequestException
-   */
-  public boolean badRequest() throws HttpRequestException {
-    return HTTP_BAD_REQUEST == code();
-  }
-
-  /**
-   * Is the response code a 404 Not Found?
-   *
-   * @return true if 404, false otherwise
-   * @throws HttpRequestException
-   */
-  public boolean notFound() throws HttpRequestException {
-    return HTTP_NOT_FOUND == code();
-  }
-
-  /**
-   * Is the response code a 304 Not Modified?
-   *
-   * @return true if 304, false otherwise
-   * @throws HttpRequestException
-   */
-  public boolean notModified() throws HttpRequestException {
-    return HTTP_NOT_MODIFIED == code();
   }
 
   /**
@@ -1666,79 +1108,6 @@ public class HttpRequest {
     } catch (IOException e) {
       throw new HttpRequestException(e);
     }
-  }
-
-  /**
-   * Disconnect the connection
-   *
-   * @return this request
-   */
-  public HttpRequest disconnect() {
-    getConnection().disconnect();
-    return this;
-  }
-
-  /**
-   * Set chunked streaming mode to the given size
-   *
-   * @param size
-   * @return this request
-   */
-  public HttpRequest chunk(final int size) {
-    getConnection().setChunkedStreamingMode(size);
-    return this;
-  }
-
-  /**
-   * Set the size used when buffering and copying between streams
-   * <p>
-   * This size is also used for send and receive buffers created for both char
-   * and byte arrays
-   * <p>
-   * The default buffer size is 8,192 bytes
-   *
-   * @param size
-   * @return this request
-   */
-  public HttpRequest bufferSize(final int size) {
-    if (size < 1)
-      throw new IllegalArgumentException("Size must be greater than zero");
-    bufferSize = size;
-    return this;
-  }
-
-  /**
-   * Get the configured buffer size
-   * <p>
-   * The default buffer size is 8,192 bytes
-   *
-   * @return buffer size
-   */
-  public int bufferSize() {
-    return bufferSize;
-  }
-
-  /**
-   * Set whether or not the response body should be automatically uncompressed
-   * when read from.
-   * <p>
-   * This will only affect requests that have the 'Content-Encoding' response
-   * header set to 'gzip'.
-   * <p>
-   * This causes all receive methods to use a {@link GZIPInputStream} when
-   * applicable so that higher level streams and readers can read the data
-   * uncompressed.
-   * <p>
-   * Setting this option does not cause any request headers to be set
-   * automatically so {@link #acceptGzipEncoding()} should be used in
-   * conjunction with this setting to tell the server to gzip the response.
-   *
-   * @param uncompress
-   * @return this request
-   */
-  public HttpRequest uncompress(final boolean uncompress) {
-    this.uncompress = uncompress;
-    return this;
   }
 
   /**
@@ -1814,35 +1183,8 @@ public class HttpRequest {
 
 
   /**
-   * Is the response body empty?
-   *
-   * @return true if the Content-Length response header is 0, false otherwise
-   * @throws HttpRequestException
-   */
-  public boolean isBodyEmpty() throws HttpRequestException {
-    return contentLength() == 0;
-  }
-
-  /**
-   * Get response as byte array
-   *
-   * @return byte array
-   * @throws HttpRequestException
-   */
-  public byte[] bytes() throws HttpRequestException {
-    final ByteArrayOutputStream output = byteStream();
-    try {
-      copy(buffer(), output);
-    } catch (IOException e) {
-      throw new HttpRequestException(e);
-    }
-    return output.toByteArray();
-  }
-
-  /**
    * Get response in a buffered stream
    *
-   * @see #bufferSize(int)
    * @return stream
    * @throws HttpRequestException
    */
@@ -1888,63 +1230,6 @@ public class HttpRequest {
   }
 
   /**
-   * Get reader to response body using given character set.
-   * <p>
-   * This will fall back to using the UTF-8 character set if the given charset
-   * is null
-   *
-   * @param charset
-   * @return reader
-   * @throws HttpRequestException
-   */
-  public InputStreamReader reader(final String charset)
-      throws HttpRequestException {
-    try {
-      return new InputStreamReader(stream(), getValidCharset(charset));
-    } catch (UnsupportedEncodingException e) {
-      throw new HttpRequestException(e);
-    }
-  }
-
-  /**
-   * Get reader to response body using the character set returned from
-   * {@link #charset()}
-   *
-   * @return reader
-   * @throws HttpRequestException
-   */
-  public InputStreamReader reader() throws HttpRequestException {
-    return reader(charset());
-  }
-
-  /**
-   * Get buffered reader to response body using the given character set r and
-   * the configured buffer size
-   *
-   *
-   * @see #bufferSize(int)
-   * @param charset
-   * @return reader
-   * @throws HttpRequestException
-   */
-  public BufferedReader bufferedReader(final String charset)
-      throws HttpRequestException {
-    return new BufferedReader(reader(charset), bufferSize);
-  }
-
-  /**
-   * Get buffered reader to response body using the character set returned from
-   * {@link #charset()} and the configured buffer size
-   *
-   * @see #bufferSize(int)
-   * @return reader
-   * @throws HttpRequestException
-   */
-  public BufferedReader bufferedReader() throws HttpRequestException {
-    return bufferedReader(charset());
-  }
-
-  /**
    * Stream response body to file
    *
    * @param file
@@ -1961,7 +1246,7 @@ public class HttpRequest {
     return new CloseOperation<HttpRequest>(output, ignoreCloseExceptions) {
 
       @Override
-      protected HttpRequest run() throws HttpRequestException, IOException {
+      protected HttpRequest run() throws HttpRequestException {
         return receive(output);
       }
     }.call();
@@ -1981,62 +1266,6 @@ public class HttpRequest {
     } catch (IOException e) {
       throw new HttpRequestException(e);
     }
-  }
-
-  /**
-   * Stream response to given print stream
-   *
-   * @param output
-   * @return this request
-   * @throws HttpRequestException
-   */
-  public HttpRequest receive(final PrintStream output)
-      throws HttpRequestException {
-    return receive((OutputStream) output);
-  }
-
-  /**
-   * Receive response into the given appendable
-   *
-   * @param appendable
-   * @return this request
-   * @throws HttpRequestException
-   */
-  public HttpRequest receive(final Appendable appendable)
-      throws HttpRequestException {
-    final BufferedReader reader = bufferedReader();
-    return new CloseOperation<HttpRequest>(reader, ignoreCloseExceptions) {
-
-      @Override
-      public HttpRequest run() throws IOException {
-        final CharBuffer buffer = CharBuffer.allocate(bufferSize);
-        int read;
-        while ((read = reader.read(buffer)) != -1) {
-          buffer.rewind();
-          appendable.append(buffer, 0, read);
-          buffer.rewind();
-        }
-        return HttpRequest.this;
-      }
-    }.call();
-  }
-
-  /**
-   * Receive response into the given writer
-   *
-   * @param writer
-   * @return this request
-   * @throws HttpRequestException
-   */
-  public HttpRequest receive(final Writer writer) throws HttpRequestException {
-    final BufferedReader reader = bufferedReader();
-    return new CloseOperation<HttpRequest>(reader, ignoreCloseExceptions) {
-
-      @Override
-      public HttpRequest run() throws IOException {
-        return copy(reader, writer);
-      }
-    }.call();
   }
 
   /**
@@ -2074,41 +1303,6 @@ public class HttpRequest {
   }
 
   /**
-   * Set header name to given value
-   *
-   * @param name
-   * @param value
-   * @return this request
-   */
-  public HttpRequest header(final String name, final Number value) {
-    return header(name, value != null ? value.toString() : null);
-  }
-
-  /**
-   * Set all headers found in given map where the keys are the header names and
-   * the values are the header values
-   *
-   * @param headers
-   * @return this request
-   */
-  public HttpRequest headers(final Map<String, String> headers) {
-    if (!headers.isEmpty())
-      for (Entry<String, String> header : headers.entrySet())
-        header(header);
-    return this;
-  }
-
-  /**
-   * Set header to have given entry's key as the name and value as the value
-   *
-   * @param header
-   * @return this request
-   */
-  public HttpRequest header(final Entry<String, String> header) {
-    return header(header.getKey(), header.getValue());
-  }
-
-  /**
    * Get a response header
    *
    * @param name
@@ -2118,17 +1312,6 @@ public class HttpRequest {
   public String header(final String name) throws HttpRequestException {
     closeOutputQuietly();
     return getConnection().getHeaderField(name);
-  }
-
-  /**
-   * Get all the response headers
-   *
-   * @return map of response header names to their value(s)
-   * @throws HttpRequestException
-   */
-  public Map<String, List<String>> headers() throws HttpRequestException {
-    closeOutputQuietly();
-    return getConnection().getHeaderFields();
   }
 
   /**
@@ -2184,24 +1367,6 @@ public class HttpRequest {
       throws HttpRequestException {
     closeOutputQuietly();
     return getConnection().getHeaderFieldInt(name, defaultValue);
-  }
-
-  /**
-   * Get all values of the given header from the response
-   *
-   * @param name
-   * @return non-null but possibly empty array of {@link String} header values
-   */
-  public String[] headers(final String name) {
-    final Map<String, List<String>> headers = headers();
-    if (headers == null || headers.isEmpty())
-      return EMPTY_STRINGS;
-
-    final List<String> values = headers.get(name);
-    if (values != null && !values.isEmpty())
-      return values.toArray(new String[values.size()]);
-    else
-      return EMPTY_STRINGS;
   }
 
   /**
@@ -2326,67 +1491,6 @@ public class HttpRequest {
   }
 
   /**
-   * Set the 'User-Agent' header to given value
-   *
-   * @param userAgent
-   * @return this request
-   */
-  public HttpRequest userAgent(final String userAgent) {
-    return header(HEADER_USER_AGENT, userAgent);
-  }
-
-  /**
-   * Set the 'Referer' header to given value
-   *
-   * @param referer
-   * @return this request
-   */
-  public HttpRequest referer(final String referer) {
-    return header(HEADER_REFERER, referer);
-  }
-
-  /**
-   * Set value of {@link HttpURLConnection#setUseCaches(boolean)}
-   *
-   * @param useCaches
-   * @return this request
-   */
-  public HttpRequest useCaches(final boolean useCaches) {
-    getConnection().setUseCaches(useCaches);
-    return this;
-  }
-
-  /**
-   * Set the 'Accept-Encoding' header to given value
-   *
-   * @param acceptEncoding
-   * @return this request
-   */
-  public HttpRequest acceptEncoding(final String acceptEncoding) {
-    return header(HEADER_ACCEPT_ENCODING, acceptEncoding);
-  }
-
-  /**
-   * Set the 'Accept-Encoding' header to 'gzip'
-   *
-   * @see #uncompress(boolean)
-   * @return this request
-   */
-  public HttpRequest acceptGzipEncoding() {
-    return acceptEncoding(ENCODING_GZIP);
-  }
-
-  /**
-   * Set the 'Accept-Charset' header to given value
-   *
-   * @param acceptCharset
-   * @return this request
-   */
-  public HttpRequest acceptCharset(final String acceptCharset) {
-    return header(HEADER_ACCEPT_CHARSET, acceptCharset);
-  }
-
-  /**
    * Get the 'Content-Encoding' header from the response
    *
    * @return this request
@@ -2414,113 +1518,12 @@ public class HttpRequest {
   }
 
   /**
-   * Get the 'Cache-Control' header from the response
-   *
-   * @return cache control
-   */
-  public String cacheControl() {
-    return header(HEADER_CACHE_CONTROL);
-  }
-
-  /**
-   * Get the 'ETag' header from the response
-   *
-   * @return entity tag
-   */
-  public String eTag() {
-    return header(HEADER_ETAG);
-  }
-
-  /**
-   * Get the 'Expires' header from the response
-   *
-   * @return expires value, -1 on failures
-   */
-  public long expires() {
-    return dateHeader(HEADER_EXPIRES);
-  }
-
-  /**
-   * Get the 'Last-Modified' header from the response
-   *
-   * @return last modified value, -1 on failures
-   */
-  public long lastModified() {
-    return dateHeader(HEADER_LAST_MODIFIED);
-  }
-
-  /**
    * Get the 'Location' header from the response
    *
    * @return location
    */
   public String location() {
     return header(HEADER_LOCATION);
-  }
-
-  /**
-   * Set the 'Authorization' header to given value
-   *
-   * @param authorization
-   * @return this request
-   */
-  public HttpRequest authorization(final String authorization) {
-    return header(HEADER_AUTHORIZATION, authorization);
-  }
-
-  /**
-   * Set the 'Proxy-Authorization' header to given value
-   *
-   * @param proxyAuthorization
-   * @return this request
-   */
-  public HttpRequest proxyAuthorization(final String proxyAuthorization) {
-    return header(HEADER_PROXY_AUTHORIZATION, proxyAuthorization);
-  }
-
-  /**
-   * Set the 'Authorization' header to given values in Basic authentication
-   * format
-   *
-   * @param name
-   * @param password
-   * @return this request
-   */
-  public HttpRequest basic(final String name, final String password) {
-    return authorization("Basic " + Base64.encode(name + ':' + password));
-  }
-
-  /**
-   * Set the 'Proxy-Authorization' header to given values in Basic authentication
-   * format
-   *
-   * @param name
-   * @param password
-   * @return this request
-   */
-  public HttpRequest proxyBasic(final String name, final String password) {
-    return proxyAuthorization("Basic " + Base64.encode(name + ':' + password));
-  }
-
-  /**
-   * Set the 'If-Modified-Since' request header to the given value
-   *
-   * @param ifModifiedSince
-   * @return this request
-   */
-  public HttpRequest ifModifiedSince(final long ifModifiedSince) {
-    getConnection().setIfModifiedSince(ifModifiedSince);
-    return this;
-  }
-
-  /**
-   * Set the 'If-None-Match' request header to the given value
-   *
-   * @param ifNoneMatch
-   * @return this request
-   */
-  public HttpRequest ifNoneMatch(final String ifNoneMatch) {
-    return header(HEADER_IF_NONE_MATCH, ifNoneMatch);
   }
 
   /**
@@ -2549,61 +1552,12 @@ public class HttpRequest {
   }
 
   /**
-   * Get the 'Content-Type' header from the response
-   *
-   * @return response header value
-   */
-  public String contentType() {
-    return header(HEADER_CONTENT_TYPE);
-  }
-
-  /**
    * Get the 'Content-Length' header from the response
    *
    * @return response header value
    */
   public int contentLength() {
     return intHeader(HEADER_CONTENT_LENGTH);
-  }
-
-  /**
-   * Set the 'Content-Length' request header to the given value
-   *
-   * @param contentLength
-   * @return this request
-   */
-  public HttpRequest contentLength(final String contentLength) {
-    return contentLength(Integer.parseInt(contentLength));
-  }
-
-  /**
-   * Set the 'Content-Length' request header to the given value
-   *
-   * @param contentLength
-   * @return this request
-   */
-  public HttpRequest contentLength(final int contentLength) {
-    getConnection().setFixedLengthStreamingMode(contentLength);
-    return this;
-  }
-
-  /**
-   * Set the 'Accept' header to given value
-   *
-   * @param accept
-   * @return this request
-   */
-  public HttpRequest accept(final String accept) {
-    return header(HEADER_ACCEPT, accept);
-  }
-
-  /**
-   * Set the 'Accept' header to 'application/json'
-   *
-   * @return this request
-   */
-  public HttpRequest acceptJson() {
-    return accept(CONTENT_TYPE_JSON);
   }
 
   /**
@@ -2750,19 +1704,6 @@ public class HttpRequest {
     } else
       output.write(CRLF + "--" + BOUNDARY + CRLF);
     return this;
-  }
-
-  /**
-   * Write part header
-   *
-   * @param name
-   * @param filename
-   * @return this request
-   * @throws IOException
-   */
-  protected HttpRequest writePartHeader(final String name, final String filename)
-      throws IOException {
-    return writePartHeader(name, filename, null);
   }
 
   /**
@@ -3059,21 +2000,6 @@ public class HttpRequest {
   }
 
   /**
-   * Create writer to request output stream
-   *
-   * @return writer
-   * @throws HttpRequestException
-   */
-  public OutputStreamWriter writer() throws HttpRequestException {
-    try {
-      openOutput();
-      return new OutputStreamWriter(output, output.encoder.charset());
-    } catch (IOException e) {
-      throw new HttpRequestException(e);
-    }
-  }
-
-  /**
    * Write the values in the map as form data to the request body
    * <p>
    * The pairs specified will be URL-encoded in UTF-8 and sent with the
@@ -3184,39 +2110,6 @@ public class HttpRequest {
   }
 
   /**
-   * Configure HTTPS connection to trust all certificates
-   * <p>
-   * This method does nothing if the current request is not a HTTPS request
-   *
-   * @return this request
-   * @throws HttpRequestException
-   */
-  public HttpRequest trustAllCerts() throws HttpRequestException {
-    final HttpURLConnection connection = getConnection();
-    if (connection instanceof HttpsURLConnection)
-      ((HttpsURLConnection) connection)
-          .setSSLSocketFactory(getTrustedFactory());
-    return this;
-  }
-
-  /**
-   * Configure HTTPS connection to trust all hosts using a custom
-   * {@link HostnameVerifier} that always returns <code>true</code> for each
-   * host verified
-   * <p>
-   * This method does nothing if the current request is not a HTTPS request
-   *
-   * @return this request
-   */
-  public HttpRequest trustAllHosts() {
-    final HttpURLConnection connection = getConnection();
-    if (connection instanceof HttpsURLConnection)
-      ((HttpsURLConnection) connection)
-          .setHostnameVerifier(getTrustedVerifier());
-    return this;
-  }
-
-  /**
    * Get the {@link URL} of this request's connection
    *
    * @return request URL
@@ -3234,32 +2127,4 @@ public class HttpRequest {
     return getConnection().getRequestMethod();
   }
 
-  /**
-   * Configure an HTTP proxy on this connection. Use {{@link #proxyBasic(String, String)} if
-   * this proxy requires basic authentication.
-   *
-   * @param proxyHost
-   * @param proxyPort
-   * @return this request
-   */
-  public HttpRequest useProxy(final String proxyHost, final int proxyPort) {
-    if (connection != null)
-      throw new IllegalStateException("The connection has already been created. This method must be called before reading or writing to the request.");
-
-    this.httpProxyHost = proxyHost;
-    this.httpProxyPort = proxyPort;
-    return this;
-  }
-
-  /**
-   * Set whether or not the underlying connection should follow redirects in
-   * the response.
-   *
-   * @param followRedirects - true fo follow redirects, false to not.
-   * @return this request
-   */
-  public HttpRequest followRedirects(final boolean followRedirects) {
-    getConnection().setInstanceFollowRedirects(followRedirects);
-    return this;
-  }
 }
