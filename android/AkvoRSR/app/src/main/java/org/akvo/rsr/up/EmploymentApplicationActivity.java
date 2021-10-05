@@ -30,6 +30,7 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.database.Cursor;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.work.Data;
 import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
@@ -111,8 +112,26 @@ public class EmploymentApplicationActivity extends BackActivity implements OnIte
         //Create db
         mDba = new RsrDbAdapter(this);
 
-        getData();
-        getOrgs();
+        //getData();
+        //getOrgs();
+
+        //This feature has been removed from the API (https://github.com/akvo/akvo-rsr/issues/4202)
+        mOrganisationEdit.setEnabled(false);
+        mCountryEdit.setEnabled(false);
+        mJobTitle.setEnabled(false);
+        showRemovedFeatureAlert();
+    }
+
+    private void showRemovedFeatureAlert() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle(R.string.request_emp_removed_dialog_title);
+        alert.setMessage(R.string.request_emp_removed_dialog_msg);
+        alert.setIcon(android.R.drawable.ic_dialog_alert);
+        alert.setPositiveButton(R.string.btncaption_ok, (dialog, whichButton) -> {
+            dialog.cancel();
+            finish();
+        });
+        alert.show();
     }
 
     private void getOrgs() {
