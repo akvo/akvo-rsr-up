@@ -8,8 +8,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 30
-        versionCode 36
-        versionName "2.0.0"
+        versionCode 37
+        versionName "2.0.1"
 
         applicationId "org.akvo.rsr.up"
         testApplicationId "org.akvo.rsr.up.test"
