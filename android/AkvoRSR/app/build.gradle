@@ -3,13 +3,13 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 33
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 30
-        versionCode 37
-        versionName "2.0.1"
+        targetSdkVersion 33
+        versionCode 38
+        versionName "2.0.2"
 
         applicationId "org.akvo.rsr.up"
         testApplicationId "org.akvo.rsr.up.test"
